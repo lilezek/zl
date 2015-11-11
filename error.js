@@ -12,6 +12,7 @@ zl.error = zl.error || {};
       lista[i].begin = compilacion.begin;
       lista[i].end = compilacion.end;
       lista[i].tipo = compilacion.tipo;
+      lista[i].opcion = compilacion.opcion;
       lista[i].error = compilacion.error;
       lista[i].reduccion = compilacion.resultado;
       compilacion = compilacion.intento;

@@ -52,6 +52,7 @@ zl.sintaxis = zl.sintaxis || {};
     $["verdadero"] = zl.analizador.newSimbolo(/^(verdadero)/i, "verdadero");
     $["falso"] = zl.analizador.newSimbolo(/^(falso)/i, "falso");
     $["imposible"] = zl.analizador.newSimbolo(/^(?!x)x/i, "imposible");
+    $["nada"] = zl.analizador.newSimbolo(/^/i, "nada");
     var espacio = zl.analizador.newSimbolo(/^([ \n\t]+)/i, "espacio");
     var comentario = zl.analizador.newSimbolo(/^(\/\/.*)/i, "comentario");
     var numero = zl.analizador.newSimbolo(/^((?:[0-1]+(?:\|2))|(?:[0-9A-Fa-f]+(?:\|16))|(?:[0-9]+(?:\|10)?))/i, "numero");
@@ -68,7 +69,7 @@ zl.sintaxis = zl.sintaxis || {};
 
     reglas[" "] = zl.analizador.newExpresion([
       ["_"],
-      []
+      [$["nada"]]
     ], "espacios opcionales");
 
     // Reglas encontradas en el BNF:
