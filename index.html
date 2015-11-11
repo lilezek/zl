@@ -1,0 +1,140 @@
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="index.css">
+  <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+  <script src="http://jsbeautifier.org/js/lib/beautify.js"></script>
+  <script src="codemirror.js"></script>
+  <script src="https://codemirror.net/addon/mode/simple.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.8.0/codemirror.css">
+  <script src="zlsintaxis.js"></script>
+  <script src="error.js"></script>
+  <script src="sintaxis.js"></script>
+  <script src="generadorarbol.js"></script>
+  <script src="compilador.js"></script>
+  <script src="editor.js"></script>
+  <script src="https://skalman.github.io/UglifyJS-online/uglify/lib/utils.js"></script>
+  <script src="https://skalman.github.io/UglifyJS-online/uglify/lib/ast.js"></script>
+  <script src="https://skalman.github.io/UglifyJS-online/uglify/lib/parse.js"></script>
+  <script src="https://skalman.github.io/UglifyJS-online/uglify/lib/transform.js"></script>
+  <script src="https://skalman.github.io/UglifyJS-online/uglify/lib/scope.js"></script>
+  <script src="https://skalman.github.io/UglifyJS-online/uglify/lib/output.js"></script>
+  <script src="https://skalman.github.io/UglifyJS-online/uglify/lib/compress.js"></script>
+  <script>
+  var default_options = {};
+
+  function uglify(code) {
+    var options = {};
+    // Create copies of the options
+    var parse_options = defaults({}, options.parse);
+    var compress_options = defaults({}, options.compress);
+    var output_options = defaults({}, options.output);
+
+    parse_options = defaults(parse_options, default_options.parse, true);
+    compress_options = defaults(compress_options, default_options.compress, true);
+    output_options = defaults(output_options, default_options.output, true);
+
+    // 1. Parse
+    var toplevel_ast = parse(code, parse_options);
+    toplevel_ast.figure_out_scope();
+
+    // 2. Compress
+    var compressor = new Compressor(compress_options);
+    var compressed_ast = toplevel_ast.transform(compressor);
+
+    // 3. Mangle
+    compressed_ast.figure_out_scope();
+    compressed_ast.compute_char_frequency();
+    compressed_ast.mangle_names();
+
+    // 4. Generate output
+    code = compressed_ast.print_to_string(output_options);
+
+    return code;
+  }
+
+  // Cargar las dependencias:
+  zl.sintaxis.cargar();
+</script>
+</head>
+
+<body>
+  <div class="main">
+<textarea class="editor" id="editor">si (a < 10 + 5 - 13) hacer
+	a <- verdadero
+o si b hacer
+	b <- a
+si no hacer
+	c <- x
+fin</textarea>
+    <div class="v divisor"></div>
+    <div class="compilation">
+      <textarea class="content" id="content" readonly="readonly"></textarea>
+      <div class="h divisor"></div>
+      <textarea class="output" id="output" readonly="readonly"></textarea>
+      <div style="display: flex;">
+        <button class="run" id="run">
+          Run
+        </button>
+        <button class="min" id="min" disabled="disabled">
+          Activar compresión
+        </button>
+      </div>
+    </div>
+
+    <script>
+      var editor = CodeMirror.fromTextArea($("#editor").get(0), {
+        lineNumbers: true,
+        mode: "zl",
+        tabSize: 2,
+        identWithTabs: false,
+        smartIdent: true
+      });
+      editor.on("change", function() {
+        if (lasttimeout) {
+          clearTimeout(lasttimeout);
+        }
+        lasttimeout = setTimeout(Compile, 500, editor.getValue());
+      });
+
+      var lastjs = "";
+      var lasttimeout = null;
+      var minify = false;
+
+      $("#run").click(function() {
+        eval(lastjs);
+        var consola = zl.DataTypes["consola"].construct();
+        consola.dom = $("#output").get(0);
+        $zlf_inicio({c: consola});
+      });
+
+      $("#min").click(function() {
+        // TODO: activar cuando se genere javascript válido
+        /*if (minify) {
+          $(this).html("Activar compresión");
+        } else {
+          $(this).html("Desactivar compresión");
+        }
+        minify = !minify;*/
+      });
+
+      function Compile(zlcode) {
+        lasttimeout = null;
+        var compilation = $("#content").get(0);
+        var comp = zl.Compilar(zlcode);
+        if (comp.error)
+          compilation.innerHTML = js_beautify(zl.error.obtenerMensaje(comp));
+        else if (comp.javascript) {
+          if (minify)
+            lastjs = js_beautify(uglify(js_beautify(comp.javascript)));
+          else
+            lastjs = js_beautify(comp.javascript);
+          compilation.innerHTML = lastjs;
+        }
+      }
+      Compile(editor.getValue());
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,70 @@
+body, html {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-flow: column nowrap;
+  flex-flow: column nowrap;
+  overflow: hidden;
+}
+
+.main {
+  display: flex;
+  display: -webkit-flex;
+  -webkit-flex: 1;
+  flex: 1;
+  -webkit-flex-flow: row nowrap;
+  flex-flow: row nowrap;
+}
+
+.CodeMirror {
+  height: 100% !important;
+  -webkit-flex: 1;
+  flex: 1;
+}
+
+.compilation {
+  display: flex;
+  display: -webkit-flex;
+  -webkit-flex-flow: column nowrap;
+  flex-flow: column nowrap;
+  -webkit-flex: 1;
+  flex: 1;
+}
+
+.content {
+  -webkit-flex: 1;
+  flex: 1;
+  font-family: monospace;
+}
+
+.output {
+  -webkit-flex: 1;
+  flex: 1;
+  font-family: monospace;
+}
+
+.run {
+  height: 50px;
+}
+
+.divisor {
+  background-color: #cecece;
+}
+
+.v.divisor {
+  width: 3px;
+  height: 100%;
+}
+
+
+.h.divisor {
+  width: 100%;
+  height: 3px;
+}
+.min, .run {
+  -webkit-flex: 1;
+  flex: 1;
+}
