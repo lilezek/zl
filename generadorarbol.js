@@ -7,6 +7,7 @@ zl.analizador = {};
   function Simbolo(regex, nombre) {
     this.regex = regex;
     this.nombre = nombre;
+    this.memo = {};
     return this;
   }
 
@@ -59,21 +60,20 @@ zl.analizador = {};
         resultado: []
       };
 
+
       var cadena = this.opciones[i];
+      var r;
       for (var j = 0; j < cadena.length; j++) {
-        var r;
+
         // Comprobar si ya se intentó esta reducción:
         if (cadena[j].memo && cadena[j].memo[resultado.end]) {
           r = cadena[j].memo[resultado.end];
           r.reintento = true;
-        } else if (cadena[j].memo) {
-          cadena[j].memo[resultado.end] = r = cadena[j].reducir(pajar, resultado.end);
         } else {
-          r = cadena[j].reducir(pajar, resultado.end);
+          cadena[j].memo[resultado.end] = r = cadena[j].reducir(pajar, resultado.end);
         }
         resultado.end = r.end
         if (r.error) {
-          resultado.error = r.error;
           break;
         } else {
           resultado.resultado.push(r.resultado);
@@ -81,7 +81,7 @@ zl.analizador = {};
       }
 
       // Si compila, se aplican las comprobaciones sintácticas:
-      if (!resultado.error) {
+      if (!r.error) {
         var tmperr = this.error(resultado.resultado, i, posicion);
         if (!tmperr) {
           error = false;
@@ -91,22 +91,27 @@ zl.analizador = {};
           resultado.error = tmperr;
           return resultado;
         }
-      } else if (resultado.error) {
+      } else {
         if (intento == null || intento.end < resultado.end) {
           intento = r;
+          opcion = i;
+          masDeUnIntento = false;
         } else if (intento.end == r.end && !r.reintento) {
           masDeUnIntento = true;
         }
       }
+
     }
 
-    if (!resultado.error) {
+    if (!error) {
       resultado.resultado = this.postproceso(resultado.resultado, opcion);
       return resultado;
     } else {
       if (!masDeUnIntento)
         resultado.intento = intento;
+      resultado.opcion = opcion;
       resultado.end = intento.end;
+      resultado.error = intento.error;
       return resultado;
     }
   }
@@ -144,7 +149,11 @@ zl.analizador = {};
   zl.analizador.limpiarCache = function(reglas) {
     for (var k in reglas) {
       var r = reglas[k];
-      r.memo = {};
+      for (var i = 0; i < r.opciones.length; i++) {
+        for (var j = 0; j < r.opciones[i].length; j++) {
+          r.opciones[i][j].memo = {};
+        }
+      }
     }
   }
 })();

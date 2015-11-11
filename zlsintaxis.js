@@ -51,7 +51,7 @@ zl.sintaxis = zl.sintaxis || {};
     $["fin"] = zl.analizador.newSimbolo(/^(fin)/i, "fin");
     $["verdadero"] = zl.analizador.newSimbolo(/^(verdadero)/i, "verdadero");
     $["falso"] = zl.analizador.newSimbolo(/^(falso)/i, "falso");
-    $["eof"] = zl.analizador.newSimbolo(/^spoiejg9wp84eyjwe8rg$/i, "eof");
+    $["imposible"] = zl.analizador.newSimbolo(/^(?!x)x/i, "imposible");
     var espacio = zl.analizador.newSimbolo(/^([ \n\t]+)/i, "espacio");
     var comentario = zl.analizador.newSimbolo(/^(\/\/.*)/i, "comentario");
     var numero = zl.analizador.newSimbolo(/^((?:[0-1]+(?:\|2))|(?:[0-9A-Fa-f]+(?:\|16))|(?:[0-9]+(?:\|10)?))/i, "numero");
@@ -79,8 +79,8 @@ zl.sintaxis = zl.sintaxis || {};
 
     reglas["sentencia"] = zl.analizador.newExpresion([
       ["asignacion"],
-      [$["eof"]], // TODO
-      [$["eof"]], // TODO
+      [$["imposible"]], // TODO
+      [$["imposible"]], // TODO
       ["sicondicional"]
     ], "sentencia")
 
