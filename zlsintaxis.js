@@ -46,18 +46,24 @@ zl.sintaxis = zl.sintaxis || {};
     $["/"] = zl.analizador.newSimbolo(/^(\/)/i, "/");
     $[")"] = zl.analizador.newSimbolo(/^(\))/i, ")");
     $["("] = zl.analizador.newSimbolo(/^(\()/i, "(");
-    $["hacer"] = zl.analizador.newSimbolo(/^(hacer)/i, "hacer");
-    $["si"] = zl.analizador.newSimbolo(/^(si)/i, "si");
-    $["fin"] = zl.analizador.newSimbolo(/^(fin)/i, "fin");
-    $["verdadero"] = zl.analizador.newSimbolo(/^(verdadero)/i, "verdadero");
-    $["falso"] = zl.analizador.newSimbolo(/^(falso)/i, "falso");
-    $["imposible"] = zl.analizador.newSimbolo(/^(?!x)x/i, "imposible");
-    $["nada"] = zl.analizador.newSimbolo(/^/i, "nada");
-    var espacio = zl.analizador.newSimbolo(/^([ \n\t]+)/i, "espacio");
-    var comentario = zl.analizador.newSimbolo(/^(\/\/.*)/i, "comentario");
-    var numero = zl.analizador.newSimbolo(/^((?:[0-1]+(?:\|2))|(?:[0-9A-Fa-f]+(?:\|16))|(?:[0-9]+(?:\|10)?))/i, "numero");
-    var texto = zl.analizador.newSimbolo(/^\"([^"\\]|\\.|\\\n)*\"/i, "texto");
-    var letra = zl.analizador.newSimbolo(/^\'([^"\\]|\\.|\\\n)*\'/i, "letra");
+    $["["] = zl.analizador.newSimbolo(/^(\[)/i, "[");
+    $["]"] = zl.analizador.newSimbolo(/^(\])/i, "]");
+    $["->"] = zl.analizador.newSimbolo(/^(->)/i, "->");
+
+      $["hacer"] = zl.analizador.newSimbolo(/^(hacer)/i, "hacer");
+      $["si"] = zl.analizador.newSimbolo(/^(si)/i, "si");
+      $["fin"] = zl.analizador.newSimbolo(/^(fin)/i, "fin");
+      $["verdadero"] = zl.analizador.newSimbolo(/^(verdadero)/i, "verdadero");
+      $["falso"] = zl.analizador.newSimbolo(/^(falso)/i, "falso");
+      $["imposible"] = zl.analizador.newSimbolo(/^(?!x)x/i, "imposible");
+      $["nada"] = zl.analizador.newSimbolo(/^/i, "nada");
+      $["veces"] = zl.analizador.newSimbolo(/^(veces)/i, "veces");
+      $["repetir"] = zl.analizador.newSimbolo(/^(repetir)/i, "repetir");
+      var espacio = zl.analizador.newSimbolo(/^([ \n\t]+)/i, "espacio");
+      var comentario = zl.analizador.newSimbolo(/^(\/\/.*)/i, "comentario");
+      var numero = zl.analizador.newSimbolo(/^((?:[0-1]+(?:\|2))|(?:[0-9A-Fa-f]+(?:\|16))|(?:[0-9]+(?:\|10)?))/i, "numero");
+      var texto = zl.analizador.newSimbolo(/^\"([^"\\]|\\.|\\\n)*\"/i, "texto");
+      var letra = zl.analizador.newSimbolo(/^\'([^"\\]|\\.|\\\n)*\'/i, "letra");
 
     // Reglas básicas
     reglas["_"] = zl.analizador.newExpresion([
@@ -65,72 +71,96 @@ zl.sintaxis = zl.sintaxis || {};
       [comentario, "_"],
       [espacio],
       [comentario]
-    ], "espacios o comentarios")
+      ], "espacios o comentarios")
 
     reglas[" "] = zl.analizador.newExpresion([
       ["_"],
       [$["nada"]]
-    ], "espacios opcionales");
+      ], "espacios opcionales");
 
     // Reglas encontradas en el BNF:
     reglas["nombre"] = zl.analizador.newExpresion([
       [nombreSimple, $["."], "nombre"],
       [nombreSimple]
-    ], "nombre");
+      ], "nombre");
 
     reglas["sentencia"] = zl.analizador.newExpresion([
       ["asignacion"],
-      [$["imposible"]], // TODO
-      [$["imposible"]], // TODO
+      ["ecuacion"], 
+      ["llamada"], 
+      ["repetir"],
       ["sicondicional"]
-    ], "sentencia")
+      ], "sentencia")
 
     reglas["sentencia+"] = zl.analizador.newExpresion([
       ["sentencia", " ", "sentencia+"],
       ["sentencia"]
-    ], "lista de sentencias");
+      ], "lista de sentencias");
 
     reglas["asignacion"] = zl.analizador.newExpresion([
       ["nombre", " ", $["<-"], " ", "expresion"]
-    ], "asignacion");
+      ], "asignacion");
+
+    reglas["ecuacion"] = zl.analizador.newExpresion([
+        ["expresion", " ", $["="] , " ", "expresion"]
+      ],"ecuacion"); 
+
+    reglas["llamada"] = zl.analizador.newExpresion([
+        ["nombre", " ", $["->"], " ", "nombre", " ", $["->"], " ", "nombre"],
+        ["nombre", " ", $["->"], " ", "nombre"],
+        ["nombre", " ", $["["], " ", "llamadaAsignacion+", " ", $["]"]]
+      ],"llamada"); 
+
+    reglas["repetir"] = zl.analizador.newExpresion([
+      [$["repetir"], " ", "expresion", " ", $["veces"], " ", "sentencia+", " ", $["fin"]]
+      ],"repetir"); 
 
     reglas["sicondicional"] = zl.analizador.newExpresion([
       [$["si"], "_", "expresion", "_", $["hacer"], "_", "sentencia+", "_", $["fin"]],
       [$["si"], "_", "expresion", "_", $["hacer"], "_", "sentencia+", "_", "sinocondicional"],
       [$["si"], "_", "expresion", "_", $["hacer"], "_", "sentencia+", "_", "sino"]
-    ], "si condicional");
+      ], "si condicional");
 
     reglas["sinocondicional"] = zl.analizador.newExpresion([
       [$["o"], "_", $["si"], "_", "expresion", "_", $["hacer"], "_", "sentencia+", "_", $["fin"]],
       [$["o"], "_", $["si"], "_", "expresion", "_", $["hacer"], "_", "sentencia+", "_", "sinocondicional"],
       [$["o"], "_", $["si"], "_", "expresion", "_", $["hacer"], "_", "sentencia+", "_", "sino"]
-    ], "si no condicional");
+      ], "si no condicional");
 
     reglas["sino"] = zl.analizador.newExpresion([
       [$["si"], "_", $["no"], "_", $["hacer"], "_", "sentencia+", "_", $["fin"]]
-    ], "si no");
+      ], "si no");
 
+    reglas["llamadaAsignacion"] = zl.analizador.newExpresion([ 
+      ["expresion", " ", $["->"], " ", "nombre"],
+      ["nombre", " ", $["<-"], " ", "expresion"]
+    ],"llamadaAsignacion")
+
+    reglas["llamadaAsignacion+"] = zl.analizador.newExpresion([ 
+      ["llamadaAsignacion", " ", "llamadaAsignacion+"],
+      ["llamadaAsignacion"]
+    ],"llamadaAsignacion+")    
 
     reglas["expresion"] = zl.analizador.newExpresion([
       ["expresionTercera", " ", "operadorBinarioCuarto", " ", "expresion"],
       ["expresionTercera"]
-    ], "expresion")
+      ], "expresion")
 
     reglas["expresionTercera"] = zl.analizador.newExpresion([
       ["expresionSegunda", " ", "operadorBinarioTercero", " ", "expresionTercera"],
       ["expresionSegunda"]
-    ], "expresionTercera")
+      ], "expresionTercera")
 
     reglas["expresionSegunda"] = zl.analizador.newExpresion([
       ["expresionPrimera", " ", "operadorBinarioSegundo", " ", "expresionSegunda"],
       ["expresionPrimera"]
-    ], "expresionSegunda")
+      ], "expresionSegunda")
 
     reglas["expresionPrimera"] = zl.analizador.newExpresion([
       ["evaluacion", " ", "operadorBinarioPrimero", " ", "expresionPrimera"],
       ["evaluacion"],
       ["operadorUnario", " ", "expresion"]
-    ], "expresionPrimera")
+      ], "expresionPrimera")
 
     reglas["evaluacion"] = zl.analizador.newExpresion([
       [numero],
@@ -140,18 +170,18 @@ zl.sintaxis = zl.sintaxis || {};
       [$["falso"]],
       ["nombre"],
       [$["("], " ", "expresion", " ", $[")"]]
-    ], "evaluacion")
+      ], "evaluacion")
 
     reglas["operadorUnario"] = zl.analizador.newExpresion([
       [$["-"]],
       [$["+"]],
       [$["no"]]
-    ], "operadorUnario")
+      ], "operadorUnario")
 
     reglas["operadorBinarioCuarto"] = zl.analizador.newExpresion([
       [$["y"]],
       [$["o"]]
-    ], "operadorBinarioCuarto")
+      ], "operadorBinarioCuarto")
 
     reglas["operadorBinarioTercero"] = zl.analizador.newExpresion([
       [$["<"]],
@@ -160,17 +190,17 @@ zl.sintaxis = zl.sintaxis || {};
       [$[">="]],
       [$["="]],
       [$["<>"]]
-    ], "operadorBinarioTercero")
+      ], "operadorBinarioTercero")
 
     reglas["operadorBinarioSegundo"] = zl.analizador.newExpresion([
       [$["+"]],
       [$["-"]]
-    ], "operadorBinarioSegundo")
+      ], "operadorBinarioSegundo")
 
     reglas["operadorBinarioPrimero"] = zl.analizador.newExpresion([
       [$["*"]],
       [$["/"]]
-    ], "operadorBinarioPrimero")
+      ], "operadorBinarioPrimero")
 
     // Comportamiento de las reglas:
     reglas["nombre"].error = function(datos, opcion, posicion) {
@@ -203,11 +233,11 @@ zl.sintaxis = zl.sintaxis || {};
       if (opcion == 0) {
         s.tipo = "asignacion";
       } else if (opcion == 1) {
-
+        s.tipo = "ecuacion";
       } else if (opcion == 2) {
-
+        s.tipo = "llamada";
       } else if (opcion == 3) {
-
+        s.tipo = "repetir";
       } else if (opcion == 4) {
         s.tipo = "sicondicional";
       }
@@ -218,7 +248,23 @@ zl.sintaxis = zl.sintaxis || {};
       return {
         variable: datos[0],
         valor: datos[4]
+      };
+    }
+
+    reglas["llamada"].postproceso = function(datos, opcion) {
+      if (opcion == 2) {
+        return {
+          nombre: datos[0],
+          asignaciones: datos[4]
+        };
       }
+    }
+
+    reglas["repetir"].postproceso = function(datos) {
+      return {
+        veces: datos[2],
+        sentencias: datos[6]
+      };
     }
 
     reglas["sicondicional"].postproceso = function(datos, opcion) {
@@ -245,6 +291,28 @@ zl.sintaxis = zl.sintaxis || {};
       var d = {};
       d.sentencias = datos[6];
       return d;
+    }
+
+    reglas["llamadaAsignacion+"].postproceso = function(datos, opcion) {
+      if (opcion == 0) {
+        return [datos[0]].concat(datos[2]);
+      }
+      return [datos[0]];
+    }
+
+    reglas["llamadaAsignacion"].postproceso = function(datos, opcion) {
+      if (opcion == 0) {
+        return {
+          tipo: "salida",
+          izq: datos[0],
+          der: datos[4]
+        };
+      }
+      return {
+          tipo: "entrada",
+          izq: datos[0],
+          der: datos[4]
+        };
     }
 
     reglas["expresion"].postproceso = reglas["expresionPrimera"].postproceso = reglas["expresionSegunda"].postproceso = reglas["expresionTercera"].postproceso = function(datos, opcion) {
@@ -279,37 +347,37 @@ zl.sintaxis = zl.sintaxis || {};
           op: op,
           nivel: this.nombre
         };
-      else if (der && op)
-        return {
-          der: der,
-          op: op,
-          nivel: this.nombre
-        };
-      else
-        return datos[0];
-    }
+        else if (der && op)
+          return {
+            der: der,
+            op: op,
+            nivel: this.nombre
+          };
+          else
+            return datos[0];
+        }
 
-    reglas["evaluacion"].postproceso = function(datos, opcion) {
-      if (opcion == 0) {
-        var partes = datos[0].split("|");
-        var num = parseInt(partes[0],partes[1]);
-        return num;
-      }
-      else if (opcion < 6)
-        return datos[0];
-      return {
-        der: datos[2],
-        op: "()"
-      };
-    }
+        reglas["evaluacion"].postproceso = function(datos, opcion) {
+          if (opcion == 0) {
+            var partes = datos[0].split("|");
+            var num = parseInt(partes[0],partes[1]);
+            return num;
+          }
+          else if (opcion < 6)
+            return datos[0];
+          return {
+            der: datos[2],
+            op: "()"
+          };
+        }
 
-    reglas["operadorUnario"].postproceso =
-      reglas["operadorBinarioCuarto"].postproceso =
-      reglas["operadorBinarioTercero"].postproceso =
-      reglas["operadorBinarioSegundo"].postproceso =
-      reglas["operadorBinarioPrimero"].postproceso = function(datos, opcion) {
-        return datos[0];
-      }
+        reglas["operadorUnario"].postproceso =
+        reglas["operadorBinarioCuarto"].postproceso =
+        reglas["operadorBinarioTercero"].postproceso =
+        reglas["operadorBinarioSegundo"].postproceso =
+        reglas["operadorBinarioPrimero"].postproceso = function(datos, opcion) {
+          return datos[0];
+        }
 
 
 
