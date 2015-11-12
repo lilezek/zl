@@ -12,7 +12,10 @@
   <script src="error.js"></script>
   <script src="sintaxis.js"></script>
   <script src="generadorarbol.js"></script>
+  <script src="entorno.js"></script>
+  <script src="semantica.js"></script>
   <script src="compilador.js"></script>
+  <script src="javascript.js"></script>
   <script src="editor.js"></script>
   <script src="https://skalman.github.io/UglifyJS-online/uglify/lib/utils.js"></script>
   <script src="https://skalman.github.io/UglifyJS-online/uglify/lib/ast.js"></script>
@@ -61,13 +64,16 @@
 
 <body>
   <div class="main">
-<textarea class="editor" id="editor">si (a < 10 + 5 - 13) hacer
-	a <- verdadero
-o si b hacer
-	b <- a
-si no hacer
-	c <- x
-fin</textarea>
+<textarea class="editor" id="editor">
+contador <- 3
+mientras contador > 0 hacer
+  mostrar
+  [
+    mensaje <- contador + "\n"
+  ]
+  contador <- contador - 1
+fin
+</textarea>
     <div class="v divisor"></div>
     <div class="compilation">
       <textarea class="content" id="content" readonly="readonly"></textarea>
@@ -75,10 +81,10 @@ fin</textarea>
       <textarea class="output" id="output" readonly="readonly"></textarea>
       <input type="text">
       <div style="display: flex;">
-        <button class="run" id="run" disabled="disabled">
+        <button class="run" id="run">
           Run
         </button>
-        <button class="min" id="min" disabled="disabled">
+        <button class="min" id="min">
           Activar compresión
         </button>
       </div>
@@ -104,20 +110,19 @@ fin</textarea>
       var minify = false;
 
       $("#run").click(function() {
+        var $zl_mostrar = function(arg) {
+          $("#output").get(0).innerHTML += arg.mensaje;
+        }
         eval(lastjs);
-        var consola = zl.DataTypes["consola"].construct();
-        consola.dom = $("#output").get(0);
-        $zlf_inicio({c: consola});
       });
 
       $("#min").click(function() {
-        // TODO: activar cuando se genere javascript válido
-        /*if (minify) {
+        if (minify) {
           $(this).html("Activar compresión");
         } else {
           $(this).html("Desactivar compresión");
         }
-        minify = !minify;*/
+        minify = !minify;
       });
 
       function Compile(zlcode) {
@@ -125,7 +130,7 @@ fin</textarea>
         var compilation = $("#content").get(0);
         var comp = zl.Compilar(zlcode);
         if (comp.error)
-          compilation.innerHTML = js_beautify(zl.error.obtenerMensaje(comp));
+          compilation.innerHTML = zl.error.obtenerMensaje(comp);
         else if (comp.javascript) {
           if (minify)
             lastjs = js_beautify(uglify(js_beautify(comp.javascript)));

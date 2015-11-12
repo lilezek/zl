@@ -1,6 +1,6 @@
 var zl = zl || {};
 
-(function(){
+(function() {
   "use strict";
 
   // Genera código javascript a partir de código
@@ -14,7 +14,9 @@ var zl = zl || {};
       // En caso de error, si se pudo procesar algún token,
       // es que hubo error en la configuración.
       if (compilado.end > compilado.begin) {
-        return compilado;
+        return {
+          error: zl.error.obtenerMensaje(compilado)
+        };
       }
     }
 
@@ -25,37 +27,41 @@ var zl = zl || {};
     // Fase 3, obtener el árbol sintáctico del resto del código:
     compilado = zl.sintaxis.arbolCodigo(zlcode);
 
-    // TODO: no cortar en fase 3
-    if (!compilado.error)
-      return {javascript: JSON.stringify(compilado)};
-
     // En caso de error, terminar:
     if (compilado.error) {
-      return compilado;
+      return {
+        error: zl.error.obtenerMensaje(compilado)
+      };
     }
 
     // Fase 4, registrar nombres (de variables, de subrutinas, de objetos...)
-    zl.entorno.registrarNombres(compilado);
+    var entorno = zl.entorno.registrarNombres(compilado);
 
     // En caso de error, terminar:
-    if (compilado.error) {
-      return compilado;
+    if (entorno.error) {
+      return {
+        error: zl.error.obtenerMensaje(entorno.error)
+      };
     }
 
     // Fase 5, comprobaciones semánticas (tipos compatibles, uso de nombres que
     // están registrados, etc...).
-    zl.semantica.testar(compilado);
+    entorno = zl.semantica.testar(compilado,entorno);
 
     // En caso de error, terminar:
-    if (compilado.error) {
-      return compilado;
+    if (entorno) {
+      return {
+        error: zl.error.obtenerMensaje(entorno)
+      };
     }
 
     // Fase 6, optimización opcional del código generado por el árbol
     // TODO: sin hacer
 
     // Fase 7, generación del código de salida
-    return zl.javascript.generar(compilado);
+    return {
+      javascript: zl.javascript.generar(compilado,entorno)
+    };
   }
 
 })();

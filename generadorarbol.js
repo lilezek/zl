@@ -87,7 +87,7 @@ zl.analizador = {};
           error = false;
           opcion = i;
         } else {
-          // En caso de error sintáctico, no se apilará ningún error adicional.
+          // En caso de error sintáctico, no se intentará ninguna otra opción.
           resultado.error = tmperr;
           return resultado;
         }
@@ -97,7 +97,12 @@ zl.analizador = {};
           opcion = i;
           masDeUnIntento = false;
         } else if (intento.end == r.end && !r.reintento) {
-          masDeUnIntento = true;
+          if (intento.error == r.error) {
+            // TODO: mejorar este tipo de error
+            intento.tipo = "multiples";
+          } else {
+            masDeUnIntento = true;
+          }
         }
       }
 
@@ -107,7 +112,7 @@ zl.analizador = {};
       resultado.resultado = this.postproceso(resultado.resultado, opcion);
       return resultado;
     } else {
-      if (!masDeUnIntento)
+      //if (!masDeUnIntento)
         resultado.intento = intento;
       resultado.opcion = opcion;
       resultado.end = intento.end;

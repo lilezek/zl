@@ -22,6 +22,7 @@ zl.error = zl.error || {};
   }
 
   zl.error.obtenerMensaje = function(compilacion) {
+    console.log(compilacion);
     var listaDeErrores = zl.error.obtenerLista(compilacion);
     // Análisis de errores
 

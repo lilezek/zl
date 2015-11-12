@@ -61,8 +61,6 @@
 
 <repetir> ::= "repetir" <_> <expresion> <_> "veces" <_> (<sentencia> <_>)+ "fin"
 
-<mientras> ::= "mientras" <_> <expresion> <_> "hacer" (<sentencia> <_>)+ "fin"
-
 <sicondicional> ::= "si" <_> <expresion> <_> "hacer" <_> (<sentencia> <_>)+ "fin"
     | "si" <_> <expresion> <_> "hacer" <_> (<sentencia> <_>)+ <sinocondicional>
     | "si" <_> <expresion> <_> "hacer" <_> (<sentencia> <_>)+ <sino>
