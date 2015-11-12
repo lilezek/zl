@@ -12,6 +12,9 @@
 ; letra expresión regular \'([^"\\]|\\.|\\\n)*\'
 ; comentario expresión regular \/\/.*
 
+; Nota, para las expresiones del mismo nivel,
+; el arbol que se construye se reordena para evaluar primero a la izquierda.
+
 <programa> ::= [<configuraciones> <_>] <subrutina>+
 
 <configuraciones> ::= "configuracion" <_> (<configuracion> <_>)* "fin"
