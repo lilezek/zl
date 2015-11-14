@@ -1,0 +1,79 @@
+\documentclass{report}
+
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+\usepackage{fancyvrb}
+\usepackage[dvipsnames]{xcolor}
+
+\hypersetup{
+	colorlinks,
+	citecolor=black,
+	filecolor=black,
+	linkcolor=black,
+	urlcolor=black
+}
+
+% redefine \VerbatimInput
+\RecustomVerbatimCommand{\VerbatimInput}{VerbatimInput}%
+{
+	fontsize=\footnotesize,
+	%
+	frame=lines,  % top and bottom rule only
+	framesep=2em, % separation between frame and text
+	rulecolor=\color{Gray},
+	%
+	% label=\fbox{\color{Black}data.txt},
+	% labelposition=topline,
+	%
+}
+
+\author{Ezequiel Santamaría Navarro}
+\title{Trabajo fin de grado sobre la construcción de un entorno de aprendizaje para la programación.}
+
+
+\renewcommand{\abstractname}{Abstracto}
+\renewcommand{\contentsname}{Índice de contenido}
+\renewcommand{\chaptername}{Parte}
+
+\begin{document}
+\maketitle
+\tableofcontents
+	
+\begin{abstract}
+	Abstracto
+\end{abstract}
+
+
+\chapter{Introducción}
+Introducción
+
+\chapter{Lenguaje zl}
+\section{Introducción}
+El lenguaje está enfocado a cumplir las siguientes propiedades:
+
+\begin{itemize}
+	\item Enfocado a parecerse sintáticamente al pseudocódigo en castellano, parecido al enseñado en la asignatura IP.
+	\item Diferenciando los tipos de datos, sin hacer implícitas sus conversiones ni sus operaciones.
+	\item Insensible a mayúsculas y minúsculas, 
+	y aceptando tildes y eñes en los nombres.
+	\item Con un único tipo de datos para representar números enteros y decimales (similar a Javascript).
+\end{itemize}
+
+\section{Definición formal del lenguaje}
+La gramática del lenguaje en formato BNF es:
+
+\VerbatimInput{../sintaxis.txt}
+
+Cabe destacar de la gramática las 4 expresiones y los cuatro grupos de operadores, para poder definir correctamente el orden en el cuál los operadores se reducen.
+
+Por otro lado, los número en el lenguaje permiten indicar base 2, 10 o 16 de la siguiente manera:
+
+\begin{itemize}
+	\item $51966$ como número en base 10
+	\item $51966|10$ como el mismo número
+	\item $CAFE|16$ o $cafe|16$ como el mismo número en base hexadecimal.
+	\item $1100101011111110|2$ como el número en base binaria.
+\end{itemize}
+
+\end{document}
+
