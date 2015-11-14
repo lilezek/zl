@@ -32,7 +32,7 @@ zl.javascript = zl.javascript || {};
 
     var resultado = "";
     for (var i = 0; i < compilado.length; i++) {
-      resultado += zl.javascript.sentencia(compilado[i]);
+      resultado += zl.javascript.sentencia(compilado[i], entorno);
     }
     return resultado;
   }
@@ -44,29 +44,43 @@ zl.javascript = zl.javascript || {};
         "=" +
         zl.javascript.expresion(compilado.valor);
     } else if (compilado.tipo == "llamada") {
-      resultado = zl.javascript.nombre(compilado.nombre, entorno) +
+      resultado = "var $zlr = " +
+        zl.javascript.nombre(compilado.nombre, entorno) +
         "(" +
-        zl.javascript.llamadaAsignacion(compilado.asignaciones, entorno) +
-        ")";
+        zl.javascript.llamadaEntrada(compilado.entrada, entorno) +
+        ")" +
+        zl.javascript.llamadaSalida(compilado.salida,entorno);
     } else if (compilado.tipo == "mientras") {
-      resultado = "while (" + zl.javascript.expresion(compilado.condicion, entorno) + "){" +
+      resultado = "while(" + zl.javascript.expresion(compilado.condicion, entorno) + "){" +
         zl.javascript.sentencias(compilado.sentencias, entorno) +
         "}"
+    } else if (compilado.tipo == "repetir") {
+      var tempvar = "$zlt_"+entorno.pedirNombreTemporal();
+      resultado = "{var " + tempvar + " = "+ zl.javascript.expresion(compilado.veces, entorno) +";"
+      resultado += "while(" + tempvar + "--){"
+      resultado += zl.javascript.sentencias(compilado.sentencias, entorno);
+      resultado += "}}";
     }
     return resultado + ";";
   }
 
-  zl.javascript.llamadaAsignacion = function(compilado, entorno) {
+  zl.javascript.llamadaEntrada = function(compilado, entorno) {
     var resultado = "{";
-    if (compilado[0].tipo == "entrada") {
+    if (compilado.length > 0) {
       resultado += compilado[0].izq + ":" + zl.javascript.expresion(compilado[0].der, entorno);
-    }
-    for (var i = 1; i < compilado.length; i++) {
-      if (compilado[i].tipo == "entrada") {
+      for (var i = 1; i < compilado.length; i++) {
         resultado += compilado[i].izq + ":" + zl.javascript.expresion(compilado[i].der, entorno);
       }
     }
     return resultado + "}";
+  }
+
+  zl.javascript.llamadaSalida = function(compilado, entorno) {
+    var resultado = "";
+    for (var i = 0; i < compilado.length; i++) {
+      resultado += ";"+zl.javascript.nombre(compilado[i].der) + "=$zlr." + compilado[i].izq;
+    }
+    return resultado;
   }
 
   zl.javascript.nombre = function(compilado, entorno) {

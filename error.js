@@ -21,13 +21,15 @@ zl.error = zl.error || {};
     return lista;
   }
 
-  zl.error.obtenerMensaje = function(compilacion) {
-    console.log(compilacion);
+  zl.error.obtenerMensaje = function(compilacion, zlcodigo) {
     var listaDeErrores = zl.error.obtenerLista(compilacion);
     // Análisis de errores
 
     // 1 Símbolo inesperado
     if (listaDeErrores[0].error == zl.error.E_SIMBOLO) {
+      // Nada escrito:
+      if (zlcodigo.trim() == "")
+        return "Escribe algo de código a la izquierda para empezar."
       return JSON.stringify(listaDeErrores);
     }
 

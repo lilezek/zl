@@ -15,7 +15,7 @@ var zl = zl || {};
       // es que hubo error en la configuración.
       if (compilado.end > compilado.begin) {
         return {
-          error: zl.error.obtenerMensaje(compilado)
+          error: zl.error.obtenerMensaje(compilado, zlcode)
         };
       }
     }
@@ -30,28 +30,29 @@ var zl = zl || {};
     // En caso de error, terminar:
     if (compilado.error) {
       return {
-        error: zl.error.obtenerMensaje(compilado)
+        error: zl.error.obtenerMensaje(compilado, zlcode)
       };
     }
 
     // Fase 4, registrar nombres (de variables, de subrutinas, de objetos...)
-    var entorno = zl.entorno.registrarNombres(compilado);
+    var entorno = zl.entorno.newEntorno();
+    entorno.registrarNombres(compilado);
 
     // En caso de error, terminar:
     if (entorno.error) {
       return {
-        error: zl.error.obtenerMensaje(entorno.error)
+        error: zl.error.obtenerMensaje(entorno.error, zlcode)
       };
     }
 
     // Fase 5, comprobaciones semánticas (tipos compatibles, uso de nombres que
     // están registrados, etc...).
-    entorno = zl.semantica.testar(compilado,entorno);
+    zl.semantica.testar(compilado,entorno);
 
     // En caso de error, terminar:
-    if (entorno) {
+    if (entorno.error) {
       return {
-        error: zl.error.obtenerMensaje(entorno)
+        error: zl.error.obtenerMensaje(entorno.error, zlcode)
       };
     }
 
@@ -64,4 +65,17 @@ var zl = zl || {};
     };
   }
 
+  zl.Ejecutar = function(javascript) {
+      // Preparar el runtime:
+      $("#output").get(0).innerHTML = "";
+      var $zl_mostrar = function(arg) {
+        $("#output").get(0).innerHTML += arg.mensaje;
+      }
+      var $zl_leer = function(arg) {
+        return {mensaje: $("#input").val()};
+      }
+
+      // Después ejecutar:
+      eval(javascript);
+  }
 })();

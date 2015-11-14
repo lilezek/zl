@@ -65,13 +65,20 @@
 <body>
   <div class="main">
 <textarea class="editor" id="editor">
-contador <- 3
-mientras contador > 0 hacer
-  mostrar
-  [
-    mensaje <- contador + "\n"
-  ]
-  contador <- contador - 1
+Subrutina Externa Inicio
+Datos
+  contador es Numero
+Algoritmo
+  contador <- 3
+  mientras contador > 0 hacer
+    mostrar
+    [
+      // TODO: Este código no debería compilar en un futuro
+      // sin una conversión número a texto explícita.
+      mensaje <- contador + "\n"
+    ]
+    contador <- contador - 1
+  fin
 fin
 </textarea>
     <div class="v divisor"></div>
@@ -79,7 +86,7 @@ fin
       <textarea class="content" id="content" readonly="readonly"></textarea>
       <div class="h divisor"></div>
       <textarea class="output" id="output" readonly="readonly"></textarea>
-      <input type="text">
+      <input type="text" class="input" id="input">
       <div style="display: flex;">
         <button class="run" id="run">
           Run
@@ -96,7 +103,7 @@ fin
         mode: "zl",
         tabSize: 2,
         identWithTabs: false,
-        smartIdent: true
+        smartIdent: true,
       });
       editor.on("change", function() {
         if (lasttimeout) {
@@ -104,16 +111,18 @@ fin
         }
         lasttimeout = setTimeout(Compile, 500, editor.getValue());
       });
+      editor.addKeyMap({
+        "Ctrl-S": download,
+        "Cmd-S": download,
+        "Ctrl-O": upload
+      });
 
       var lastjs = "";
       var lasttimeout = null;
       var minify = false;
 
       $("#run").click(function() {
-        var $zl_mostrar = function(arg) {
-          $("#output").get(0).innerHTML += arg.mensaje;
-        }
-        eval(lastjs);
+        zl.Ejecutar(lastjs);
       });
 
       $("#min").click(function() {
@@ -130,7 +139,7 @@ fin
         var compilation = $("#content").get(0);
         var comp = zl.Compilar(zlcode);
         if (comp.error)
-          compilation.innerHTML = zl.error.obtenerMensaje(comp);
+          compilation.innerHTML = comp.error;
         else if (comp.javascript) {
           if (minify)
             lastjs = js_beautify(uglify(js_beautify(comp.javascript)));
@@ -140,6 +149,19 @@ fin
         }
       }
       Compile(editor.getValue());
+
+      function download() {
+        var element = document.createElement('a');
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(editor.getValue()));
+        element.setAttribute('download', "codigo.zl");
+
+        element.style.display = 'none';
+        document.body.appendChild(element);
+
+        element.click();
+
+        document.body.removeChild(element);
+      }
     </script>
 </body>
 

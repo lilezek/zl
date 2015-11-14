@@ -62,6 +62,15 @@ zl.sintaxis = zl.sintaxis || {};
     $["veces"] = zl.analizador.newSimbolo(/^(veces)/i, "veces");
     $["repetir"] = zl.analizador.newSimbolo(/^(repetir)/i, "repetir");
     $["mientras"] = zl.analizador.newSimbolo(/^(mientras)/i, "mientras");
+    $["subrutina"] = zl.analizador.newSimbolo(/^(subrutina)/i, "subrutina");
+    $["externa"] = zl.analizador.newSimbolo(/^(externa)/i, "externa");
+    $["es"] = zl.analizador.newSimbolo(/^(es)/i, "es");
+    $["rapida"] = zl.analizador.newSimbolo(/^(rapida|rápida)/i, "rapida");
+    $["entrada"] = zl.analizador.newSimbolo(/^(entrada)/i, "entrada");
+    $["salida"] = zl.analizador.newSimbolo(/^(salida)/i, "salida");
+    $["de"] = zl.analizador.newSimbolo(/^(de)/i, "de");
+    $["datos"] = zl.analizador.newSimbolo(/^(datos)/i, "datos");
+    $["algoritmo"] = zl.analizador.newSimbolo(/^(algoritmo)/i, "algoritmo");
     var espacio = zl.analizador.newSimbolo(/^([ \n\t]+)/i, "espacio");
     var comentario = zl.analizador.newSimbolo(/^(\/\/.*)/i, "comentario");
     var numero = zl.analizador.newSimbolo(/^((?:[0-1]+(?:\|2))|(?:[0-9A-Fa-f]+(?:\|16))|(?:[0-9]+(?:\|10)?))/i, "numero");
@@ -81,11 +90,60 @@ zl.sintaxis = zl.sintaxis || {};
       [$["nada"]]
     ], "espacios opcionales");
 
+    reglas["programa"] = zl.analizador.newExpresion([
+      ["subrutina+"]
+    ], "programa");
+
+    reglas["subrutina+"] = zl.analizador.newExpresion([
+      ["subrutina", " ", "subrutina+"],
+      ["subrutina"]
+    ], "subrutina+");
+
+    reglas["subrutina"] = zl.analizador.newExpresion([
+      ["subrutinaCabecera", " ", "subrutinaCuerpo"]]
+    , "subrutina");
+
+    reglas["subrutinaCabecera"] = zl.analizador.newExpresion([
+      [$["subrutina"] , " ", "modificador*" , " ", "nombre"]]
+    , "subrutinaCabecera");
+
+    reglas["subrutinaCuerpo"] = zl.analizador.newExpresion([
+      ["datos", " ", "algoritmo", " ", $["fin"]]]
+    , "subrutinaCuerpo");
+
+    reglas["modificador"] = zl.analizador.newExpresion([
+      [$["externa"]],
+      [$["es"]],
+      [$["rapida"]]
+    ],"modificador")
+
+    reglas["modificador*"] = zl.analizador.newExpresion([
+      ["modificador", " ", "modificador*"],
+      [$["nada"]]
+    ],"modificador")
+
     // Reglas encontradas en el BNF:
     reglas["nombre"] = zl.analizador.newExpresion([
       [nombreSimple, $["."], "nombre"],
       [nombreSimple]
     ], "nombre");
+
+    reglas["datos"] = zl.analizador.newExpresion([
+      [$["datos"], " ", "declaracion+"]
+    ], "datos");
+
+    reglas["algoritmo"] = zl.analizador.newExpresion([
+      [$["algoritmo"], " ", "sentencia+"]
+    ], "algoritmo");
+
+    reglas["declaracion"] = zl.analizador.newExpresion([
+      ["nombre", " ", $["es"], " ", "nombre", " ", "declaracionModificador*"]
+    ], "declaracion");
+
+    reglas["declaracion+"] = zl.analizador.newExpresion([
+      ["declaracion", " ", "declaracion+"],
+      ["declaracion"]
+    ], "declaracion+");
 
     reglas["sentencia"] = zl.analizador.newExpresion([
       ["asignacion"],
@@ -100,6 +158,16 @@ zl.sintaxis = zl.sintaxis || {};
       ["sentencia", " ", "sentencia+"],
       ["sentencia"]
     ], "lista de sentencias");
+
+    reglas["declaracionModificador"] = zl.analizador.newExpresion([
+      [$["entrada"]],
+      [$["salida"]]
+    ],"declaracionModificador");
+
+    reglas["declaracionModificador*"] = zl.analizador.newExpresion([
+      [$["de"], " ", "declaracionModificador", " ", "declaracionModificador*" ],
+      [$["nada"]]
+    ],"declaracionModificador*");
 
     reglas["asignacion"] = zl.analizador.newExpresion([
       ["nombre", " ", $["<-"], " ", "expresion"]
@@ -140,7 +208,7 @@ zl.sintaxis = zl.sintaxis || {};
     ], "si no");
 
     reglas["llamadaAsignacion"] = zl.analizador.newExpresion([
-      ["expresion", " ", $["->"], " ", "nombre"],
+      ["nombre", " ", $["->"], " ", "nombre"],
       ["nombre", " ", $["<-"], " ", "expresion"]
     ], "llamadaAsignacion")
 
@@ -265,7 +333,8 @@ zl.sintaxis = zl.sintaxis || {};
       if (opcion == 2) {
         return {
           nombre: datos[0],
-          asignaciones: datos[4]
+          entrada: datos[4].entrada,
+          salida: datos[4].salida
         };
       }
     }
@@ -312,9 +381,19 @@ zl.sintaxis = zl.sintaxis || {};
 
     reglas["llamadaAsignacion+"].postproceso = function(datos, opcion) {
       if (opcion == 0) {
-        return [datos[0]].concat(datos[2]);
+        var resultado = datos[2];
+        if (datos[0].tipo == "entrada") {
+          resultado.entrada = [datos[0]].concat(resultado.entrada);
+        } else {
+          resultado.salida = [datos[0]].concat(resultado.salida);
+        }
+        return resultado;
       }
-      return [datos[0]];
+      if (datos[0].tipo == "entrada") {
+        return {entrada: [datos[0]], salida: []}
+      } else {
+        return {entrada: [], salida: [datos[0]]}
+      }
     }
 
     reglas["llamadaAsignacion"].postproceso = function(datos, opcion) {
@@ -412,7 +491,7 @@ zl.sintaxis = zl.sintaxis || {};
             tipo: "expresion",
             valor: datos[2]
           }
-      }      
+      }
     }
 
     reglas["operadorUnario"].postproceso =
