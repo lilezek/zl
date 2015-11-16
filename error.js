@@ -35,7 +35,7 @@ zl.error = zl.error || {};
 
   zl.error.obtenerMensaje = function(compilacion, zlcodigo) {
     var listaDeErrores = zl.error.obtenerLista(compilacion);
-    //var siguienteCaracter = (zlcodigo.length < listaDeErrores[0].end ? zlcodigo[listaDeErrores[0].end] : "");
+    var siguienteCaracter = (zlcodigo.length > listaDeErrores[0].end ? zlcodigo[listaDeErrores[0].end] : "");
     // Análisis de errores
 
     // 1 Símbolo inesperado
@@ -48,11 +48,14 @@ zl.error = zl.error || {};
         // Evaluación opción 6 
         if (listaDeErrores[i].tipo == "evaluacion" && listaDeErrores[i].opcion == 6) {
           var pos = zl.error.posicionCaracter(zlcodigo, listaDeErrores[i].begin);
-                    return "Hay un paréntesis en la línea "+pos.linea+" que está sin cerrar";
+          return "Hay un paréntesis '(' en la línea "+pos.linea+" que está sin cerrar";
         }
       }
       // Sobra paréntesis:
-      //console.log(siguienteCaracter);
+      if (siguienteCaracter == ")") {
+        var pos = zl.error.posicionCaracter(zlcodigo, listaDeErrores[0].end);
+        return "Hay un paréntesis ')' en la línea "+pos.linea+" que sobra";
+      }
       return JSON.stringify(listaDeErrores);
     }
 
