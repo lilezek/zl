@@ -1,7 +1,7 @@
 var zl = zl || {};
 
 (function() {
-  "use strict";
+//  "use strict";
 
   // Genera código javascript a partir de código
   // en zl
@@ -69,7 +69,10 @@ var zl = zl || {};
       // Preparar el runtime:
       $("#output").get(0).innerHTML = "";
       var $zl_mostrar = function(arg) {
-        $("#output").get(0).innerHTML += arg.mensaje;
+        $("#output").get(0).innerHTML += arg.mensaje+"\n";
+      }
+      var $zl_leernumero = function(arg){
+        return {mensaje: parseInt(prompt("Introduce un número", "0"))}
       }
       var $zl_leer = function(arg) {
         return {mensaje: $("#input").val()};

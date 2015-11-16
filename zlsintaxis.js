@@ -51,6 +51,7 @@ zl.sintaxis = zl.sintaxis || {};
     $["["] = zl.analizador.newSimbolo(/^(\[)/i, "[");
     $["]"] = zl.analizador.newSimbolo(/^(\])/i, "]");
     $["->"] = zl.analizador.newSimbolo(/^(->)/i, "->");
+    $["%"] = zl.analizador.newSimbolo(/^(%)/i, "%");
 
     $["hacer"] = zl.analizador.newSimbolo(/^(hacer)/i, "hacer");
     $["si"] = zl.analizador.newSimbolo(/^(si)/i, "si");
@@ -260,12 +261,12 @@ zl.sintaxis = zl.sintaxis || {};
     ], "operadorBinarioCuarto")
 
     reglas["operadorBinarioTercero"] = zl.analizador.newExpresion([
-      [$["<"]],
-      [$[">"]],
       [$["<="]],
       [$[">="]],
-      [$["="]],
-      [$["<>"]]
+      [$["<>"]],
+      [$["<"]],
+      [$[">"]],
+      [$["="]]
     ], "operadorBinarioTercero")
 
     reglas["operadorBinarioSegundo"] = zl.analizador.newExpresion([
@@ -275,7 +276,8 @@ zl.sintaxis = zl.sintaxis || {};
 
     reglas["operadorBinarioPrimero"] = zl.analizador.newExpresion([
       [$["*"]],
-      [$["/"]]
+      [$["/"]],
+      [$["%"]]
     ], "operadorBinarioPrimero")
 
     // Comportamiento de las reglas:
@@ -289,12 +291,36 @@ zl.sintaxis = zl.sintaxis || {};
       }
     }
 
+    reglas["programa"].postproceso = function(datos, opcion) {
+      return datos[0];
+    }
+
+    reglas["subrutina+"].postproceso = function(datos, opcion) {
+      if (opcion == 0)
+        return [datos[0]].concat(datos[2]);
+      else
+        return [datos[0]];
+    }
+
+    reglas["subrutina"].postproceso = function(datos, opcion) {
+      return {
+        modificadores: datos[0][2],
+        nombre: datos[0][4],
+        datos: datos[2][0],
+        sentencias: datos[2][2]
+      };
+    }
+
     reglas["nombre"].postproceso = function(datos, opcion) {
       var nombre = datos[0];
       if (opcion == 0) {
         nombre = datos[0] + datos[1] + datos[2];
       }
       return nombre;
+    }
+
+    reglas["algoritmo"].postproceso = function(datos, opcion) {
+      return datos[2];
     }
 
     reglas["sentencia+"].postproceso = function(datos, opcion) {

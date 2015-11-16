@@ -7,29 +7,45 @@ zl.javascript = zl.javascript || {};
   // Generar la cabecera
   // TODO: Hacerlo a partir del entorno
   zl.javascript.cabecera = function(compilado, entorno) {
-    return "(function(){/*\"use strict\"*/";
+    return "var $zl_inicio;(function(){/*\"use strict\"*/";
   }
 
   // Generar el final
   // TODO: Hacerlo a partir del entorno
   zl.javascript.final = function(compilado, entorno) {
-    return "})();"
+    return "})();$zl_inicio({});"
   }
 
   zl.javascript.generar = function(compilado, entorno) {
-    var cab = zl.javascript.cabecera(compilado, entorno);
-    var fin = zl.javascript.final(compilado, entorno);
-    var cod = zl.javascript.compilarCodigo(compilado, entorno);
-    return cab + cod + fin;
+    return zl.javascript.compilarCodigo(compilado, entorno);
   }
 
   zl.javascript.compilarCodigo = function(compilado, entorno) {
-    // TODO: De momento lista de sentencias:
-    return zl.javascript.sentencias(compilado, entorno);
+    return zl.javascript.programa(compilado, entorno);
+  }
+
+  zl.javascript.programa = function(compilado, entorno) {
+    return  zl.javascript.cabecera(compilado, entorno) +
+            zl.javascript.subrutinas(compilado, entorno) +
+            zl.javascript.final(compilado, entorno);
+  }
+
+  zl.javascript.subrutina = function(compilado, entorno) {
+    //TODO: tratar los modificadores y los datos correctamente
+    return  /*"var " +*/ zl.javascript.nombre(compilado.nombre, entorno) + "= function(arg){" +
+            zl.javascript.sentencias(compilado.sentencias, entorno) +
+            "};";
+  }
+
+  zl.javascript.subrutinas = function(compilado, entorno) {
+    var resultado = "";
+    for (var i = 0; i < compilado.length; i++) {
+      resultado += zl.javascript.subrutina(compilado[i], entorno);
+    }
+    return resultado;
   }
 
   zl.javascript.sentencias = function(compilado, entorno) {
-
     var resultado = "";
     for (var i = 0; i < compilado.length; i++) {
       resultado += zl.javascript.sentencia(compilado[i], entorno);
@@ -60,6 +76,23 @@ zl.javascript = zl.javascript || {};
       resultado += "while(" + tempvar + "--){"
       resultado += zl.javascript.sentencias(compilado.sentencias, entorno);
       resultado += "}}";
+    } else if (compilado.tipo == "sicondicional") {
+      var siguiente = compilado.siguiente;
+      resultado = "if(" + zl.javascript.expresion(compilado.condicion) + "){" +
+                  zl.javascript.sentencias(compilado.sentencias)+
+                  "}";
+      while (siguiente) {
+        if (siguiente.condicion)
+          resultado +=  "else if(" + zl.javascript.expresion(siguiente.condicion) + "){" +
+              zl.javascript.sentencias(siguiente.sentencias)+
+              "}";
+        else
+          resultado +=  "else{" +
+              zl.javascript.sentencias(siguiente.sentencias)+
+              "}";
+
+        siguiente = siguiente.siguiente;
+      }
     }
     return resultado + ";";
   }
@@ -84,24 +117,35 @@ zl.javascript = zl.javascript || {};
   }
 
   zl.javascript.nombre = function(compilado, entorno) {
-    return "$zl_" + compilado;
+    return "$zl_" + compilado.toLowerCase();
   }
 
   zl.javascript.expresion = function(compilado, entorno) {
     // Operaciones con dos operadores:
+    var operador = zl.javascript.operador(compilado.op, entorno);
     if (compilado.izq && compilado.der) {
       var izq = zl.javascript.expresion(compilado.izq);
       var der = zl.javascript.expresion(compilado.der);
 
-      return izq + compilado.op + der;
-    } else if (compilado.der && compilado.op) {
+      return izq + " " +  operador +  " " + der;
+    } else if (compilado.der && operador) {
       var der = (compilado.der.tipo.indexOf("expresion") > -1 ?
         zl.javascript.expresion(compilado.der) :
         zl.javascript.evaluacion(compilado.der));
-      return compilado.op + der;
+      return operador + der;
     } else {
       return zl.javascript.evaluacion(compilado);
     }
+  }
+
+  zl.javascript.operador = function(compilado, entorno) {
+    if (compilado == "=")
+      return "==";
+    if (compilado == "o")
+      return "||";
+    if (compilado == "y")
+      return "&&";
+    return compilado;
   }
 
   zl.javascript.evaluacion = function(compilado, entorno) {

@@ -68,16 +68,35 @@
 Subrutina Externa Inicio
 Datos
   contador es Numero
+  num es Numero
+  primo es Boleano
 Algoritmo
-  contador <- 3
-  mientras contador > 0 hacer
+  mostrar
+  [
+    mensaje <- "Introduce un número"
+  ]
+  leerNumero
+  [
+    mensaje -> num
+  ]
+  contador <- 2
+  primo <- num >= 2
+  mientras contador < num/2 y primo = verdadero hacer
+    si num%contador = 0 hacer
+      primo <- falso
+    fin
+    contador <- contador + 1
+  fin
+  si primo = verdadero hacer
     mostrar
     [
-      // TODO: Este código no debería compilar en un futuro
-      // sin una conversión número a texto explícita.
-      mensaje <- contador + "\n"
+      mensaje <- "El número " + num + " es primo"
     ]
-    contador <- contador - 1
+  si no hacer
+    mostrar
+    [
+      mensaje <- "El número " + num + " no es primo: es divisible por " + (contador - 1)
+    ]
   fin
 fin
 </textarea>
