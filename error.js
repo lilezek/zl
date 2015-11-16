@@ -20,9 +20,22 @@ zl.error = zl.error || {};
     }
     return lista;
   }
+  
+  zl.error.posicionCaracter = function(texto, posicion) {
+    var resultado = {linea: 1, columna: 1};
+    for (var i = 0; i < posicion; i++) {
+      resultado.columna += 1;
+      if (texto[i] == "\n") {
+        resultado.linea += 1;
+        resultado.columna = 0;
+      }
+    }
+    return resultado;
+  }
 
   zl.error.obtenerMensaje = function(compilacion, zlcodigo) {
     var listaDeErrores = zl.error.obtenerLista(compilacion);
+    //var siguienteCaracter = (zlcodigo.length < listaDeErrores[0].end ? zlcodigo[listaDeErrores[0].end] : "");
     // Análisis de errores
 
     // 1 Símbolo inesperado
@@ -30,6 +43,16 @@ zl.error = zl.error || {};
       // Nada escrito:
       if (zlcodigo.trim() == "")
         return "Escribe algo de código a la izquierda para empezar."
+      for (var i = listaDeErrores.length-1; i >= 0; i--) {
+        // Falta un paréntesis:
+        // Evaluación opción 6 
+        if (listaDeErrores[i].tipo == "evaluacion" && listaDeErrores[i].opcion == 6) {
+          var pos = zl.error.posicionCaracter(zlcodigo, listaDeErrores[i].begin);
+                    return "Hay un paréntesis en la línea "+pos.linea+" que está sin cerrar";
+        }
+      }
+      // Sobra paréntesis:
+      //console.log(siguienteCaracter);
       return JSON.stringify(listaDeErrores);
     }
 
