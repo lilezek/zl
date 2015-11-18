@@ -20,11 +20,11 @@ zl.analizador = {};
         resultado: aguja[0]
       };
     } else {
-      return {
+      throw zl.error.newError(zl.error.E_SIMBOLO, {
         begin: posicion,
         end: posicion,
-        error: zl.error.E_SIMBOLO
-      };
+        rama: [this.nombre]
+      });
     }
   }
 
@@ -47,11 +47,13 @@ zl.analizador = {};
     var posicion = posicion || 0;
     var intento = null;
     var masDeUnIntento = false;
-    var error = true;
     var opcion = 0;
-    var resultado;
+    var resultado = null;
+    var error = null;
     // Backtracking:
     for (var i = 0; i < this.opciones.length && error; i++) {
+      var cadena = this.opciones[i];
+      var reduccion;
       resultado = {
         begin: posicion,
         end: posicion,
@@ -59,26 +61,29 @@ zl.analizador = {};
         opcion: i,
         resultado: []
       };
-
-
-      var cadena = this.opciones[i];
-      var r;
-      for (var j = 0; j < cadena.length; j++) {
-
-        // Comprobar si ya se intentó esta reducción:
-        if (cadena[j].memo && cadena[j].memo[resultado.end]) {
-          r = cadena[j].memo[resultado.end];
-          r.reintento = true;
-        } else {
-          cadena[j].memo[resultado.end] = r = cadena[j].reducir(pajar, resultado.end);
+      try {
+        for (var j = 0; j < cadena.length; j++) {
+          // Comprobar si ya se intentó esta reducción:
+          if (cadena[j].memo && cadena[j].memo[resultado.end]) {
+            reduccion = cadena[j].memo[resultado.end];
+            reduccion.reintento = true;
+          } else {
+            cadena[j].memo[resultado.end] = reduccion = cadena[j].reducir(pajar, resultado.end);
+          }
+          // Añadir la reduccion
+          resultado.resultado.push(reduccion.resultado);
         }
-        resultado.end = r.end
-        if (r.error) {
-          break;
+
+      } catch(err) {
+        if (err && err.constructor && err.constructor.name === "Error") {
+          error = err;
+          error.traza.rama = [resultado].concat(error.traza.rama);
+          // Siguiente opcion
+          continue;
         } else {
-          resultado.resultado.push(r.resultado);
+          throw err;
         }
-      }
+      } 
 
       // Si compila, se aplican las comprobaciones sintácticas:
       if (!r.error) {
@@ -112,12 +117,7 @@ zl.analizador = {};
       resultado.resultado = this.postproceso(resultado.resultado, opcion);
       return resultado;
     } else {
-      //if (!masDeUnIntento)
-        resultado.intento = intento;
-      resultado.opcion = opcion;
-      resultado.end = intento.end;
-      resultado.error = intento.error;
-      return resultado;
+      throw error;
     }
   }
 

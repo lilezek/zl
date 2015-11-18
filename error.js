@@ -4,6 +4,12 @@ zl.error = zl.error || {};
 (function() {
   "use strict";
 
+  function Error(tipo, traza) {
+    this.tipo = tipo;
+    this.traza = traza;
+    return this;
+  }
+
   zl.error.obtenerLista = function(compilacion) {
     var lista = [];
     var i = 0;
@@ -69,4 +75,9 @@ zl.error = zl.error || {};
   // distintos errores:
   zl.error.E_SIMBOLO = 1;
   zl.error.E_PALABRA_RESERVADA = 2;
+  
+  
+  zl.error.newError = function(a,b) {
+    return new Error(a,b);
+  }
 })();
