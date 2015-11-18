@@ -25,7 +25,12 @@ var zl = zl || {};
     zlcode = zlcode.substring(compilado.end).trim();
 
     // Fase 3, obtener el árbol sintáctico del resto del código:
-    compilado = zl.sintaxis.arbolCodigo(zlcode);
+    try {
+      compilado = zl.sintaxis.arbolCodigo(zlcode);  
+    } catch (err) {
+      console.log(err);
+    }
+    
 
     // En caso de error, terminar:
     if (compilado.error) {

@@ -23,7 +23,7 @@ zl.analizador = {};
       throw zl.error.newError(zl.error.E_SIMBOLO, {
         begin: posicion,
         end: posicion,
-        rama: [this.nombre]
+        arbol: this.nombre
       });
     }
   }
@@ -45,22 +45,20 @@ zl.analizador = {};
 
   Expresion.prototype.reducir = function(pajar, posicion) {
     var posicion = posicion || 0;
-    var intento = null;
-    var masDeUnIntento = false;
     var opcion = 0;
-    var resultado = null;
-    var error = null;
-    // Backtracking:
-    for (var i = 0; i < this.opciones.length && error; i++) {
-      var cadena = this.opciones[i];
-      var reduccion;
-      resultado = {
+    var resultado = {
         begin: posicion,
         end: posicion,
         tipo: this.nombre,
-        opcion: i,
+        opcion: 0,
         resultado: []
       };
+    var error = null;
+    // Backtracking:
+    for (var i = 0; i < this.opciones.length; i++) {
+      var cadena = this.opciones[i];
+      var reduccion; 
+      resultado.opcion = i;
       try {
         for (var j = 0; j < cadena.length; j++) {
           // Comprobar si ya se intentó esta reducción:
@@ -76,8 +74,19 @@ zl.analizador = {};
 
       } catch(err) {
         if (err && err.constructor && err.constructor.name === "Error") {
-          error = err;
-          error.traza.rama = [resultado].concat(error.traza.rama);
+          if (!error) {
+            error = err;
+            var errarb = error.traza.arbol;
+            error.traza.arbol = {
+              begin: posicion,
+              end: errarb.end,
+              opciones: {},
+              tipo: this.nombre
+            };
+            error.traza.arbol.opciones[i] = errarb;
+          } else {
+            error.traza.arbol.opciones[i] = error.traza.arbol;
+          }
           // Siguiente opcion
           continue;
         } else {
@@ -85,32 +94,15 @@ zl.analizador = {};
         }
       } 
 
-      // Si compila, se aplican las comprobaciones sintácticas:
-      if (!r.error) {
-        var tmperr = this.error(resultado.resultado, i, posicion);
-        if (!tmperr) {
-          error = false;
+      var tmperr = this.error(resultado.resultado, i, posicion);
+      resultado.end = reduccion.end;
+      if (!tmperr) {
+          error = null;
           opcion = i;
-        } else {
-          // En caso de error sintáctico, no se intentará ninguna otra opción.
-          resultado.error = tmperr;
-          return resultado;
-        }
       } else {
-        if (intento == null || intento.end < resultado.end) {
-          intento = r;
-          opcion = i;
-          masDeUnIntento = false;
-        } else if (intento.end == r.end && !r.reintento) {
-          if (intento.error == r.error) {
-            // TODO: mejorar este tipo de error
-            intento.tipo = "multiples";
-          } else {
-            masDeUnIntento = true;
-          }
-        }
+        // En caso de error sintáctico, no se intentará ninguna otra opción.
+        throw zl.error.newError(tmperr, resultado);
       }
-
     }
 
     if (!error) {
