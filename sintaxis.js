@@ -14,7 +14,6 @@ zl.sintaxis = zl.sintaxis || {};
     zl.analizador.limpiarCache(reglas);
     var reglaPrincipal = reglas["programa"];
     var arbol = reglaPrincipal.reducir(zlcode);
-    console.log(arbol);
     if (!arbol.error) {
       return arbol.resultado;
     }

@@ -57,26 +57,29 @@ zl.analizador = {};
     // Backtracking:
     for (var i = 0; i < this.opciones.length; i++) {
       var cadena = this.opciones[i];
-      var reduccion; 
+      var reduccion;
       resultado.opcion = i;
+      resultado.resultado = [];
       try {
+        // Iterador que avanza con las reducciones
+        var posAct = posicion;
         for (var j = 0; j < cadena.length; j++) {
           // Comprobar si ya se intentó esta reducción:
-          if (cadena[j].memo && cadena[j].memo[resultado.end]) {
-            reduccion = cadena[j].memo[resultado.end];
+          if (cadena[j].memo && cadena[j].memo[posAct]) {
+            reduccion = cadena[j].memo[posAct];
             reduccion.reintento = true;
           } else {
-            cadena[j].memo[resultado.end] = reduccion = cadena[j].reducir(pajar, resultado.end);
+            cadena[j].memo[posAct] = reduccion = cadena[j].reducir(pajar, posAct);
           }
           // Añadir la reduccion
+          posAct = reduccion.end;
           resultado.resultado.push(reduccion.resultado);
         }
-
       } catch(err) {
-        if (err && err.constructor && err.constructor.name === "Error") {
+        if (zl.error.esError(err)) {
           if (!error) {
             error = err;
-            var errarb = error.traza.arbol;
+            var errarb = error.traza.arbol || error.traza;
             error.traza.arbol = {
               begin: posicion,
               end: errarb.end,
@@ -85,26 +88,45 @@ zl.analizador = {};
             };
             error.traza.arbol.opciones[i] = errarb;
           } else {
-            error.traza.arbol.opciones[i] = error.traza.arbol;
+            // Si viene un nuevo error, comprobar que sea del mismo tamaño
+            // Si el tamaño del error es más grande, significa que ha
+            // reducido más tokens y que probablemente se acerque más
+            // a lo que el usuario quiso escribir.
+            if (err.end > error.end) {
+              error.traza.arbol = {
+                begin: posicion,
+                end: err.end,
+                opciones: {},
+                tipo: this.nombre
+              };
+              error.traza.arbol.opciones[i] = err.traza.arbol;
+            } else if (err.end == error.end) {
+              error.traza.arbol.opciones[i] = err.traza.arbol;
+            }
           }
           // Siguiente opcion
           continue;
         } else {
           throw err;
         }
-      } 
-
-      var tmperr = this.error(resultado.resultado, i, posicion);
+      }
+      // Si se llega aquí es porque alguna de las opciones no dio error.
+      error = null;
       resultado.end = reduccion.end;
+
+      // Comprobar errores después de la reducción.
+      var tmperr = this.error(resultado.resultado, i, posicion);
       if (!tmperr) {
-          error = null;
           opcion = i;
       } else {
         // En caso de error sintáctico, no se intentará ninguna otra opción.
         throw zl.error.newError(tmperr, resultado);
       }
-    }
 
+      // Romper aquí el bucle.
+      // Que nadie vea este break nunca en la vida
+      break;
+    }
     if (!error) {
       resultado.resultado = this.postproceso(resultado.resultado, opcion);
       return resultado;

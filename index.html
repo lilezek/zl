@@ -6,6 +6,9 @@
   <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
   <script src="http://jsbeautifier.org/js/lib/beautify.js"></script>
   <script src="codemirror.js"></script>
+  <script src="filesaver.js"></script>
+  <script src="jszip.js"></script>
+  <script src="jsziputils.js"></script>
   <script src="https://codemirror.net/addon/mode/simple.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.8.0/codemirror.css">
   <script src="zlsintaxis.js"></script>
@@ -81,7 +84,7 @@ Algoritmo
   ]
   contador <- 2
   primo <- num >= 2
-  mientras contador < num/2 y primo = verdadero hacer
+  mientras contador*contador < num y primo = verdadero hacer
     si num%contador = 0 hacer
       primo <- falso
     fin
@@ -98,8 +101,7 @@ Algoritmo
       mensaje <- "El número " + num + " no es primo: es divisible por " + (contador - 1)
     ]
   fin
-fin
-</textarea>
+fin</textarea>
     <div class="v divisor"></div>
     <div class="compilation">
       <textarea class="content" id="content" readonly="readonly"></textarea>
@@ -108,7 +110,7 @@ fin
       <input type="text" class="input" id="input">
       <div style="display: flex;">
         <button class="run" id="run">
-          Run
+          Empezar
         </button>
         <button class="min" id="min">
           Activar compresión
@@ -168,17 +170,19 @@ fin
       }
       Compile(editor.getValue());
 
+      var zip;
+      JSZipUtils.getBinaryContent('entorno.zip', function(err, data) {
+        if(err) {
+          throw err; // or handle err
+        }
+
+        zip = new JSZip(data);
+      });
       function download() {
-        var element = document.createElement('a');
-        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(editor.getValue()));
-        element.setAttribute('download', "codigo.zl");
-
-        element.style.display = 'none';
-        document.body.appendChild(element);
-
-        element.click();
-
-        document.body.removeChild(element);
+        zip.file("codigo.zl",editor.getValue());
+        zip.file("zl.comp.js", lastjs);
+        var content = zip.generate({type: "blob"});
+        saveAs(content, "programa.zip");
       }
     </script>
 </body>

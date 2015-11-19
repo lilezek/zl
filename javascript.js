@@ -13,7 +13,7 @@ zl.javascript = zl.javascript || {};
   // Generar el final
   // TODO: Hacerlo a partir del entorno
   zl.javascript.final = function(compilado, entorno) {
-    return "})();$zl_inicio({});"
+    return "})();"
   }
 
   zl.javascript.generar = function(compilado, entorno) {

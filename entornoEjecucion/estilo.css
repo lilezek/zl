@@ -1,0 +1,32 @@
+body, html {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-flow: column nowrap;
+  flex-flow: column nowrap;
+  overflow: hidden;
+}
+
+.main {
+  display: flex;
+  display: -webkit-flex;
+  -webkit-flex: 1;
+  flex: 1;
+  -webkit-flex-flow: column nowrap;
+  flex-flow: column nowrap;
+}
+
+.output {
+  -webkit-flex: 1;
+  flex: 1;
+  font-family: monospace;
+}
+
+.run {
+  height: 50px;
+  -webkit-flex: 1;
+  flex: 1;
+}

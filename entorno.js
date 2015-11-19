@@ -50,19 +50,15 @@ zl.entorno = zl.entorno || {};
       // Lista de subrutinas
       for (var i = 0; i < c.subrutinas.length; i++) {
         subrutina(c.subrutinas[i],e);
-        if (c.subrutinas[i].error) {
-          c.error = c.subrutinas[i].error;
-          c.intento = c.subrutinas[i];
-          return;
-        }
       }
     }
 
     var subrutina = function(c,e) {
       // Esto cambia la subrutina actual:
       if (!e.registrarSubrutina(c.nombre)) {
-          c.error = zl.error.E_NOMBRE_SUBRUTINA_YA_USADO;
-          return;
+        throw zl.error.newError(zl.error.E_NOMBRE_SUBRUTINA_YA_USADO, {
+
+        });
       }
       // Registrar modificadores
       for (var i = 0; i < c.modificadores.length; i++) {
@@ -70,25 +66,24 @@ zl.entorno = zl.entorno || {};
       }
       // Registrar datos
       for (var i = 0; i < c.datos.length; i++) {
-        console.log(e.subrutinaActual);
         var dato = e.subrutinaActual.registrarDato(c.datos[i].nombre);
         if (!dato) {
-          c.error = c.datos[i].error = zl.error.E_NOMBRE_DATO_YA_USADO;
-          c.intento = c.datos[i];
-          return;
+          throw zl.error.newError(zl.error.E_NOMBRE_DATO_YA_USADO, {
+
+          });
         }
         dato.tipo = c.datos[i].tipo;
         for (var j = 0; j < c.datos[i].modificadores.length; j++) {
           var mod = c.datos[i].modificadores[j].toLowerCase();
           if (mod == "salida") {
             if (dato.modificador == dato.M_GLOBAL) {
-              c.error = c.datos[i].error = zl.error.E_USO_INDEBIDO_MODIFICADOR_GLOBAL;
-              c.intento = c.datos[i];
-              return;
+              throw zl.error.newError(zl.error.E_USO_INDEBIDO_MODIFICADOR_GLOBAL, {
+
+              });
             } else if (dato.modificador == dato.M_SALIDA) {
-              c.error = c.datos[i].error = zl.error.E_MODIFICADOR_REPETIDO;
-              c.intento = c.datos[i];
-              return;
+              throw zl.error.newError(zl.error.E_MODIFICADOR_REPETIDO, {
+
+              });
             } else if (dato.modificador == dato.M_ENTRADA) {
               dato.modificador = dato.M_ENTRADA_SALIDA;
             } else {
@@ -96,13 +91,13 @@ zl.entorno = zl.entorno || {};
             }
           } else if (mod == "entrada") {
             if (dato.modificador == dato.M_GLOBAL) {
-              c.error = c.datos[i].error = zl.error.E_USO_INDEBIDO_MODIFICADOR_GLOBAL;
-              c.intento = c.datos[i];
-              return;
+              throw zl.error.newError(zl.error.E_USO_INDEBIDO_MODIFICADOR_GLOBAL, {
+
+              });
             } else if (dato.modificador == dato.M_ENTRADA) {
-              c.error = c.datos[i].error = zl.error.E_MODIFICADOR_REPETIDO;
-              c.intento = c.datos[i];
-              return;
+              throw zl.error.newError(zl.error.E_MODIFICADOR_REPETIDO, {
+
+              });
             } else if (dato.modificador == dato.M_SALIDA) {
               dato.modificador = dato.M_ENTRADA_SALIDA;
             } else {
@@ -110,13 +105,13 @@ zl.entorno = zl.entorno || {};
             }
           } else if (mod == "global") {
             if (dato.modificador == dato.M_GLOBAL) {
-              c.error = c.datos[i].error = zl.error.E_MODIFICADOR_REPETIDO;
-              c.intento = c.datos[i];
-              return;
+              throw zl.error.newError(zl.error.E_MODIFICADOR_REPETIDO, {
+
+              });
             } else if (dato.modificador == dato.M_ENTRADA || dato.modificador == dato.M_SALIDA) {
-              c.error = c.datos[i].error = zl.error.E_MODIFICADOR_REPETIDO;
-              c.intento = c.datos[i];
-              return;
+              throw zl.error.newError(zl.error.E_MODIFICADOR_REPETIDO, {
+
+              });
             } else {
               dato.modificador = dato.M_GLOBAL;
             }
