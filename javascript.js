@@ -7,7 +7,7 @@ zl.javascript = zl.javascript || {};
   // Generar la cabecera
   // TODO: Hacerlo a partir del entorno
   zl.javascript.cabecera = function(compilado, entorno) {
-    return "var $zl_inicio;(function(){/*\"use strict\"*/";
+    return "var $zl_inicio;(function(){\"use strict\";";
   }
 
   // Generar el final
