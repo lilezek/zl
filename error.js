@@ -4,6 +4,12 @@ zl.error = zl.error || {};
 (function() {
   "use strict";
 
+  function Error(tipo, traza) {
+    this.tipo = tipo;
+    this.traza = traza;
+    return this;
+  }
+
   zl.error.obtenerLista = function(compilacion) {
     var lista = [];
     var i = 0;
@@ -81,4 +87,5 @@ zl.error = zl.error || {};
   zl.error.E_NOMBRE_DATO_YA_USADO = 4;
   zl.error.E_MODIFICADOR_REPETIDO = 5;
   zl.error.E_USO_INDEBIDO_MODIFICADOR_GLOBAL = 6;
+  }
 })();
