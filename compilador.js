@@ -37,11 +37,12 @@ var zl = zl || {};
     // Fase 4, registrar nombres (de variables, de subrutinas, de objetos...)
     var entorno = zl.entorno.newEntorno();
     entorno.registrarNombres(compilado);
+    console.log(compilado, entorno);
 
     // En caso de error, terminar:
-    if (entorno.error) {
+    if (compilado.error) {
       return {
-        error: zl.error.obtenerMensaje(entorno.error, zlcode)
+        error: zl.error.obtenerMensaje(compilado, zlcode)
       };
     }
 
@@ -50,9 +51,9 @@ var zl = zl || {};
     zl.semantica.testar(compilado,entorno);
 
     // En caso de error, terminar:
-    if (entorno.error) {
+    if (compilado.error) {
       return {
-        error: zl.error.obtenerMensaje(entorno.error, zlcode)
+        error: zl.error.obtenerMensaje(compilado, zlcode)
       };
     }
 

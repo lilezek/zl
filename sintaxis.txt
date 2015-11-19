@@ -39,7 +39,7 @@
 
 <algoritmo> ::= "algoritmo" <_> (<sentencia> <_>)+
 
-<declaracion> ::= <nombre> <_> "es" <_> <nombre> (<_> "de" <_> <declaracionModificador>)*
+<declaracion> ::= <nombre> <_> "es" <_> <nombre> (<_> <declaracionModificador>)*
 
 <sentencia> ::= <asignacion>
     | <ecuacion>
@@ -48,12 +48,13 @@
     | <sicondicional>
     | <mientras>
 
-<declaracionModificador> ::= "entrada"
-    | "salida"
+<declaracionModificador> ::= "de" <_> "entrada"
+    | "de" <_> "salida"
+    | "global"
 
 <asignacion> ::= <nombre> <_> "<-" <_> <expresion>
 
-<ecuacion> ::= <expresion> <_> "=" <_> <expresion>
+<ecuacion> ::= <nombre> <_> "=" <_> <expresion>
 
 <llamada> ::= <nombre> <_> "->" <_> <nombre> <_> "->" <_> <nombre>
     | <nombre> <_> "->" <_> <nombre>

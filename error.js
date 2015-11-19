@@ -20,7 +20,7 @@ zl.error = zl.error || {};
     }
     return lista;
   }
-  
+
   zl.error.posicionCaracter = function(texto, posicion) {
     var resultado = {linea: 1, columna: 1};
     for (var i = 0; i < posicion; i++) {
@@ -45,7 +45,7 @@ zl.error = zl.error || {};
         return "Escribe algo de código a la izquierda para empezar."
       for (var i = listaDeErrores.length-1; i >= 0; i--) {
         // Falta un paréntesis:
-        // Evaluación opción 6 
+        // Evaluación opción 6
         if (listaDeErrores[i].tipo == "evaluacion" && listaDeErrores[i].opcion == 6) {
           var pos = zl.error.posicionCaracter(zlcodigo, listaDeErrores[i].begin);
           return "Hay un paréntesis '(' en la línea "+pos.linea+" que está sin cerrar";
@@ -64,9 +64,21 @@ zl.error = zl.error || {};
       var palabra = listaDeErrores[listaDeErrores.length-1].reduccion[0];
       return "La palabra '"+palabra+"' está reservada y no se puede usar como nombre";
     }
+
+    console.log(listaDeErrores);
+
+    // Uso indebido de global (global + salida o global + entrada):
+    if (compilacion.error == zl.error.E_USO_INDEBIDO_MODIFICADOR_GLOBAL) {
+      var pos = zl.error.posicionCaracter(zlcodigo, listaDeErrores[0].end);
+      return "El dato en la línea "+pos.linea+" no puede ser de entrada o de salida a la vez que global";
+    }
   }
 
   // distintos errores:
   zl.error.E_SIMBOLO = 1;
   zl.error.E_PALABRA_RESERVADA = 2;
+  zl.error.E_NOMBRE_SUBRUTINA_YA_USADO = 3;
+  zl.error.E_NOMBRE_DATO_YA_USADO = 4;
+  zl.error.E_MODIFICADOR_REPETIDO = 5;
+  zl.error.E_USO_INDEBIDO_MODIFICADOR_GLOBAL = 6;
 })();

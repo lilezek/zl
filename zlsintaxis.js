@@ -72,6 +72,7 @@ zl.sintaxis = zl.sintaxis || {};
     $["de"] = zl.analizador.newSimbolo(/^(de)/i, "de");
     $["datos"] = zl.analizador.newSimbolo(/^(datos)/i, "datos");
     $["algoritmo"] = zl.analizador.newSimbolo(/^(algoritmo)/i, "algoritmo");
+    $["global"] = zl.analizador.newSimbolo(/^(global)/i, "global");
     var espacio = zl.analizador.newSimbolo(/^([ \n\t]+)/i, "espacio");
     var comentario = zl.analizador.newSimbolo(/^(\/\/.*)/i, "comentario");
     var numero = zl.analizador.newSimbolo(/^((?:[0-1]+(?:\|2))|(?:[0-9A-Fa-f]+(?:\|16))|(?:[0-9]+(?:\|10)?))/i, "numero");
@@ -161,12 +162,13 @@ zl.sintaxis = zl.sintaxis || {};
     ], "lista de sentencias");
 
     reglas["declaracionModificador"] = zl.analizador.newExpresion([
-      [$["entrada"]],
-      [$["salida"]]
+      [$["de"], " ", $["entrada"]],
+      [$["de"], " ", $["salida"]],
+      [$["global"]]
     ],"declaracionModificador");
 
     reglas["declaracionModificador*"] = zl.analizador.newExpresion([
-      [$["de"], " ", "declaracionModificador", " ", "declaracionModificador*" ],
+      ["declaracionModificador", " ", "declaracionModificador*" ],
       [$["nada"]]
     ],"declaracionModificador*");
 
@@ -292,7 +294,7 @@ zl.sintaxis = zl.sintaxis || {};
     }
 
     reglas["programa"].postproceso = function(datos, opcion) {
-      return datos[0];
+      return {subrutinas: datos[0]};
     }
 
     reglas["subrutina+"].postproceso = function(datos, opcion) {
@@ -311,6 +313,19 @@ zl.sintaxis = zl.sintaxis || {};
       };
     }
 
+    reglas["modificador"].postproceso = function(datos, opcion) {
+      if (opcion == 2)
+        return "rapida";
+      return datos[0];
+    }
+
+    reglas["modificador*"].postproceso = function(datos, opcion) {
+      if (opcion == 0)
+        return [datos[0]].concat(datos[2]);
+      else
+        return [];
+    }
+
     reglas["nombre"].postproceso = function(datos, opcion) {
       var nombre = datos[0];
       if (opcion == 0) {
@@ -319,8 +334,27 @@ zl.sintaxis = zl.sintaxis || {};
       return nombre;
     }
 
+    reglas["datos"].postproceso = function(datos, opcion) {
+      return datos[2];
+    }
+
     reglas["algoritmo"].postproceso = function(datos, opcion) {
       return datos[2];
+    }
+
+    reglas["declaracion"].postproceso = function(datos, opcion) {
+      return {
+        nombre: datos[0],
+        tipo: datos[4],
+        modificadores: datos[6]
+      }
+    }
+
+    reglas["declaracion+"].postproceso = function(datos, opcion) {
+      if (opcion == 0)
+        return [datos[0]].concat(datos[2]);
+      else
+        return [datos[0]];
     }
 
     reglas["sentencia+"].postproceso = function(datos, opcion) {
@@ -346,6 +380,17 @@ zl.sintaxis = zl.sintaxis || {};
         s.tipo = "mientras";
       }
       return s;
+    }
+
+    reglas["declaracionModificador"].postproceso = function(datos, opcion) {
+      return datos[datos.length-1];
+    }
+
+    reglas["declaracionModificador*"].postproceso = function(datos, opcion) {
+      if (opcion == 0)
+        return [datos[0]].concat(datos[2]);
+      else
+        return [];
     }
 
     reglas["asignacion"].postproceso = function(datos) {

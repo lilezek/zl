@@ -26,15 +26,31 @@ zl.javascript = zl.javascript || {};
 
   zl.javascript.programa = function(compilado, entorno) {
     return  zl.javascript.cabecera(compilado, entorno) +
-            zl.javascript.subrutinas(compilado, entorno) +
+            zl.javascript.subrutinas(compilado.subrutinas, entorno) +
             zl.javascript.final(compilado, entorno);
   }
 
   zl.javascript.subrutina = function(compilado, entorno) {
     //TODO: tratar los modificadores y los datos correctamente
-    return  /*"var " +*/ zl.javascript.nombre(compilado.nombre, entorno) + "= function(arg){" +
+    entorno.cambiarSubrutina(compilado.nombre);
+    var resultado = "";
+    if (!entorno.subrutinaActual.modificadores.externa)
+      resultado += "var ";
+
+    resultado += zl.javascript.nombre(compilado.nombre, entorno) + "= function(arg){" +
+            zl.javascript.datos(compilado.datos, entorno) +
             zl.javascript.sentencias(compilado.sentencias, entorno) +
             "};";
+    return resultado;
+  }
+
+  zl.javascript.datos = function(compilado, entorno) {
+    var resultado = "";
+    for (var k in entorno.subrutinaActual.datos) {
+      var dato = entorno.subrutinaActual.datos[k];
+      resultado += "var " + zl.javascript.nombre(dato.nombre) + ";";
+    }
+    return resultado;
   }
 
   zl.javascript.subrutinas = function(compilado, entorno) {
