@@ -14,7 +14,7 @@ CodeMirror.defineSimpleMode("zl", {
     // You can match multiple tokens at once. Note that the captured
     // groups must span the whole string in this case
     {
-      regex: /(subrutina)(.+)\s([a-zA-Z]+)/i,
+      regex: /(subrutina)(.+\s)([a-zA-Z]+)/i,
       token: ["keyword", null, "variable-2"]
     },
     // Rules are matched in the order in which they appear, so there is
