@@ -118,7 +118,7 @@ zl.javascript = zl.javascript || {};
     if (compilado.length > 0) {
       resultado += compilado[0].izq + ":" + zl.javascript.expresion(compilado[0].der, entorno);
       for (var i = 1; i < compilado.length; i++) {
-        resultado += compilado[i].izq + ":" + zl.javascript.expresion(compilado[i].der, entorno);
+        resultado += ","+compilado[i].izq + ":" + zl.javascript.expresion(compilado[i].der, entorno);
       }
     }
     return resultado + "}";

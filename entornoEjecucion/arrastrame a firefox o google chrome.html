@@ -33,6 +33,11 @@
       mensaje: $("#input").val()
     };
   }
+  var $zl_aleatorio = function(arg) {
+    return {
+      resultado: Math.round((Math.random() * (arg.maximo - arg.minimo)) + arg.minimo)
+    };
+  }
   function run() {
     "use strict";
     // Preparar el runtime:

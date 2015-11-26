@@ -60,6 +60,12 @@ var zl = zl || {};
       };
     }
 
+    var $zl_aleatorio = function(arg) {
+      return {
+        resultado: Math.round((Math.random() * (arg.maximo - arg.minimo)) + arg.minimo)
+      };
+    }
+
     // Después ejecutar:
     eval(javascript);
     $zl_inicio({});
