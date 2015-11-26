@@ -157,16 +157,21 @@ fin</textarea>
       function Compile(zlcode) {
         lasttimeout = null;
         var compilation = $("#content").get(0);
-        var comp = zl.Compilar(zlcode);
-        if (comp.error)
-          compilation.innerHTML = comp.error;
-        else if (comp.javascript) {
+        var comp;
+        try {
+          comp = zl.Compilar(zlcode);
           if (minify)
             lastjs = js_beautify(uglify(js_beautify(comp.javascript)));
           else
             lastjs = js_beautify(comp.javascript);
           compilation.innerHTML = lastjs;
-        }
+
+        } catch (e) {
+          if (zl.error.esError(e))
+            compilation.innerHTML = zl.error.obtenerMensaje(e, zlcode);
+          else
+            throw e;
+        } 
       }
       Compile(editor.getValue());
 

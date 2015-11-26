@@ -16,11 +16,26 @@ zl.sintaxis = zl.sintaxis || {};
       "no": true,
       "y": true,
       "o": true,
-      "si": true,
       "hacer": true,
+      "si": true,
       "fin": true,
+      "verdadero": true,
+      "falso": true,
+      "imposible": true,
+      "nada": true,
+      "veces": true,
+      "repetir": true,
       "mientras": true,
-      "repetir": true
+      "subrutina": true,
+      "externa": true,
+      "es": true,
+      "rapida": true,
+      "entrada": true,
+      "salida": true,
+      "de": true,
+      "datos": true,
+      "algoritmo": true,
+      "global": true
     };
 
     // Conjunto de las reglas:
@@ -288,7 +303,7 @@ zl.sintaxis = zl.sintaxis || {};
       if (opcion == 0) {
         nombre = datos[0] + datos[1] + datos[2];
       }
-      if (nombre in palabrasReservadas) {
+      if (nombre.toLowerCase() in palabrasReservadas) {
         return zl.error.E_PALABRA_RESERVADA;
       }
     }

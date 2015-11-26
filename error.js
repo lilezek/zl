@@ -10,6 +10,20 @@ zl.error = zl.error || {};
     return this;
   }
 
+  Error.prototype.hojas = function(nodo) {
+    var nodo = nodo || this.traza.arbol;
+    var res = [];
+    if (nodo.opciones) {
+      for (var k in nodo.opciones) {
+        var x = Error.prototype.hojas(nodo.opciones[k]);
+        res = res.concat(x);
+      }
+      return res;
+    } else {
+      return [nodo];
+    }
+  }
+
   zl.error.posicionCaracter = function(texto, posicion) {
     var resultado = {linea: 1, columna: 1};
     for (var i = 0; i < posicion; i++) {
@@ -23,7 +37,12 @@ zl.error = zl.error || {};
   }
 
   zl.error.obtenerMensaje = function(error, zlcodigo) {
-    return JSON.stringify(error);
+    if (error.tipo == zl.error.E_PALABRA_RESERVADA) {
+      var palabra = error.hojas()[0].resultado.resultado[0];
+      return  "En la línea "+zl.error.posicionCaracter(zlcodigo, error.traza.arbol.end).linea+
+              " se usa como nombre la palabra reservada '"+palabra+"'"
+    }
+    return js_beautify(JSON.stringify(error));
   }
 
   // distintos errores:

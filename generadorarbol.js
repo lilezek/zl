@@ -21,9 +21,11 @@ zl.analizador = {};
       };
     } else {
       throw zl.error.newError(zl.error.E_SIMBOLO, {
-        begin: posicion,
-        end: posicion,
-        arbol: this.nombre
+        arbol: {
+          tipo: this.nombre,
+          begin: posicion,
+          end: posicion
+        }
       });
     }
   }
@@ -92,16 +94,28 @@ zl.analizador = {};
             // Si el tamaño del error es más grande, significa que ha
             // reducido más tokens y que probablemente se acerque más
             // a lo que el usuario quiso escribir.
-            if (err.end > error.end) {
+            if (err.traza.arbol.end > error.traza.arbol.end) {
               error.traza.arbol = {
                 begin: posicion,
-                end: err.end,
+                end: err.traza.arbol.end,
                 opciones: {},
                 tipo: this.nombre
               };
               error.traza.arbol.opciones[i] = err.traza.arbol;
-            } else if (err.end == error.end) {
-              error.traza.arbol.opciones[i] = err.traza.arbol;
+              error.tipo = err.tipo;
+            } else if (err.traza.arbol.end == error.traza.arbol.end) {
+              if (error.tipo < err.tipo) {
+                error.traza.arbol = {
+                  begin: posicion,
+                  end: err.traza.arbol.end,
+                  opciones: {},
+                  tipo: this.nombre
+                };
+                error.traza.arbol.opciones[i] = err.traza.arbol;
+                error.tipo = err.tipo;
+              } else {
+                error.traza.arbol.opciones[i] = err.traza.arbol;  
+              }              
             }
           }
           // Siguiente opcion
@@ -120,7 +134,13 @@ zl.analizador = {};
           opcion = i;
       } else {
         // En caso de error sintáctico, no se intentará ninguna otra opción.
-        throw zl.error.newError(tmperr, resultado);
+        throw zl.error.newError(tmperr, {
+          arbol: {
+            begin: posicion,
+            end: resultado.end,
+            resultado: resultado
+          }
+        });
       }
 
       // Romper aquí el bucle.
