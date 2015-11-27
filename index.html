@@ -68,39 +68,35 @@
 <body>
   <div class="main">
 <textarea class="editor" id="editor">
+Subrutina DivisionEntera
+Datos
+  dividendo es Numero de entrada
+  divisor es Numero de entrada
+  resultado es Numero de salida
+Algoritmo
+  resultado <- (dividendo - (dividendo % divisor)) / divisor
+fin
+
 Subrutina Externa Inicio
 Datos
-  contador es Numero
-  num es Numero
-  primo es Boleano
+  divisor es Numero
+  dividendo es Numero
+  resultado es Numero
 Algoritmo
-  mostrar
-  [
-    mensaje <- "Introduce un número"
+  leerNumero [ mensaje -> dividendo ]  
+  leerNumero [ mensaje -> divisor ]
+    
+  // Llamada completa
+  DivisionEntera [
+    resultado -> resultado
+    dividendo <- dividendo
+    divisor <- divisor
   ]
-  leerNumero
-  [
-    mensaje -> num
-  ]
-  contador <- 2
-  primo <- num >= 2
-  mientras contador*contador <= num y primo = verdadero hacer
-    si num%contador = 0 hacer
-      primo <- falso
-    fin
-    contador <- contador + 1
-  fin
-  si primo = verdadero hacer
-    mostrar
-    [
-      mensaje <- "El número " + num + " es primo"
-    ]
-  si no hacer
-    mostrar
-    [
-      mensaje <- "El número " + num + " no es primo: es divisible por " + (contador - 1)
-    ]
-  fin
+  mostrar [ mensaje <- resultado ]
+  
+  // Llamada incompleta
+  // resultado <- DivisionEntera [ dividendo divisor ]
+  // mostrar [ mensaje <- resultado ]
 fin</textarea>
     <div class="v divisor"></div>
     <div class="compilation">

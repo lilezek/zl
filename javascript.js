@@ -37,18 +37,33 @@ zl.javascript = zl.javascript || {};
     if (!entorno.subrutinaActual.modificadores.externa)
       resultado += "var ";
 
-    resultado += zl.javascript.nombre(compilado.nombre, entorno) + "= function(arg){" +
+    resultado += zl.javascript.nombre(compilado.nombre, entorno) + "=function(arg){" +
             zl.javascript.datos(compilado.datos, entorno) +
             zl.javascript.sentencias(compilado.sentencias, entorno) +
-            "};";
+            "return {"
+
+    var coma = "";
+    for (var k in entorno.subrutinaActual.datos) {
+      var dato = entorno.subrutinaActual.datos[k];
+      if (dato.modificador == dato.M_SALIDA || dato.modificador == dato.M_ENTRADA_SALIDA) {
+        resultado += dato.nombre + ":" + zl.javascript.nombre(dato.nombre) + coma;
+      }
+      coma = ",";
+    }
+
+    resultado += "};};";
     return resultado;
   }
 
   zl.javascript.datos = function(compilado, entorno) {
+    //TODO: tratar los modificadores y los datos correctamente
     var resultado = "";
     for (var k in entorno.subrutinaActual.datos) {
       var dato = entorno.subrutinaActual.datos[k];
-      resultado += "var " + zl.javascript.nombre(dato.nombre) + ";";
+      if (dato.modificador == dato.M_ENTRADA || dato.modificador == dato.M_ENTRADA_SALIDA)
+        resultado += "var " + zl.javascript.nombre(dato.nombre) + "=arg." + dato.nombre + ";";
+      else
+        resultado += "var " + zl.javascript.nombre(dato.nombre) + ";";
     }
     return resultado;
   }

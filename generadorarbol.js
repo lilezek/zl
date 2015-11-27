@@ -149,6 +149,10 @@ zl.analizador = {};
     }
     if (!error) {
       resultado.resultado = this.postproceso(resultado.resultado, opcion);
+      resultado.resultado.$ = {
+        begin: resultado.begin,
+        end: resultado.end
+      }
       return resultado;
     } else {
       throw error;
