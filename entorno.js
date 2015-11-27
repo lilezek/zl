@@ -7,6 +7,7 @@ zl.entorno = zl.entorno || {};
     function Entorno() {
       this.subrutinas = {};
       this.subrutinaActual = new Subrutina();
+      this.globales = {};
       return this;
     }
 
@@ -98,6 +99,7 @@ zl.entorno = zl.entorno || {};
               throw zl.error.newError(zl.error.E_MODIFICADOR_REPETIDO, c.datos[i]);
             } else {
               dato.modificador = dato.M_GLOBAL;
+              e.globales[dato.nombre.toLowerCase()] = dato;
             }
           }
         }

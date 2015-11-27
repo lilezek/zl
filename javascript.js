@@ -7,7 +7,11 @@ zl.javascript = zl.javascript || {};
   // Generar la cabecera
   // TODO: Hacerlo a partir del entorno
   zl.javascript.cabecera = function(compilado, entorno) {
-    return "var $zl_inicio;(function(){\"use strict\";";
+    var resultado = "var $zl_inicio;(function(){\"use strict\";";
+    for (var k in entorno.globales) {
+      resultado += "var $zl_"+k+";";
+    }
+    return resultado;
   }
 
   // Generar el final
@@ -40,7 +44,7 @@ zl.javascript = zl.javascript || {};
     resultado += zl.javascript.nombre(compilado.nombre, entorno) + "=function(arg){" +
             zl.javascript.datos(compilado.datos, entorno) +
             zl.javascript.sentencias(compilado.sentencias, entorno) +
-            "return {"
+            "return{"
 
     var coma = "";
     for (var k in entorno.subrutinaActual.datos) {
@@ -62,7 +66,7 @@ zl.javascript = zl.javascript || {};
       var dato = entorno.subrutinaActual.datos[k];
       if (dato.modificador == dato.M_ENTRADA || dato.modificador == dato.M_ENTRADA_SALIDA)
         resultado += "var " + zl.javascript.nombre(dato.nombre) + "=arg." + dato.nombre + ";";
-      else
+      else if (dato.modificador != dato.M_GLOBAL)
         resultado += "var " + zl.javascript.nombre(dato.nombre) + ";";
     }
     return resultado;

@@ -42,7 +42,7 @@ zl.error = zl.error || {};
       return  "En la línea "+zl.error.posicionCaracter(zlcodigo, error.traza.arbol.end).linea+
               " se usa como nombre la palabra reservada '"+palabra+"'"
     }
-    return js_beautify(JSON.stringify(error));
+    return js_beautify(JSON.stringify(error.hojas()));
   }
 
   // distintos errores:
