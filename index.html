@@ -68,6 +68,22 @@
 <body>
   <div class="main">
 <textarea class="editor" id="editor">
+Subrutina read
+Datos
+  g es Numero Global
+  valor es Numero de salida
+Algoritmo
+  valor <- g
+fin
+
+Subrutina write
+Datos
+  g es Numero Global
+  valor es Numero de entrada
+Algoritmo
+  g <- valor
+fin
+  
 Subrutina DivisionEntera
 Datos
   dividendo es Numero de entrada
@@ -86,7 +102,6 @@ Algoritmo
   leerNumero [ mensaje -> dividendo ]  
   leerNumero [ mensaje -> divisor ]
     
-  // Llamada completa
   DivisionEntera [
     resultado -> resultado
     dividendo <- dividendo
@@ -94,9 +109,13 @@ Algoritmo
   ]
   mostrar [ mensaje <- resultado ]
   
-  // Llamada incompleta
-  // resultado <- DivisionEntera [ dividendo divisor ]
-  // mostrar [ mensaje <- resultado ]
+
+  // Globales:
+  write [ valor <- 15 ]
+  read [ valor -> resultado ]
+  
+  mostrar [ mensaje <- resultado ]
+  
 fin</textarea>
     <div class="v divisor"></div>
     <div class="compilation">
