@@ -50,7 +50,7 @@ CodeMirror.defineSimpleMode("zl", {
       indent: true,
       token: "keyword"
     }, {
-      regex: /([\]]|fin|si)/,
+      regex: /([\]]|fin|si)/i,
       dedent: true,
       token: "keyword"
     }, {

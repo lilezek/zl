@@ -114,8 +114,8 @@ zl.analizador = {};
                 error.traza.arbol.opciones[i] = err.traza.arbol;
                 error.tipo = err.tipo;
               } else {
-                error.traza.arbol.opciones[i] = err.traza.arbol;  
-              }              
+                error.traza.arbol.opciones[i] = err.traza.arbol;
+              }
             }
           }
           // Siguiente opcion

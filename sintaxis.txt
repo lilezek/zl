@@ -40,6 +40,13 @@
 <algoritmo> ::= "algoritmo" <_> (<sentencia> <_>)+
 
 <declaracion> ::= <nombre> <_> "es" <_> <nombre> (<_> <declaracionModificador>)*
+    | <nombre> <_> "(" <_> <listaDecl> <_> ")" "es" <_> "lista" <_> "de" <_> <nombre> (<_> <declaracionModificador>)*
+    | <nombre> <_> "es" <_> "relacion" <_> "de" <_> <nombre> <_> "a" <_>  (<_> <declaracionModificador>)*
+
+<listaDecl> ::= <rango> <_> ";" <_> <listaDecl>
+    | <rango>
+
+<rango> ::= <numero> <_> ".." <_> <numero>
 
 <sentencia> ::= <asignacion>
     | <ecuacion>
@@ -53,6 +60,7 @@
     | "global"
 
 <asignacion> ::= <nombre> <_> "<-" <_> <expresion>
+    | <nombre> <_> "(" <_> <listaAcceso> <_> ")" <_> "<-" <_> <expresion>
 
 <ecuacion> ::= <nombre> <_> "=" <_> <expresion>
 
@@ -95,8 +103,14 @@
     | <letra>
     | "verdadero"
     | "falso"
+    | <nombre> <_> "(" <_> <listaAcceso> <_> ")"
     | <nombre>
     | "(" <_> <expresion> <_> ")"
+
+<listaAcceso> ::= <rango> <_> ";" <_> <listaAcceso>
+    | <expresion> <_> ";" <_> <listaAcceso>
+    | <rango>
+    | <expresion>
 
 <operadorUnario> ::= "-"
     | "+"

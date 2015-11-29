@@ -9,7 +9,7 @@ zl.javascript = zl.javascript || {};
   zl.javascript.cabecera = function(compilado, entorno) {
     var resultado = "var $zl_inicio;(function(){\"use strict\";";
     for (var k in entorno.globales) {
-      resultado += "var $zl_"+k+";";
+      resultado += zl.javascript.dato(entorno.globales[k], entorno);
     }
     return resultado;
   }
@@ -29,9 +29,9 @@ zl.javascript = zl.javascript || {};
   }
 
   zl.javascript.programa = function(compilado, entorno) {
-    return  zl.javascript.cabecera(compilado, entorno) +
-            zl.javascript.subrutinas(compilado.subrutinas, entorno) +
-            zl.javascript.final(compilado, entorno);
+    return zl.javascript.cabecera(compilado, entorno) +
+      zl.javascript.subrutinas(compilado.subrutinas, entorno) +
+      zl.javascript.final(compilado, entorno);
   }
 
   zl.javascript.subrutina = function(compilado, entorno) {
@@ -41,10 +41,10 @@ zl.javascript = zl.javascript || {};
     if (!entorno.subrutinaActual.modificadores.externa)
       resultado += "var ";
 
-    resultado += zl.javascript.nombre(compilado.nombre, entorno) + "=function(arg){" +
-            zl.javascript.datos(compilado.datos, entorno) +
-            zl.javascript.sentencias(compilado.sentencias, entorno) +
-            "return{"
+    resultado += zl.javascript.nombre(compilado.nombre, entorno) + "=function(arg){var $zlr;" +
+      zl.javascript.datos(compilado.datos, entorno) +
+      zl.javascript.sentencias(compilado.sentencias, entorno) +
+      "return{"
 
     var coma = "";
     for (var k in entorno.subrutinaActual.datos) {
@@ -64,10 +64,9 @@ zl.javascript = zl.javascript || {};
     var resultado = "";
     for (var k in entorno.subrutinaActual.datos) {
       var dato = entorno.subrutinaActual.datos[k];
-      if (dato.modificador == dato.M_ENTRADA || dato.modificador == dato.M_ENTRADA_SALIDA)
-        resultado += "var " + zl.javascript.nombre(dato.nombre) + "=arg." + dato.nombre + ";";
-      else if (dato.modificador != dato.M_GLOBAL)
-        resultado += "var " + zl.javascript.nombre(dato.nombre) + ";";
+      // Si es global, ignorar:
+      if (dato.modificador != dato.M_GLOBAL)
+        resultado += zl.javascript.dato(dato, entorno);
     }
     return resultado;
   }
@@ -91,40 +90,42 @@ zl.javascript = zl.javascript || {};
   zl.javascript.sentencia = function(compilado, entorno) {
     var resultado = "";
     if (compilado.tipo == "asignacion") {
-      resultado = zl.javascript.nombre(compilado.variable, entorno) +
-        "=" +
+      resultado = zl.javascript.nombre(compilado.variable, entorno);
+      if (compilado.acceso)
+        resultado += zl.javascript.listaAcceso(compilado.acceso);
+      resultado += "=" +
         zl.javascript.expresion(compilado.valor);
     } else if (compilado.tipo == "llamada") {
-      resultado = "var $zlr = " +
+      resultado = "$zlr = " +
         zl.javascript.nombre(compilado.nombre, entorno) +
         "(" +
         zl.javascript.llamadaEntrada(compilado.entrada, entorno) +
         ")" +
-        zl.javascript.llamadaSalida(compilado.salida,entorno);
+        zl.javascript.llamadaSalida(compilado.salida, entorno);
     } else if (compilado.tipo == "mientras") {
       resultado = "while(" + zl.javascript.expresion(compilado.condicion, entorno) + "){" +
         zl.javascript.sentencias(compilado.sentencias, entorno) +
         "}"
     } else if (compilado.tipo == "repetir") {
-      var tempvar = "$zlt_"+entorno.pedirNombreTemporal();
-      resultado = "{var " + tempvar + " = "+ zl.javascript.expresion(compilado.veces, entorno) +";"
+      var tempvar = "$zlt_" + entorno.pedirNombreTemporal();
+      resultado = "{var " + tempvar + " = " + zl.javascript.expresion(compilado.veces, entorno) + ";"
       resultado += "while(" + tempvar + "--){"
       resultado += zl.javascript.sentencias(compilado.sentencias, entorno);
       resultado += "}}";
     } else if (compilado.tipo == "sicondicional") {
       var siguiente = compilado.siguiente;
       resultado = "if(" + zl.javascript.expresion(compilado.condicion) + "){" +
-                  zl.javascript.sentencias(compilado.sentencias)+
-                  "}";
+        zl.javascript.sentencias(compilado.sentencias) +
+        "}";
       while (siguiente) {
         if (siguiente.condicion)
-          resultado +=  "else if(" + zl.javascript.expresion(siguiente.condicion) + "){" +
-              zl.javascript.sentencias(siguiente.sentencias)+
-              "}";
+          resultado += "else if(" + zl.javascript.expresion(siguiente.condicion) + "){" +
+          zl.javascript.sentencias(siguiente.sentencias) +
+          "}";
         else
-          resultado +=  "else{" +
-              zl.javascript.sentencias(siguiente.sentencias)+
-              "}";
+          resultado += "else{" +
+          zl.javascript.sentencias(siguiente.sentencias) +
+          "}";
 
         siguiente = siguiente.siguiente;
       }
@@ -137,7 +138,7 @@ zl.javascript = zl.javascript || {};
     if (compilado.length > 0) {
       resultado += compilado[0].izq + ":" + zl.javascript.expresion(compilado[0].der, entorno);
       for (var i = 1; i < compilado.length; i++) {
-        resultado += ","+compilado[i].izq + ":" + zl.javascript.expresion(compilado[i].der, entorno);
+        resultado += "," + compilado[i].izq + ":" + zl.javascript.expresion(compilado[i].der, entorno);
       }
     }
     return resultado + "}";
@@ -146,7 +147,7 @@ zl.javascript = zl.javascript || {};
   zl.javascript.llamadaSalida = function(compilado, entorno) {
     var resultado = "";
     for (var i = 0; i < compilado.length; i++) {
-      resultado += ";"+zl.javascript.nombre(compilado[i].der) + "=$zlr." + compilado[i].izq;
+      resultado += ";" + zl.javascript.nombre(compilado[i].der) + "=$zlr." + compilado[i].izq;
     }
     return resultado;
   }
@@ -162,7 +163,7 @@ zl.javascript = zl.javascript || {};
       var izq = zl.javascript.expresion(compilado.izq);
       var der = zl.javascript.expresion(compilado.der);
 
-      return izq + " " +  operador +  " " + der;
+      return izq + " " + operador + " " + der;
     } else if (compilado.der && operador) {
       var der = (compilado.der.tipo.indexOf("expresion") > -1 ?
         zl.javascript.expresion(compilado.der) :
@@ -192,10 +193,30 @@ zl.javascript = zl.javascript || {};
       return compilado.valor;
     } else if (compilado.tipo == "boleano") {
       return "" + (compilado.valor == "verdadero");
+    } else if (compilado.tipo == "acceso") {
+      return zl.javascript.nombre(compilado.nombre) + zl.javascript.listaAcceso(compilado.acceso);
     } else if (compilado.tipo == "nombre") {
       return zl.javascript.nombre(compilado.valor);
     } else if (compilado.tipo == "expresion") {
       return "(" + zl.javascript.expresion(compilado.valor, entorno) + ")";
     }
+  }
+
+  zl.javascript.listaAcceso = function(compilado, entorno) {
+    var resultado = "";
+    for (var i = 0; i < compilado.length; i++) {
+      resultado += "[" + zl.javascript.expresion(compilado[i]) + "]";
+    }
+    return resultado;
+  }
+
+  zl.javascript.dato = function(dato, entorno) {
+    var resultado = "var " + zl.javascript.nombre(dato.nombre);
+    if (dato.modificador == dato.M_ENTRADA || dato.modificador == dato.M_ENTRADA_SALIDA)
+      resultado += "=arg." + dato.nombre;
+    if ((dato.modificador == dato.M_GLOBAL || dato.modificador == dato.M_SALIDA || dato.modificador == dato.M_LOCAL) && dato.tipo == "relacion") {
+      resultado += "={}";
+    }
+    return resultado + ";";
   }
 })();
