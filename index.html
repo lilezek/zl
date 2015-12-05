@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.8.0/codemirror.css">
   <script src="zlsintaxis.js"></script>
   <script src="error.js"></script>
+  <script src="configuracion.js"></script>
   <script src="sintaxis.js"></script>
   <script src="generadorarbol.js"></script>
   <script src="entorno.js"></script>
@@ -68,88 +69,21 @@
 <body>
   <div class="main">
 <textarea class="editor" id="editor">
-Subrutina esPrimo
-Datos
-  primos es Relacion de Numero a Texto Global
-  pregunta es Numero de Entrada
-  respuesta es Booleano de salida
-
-  d es Numero
-Algoritmo
-  Si primos(pregunta) = "Es primo" hacer
-    respuesta <- verdadero
-  O si primos(pregunta) = "No es primo" hacer
-    respuesta <- falso
-  Si no hacer
-    mostrar [ mensaje <- "Calculando si " + pregunta + " es primo" ]
-    d <- 2
-    primos(pregunta) <- "Es primo"
-    Mientras d*d <= pregunta hacer
-      Si pregunta % d = 0 hacer
-        primos(pregunta) <- "No es primo"
-      Fin
-      d <- d + 1
-    Fin
-    respuesta <- (primos(pregunta) = "Es primo")
-  Fin
-Fin
-
-Subrutina Leer
-Datos
-  g es Numero Global
-  valor es Numero de salida
-Algoritmo
-  valor <- g
-fin
-
-Subrutina Escribir
-Datos
-  g es Numero Global
-  valor es Numero de entrada
-Algoritmo
-  g <- valor
-fin
-
-Subrutina DivisionEntera
-Datos
-  dividendo es Numero de entrada
-  divisor es Numero de entrada
-  resultado es Numero de salida
-Algoritmo
-  resultado <- (dividendo - (dividendo % divisor)) / divisor
-fin
-
 Subrutina Externa Inicio
 Datos
-  divisor es Numero
-  dividendo es Numero
-  resultado es Numero
-
-  r es Booleano
+	n es Numero Global
 Algoritmo
-  leerNumero [ mensaje -> dividendo ]
-  leerNumero [ mensaje -> divisor ]
+  n <- 0
+Fin
 
-  DivisionEntera [
-    resultado -> resultado
-    dividendo <- dividendo
-    divisor <- divisor
-  ]
-  mostrar [ mensaje <- resultado ]
-
-
-  // Globales:
-  escribir [ valor <- 15 ]
-  leer [ valor -> resultado ]
-
-  mostrar [ mensaje <- resultado ]
-
-  esPrimo [ pregunta <- 7 respuesta -> r ]
-  mostrar [ mensaje <- r ]
-  esPrimo [ pregunta <- 7 respuesta -> r ]
-  mostrar [ mensaje <- r ]
-
-fin</textarea>
+Subrutina Externa Fotograma
+Datos
+  n es Numero Global
+Algoritmo
+	limpiar [a <- n]
+  mostrarNumero [mensaje <- n]
+  n <- n + 1/25
+Fin</textarea>
     <div class="v divisor"></div>
     <div class="compilation">
       <textarea class="content" id="content" readonly="readonly"></textarea>
@@ -236,6 +170,22 @@ fin</textarea>
         zip.file("zl.comp.js", lastjs);
         var content = zip.generate({type: "blob"});
         saveAs(content, "programa.zip");
+      }
+
+
+      var isBottom = true;
+      $("#output").get(0).onscroll = function(ev) {
+        $this = $("#output");
+        var t = $this.get(0);
+        isBottom = (t.scrollTop+$this.innerHeight() >= t.scrollHeight);
+      };
+
+      var outWrite = function(html) {
+        var t = $("#output").get(0);
+        t.innerHTML += html;
+        if (isBottom) {
+          t.scrollTop = t.scrollHeight;
+        }
       }
     </script>
 </body>

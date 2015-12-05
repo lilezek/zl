@@ -45,18 +45,24 @@ var zl = zl || {};
 
   zl.Ejecutar = function(javascript) {
     // Preparar el runtime:
-    $("#output").get(0).innerHTML = "";
     var $zl_mostrar = function(arg) {
-      $("#output").get(0).innerHTML += arg.mensaje + "\n";
+      outWrite(arg.mensaje + "\n");
     }
+
+    var $zl_mostrarnumero = function(arg) {
+      outWrite(arg.mensaje.toPrecision(7) + "\n");
+    }
+
     var $zl_leernumero = function(arg) {
       return {
         mensaje: parseInt(prompt("Introduce un número", "0"))
       }
     }
     var $zl_leer = function(arg) {
+      var x = $("#input").val();
+      $("#input").val("");
       return {
-        mensaje: $("#input").val()
+        mensaje: x
       };
     }
 
@@ -66,8 +72,12 @@ var zl = zl || {};
       };
     }
 
+    var $zl_limpiar = function(arg) {
+      $("#output").get(0).innerHTML = "";
+      return {};
+    }
+
     // Después ejecutar:
     eval(javascript);
-    $zl_inicio({});
   }
 })();

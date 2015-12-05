@@ -7,7 +7,12 @@ zl.javascript = zl.javascript || {};
   // Generar la cabecera
   // TODO: Hacerlo a partir del entorno
   zl.javascript.cabecera = function(compilado, entorno) {
-    var resultado = "var $zl_inicio;(function(){\"use strict\";";
+    var resultado = "";
+    for (var k in entorno.subrutinas) {
+      if ("externa" in entorno.subrutinas[k].modificadores)
+        resultado += "var "+zl.javascript.nombre(entorno.subrutinas[k].nombre, entorno) + ";";
+    }
+    resultado += "(function(){\"use strict\";";
     for (var k in entorno.globales) {
       resultado += zl.javascript.dato(entorno.globales[k], entorno);
     }
@@ -17,7 +22,14 @@ zl.javascript = zl.javascript || {};
   // Generar el final
   // TODO: Hacerlo a partir del entorno
   zl.javascript.final = function(compilado, entorno) {
-    return "})();"
+    var resultado = "})();";
+    if ("fotograma" in entorno.subrutinas) {
+      resultado += "setInterval("+zl.javascript.nombre("fotograma", entorno)+", "+1/zl.configuracion.fps*1000+");";
+    }
+    if ("inicio" in entorno.subrutinas) {
+      resultado += zl.javascript.nombre("inicio", entorno) + "();"
+    }
+    return resultado;
   }
 
   zl.javascript.generar = function(compilado, entorno) {
