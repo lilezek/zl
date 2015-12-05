@@ -5,6 +5,7 @@
   <link rel="stylesheet" href="index.css">
   <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
   <script src="http://jsbeautifier.org/js/lib/beautify.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/async/1.5.0/async.min.js"></script>
   <script src="codemirror.js"></script>
   <script src="filesaver.js"></script>
   <script src="jszip.js"></script>
@@ -73,7 +74,8 @@ Subrutina Externa Inicio
 Datos
 	n es Numero Global
 Algoritmo
-  n <- 0
+  mostrar [mensaje <- "Escribe el número por el cual empezar a contar"]
+  leerNumero [ mensaje -> n ]
 Fin
 
 Subrutina Externa Fotograma
@@ -89,7 +91,7 @@ Fin</textarea>
       <textarea class="content" id="content" readonly="readonly"></textarea>
       <div class="h divisor"></div>
       <textarea class="output" id="output" readonly="readonly"></textarea>
-      <input type="text" class="input" id="input">
+      <input type="text" class="input" id="input" disabled="disabled">
       <div style="display: flex;">
         <button class="run" id="run">
           Empezar
@@ -186,6 +188,19 @@ Fin</textarea>
         if (isBottom) {
           t.scrollTop = t.scrollHeight;
         }
+      }
+
+      var inRead = function(callback) {
+        $("#input").prop("disabled",false);
+        $("#input").keypress(function (e) {
+          if (e.which == 13) {
+            var v = $("#input").val();
+            $("#input").val("");
+            $("#input").prop('disabled', true);
+            callback(null, v);
+            $(this).off("keypress");
+          }
+        });
       }
     </script>
 </body>

@@ -23,11 +23,14 @@ zl.javascript = zl.javascript || {};
   // TODO: Hacerlo a partir del entorno
   zl.javascript.final = function(compilado, entorno) {
     var resultado = "})();";
+    if ("inicio" in entorno.subrutinas) {
+      resultado += zl.javascript.nombre("inicio", entorno) + "({},function(){"
+    }
     if ("fotograma" in entorno.subrutinas) {
       resultado += "setInterval("+zl.javascript.nombre("fotograma", entorno)+", "+1/zl.configuracion.fps*1000+");";
     }
     if ("inicio" in entorno.subrutinas) {
-      resultado += zl.javascript.nombre("inicio", entorno) + "();"
+      resultado += "});";
     }
     return resultado;
   }
@@ -53,10 +56,12 @@ zl.javascript = zl.javascript || {};
     if (!entorno.subrutinaActual.modificadores.externa)
       resultado += "var ";
 
-    resultado += zl.javascript.nombre(compilado.nombre, entorno) + "=function(arg){var $zlr;" +
+    resultado += zl.javascript.nombre(compilado.nombre, entorno) + "=function(arg, done){" +
       zl.javascript.datos(compilado.datos, entorno) +
+      "async.waterfall([function(c){c(null,arg);}," +
+      "function(arg,done){var $zlr = {};" +
       zl.javascript.sentencias(compilado.sentencias, entorno) +
-      "return{"
+      "done(null, $zlr)}],done);"
 
     var coma = "";
     for (var k in entorno.subrutinaActual.datos) {
@@ -67,7 +72,7 @@ zl.javascript = zl.javascript || {};
       coma = ",";
     }
 
-    resultado += "};};";
+    resultado += "};";
     return resultado;
   }
 
@@ -109,10 +114,10 @@ zl.javascript = zl.javascript || {};
         zl.javascript.expresion(compilado.valor);
     } else if (compilado.tipo == "llamada") {
       resultado = "$zlr = " +
-        zl.javascript.nombre(compilado.nombre, entorno) +
-        "(" +
         zl.javascript.llamadaEntrada(compilado.entrada, entorno) +
-        ")" +
+        "done(null,$zlr)}," +
+        zl.javascript.nombre(compilado.nombre, entorno) +
+        ",function(arg,done) {var $zlr;" +
         zl.javascript.llamadaSalida(compilado.salida, entorno);
     } else if (compilado.tipo == "mientras") {
       resultado = "while(" + zl.javascript.expresion(compilado.condicion, entorno) + "){" +
@@ -159,7 +164,7 @@ zl.javascript = zl.javascript || {};
   zl.javascript.llamadaSalida = function(compilado, entorno) {
     var resultado = "";
     for (var i = 0; i < compilado.length; i++) {
-      resultado += ";" + zl.javascript.nombre(compilado[i].der) + "=$zlr." + compilado[i].izq;
+      resultado += ";" + zl.javascript.nombre(compilado[i].der) + "=arg." + compilado[i].izq;
     }
     return resultado;
   }

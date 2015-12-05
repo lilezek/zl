@@ -45,36 +45,42 @@ var zl = zl || {};
 
   zl.Ejecutar = function(javascript) {
     // Preparar el runtime:
-    var $zl_mostrar = function(arg) {
+    var $zl_mostrar = function(arg, callback) {
       outWrite(arg.mensaje + "\n");
+      callback(null,{});
     }
 
-    var $zl_mostrarnumero = function(arg) {
+    var $zl_mostrarnumero = function(arg, callback) {
       outWrite(arg.mensaje.toPrecision(7) + "\n");
+      callback(null,{});
     }
 
-    var $zl_leernumero = function(arg) {
-      return {
-        mensaje: parseInt(prompt("Introduce un número", "0"))
-      }
+    var $zl_leernumero = function(arg, callback) {
+      inRead(function cbck(err, value) {
+        var x = parseInt(value);
+        console.log(value);
+        if (isNaN(x))
+          isRead(cbck);
+        else
+          callback(null, {mensaje: parseInt(value)});
+      });
     }
-    var $zl_leer = function(arg) {
-      var x = $("#input").val();
-      $("#input").val("");
-      return {
-        mensaje: x
-      };
+    var $zl_leer = function(arg, callback) {
+      $("#input").prop("disabled",false);
+      inRead(function(err, value) {
+        callback(null, {mensaje: value});
+      });
     }
 
-    var $zl_aleatorio = function(arg) {
-      return {
+    var $zl_aleatorio = function(arg, callback) {
+      callback(null,{
         resultado: Math.round((Math.random() * (arg.maximo - arg.minimo)) + arg.minimo)
-      };
+      });
     }
 
-    var $zl_limpiar = function(arg) {
+    var $zl_limpiar = function(arg, callback) {
       $("#output").get(0).innerHTML = "";
-      return {};
+      callback(null,{});
     }
 
     // Después ejecutar:
