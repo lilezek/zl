@@ -13,6 +13,7 @@
   <script src="https://codemirror.net/addon/mode/simple.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.8.0/codemirror.css">
   <script src="zlsintaxis.js"></script>
+  <script src="ejecucion.js"></script>
   <script src="error.js"></script>
   <script src="configuracion.js"></script>
   <script src="sintaxis.js"></script>
@@ -72,19 +73,28 @@
 <textarea class="editor" id="editor">
 Subrutina Externa Inicio
 Datos
-	n es Numero Global
+ 	a es Numero
+  b es Numero
+  m es Numero
+  respuesta es Texto
 Algoritmo
-  mostrar [mensaje <- "Escribe el número por el cual empezar a contar"]
-  leerNumero [ mensaje -> n ]
-Fin
-
-Subrutina Externa Fotograma
-Datos
-  n es Numero Global
-Algoritmo
-	limpiar []
-  mostrarNumero [mensaje <- n]
-  n <- n + 1/25
+	a <- 1
+  b <- 1000
+  Mientras a < b hacer
+    m <- (a+b - (a+b)%2)/2
+    mostrar [ mensaje <- "¿Mayor, menor o igual a "+m+"?" ]
+    leer [ mensaje -> respuesta ]
+    Si respuesta = "igual" hacer
+      a <- m
+      b <- m
+    o si respuesta = "menor" hacer
+      b <- m-1
+    o si respuesta = "mayor" hacer
+      a <- m+1
+    Fin
+    limpiar []
+  Fin
+  mostrar [ mensaje <- "El número es: "+a ]
 Fin</textarea>
     <div class="v divisor"></div>
     <div class="compilation">
