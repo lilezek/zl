@@ -58,7 +58,6 @@ var zl = zl || {};
     var $zl_leernumero = function(arg, callback) {
       inRead(function cbck(err, value) {
         var x = parseInt(value);
-        console.log(value);
         if (isNaN(x))
           isRead(cbck);
         else
@@ -83,7 +82,25 @@ var zl = zl || {};
       callback(null,{});
     }
 
-    // Después ejecutar:
+    // Después cargar el código:
     eval(javascript);
+
+    // Y preparar la ejecución:
+    var ejecucion = "";
+    if ($zl_inicio) {
+      ejecucion += "$zl_inicio({},function() {";
+    }
+    if ($zl_fotograma) {
+      ejecucion += "var $zlinterval=setInterval(function cbck(){"+
+        "clearInterval($zlinterval);"+
+        "$zl_fotograma({},function(){$zlinterval = setInterval(cbck,"+1/zl.configuracion.fps*1000+")})"+
+      "},"+1/zl.configuracion.fps*1000+")";
+    }
+    if ($zl_inicio) {
+      ejecucion += "});";
+    }
+
+    // Y Ejecutar
+    eval(ejecucion);
   }
 })();

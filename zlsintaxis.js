@@ -22,7 +22,7 @@ zl.sintaxis = zl.sintaxis || {};
       "verdadero": true,
       "falso": true,
       "imposible": true,
-      "nada": true,
+      //"nada": true,
       "veces": true,
       "repetir": true,
       "mientras": true,
@@ -216,7 +216,7 @@ zl.sintaxis = zl.sintaxis || {};
     reglas["llamada"] = zl.analizador.newExpresion([
       ["nombre", " ", $["->"], " ", "nombre", " ", $["->"], " ", "nombre"],
       ["nombre", " ", $["->"], " ", "nombre"],
-      ["nombre", " ", $["["], " ", "llamadaAsignacion+", " ", $["]"]]
+      ["nombre", " ", $["["], " ", "llamadaAsignacion*", " ", $["]"]]
     ], "llamada");
 
     reglas["repetir"] = zl.analizador.newExpresion([
@@ -248,10 +248,10 @@ zl.sintaxis = zl.sintaxis || {};
       ["nombre", " ", $["<-"], " ", "expresion"]
     ], "llamadaAsignacion")
 
-    reglas["llamadaAsignacion+"] = zl.analizador.newExpresion([
-      ["llamadaAsignacion", " ", "llamadaAsignacion+"],
-      ["llamadaAsignacion"]
-    ], "llamadaAsignacion+")
+    reglas["llamadaAsignacion*"] = zl.analizador.newExpresion([
+      ["llamadaAsignacion", " ", "llamadaAsignacion*"],
+      [$["nada"]]
+    ], "llamadaAsignacion*")
 
     reglas["expresion"] = zl.analizador.newExpresion([
       ["expresionTercera", " ", "operadorBinarioCuarto", " ", "expresion"],
@@ -533,7 +533,7 @@ zl.sintaxis = zl.sintaxis || {};
       return d;
     }
 
-    reglas["llamadaAsignacion+"].postproceso = function(datos, opcion) {
+    reglas["llamadaAsignacion*"].postproceso = function(datos, opcion) {
       if (opcion == 0) {
         var resultado = datos[2];
         if (datos[0].tipo == "entrada") {
@@ -543,16 +543,9 @@ zl.sintaxis = zl.sintaxis || {};
         }
         return resultado;
       }
-      if (datos[0].tipo == "entrada") {
-        return {
-          entrada: [datos[0]],
-          salida: []
-        }
-      } else {
-        return {
-          entrada: [],
-          salida: [datos[0]]
-        }
+      return {
+        entrada: [],
+        salida: []
       }
     }
 
