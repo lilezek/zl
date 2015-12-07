@@ -75,11 +75,13 @@ Subrutina Externa Inicio
 Datos
   x es Numero
 Algoritmo
-  aleatorio [ resultado -> x minimo <- 0 maximo <- 100]
-  Si x > 50 hacer
-    mostrar [ mensaje <- "Cara" ]
-  si no hacer
-    mostrar [ mensaje <- "Cruz" ]
+  Repetir 100 veces
+    aleatorio [ resultado -> x minimo <- 0 maximo <- 100]
+    Si x > 50 hacer
+      mostrar [ mensaje <- "Cara" ]
+    si no hacer
+      mostrar [ mensaje <- "Cruz" ]
+    Fin
   Fin
 Fin</textarea>
     <div class="v divisor"></div>
