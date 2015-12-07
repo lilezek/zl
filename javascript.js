@@ -122,23 +122,37 @@ zl.javascript = zl.javascript || {};
         "}"+tempcallback+"(arg,done);},function(arg,done){var $zlr;";
     } else if (compilado.tipo == "repetir") {
       var tempvar = "$zlt_" + entorno.pedirNombreTemporal();
-      resultado = "async.waterfall([],done);},{var " + tempvar + "=" + zl.javascript.expresion(compilado.veces, entorno) + ";"
-      resultado += "while(" + tempvar + "--){"
-      resultado += zl.javascript.sentencias(compilado.sentencias, entorno);
-      resultado += "}}";
+      var tempcallback = "$zlt_" + entorno.pedirNombreTemporal();
+      resultado = "done(null,$zlr);}, function(arg,done){var $zlr;" +
+        "var "+tempvar+"="+zl.javascript.expresion(compilado.veces,entorno)+";"+
+        "function "+tempcallback+"(arg){"+
+        "if ("+ tempvar +"--){" +
+        "async.waterfall([function(c){c(null,arg);},function(arg,done){"+
+        zl.javascript.sentencias(compilado.sentencias, entorno)+
+        ";done(null,$zlr);}],"+tempcallback+");}"+
+        "else {done(null, arg);}"+
+        "}"+tempcallback+"(arg,done);},function(arg,done){var $zlr;";
     } else if (compilado.tipo == "sicondicional") {
       var siguiente = compilado.siguiente;
-      resultado = "if(" + zl.javascript.expresion(compilado.condicion) + "){" +
-        zl.javascript.sentencias(compilado.sentencias) +
+
+      resultado = "done(null,$zlr);}, function(arg, done){var $zlr;"+
+        "if(" + zl.javascript.expresion(compilado.condicion) + "){" +
+        "async.waterfall([function(c){c(null,arg);},function(arg,done){"+
+          zl.javascript.sentencias(compilado.sentencias) +
+          "}],done);"+
         "}";
       while (siguiente) {
         if (siguiente.condicion)
           resultado += "else if(" + zl.javascript.expresion(siguiente.condicion) + "){" +
-          zl.javascript.sentencias(siguiente.sentencias) +
+          "async.waterfall([function(c){c(null,arg);},function(arg,done){"+
+            zl.javascript.sentencias(siguiente.sentencias) +
+            "}],done);"+
           "}";
         else
           resultado += "else{" +
+          "async.waterfall([function(c){c(null,arg);},function(arg,done){"+
           zl.javascript.sentencias(siguiente.sentencias) +
+          "}],done);"+
           "}";
 
         siguiente = siguiente.siguiente;

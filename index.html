@@ -73,28 +73,14 @@
 <textarea class="editor" id="editor">
 Subrutina Externa Inicio
 Datos
- 	a es Numero
-  b es Numero
-  m es Numero
-  respuesta es Texto
+  x es Numero
 Algoritmo
-	a <- 1
-  b <- 1000
-  Mientras a < b hacer
-    m <- (a+b - (a+b)%2)/2
-    mostrar [ mensaje <- "¿Mayor, menor o igual a "+m+"?" ]
-    leer [ mensaje -> respuesta ]
-    Si respuesta = "igual" hacer
-      a <- m
-      b <- m
-    o si respuesta = "menor" hacer
-      b <- m-1
-    o si respuesta = "mayor" hacer
-      a <- m+1
-    Fin
-    limpiar []
+  aleatorio [ resultado -> x minimo <- 0 maximo <- 100]
+  Si x > 50 hacer
+    mostrar [ mensaje <- "Cara" ]
+  si no hacer
+    mostrar [ mensaje <- "Cruz" ]
   Fin
-  mostrar [ mensaje <- "El número es: "+a ]
 Fin</textarea>
     <div class="v divisor"></div>
     <div class="compilation">
@@ -169,14 +155,6 @@ Fin</textarea>
       }
       Compile(editor.getValue());
 
-      var zip;
-      JSZipUtils.getBinaryContent('entorno.zip', function(err, data) {
-        if(err) {
-          throw err; // or handle err
-        }
-
-        zip = new JSZip(data);
-      });
       function download() {
         zip.file("codigo.zl",editor.getValue());
         zip.file("zl.comp.js", lastjs);
@@ -211,7 +189,19 @@ Fin</textarea>
             $(this).off("keypress");
           }
         });
+        $("#input").focus();
       }
+
+
+      // Dejar este código al final, que no funciona en entorno local
+      var zip;
+      JSZipUtils.getBinaryContent('entorno.zip', function(err, data) {
+        if(err) {
+          throw err; // or handle err
+        }
+
+        zip = new JSZip(data);
+      });
     </script>
 </body>
 
