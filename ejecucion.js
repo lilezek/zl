@@ -3,6 +3,8 @@ var zl = zl || {};
 (function() {
   // Nota, no usar "use strict" para este pedazo de código;
   // Preparar el runtime:
+
+  // mensaje es Texto de Entrada
   var $zl_mostrar = function(arg, callback) {
     outWrite(arg.mensaje + "\n");
     callback(null,{});
@@ -38,6 +40,14 @@ var zl = zl || {};
   var $zl_limpiar = function(arg, callback) {
     $("#output").get(0).innerHTML = "";
     callback(null,{});
+  }
+
+  // Registra el entorno de ejecución para que se pueda usar desde el lenguaje
+  zl.registrarEntorno = function(entorno) {
+    entorno.registrarSubrutina("mostrar");
+    var dato = entorno.subrutinaActual.registrarDato("mensaje");
+    dato.tipo = "texto";
+    dato.modificador = dato.M_SALIDA;
   }
 
   zl.Ejecutar = function(javascript) {
