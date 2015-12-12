@@ -4,6 +4,13 @@ zl.sintaxis = zl.sintaxis || {};
 (function() {
   "use strict";
 
+  // Función auxiliar que sobreescribe un objeto con un json
+  zl.writeJson = function(obj, json) {
+    for (var k in json) {
+      obj[k] = json[k];
+    }
+  }
+
   // Sintaxis de zl
   var zls = {};
 
@@ -112,9 +119,9 @@ zl.sintaxis = zl.sintaxis || {};
       [$["nada"]]
     ], "espacios opcionales");
 
-    reglas["programa"] = zl.analizador.newExpresion([
+    reglas["modulo"] = zl.analizador.newExpresion([
       ["subrutina+"]
-    ], "programa");
+    ], "modulo");
 
     reglas["subrutina+"] = zl.analizador.newExpresion([
       ["subrutina", " ", "subrutina+"],
@@ -334,7 +341,7 @@ zl.sintaxis = zl.sintaxis || {};
       }
     }
 
-    reglas["programa"].postproceso = function(datos, opcion) {
+    reglas["modulo"].postproceso = function(datos, opcion) {
       return {
         subrutinas: datos[0]
       };

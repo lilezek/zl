@@ -15,7 +15,7 @@
 ; Nota, para las expresiones del mismo nivel,
 ; el arbol que se construye se reordena para evaluar primero a la izquierda.
 
-<programa> ::= [<configuraciones> <_>] <subrutina>+
+<modulo> ::= [<configuraciones> <_>] <subrutina>+
 
 <configuraciones> ::= "configuracion" <_> (<configuracion> <_>)* "fin"
 

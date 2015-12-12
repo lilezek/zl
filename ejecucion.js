@@ -1,54 +1,23 @@
 var zl = zl || {};
+zl.ejecucion = zl.ejecucion || {};
 
 (function() {
   // Nota, no usar "use strict" para este pedazo de código;
-  // Preparar el runtime:
 
-  // mensaje es Texto de Entrada
-  var $zl_mostrar = function(arg, callback) {
-    outWrite(arg.mensaje + "\n");
-    callback(null,{});
-  }
-
-  var $zl_mostrarnumero = function(arg, callback) {
-    outWrite(arg.mensaje.toPrecision(7) + "\n");
-    callback(null,{});
-  }
-
-  var $zl_leernumero = function(arg, callback) {
-    inRead(function cbck(err, value) {
-      var x = parseInt(value);
-      if (isNaN(x))
-        isRead(cbck);
-      else
-        callback(null, {mensaje: parseInt(value)});
+  // El módulo interno contiene las funciones básicas del lenguaje.
+  // Recibe un módulo y devuelve el mismo módulo con las transformaciones oportunas.
+  var moduloInterno = function (mod) {
+    var aleatorio = zl.entorno.newSubrutina(mod);
+    // TODO: acabar el módulo
+    zl.writeJson(aleatorio, {
+      nombre: "aleatorio",
+      modificadores: ""
     });
-  }
-  var $zl_leer = function(arg, callback) {
-    $("#input").prop("disabled",false);
-    inRead(function(err, value) {
-      callback(null, {mensaje: value});
-    });
+
+    mod.serializar();
+    return mod;
   }
 
-  var $zl_aleatorio = function(arg, callback) {
-    callback(null,{
-      resultado: Math.round((Math.random() * (arg.maximo - arg.minimo)) + arg.minimo)
-    });
-  }
-
-  var $zl_limpiar = function(arg, callback) {
-    $("#output").get(0).innerHTML = "";
-    callback(null,{});
-  }
-
-  // Registra el entorno de ejecución para que se pueda usar desde el lenguaje
-  zl.registrarEntorno = function(entorno) {
-    entorno.registrarSubrutina("mostrar");
-    var dato = entorno.subrutinaActual.registrarDato("mensaje");
-    dato.tipo = "texto";
-    dato.modificador = dato.M_SALIDA;
-  }
 
   zl.Ejecutar = function(javascript) {
     // Cargar el código:
@@ -73,4 +42,47 @@ var zl = zl || {};
     // Y Ejecutar
     eval(ejecucion);
   }
+
+  zl.ejecucion.moduloInterno = moduloInterno;
 })();
+
+// A parte del módulo, se preparar el runtime:
+
+// mensaje es Texto de Entrada
+var $zl_mostrar = function(arg, callback) {
+  outWrite(arg.mensaje + "\n");
+  callback(null,{});
+}
+
+var $zl_mostrarnumero = function(arg, callback) {
+  outWrite(arg.mensaje.toPrecision(7) + "\n");
+  callback(null,{});
+}
+
+var $zl_leernumero = function(arg, callback) {
+  inRead(function cbck(err, value) {
+    var x = parseInt(value);
+    if (isNaN(x))
+      isRead(cbck);
+    else
+      callback(null, {mensaje: parseInt(value)});
+  });
+}
+
+var $zl_leer = function(arg, callback) {
+  $("#input").prop("disabled",false);
+  inRead(function(err, value) {
+    callback(null, {mensaje: value});
+  });
+}
+
+var $zl_aleatorio = function(arg, callback) {
+  callback(null,{
+    resultado: Math.round((Math.random() * (arg.maximo - arg.minimo)) + arg.minimo)
+  });
+}
+
+var $zl_limpiar = function(arg, callback) {
+  $("#output").get(0).innerHTML = "";
+  callback(null,{});
+}

@@ -12,7 +12,7 @@ zl.sintaxis = zl.sintaxis || {};
   var arbolCodigo = function(zlcode) {
     var reglas = zl.sintaxis.reglasCodigo;
     zl.analizador.limpiarCache(reglas);
-    var reglaPrincipal = reglas["programa"];
+    var reglaPrincipal = reglas["modulo"];
     var arbol = reglaPrincipal.reducir(zlcode);
     if (!arbol.error) {
       return arbol.resultado;

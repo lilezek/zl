@@ -42,7 +42,7 @@ El módulo interno con las subrutinas internas del lenguaje no tiene nombre. Sus
 
 ## Módulo
 
-Conjunto de subrutinas y globales. Los globales de un módulo deben ser inaccesibles desde otros módulos, salvo si se escribe un `getter` del estilo:
+Conjunto de subrutinas y globales. Los globales de un módulo deben ser inaccesibles desde otros módulos, salvo si se escribe un *getter* del estilo:
 
 ```
 Subrutina GetEjemplo
@@ -53,6 +53,7 @@ Algoritmo
   out <- Ejemplo
 Fin
 ```
+
 Los módulos no tienen nombre *per se*. El nombre lo generará el módulo que lo necesite.
 Los módulos se pueden instanciar un número arbitrario de veces, en forma de declaración.
 Un módulo puede tener la subrutina externa **Inicio**, que se ejecutará cada vez que se instancie el módulo.
@@ -78,6 +79,6 @@ El tipo debe existir. El tipo puede ser alguno de los siguientes:
 * Numero
 * Texto
 * Booleano
-* Cualquier módulo instanciado
+* Cualquier instancia de módulo
 
-Los modificadores indician si el dato es de entrada, de salida, es global, es una lista o una relación 
+Los modificadores indician si el dato es de entrada, de salida, es global, es una lista o una relación entre dos tipos.
