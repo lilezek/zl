@@ -75,8 +75,8 @@ zl.error = zl.error || {};
       return resultado;
     } else if (error.tipo == zl.error.E_LLAMADA_DATO_INEXISTENTE) {
       var t = error.traza;
-      var resultado = zl.error.posicionCaracter(zlcodigo, t.posicion[0]).linea+".\tSe usa el nombre '"+t.dato.izq+"' pero no está definido en la subrutina' "+t.subrutina.nombre+"'.\n\n"+
-                      "La lista de entradas y salidas es la siguiente: \n";
+      var resultado = zl.error.posicionCaracter(zlcodigo, t.posicion[0]).linea+".\tSe usa el nombre '"+t.dato.izq+"' pero no está definido en la subrutina '"+t.subrutina.nombre+"'.\n\n"+
+                      "La lista de entradas y salidas de '"+t.subrutina.nombre+"' es la siguiente: \n";
       for (var k in t.subrutina.declaraciones) {
         resultado += "\t"+t.subrutina.declaraciones[k].nombre+" es "+t.subrutina.declaraciones[k].tipo.nombre;
         if (t.subrutina.declaraciones[k].modificadores & t.subrutina.declaraciones[k].M_ENTRADA)

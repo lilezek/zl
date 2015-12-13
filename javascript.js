@@ -7,6 +7,7 @@ zl.javascript = zl.javascript || {};
   // Función auxiliar
   // Genera nombres temporales para que no se repitan
   var temporal = 0;
+
   function pedirNombreTemporal() {
     return temporal++;
   }
@@ -17,7 +18,7 @@ zl.javascript = zl.javascript || {};
     var resultado = "";
     for (var k in simbolo.subrutinas) {
       if ("externa" in simbolo.subrutinas[k].modificadores)
-        resultado += "var "+zl.javascript.nombre(simbolo.subrutinas[k].nombre, simbolo) + ";";
+        resultado += "var " + zl.javascript.nombre(simbolo.subrutinas[k].nombre, simbolo) + ";";
     }
     resultado += "(function(){\"use strict\";";
     for (var k in simbolo.globales) {
@@ -112,50 +113,49 @@ zl.javascript = zl.javascript || {};
     } else if (compilado.tipo == "mientras") {
       var tempcallback = "$zlt_" + simbolo.pedirNombreTemporal();
       resultado = "done(null,$zlr);}, function(arg,done){var $zlr;" +
-        "function "+tempcallback+"(arg){"+
-        "if ("+ zl.javascript.expresion(compilado.condicion, simbolo) +"){" +
-        "async.waterfall([function(c){c(null,arg);},function(arg,done){"+
-        zl.javascript.sentencias(compilado.sentencias, simbolo)+
-        ";done(null,$zlr);}],"+tempcallback+");}"+
-        "else {done(null, arg);}"+
-        "}"+tempcallback+"(arg,done);},function(arg,done){var $zlr;";
+        "function " + tempcallback + "(arg){" +
+        "if (" + zl.javascript.expresion(compilado.condicion, simbolo) + "){" +
+        "async.waterfall([function(c){c(null,arg);},function(arg,done){" +
+        zl.javascript.sentencias(compilado.sentencias, simbolo) +
+        ";done(null,$zlr);}]," + tempcallback + ");}" +
+        "else {done(null, arg);}" +
+        "}" + tempcallback + "(arg,done);},function(arg,done){var $zlr;";
     } else if (compilado.tipo == "repetir") {
       var tempvar = "$zlt_" + pedirNombreTemporal();
       var tempcallback = "$zlt_" + pedirNombreTemporal();
       resultado = "done(null,$zlr);}, function(arg,done){var $zlr;" +
-        "var "+tempvar+"="+zl.javascript.expresion(compilado.veces,simbolo)+";"+
-        "function "+tempcallback+"(arg){"+
-        "if ("+ tempvar +"--){" +
-        "async.waterfall([function(c){c(null,arg);},function(arg,done){"+
-        zl.javascript.sentencias(compilado.sentencias, simbolo)+
-        ";done(null,$zlr);}],"+tempcallback+");}"+
-        "else {done(null, arg);}"+
-        "}"+tempcallback+"(arg,done);},function(arg,done){var $zlr;";
+        "var " + tempvar + "=" + zl.javascript.expresion(compilado.veces, simbolo) + ";" +
+        "function " + tempcallback + "(arg){" +
+        "if (" + tempvar + "--){" +
+        "async.waterfall([function(c){c(null,arg);},function(arg,done){" +
+        zl.javascript.sentencias(compilado.sentencias, simbolo) +
+        ";done(null,$zlr);}]," + tempcallback + ");}" +
+        "else {done(null, arg);}" +
+        "}" + tempcallback + "(arg,done);},function(arg,done){var $zlr;";
     } else if (compilado.tipo == "sicondicional") {
       var siguiente = compilado.siguiente;
-
-      resultado = "done(null,$zlr);}, function(arg, done){var $zlr;"+
+      resultado = "done(null,$zlr);}, function(arg, done){var $zlr;" +
         "if(" + zl.javascript.expresion(compilado.condicion) + "){" +
-        "async.waterfall([function(c){c(null,arg);},function(arg,done){"+
-          zl.javascript.sentencias(compilado.sentencias) +
-          "}],done);"+
+        "async.waterfall([function(c){c(null,arg);},function(arg,done){" +
+        zl.javascript.sentencias(compilado.sentencias) +
+        "done(null, arg);}],done);" +
         "}";
       while (siguiente) {
         if (siguiente.condicion)
           resultado += "else if(" + zl.javascript.expresion(siguiente.condicion) + "){" +
-          "async.waterfall([function(c){c(null,arg);},function(arg,done){"+
-            zl.javascript.sentencias(siguiente.sentencias) +
-            "}],done);"+
+          "async.waterfall([function(c){c(null,arg);},function(arg,done){" +
+          zl.javascript.sentencias(siguiente.sentencias) +
+          "done(null,arg);}],done);" +
           "}";
         else
           resultado += "else{" +
-          "async.waterfall([function(c){c(null,arg);},function(arg,done){"+
+          "async.waterfall([function(c){c(null,arg);},function(arg,done){" +
           zl.javascript.sentencias(siguiente.sentencias) +
-          "}],done);"+
+          "done(null,arg);}],done);" +
           "}";
-
         siguiente = siguiente.siguiente;
       }
+      resultado += "}, function(arg, done){var $zlr;";
     }
     return resultado + ";";
   }
