@@ -8,6 +8,7 @@ zl.entorno = zl.entorno || {};
     this.modulos = {
       "$internal": modInterno // Módulo interno
     };
+    modInterno.padre = this;
     return this;
   }
 
@@ -18,11 +19,19 @@ zl.entorno = zl.entorno || {};
     mod.padre = this;
   }
 
+  Programa.prototype.subrutinaPorNombre = function(nombre) {
+    nombre = nombre.split(".");
+    if (nombre.length == 1)
+      return this.modulos["$internal"].subrutinaPorNombre(nombre[0]);
+    return this.modulos[nombre[0]].subrutinaPorNombre(nombre[1]);
+  }
+
   function Modulo(programa) {
     // Programa padre:
     this.padre = programa || null;
 
     this.subrutinas = {};
+    this.tipos = {};
     this.globales = {};
 
     // Por defecto: representa el código escrito en el propio editor.
@@ -32,6 +41,23 @@ zl.entorno = zl.entorno || {};
     this.serial = "";
 
     return this;
+  }
+
+  Modulo.prototype.registrar = function (r) {
+    var x =
+    r instanceof Subrutina  ? this.registrarSubrutina(r)  :
+    r instanceof Tipo       ? this.registrarTipo(r)       :
+    "Solo se pueden registrar subrutinas o tipos";
+    if (x)
+      throw x;
+  }
+
+  Modulo.prototype.registrarSubrutina = function(sub) {
+    this.subrutinas[sub.nombre] = sub;
+  }
+
+  Modulo.prototype.registrarTipo = function(tipo) {
+    this.tipos[tipo.nombre] = tipo;
   }
 
   Modulo.prototype.esIgual = function(mod) {
@@ -44,11 +70,25 @@ zl.entorno = zl.entorno || {};
   }
 
   Modulo.prototype.subrutinaPorNombre = function(nombre) {
+    nombre = nombre.toLowerCase();
     for (var k in this.subrutinas) {
       if (this.subrutinas[k].nombre == nombre)
         return this.subrutinas[k];
     }
     return null;
+  }
+
+  Modulo.prototype.tipoPorNombre = function(nombre) {
+    nombre = nombre.toLowerCase();
+    for (var k in this.tipos) {
+      if (this.tipos[k].nombre == nombre)
+        return this.tipos[k];
+    }
+    // Si no está en el módulo, mirar en los internos:
+    return (
+    this.padre ?  this.padre.modulos["$internal"].tipoPorNombre(nombre) :
+                  null
+    );
   }
 
   Modulo.prototype.serializar = function() {
@@ -158,7 +198,7 @@ zl.entorno = zl.entorno || {};
     this.posicionDatos = [arbol.datos[0].$.begin, arbol.datos[arbol.datos.length - 1].$.end];
     this.posicionAlgoritmo = [arbol.sentencias[0].$.begin, arbol.sentencias[arbol.sentencias.length - 1].$.end - 3]; // El - 3 resta la palabra Fin
 
-    this.nombre = arbol.nombre;
+    this.nombre = arbol.nombre.toLowerCase();
 
     // Registrar modificadores
     for (var i = 0; i < arbol.modificadores.length; i++) {
@@ -199,19 +239,19 @@ zl.entorno = zl.entorno || {};
 
   // Usado para comprobar que dos declaraciones son compatibles
   Declaracion.prototype.esCompatible = function(dec) {
-    return (dec instanceof Declaracion) && (dec.serial == this.serial);
+    return (dec instanceof Declaracion) && (dec.serial === this.serial);
   }
 
   Declaracion.prototype.serializar = function() {
     //TODO: serializar correctamente el tipo
-    this.serial = (this.nombre + "@" + this.tipo + "@" + this.modificadores).toLowerCase();
+    this.serial = (this.nombre + "@" + this.tipo.serial + "@" + this.modificadores).toLowerCase();
   }
 
   Declaracion.prototype.rellenarDesdeArbol = function(arbol) {
-    this.nombre = arbol.nombre;
+    this.nombre = arbol.nombre.toLowerCase();
     this.posicion = [arbol.$.begin, arbol.$.end];
     // TODO: Para obtener el tipo, hay que irse al Programa padre:
-    this.tipo = arbol.tipo;
+    this.tipo = this.padre.padre.tipoPorNombre(arbol.tipo);
     for (var j = 0; j < arbol.modificadores.length; j++) {
       var mod = arbol.modificadores[j].toLowerCase();
       if (mod == "salida") {
@@ -233,23 +273,13 @@ zl.entorno = zl.entorno || {};
     this.serializar();
   }
 
-  function Tipo() {
+  function Tipo(modulo) {
     var self = this;
+    this.padre = modulo;
     this.nombre = "";
-    // Constructor del tipo:
-    this.construct = function(clon) {
-      return {
-        v: clon,
-        tipo: self
-      };
-    };
 
     // Métodos:
-    this.metodos = {
-      "hash": function(valor) {
-        return "" + valor;
-      }
-    };
+    this.metodos = {};
 
     // Operaciones con el tipo:
     // Unarias
@@ -260,7 +290,20 @@ zl.entorno = zl.entorno || {};
     // Conversiones:
     this.conversiones = {};
 
+    // Serialización:
+    this.serial = "";
+
     return this;
+  }
+
+  Tipo.prototype.esCompatible = function(tipo) {
+    // TODO: no limitarse a usar el nombre
+    return (tipo instanceof Tipo) && (tipo.nombre === this.nombre);
+  }
+
+  Tipo.prototype.serializar = function() {
+    // TODO: Serializar correctamente con los métodos
+    this.serial = this.nombre;
   }
 
   // Distintos tipos de modificador.
@@ -268,15 +311,6 @@ zl.entorno = zl.entorno || {};
   Declaracion.prototype.M_ENTRADA = 0x01;
   Declaracion.prototype.M_SALIDA = 0x02;
   Declaracion.prototype.M_GLOBAL = 0x04;
-
-  // Estas funciones son privadas porque no tienen una utilidad fuera de aquí:
-  var programa = function(c, e) {
-
-  }
-
-  var subrutina = function(c, e) {
-
-  }
 
   zl.entorno.newPrograma = function() {
     return new Programa();
@@ -288,6 +322,14 @@ zl.entorno = zl.entorno || {};
 
   zl.entorno.newSubrutina = function(a) {
     return new Subrutina(a);
+  }
+
+  zl.entorno.newDeclaracion = function(a) {
+    return new Declaracion(a);
+  }
+
+  zl.entorno.newTipo = function(a) {
+    return new Tipo(a);
   }
 
   // Módulo interno

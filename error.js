@@ -45,7 +45,7 @@ zl.error = zl.error || {};
       return "En la línea " + zl.error.posicionCaracter(zlcodigo, error.traza.arbol.end).linea +
         " se usa como nombre la palabra reservada '" + palabra + "'"
     }
-    if (error.tipo == zl.error.E_GLOBALES_INCOMPATIBLES) {
+    else if (error.tipo == zl.error.E_GLOBALES_INCOMPATIBLES) {
       return error.traza[0].nombre + ".\tDato '" + error.traza[0].nombre + "' global con declaraciones incompatibles\n" +
         zl.error.posicionCaracter(zlcodigo, error.traza[1].posicion[0]).linea + ".\t\tPor un lado, en la línea " + zl.error.posicionCaracter(zlcodigo, error.traza[1].posicion[0]).linea + "\n" +
         "\t\tde tipo " + error.traza[1].tipo + "\n\n" +
@@ -57,9 +57,47 @@ zl.error = zl.error || {};
         "3. No usar el modificador global\n"+
         "4. Cambiar el nombre a uno de los dos datos\n";
     }
+    else if (error.tipo == zl.error.E_LLAMADA_NOMBRE_NO_ENCONTRADO) {
+      return "Subrutina con nombre '"+error.traza["arbol"].nombre+"' no encontrada";
+    } else if (error.tipo == zl.error.E_LLAMADA_ENTRADA_SALIDA_INCOMPATIBLE) {
+      return "ayy";
+    } else if (error.tipo == zl.error.E_LLAMADA_DATO_INCOMPATIBLE) {
+      var t = error.traza;
+      return  zl.error.posicionCaracter(zlcodigo,t.posicion[0]).linea+".\tEl dato '"+t.dato.nombre+"' ha sido introducido con un valor de tipo '"+t.obtenido.nombre+"'\n"+
+              "\t\tpero debería ser de tipo '"+t.esperado.nombre+"'.";
+    } else if (error.tipo == zl.error.E_NOMBRE_NO_DEFINIDO) {
+      var t = error.traza;
+      var resultado = zl.error.posicionCaracter(zlcodigo, t.posicion[0]).linea+".\tSe usa el nombre '"+t.nombre+"' pero no está definido.\n\n"+
+                      "La lista de datos definidos es la siguiente: \n";
+      for (var k in t.declaraciones) {
+        resultado += zl.error.posicionCaracter(zlcodigo, t.declaraciones[k].posicion[0]).linea+".\t"+t.declaraciones[k].nombre+" es "+t.declaraciones[k].tipo.nombre+"\n";
+      }
+      return resultado;
+    } else if (error.tipo == zl.error.E_LLAMADA_DATO_INEXISTENTE) {
+      var t = error.traza;
+      var resultado = zl.error.posicionCaracter(zlcodigo, t.posicion[0]).linea+".\tSe usa el nombre '"+t.dato.izq+"' pero no está definido en la subrutina' "+t.subrutina.nombre+"'.\n\n"+
+                      "La lista de entradas y salidas es la siguiente: \n";
+      for (var k in t.subrutina.declaraciones) {
+        resultado += "\t"+t.subrutina.declaraciones[k].nombre+" es "+t.subrutina.declaraciones[k].tipo.nombre;
+        if (t.subrutina.declaraciones[k].modificadores & t.subrutina.declaraciones[k].M_ENTRADA)
+          resultado += " de Entrada";
+        if (t.subrutina.declaraciones[k].modificadores & t.subrutina.declaraciones[k].M_SALIDA)
+          resultado += " de Salida";
+        resultado += "\n";
+      }
+      return resultado;
+    } else if (error.tipo == zl.error.E_OPERACION_TIPO_INCOMPATIBLE_BINARIO) {
+      var t = error.traza;
+      return  zl.error.posicionCaracter(zlcodigo, t.posicion[0]).linea+".\tEn la operación \n"+
+              "\t\t"+zlcodigo.substring(t.posicion[0],t.posicion[1])+"\n"+
+              "\tel operador '"+t.op+"' no está definido para los tipos '"+t.izq.nombre+"' y '" +t.der.nombre+"'\n"+
+              "\ty las dos partes cumplen:\n"+
+              "\t\t"+zlcodigo.substring(t.posizq[0], t.posizq[1])+" es "+t.izq.nombre+"\n"+
+              "\t\t"+zlcodigo.substring(t.posder[0], t.posder[1])+" es "+t.der.nombre+"\n";
+    }
     if (error.tipo == zl.error.E_SIMBOLO)
       return js_beautify(JSON.stringify(error.hojas()));
-    return JSON.stringify(error);
+    return Object.keys(zl.error).filter(function(key) {return zl.error[key] === error.tipo})[0];
   }
 
   // distintos errores:
@@ -70,6 +108,14 @@ zl.error = zl.error || {};
   zl.error.E_MODIFICADOR_REPETIDO = 5;
   zl.error.E_USO_INDEBIDO_MODIFICADOR_GLOBAL = 6;
   zl.error.E_GLOBALES_INCOMPATIBLES = 7;
+  zl.error.E_LLAMADA_NOMBRE_NO_ENCONTRADO = 8;
+  zl.error.E_LLAMADA_DATO_INEXISTENTE = 9;
+  zl.error.E_LLAMADA_DATO_INCOMPATIBLE = 10;
+  zl.error.E_LLAMADA_DATOS_INCOMPLETOS = 11;
+  zl.error.E_NOMBRE_NO_DEFINIDO = 12;
+  zl.error.E_OPERACION_TIPO_INCOMPATIBLE_BINARIO = 13;
+  zl.error.E_OPERACION_NO_DEFINIDA = 14;
+  zl.error.E_CONDICION_NO_BOOLEANA = 15;
 
   zl.error.newError = function(a, b) {
     return new Error(a, b);

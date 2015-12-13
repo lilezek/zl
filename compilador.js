@@ -34,11 +34,10 @@ var zl = zl || {};
     // Construir este módulo
     var mod = zl.entorno.newModulo(programa);
     mod.rellenarDesdeArbol(compilado);
-    console.log(mod);
 
     // Fase 5, comprobaciones semánticas (tipos compatibles, uso de nombres que
     // están registrados, etc...).
-    zl.semantica.testar(compilado, programa);
+    zl.semantica.testarModulo(compilado, mod);
 
     // Fase 6, optimización opcional del código generado por el árbol
     // TODO: sin hacer

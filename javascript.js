@@ -8,7 +8,7 @@ zl.javascript = zl.javascript || {};
   // Genera nombres temporales para que no se repitan
   var temporal = 0;
   function pedirNombreTemporal() {
-    return "$zlt_"+temporal++;
+    return temporal++;
   }
 
   // Generar la cabecera

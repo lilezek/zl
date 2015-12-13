@@ -71,31 +71,23 @@
 <body>
   <div class="main">
 <textarea class="editor" id="editor">
+// Código de prueba con varios errores
 Subrutina Externa Inicio
 Datos
-  x es Texto Global
+  t es Texto
+  minumero es Numero Global
 Algoritmo
   Repetir 100 veces
-    aleatorio [ resultado -> x minimo <- 0 maximo <- 100]
-    Si x > 50 hacer
-      mostrar [ mensaje <- "Cara" ]
+    aleatorio [ resultado -> mnumero
+      min <- 0
+      max <- "100"
+    ]
+    Si minmuero > "50" hacer
+      t <- "Cara"
     si no hacer
-      mostrar [ mensaje <- "Cruz" ]
+      t <- "Cruz"
     Fin
-  Fin
-Fin
-
-Subrutina Externa InicioDos
-Datos
-  x es Numero Global
-Algoritmo
-  Repetir 100 veces
-    aleatorio [ resultado -> x minimo <- 0 maximo <- 100]
-    Si x > 50 hacer
-      mostrar [ mensaje <- "Cara" ]
-    si no hacer
-      mostrar [ mensaje <- "Cruz" ]
-    Fin
+  	mostrar [ msg <- t ]
   Fin
 Fin</textarea>
     <div class="v divisor"></div>

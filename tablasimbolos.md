@@ -6,6 +6,7 @@
   * Conjunto de subrutinas
   * Conjunto de declaraciones globales
   * Camino al código fuente, si existe
+  * Conjunto de tipos definidos
 * Subrutina
   * Nombre
   * Modificadores

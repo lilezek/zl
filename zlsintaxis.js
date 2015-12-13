@@ -120,7 +120,7 @@ zl.sintaxis = zl.sintaxis || {};
     ], "espacios opcionales");
 
     reglas["modulo"] = zl.analizador.newExpresion([
-      ["subrutina+"]
+      [" ","subrutina+", " "]
     ], "modulo");
 
     reglas["subrutina+"] = zl.analizador.newExpresion([
@@ -343,7 +343,7 @@ zl.sintaxis = zl.sintaxis || {};
 
     reglas["modulo"].postproceso = function(datos, opcion) {
       return {
-        subrutinas: datos[0]
+        subrutinas: datos[1]
       };
     }
 
@@ -633,12 +633,12 @@ zl.sintaxis = zl.sintaxis || {};
         }
       } else if (opcion == 3) {
         return {
-          tipo: "boleano",
+          tipo: "booleano",
           valor: datos[0]
         }
       } else if (opcion == 4) {
         return {
-          tipo: "boleano",
+          tipo: "booleano",
           valor: datos[0]
         }
       } else if (opcion == 5) {
