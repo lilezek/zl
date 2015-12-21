@@ -24,7 +24,6 @@ zl.semantica = zl.semantica || {};
         while (s) {
           if (s.condicion) {
             var tipo = testarExpresion(s.condicion, sub);
-            console.log(tipo);
             if (tipo.nombre != "booleano") {
               throw zl.error.newError(zl.error.E_CONDICION_NO_BOOLEANA, {});
             }
@@ -57,13 +56,13 @@ zl.semantica = zl.semantica || {};
             esperado: decl2.tipo,
             obtenido: tipo,
             dato: decl2,
-            posicion: [decl.$.begin, decl.$.end]
+            posicion: [decl.begin, decl.end]
           });
       } else {
         throw zl.error.newError(zl.error.E_LLAMADA_DATO_INEXISTENTE, {
           dato: decl,
           subrutina: llamada,
-          posicion: [decl.$.begin, decl.$.end]
+          posicion: [decl.begin, decl.end]
         });
       }
     }
@@ -73,7 +72,8 @@ zl.semantica = zl.semantica || {};
       var tipo = testarExpresion({
         tipo: "nombre",
         valor: decl.der,
-        $: decl.$
+        begin: decl.begin,
+        end: decl.end
       }, sub);
       var nombre = decl.izq;
       if (nombre.toLowerCase() in llamada.declaraciones) {
@@ -88,7 +88,7 @@ zl.semantica = zl.semantica || {};
         throw zl.error.newError(zl.error.E_LLAMADA_DATO_INEXISTENTE, {
           dato: decl,
           subrutina: llamada,
-          posicion: [decl.$.begin, decl.$.end]
+          posicion: [decl.begin, decl.end]
         });
       }
     }
@@ -101,19 +101,21 @@ zl.semantica = zl.semantica || {};
       return modulo.tipoPorNombre("numero");
     } else if (arbol.tipo == "texto") {
       return modulo.tipoPorNombre("texto");
+    } else if (arbol.tipo == "expresion") {
+      return testarExpresion(arbol.valor, sub);
     } else if (arbol.tipo == "nombre") {
       var dato = sub.declaraciones[arbol.valor.toLowerCase()];
       // TODO: Añadir más información al error
       if (!dato)
         throw zl.error.newError(zl.error.E_NOMBRE_NO_DEFINIDO, {
           nombre: arbol.valor,
-          posicion: [arbol.$.begin, arbol.$.end],
+          posicion: [arbol.begin, arbol.end],
           declaraciones: sub.declaraciones
         });
       return dato.tipo;
     }
     // Expresiones complejas
-    else if (!arbol.tipo && arbol.nivel) {
+    else if (!arbol.tipo && arbol.op && arbol.der) {
       var tipoder = testarExpresion(arbol.der, sub);
       var op = arbol.op;
       // TODO: añadir las unarias
@@ -124,22 +126,22 @@ zl.semantica = zl.semantica || {};
         var operacion = tipoizq.opbinario[op];
         if (!operacion)
           throw zl.error.newError(zl.error.E_OPERACION_NO_DEFINIDA, {
-            posicion: [arbol.$.begin, arbol.$.end],
+            posicion: [arbol.begin, arbol.end],
             op: op,
             izq: tipoizq,
             der: tipoder,
-            posizq: [arbol.izq.$.begin, arbol.izq.$.end],
-            posder: [arbol.der.$.begin, arbol.der.$.end]
+            posizq: [arbol.izq.begin, arbol.izq.end],
+            posder: [arbol.der.begin, arbol.der.end]
           });
         var tipores = operacion[tipoder.nombre];
         if (!tipores)
           throw zl.error.newError(zl.error.E_OPERACION_TIPO_INCOMPATIBLE_BINARIO, {
-            posicion: [arbol.$.begin, arbol.$.end],
+            posicion: [arbol.begin, arbol.end],
             op: op,
             izq: tipoizq,
             der: tipoder,
-            posizq: [arbol.izq.$.begin, arbol.izq.$.end],
-            posder: [arbol.der.$.begin, arbol.der.$.end]
+            posizq: [arbol.izq.begin, arbol.izq.end],
+            posder: [arbol.der.begin, arbol.der.end]
           });
         return modulo.tipoPorNombre(tipores);
       }

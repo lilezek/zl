@@ -194,9 +194,9 @@ zl.entorno = zl.entorno || {};
 
   Subrutina.prototype.rellenarDesdeArbol = function(arbol) {
     // Posicion de la subrutina:
-    this.posicionSubrutina = [arbol.$.begin, arbol.$.end];
-    this.posicionDatos = [arbol.datos[0].$.begin, arbol.datos[arbol.datos.length - 1].$.end];
-    this.posicionAlgoritmo = [arbol.sentencias[0].$.begin, arbol.sentencias[arbol.sentencias.length - 1].$.end - 3]; // El - 3 resta la palabra Fin
+    this.posicionSubrutina = [arbol.begin, arbol.end];
+    this.posicionDatos = [arbol.datos[0].begin, arbol.datos[arbol.datos.length - 1].end];
+    this.posicionAlgoritmo = [arbol.sentencias[0].begin, arbol.sentencias[arbol.sentencias.length - 1].end - 3]; // El - 3 resta la palabra Fin
 
     this.nombre = arbol.nombre.toLowerCase();
 
@@ -249,7 +249,7 @@ zl.entorno = zl.entorno || {};
 
   Declaracion.prototype.rellenarDesdeArbol = function(arbol) {
     this.nombre = arbol.nombre.toLowerCase();
-    this.posicion = [arbol.$.begin, arbol.$.end];
+    this.posicion = [arbol.begin, arbol.end];
     // TODO: Para obtener el tipo, hay que irse al Programa padre:
     this.tipo = this.padre.padre.tipoPorNombre(arbol.tipo);
     for (var j = 0; j < arbol.modificadores.length; j++) {

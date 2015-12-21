@@ -12,6 +12,7 @@
   <script src="jsziputils.js"></script>
   <script src="https://codemirror.net/addon/mode/simple.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.8.0/codemirror.css">
+  <script src="analizador.js"></script>
   <script src="zlsintaxis.js"></script>
   <script src="ejecucion.js"></script>
   <script src="error.js"></script>
@@ -62,9 +63,6 @@
 
     return code;
   }
-
-  // Cargar las dependencias:
-  zl.sintaxis.cargar();
 </script>
 </head>
 
@@ -78,14 +76,17 @@ Datos
   minumero es Numero Global
 Algoritmo
   Repetir 100 veces
-    aleatorio [ resultado -> mnumero
+    aleatorio [
+    resultado -> mnumero
       min <- 0
       max <- "100"
     ]
     Si minmuero > "50" hacer
       t <- "Cara"
+    o si t hacer
+  		t <- x
     si no hacer
-      t <- "Cruz"
+      t <- "Cruz""
     Fin
   	mostrar [ msg <- t ]
   Fin

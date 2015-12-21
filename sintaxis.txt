@@ -49,7 +49,6 @@
 <rango> ::= <numero> <_> ".." <_> <numero>
 
 <sentencia> ::= <asignacion>
-    | <ecuacion>
     | <llamada>
     | <repetir>
     | <sicondicional>
@@ -61,8 +60,6 @@
 
 <asignacion> ::= <nombre> <_> "<-" <_> <expresion>
     | <nombre> <_> "(" <_> <listaAcceso> <_> ")" <_> "<-" <_> <expresion>
-
-<ecuacion> ::= <nombre> <_> "=" <_> <expresion>
 
 <llamada> ::= <nombre> <_> "->" <_> <nombre> <_> "->" <_> <nombre>
     | <nombre> <_> "->" <_> <nombre>

@@ -11,11 +11,11 @@ zl.error = zl.error || {};
   }
 
   Error.prototype.hojas = function(nodo) {
-    var nodo = nodo || this.traza.arbol;
+    var nodo = nodo || this.traza;
     var res = [];
-    if (nodo.opciones) {
-      for (var k in nodo.opciones) {
-        var x = Error.prototype.hojas(nodo.opciones[k]);
+    if (nodo.length) {
+      for (var i = 0; i < nodo.length; i++) {
+        var x = Error.prototype.hojas(nodo[i]);
         res = res.concat(x);
       }
       return res;
@@ -39,10 +39,23 @@ zl.error = zl.error || {};
     return resultado;
   }
 
+  // Devuelve un string con un apuntador al error.
+  Error.prototype.apuntador = function(codigo) {
+    var hojas = this.hojas();
+    var posicion = hojas[hojas.length-1].end;
+    var pos = zl.error.posicionCaracter(codigo, posicion);
+    var resultado = pos.linea+"."+codigo.split("\n")[pos.linea-1] + "\n";
+    for (var i = 0; i < pos.columna+(pos.linea+"").length+1; i++)
+      resultado += " ";
+    return resultado + "^";
+  }
+
   zl.error.obtenerMensaje = function(error, zlcodigo) {
+    console.log(error.traza);
     if (error.tipo == zl.error.E_PALABRA_RESERVADA) {
-      var palabra = error.hojas()[0].resultado.resultado[0];
-      return "En la línea " + zl.error.posicionCaracter(zlcodigo, error.traza.arbol.end).linea +
+      var hojas = error.hojas();
+      var palabra = hojas[hojas.length-2].resultado;
+      return "En la línea " + zl.error.posicionCaracter(zlcodigo, error.traza.end).linea +
         " se usa como nombre la palabra reservada '" + palabra + "'"
     }
     else if (error.tipo == zl.error.E_GLOBALES_INCOMPATIBLES) {
@@ -95,8 +108,11 @@ zl.error = zl.error || {};
               "\t\t"+zlcodigo.substring(t.posizq[0], t.posizq[1])+" es "+t.izq.nombre+"\n"+
               "\t\t"+zlcodigo.substring(t.posder[0], t.posder[1])+" es "+t.der.nombre+"\n";
     }
-    if (error.tipo == zl.error.E_SIMBOLO)
-      return js_beautify(JSON.stringify(error.hojas()));
+    if (error.tipo == zl.error.E_SIMBOLO) {
+      console.log(error);
+      return "Error genérico:\n\n"+
+        error.apuntador(zlcodigo);
+    }
     return Object.keys(zl.error).filter(function(key) {return zl.error[key] === error.tipo})[0];
   }
 

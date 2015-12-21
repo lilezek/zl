@@ -11,678 +11,397 @@ zl.sintaxis = zl.sintaxis || {};
     }
   }
 
-  // Sintaxis de zl
-  var zls = {};
+  var palabrasReservadas = {
+    "no": true,
+    "y": true,
+    "o": true,
+    "hacer": true,
+    "si": true,
+    "fin": true,
+    "verdadero": true,
+    "falso": true,
+    "imposible": true,
+    //"nada": true,
+    "veces": true,
+    "repetir": true,
+    "mientras": true,
+    "subrutina": true,
+    "externa": true,
+    "es": true,
+    "rapida": true,
+    "entrada": true,
+    "salida": true,
+    "de": true,
+    "datos": true,
+    "algoritmo": true,
+    "global": true
+  };
 
-  // Sintaxis de configuración de zl
-  var zlc = {};
+  // Usando el analizador que he construido, genero los símbolos del lenguaje
 
-  zl.sintaxis.cargar = function() {
-    // Palabras reservadas:
-    var palabrasReservadas = {
-      "no": true,
-      "y": true,
-      "o": true,
-      "hacer": true,
-      "si": true,
-      "fin": true,
-      "verdadero": true,
-      "falso": true,
-      "imposible": true,
-      //"nada": true,
-      "veces": true,
-      "repetir": true,
-      "mientras": true,
-      "subrutina": true,
-      "externa": true,
-      "es": true,
-      "rapida": true,
-      "entrada": true,
-      "salida": true,
-      "de": true,
-      "datos": true,
-      "algoritmo": true,
-      "global": true
-    };
+  var a = zl.sintaxis.zlAnalizador = zl.analizador.newAnalizador();
+  a.simbolo("<-");
+  a.simbolo(".", /^\./);
+  a.simbolo("no");
+  a.simbolo("y");
+  a.simbolo("o");
+  a.simbolo("<");
+  a.simbolo(">");
+  a.simbolo("<=");
+  a.simbolo(">=");
+  a.simbolo("=");
+  a.simbolo("<>");
+  a.simbolo("+", /^\+/);
+  a.simbolo("-");
+  a.simbolo("*", /^\*/);
+  a.simbolo("/");
+  a.simbolo(")", /^\)/);
+  a.simbolo("(", /^\(/);
+  a.simbolo("[", /^\[/);
+  a.simbolo("]", /^\]/);
+  a.simbolo("->");
+  a.simbolo("%");
 
-    // Conjunto de las reglas:
-    var reglas = {};
+  a.simbolo("hacer");
+  a.simbolo("si");
+  a.simbolo("veces");
+  a.simbolo("fin");
+  a.simbolo(":repetir", /^repetir/i);
+  a.simbolo(":mientras", /^mientras/i);
+  a.simbolo(":subrutina", /^subrutina/i);
+  a.simbolo("externa");
+  a.simbolo("es");
+  a.simbolo("de");
+  a.simbolo("datos");
+  a.simbolo("algoritmo");
+  a.simbolo("relacion", /^(relacion|relación)/i);
+  a.simbolo("lista");
+  a.simbolo("a");
+  a.simbolo("..");
+  a.simbolo(";");
 
-    // Símbolos (terminales):
-    var $ = {};
-    var nombreSimple = zl.analizador.newSimbolo(/^([A-Za-záéíóúÁÉÍÓÚñÑ][A-Za-záéíóúÁÉÍÓÚñÑ0-9]*)/, "nombreSimple");
-    $["<-"] = zl.analizador.newSimbolo(/^(<-)/i, "<-");
-    $["."] = zl.analizador.newSimbolo(/^(\.)/i, ".");
-    $["-"] = zl.analizador.newSimbolo(/^(-)/i, "-");
-    $["+"] = zl.analizador.newSimbolo(/^(\+)/i, "+");
-    $["no"] = zl.analizador.newSimbolo(/^(no)/i, "no");
-    $["y"] = zl.analizador.newSimbolo(/^(y)/i, "y");
-    $["o"] = zl.analizador.newSimbolo(/^(o)/i, "o");
-    $["<"] = zl.analizador.newSimbolo(/^(<)/i, "<");
-    $[">"] = zl.analizador.newSimbolo(/^(>)/i, ">");
-    $["<="] = zl.analizador.newSimbolo(/^(<=)/i, "<=");
-    $[">="] = zl.analizador.newSimbolo(/^(>=)/i, ">=");
-    $["="] = zl.analizador.newSimbolo(/^(=)/i, "=");
-    $["<>"] = zl.analizador.newSimbolo(/^(<>)/i, "<>");
-    $["+"] = zl.analizador.newSimbolo(/^(\+)/i, "+");
-    $["-"] = zl.analizador.newSimbolo(/^(-)/i, "-");
-    $["*"] = zl.analizador.newSimbolo(/^(\*)/i, "*");
-    $["/"] = zl.analizador.newSimbolo(/^(\/)/i, "/");
-    $[")"] = zl.analizador.newSimbolo(/^(\))/i, ")");
-    $["("] = zl.analizador.newSimbolo(/^(\()/i, "(");
-    $["["] = zl.analizador.newSimbolo(/^(\[)/i, "[");
-    $["]"] = zl.analizador.newSimbolo(/^(\])/i, "]");
-    $["->"] = zl.analizador.newSimbolo(/^(->)/i, "->");
-    $["%"] = zl.analizador.newSimbolo(/^(%)/i, "%");
+  // Los distintos tokens:
 
-    $["hacer"] = zl.analizador.newSimbolo(/^(hacer)/i, "hacer");
-    $["si"] = zl.analizador.newSimbolo(/^(si)/i, "si");
-    $["fin"] = zl.analizador.newSimbolo(/^(fin)/i, "fin");
-    $["verdadero"] = zl.analizador.newSimbolo(/^(verdadero)/i, "verdadero");
-    $["falso"] = zl.analizador.newSimbolo(/^(falso)/i, "falso");
-    $["imposible"] = zl.analizador.newSimbolo(/^(?!x)x/i, "imposible");
-    $["nada"] = zl.analizador.newSimbolo(/^/i, "nada");
-    $["veces"] = zl.analizador.newSimbolo(/^(veces)/i, "veces");
-    $["repetir"] = zl.analizador.newSimbolo(/^(repetir)/i, "repetir");
-    $["mientras"] = zl.analizador.newSimbolo(/^(mientras)/i, "mientras");
-    $["subrutina"] = zl.analizador.newSimbolo(/^(subrutina)/i, "subrutina");
-    $["externa"] = zl.analizador.newSimbolo(/^(externa)/i, "externa");
-    $["es"] = zl.analizador.newSimbolo(/^(es)/i, "es");
-    $["rapida"] = zl.analizador.newSimbolo(/^(rapida|rápida)/i, "rapida");
-    $["entrada"] = zl.analizador.newSimbolo(/^(entrada)/i, "entrada");
-    $["salida"] = zl.analizador.newSimbolo(/^(salida)/i, "salida");
-    $["de"] = zl.analizador.newSimbolo(/^(de)/i, "de");
-    $["datos"] = zl.analizador.newSimbolo(/^(datos)/i, "datos");
-    $["algoritmo"] = zl.analizador.newSimbolo(/^(algoritmo)/i, "algoritmo");
-    $["global"] = zl.analizador.newSimbolo(/^(global)/i, "global");
-    $["relacion"] = zl.analizador.newSimbolo(/^(relación|relacion)/i, "relacion");
-    $["lista"] = zl.analizador.newSimbolo(/^(lista)/i, "lista");
-    $["a"] = zl.analizador.newSimbolo(/^(a)/i, "a");
-    $[".."] = zl.analizador.newSimbolo(/^(\.\.)/i, "..");
-    $[";"] = zl.analizador.newSimbolo(/^(;)/i, ";");
-    var espacio = zl.analizador.newSimbolo(/^([ \n\t]+)/i, "espacio");
-    var comentario = zl.analizador.newSimbolo(/^(\/\/.*)/i, "comentario");
-    var numero = zl.analizador.newSimbolo(/^((?:[0-1]+(?:\|2))|(?:[0-9A-Fa-f]+(?:\|16))|(?:[0-9]+(?:\|10)?))/i, "numero");
-    var texto = zl.analizador.newSimbolo(/^\"([^"\\]|\\.|\\\n)*\"/i, "texto");
-    var letra = zl.analizador.newSimbolo(/^\'([^'\\]|\\.|\\\n)*\'/i, "letra");
+  a.token("verdadero", /^verdadero/i, 0);
+  a.token("falso", /^falso/i, 1);
+  a.token("subModificador", /^(es|rapida|rápida|externa|constante|funcion|asíncrona|asincrona)/i, 2);
+  a.token("decModificador", /^((?:de\s+entrada)|(?:de\s+salida)|global)/i, 3);
+  a.token("numero", /^((?:[0-1]+(?:\|2))|(?:[0-9A-Fa-f]+(?:\|16))|(?:[0-9]+(?:\|10)?))/i, 4);
+  a.token("texto", /^\"([^"\\]|\\.|\\\n)*\"/i, 5);
+  a.token("letra", /^\'([^'\\]|\\.|\\\n)*\'/i, 6);
+  a.token("nombreSimple", /^([A-Za-záéíóúÁÉÍÓÚñÑ][A-Za-záéíóúÁÉÍÓÚñÑ0-9]*)/, 7);
 
-    // Reglas básicas
-    reglas["_"] = zl.analizador.newExpresion([
-      [espacio, "_"],
-      [comentario, "_"],
-      [espacio],
-      [comentario]
-    ], "espacios o comentarios")
 
-    reglas[" "] = zl.analizador.newExpresion([
-      ["_"],
-      [$["nada"]]
-    ], "espacios opcionales");
+  // Y Las reglas:
+  a.regla("configuracion", function() {
+    // TODO: Stub
+    return this;
+  });
 
-    reglas["modulo"] = zl.analizador.newExpresion([
-      [" ","subrutina+", " "]
-    ], "modulo");
+  a.regla("modulo", function() {
+    this.acumular("subrutina").avanzarObligatorioVarios();
+    this.registrarResultado({
+      subrutinas: this.resultado(0)
+    });
+    return this;
+  });
 
-    reglas["subrutina+"] = zl.analizador.newExpresion([
-      ["subrutina", " ", "subrutina+"],
-      ["subrutina"]
-    ], "subrutina+");
+  a.regla("nombre", function() {
+    this.avanzar("nombreSimple")
+      .acumular(".")
+      .acumular("nombreSimple")
+      .avanzarVarios();
+    var resultado = this.arbol(0).resultado;
+    for (var i = 0; i < this.arbol(1).length; i++) {
+      resultado += this.resultado(1, i, 0); // "."
+      resultado += this.resultado(1, i, 1); // "nombreSimple"
+    }
+    this.registrarResultado(resultado);
+    // Comprobar que el resultado no es una palabra reservada
+    if (resultado.toLowerCase() in palabrasReservadas) {
+      // Retroceder el nombre si está reservado
+      this.retroceder(2);
+      throw zl.error.newError(zl.error.E_PALABRA_RESERVADA, this.arbol());
+    }
+    return this;
+  });
 
-    reglas["subrutina"] = zl.analizador.newExpresion([
-      ["subrutinaCabecera", " ", "subrutinaCuerpo"]
-    ], "subrutina");
+  a.regla("declaracion", function() {
+    this.nombre()
+      .avanzar("es")
+      .nombre()
+      .acumular("decModificador")
+      .avanzarVarios();
+    this.registrarResultado({
+      nombre: this.resultado(0),
+      tipo: this.resultado(2),
+      modificadores: [].slice(this.resultado(3))
+    });
+    return this;
+  });
 
-    reglas["subrutinaCabecera"] = zl.analizador.newExpresion([
-      [$["subrutina"], "_", "modificador+", "_", "nombre"],
-      [$["subrutina"], "_", "nombre"]
-    ], "subrutinaCabecera");
+  a.regla("subrutina", function() {
+    // Cabecera
+    this.avanzar(":subrutina")
+      .acumular("subModificador").avanzarVarios()
+      .avanzar("nombreSimple")
+      // Datos
+      .avanzar("datos")
+      .acumular("declaracion").avanzarObligatorioVarios()
+      // Algoritmo
+      .avanzar("algoritmo")
+      .acumular("sentencia").avanzarObligatorioVarios()
+      // Fin
+      .avanzar("fin");
+    this.registrarResultado({
+      nombre: this.resultado(2),
+      modificadores: this.resultado(1),
+      datos: this.resultado(4),
+      sentencias: this.resultado(6)
+    });
+    return this;
+  });
 
-    reglas["subrutinaCuerpo"] = zl.analizador.newExpresion([
-      ["datos", " ", "algoritmo", " ", $["fin"]]
-    ], "subrutinaCuerpo");
-
-    reglas["modificador"] = zl.analizador.newExpresion([
-      [$["externa"]],
-      [$["es"]],
-      [$["rapida"]]
-    ], "modificador")
-
-    reglas["modificador+"] = zl.analizador.newExpresion([
-      ["modificador", "_", "modificador+"],
-      ["modificador"]
-    ], "modificador")
-
-    // Reglas encontradas en el BNF:
-    reglas["nombre"] = zl.analizador.newExpresion([
-      [nombreSimple, $["."], "nombre"],
-      [nombreSimple]
-    ], "nombre");
-
-    reglas["datos"] = zl.analizador.newExpresion([
-      [$["datos"], " ", "declaracion+"]
-    ], "datos");
-
-    reglas["algoritmo"] = zl.analizador.newExpresion([
-      [$["algoritmo"], " ", "sentencia+"]
-    ], "algoritmo");
-
-    reglas["declaracion"] = zl.analizador.newExpresion([
-      ["nombre", "_", $["es"], "_", $["relacion"], "_", $["de"], "_", "nombre", "_", $["a"], "_", "nombre", " ", "declaracionModificador*"],
-      ["nombre", " ", $["("], " ", "listaDecl", " ", $[")"], "_", $["es"], "_", $["lista"], "_", $["de"], "_", "nombre", " ", "declaracionModificador*"],
-      ["nombre", "_", $["es"], "_", "nombre", "_", "declaracionModificador*"]
-    ], "declaracion");
-
-    reglas["declaracion+"] = zl.analizador.newExpresion([
-      ["declaracion", " ", "declaracion+"],
-      ["declaracion"]
-    ], "declaracion+");
-
-    reglas["listaDecl"] = zl.analizador.newExpresion([
-      ["rango", " ", $[";"], " ", "listaDecl"],
-      ["rango"]
-    ], "listaDecl")
-
-    reglas["rango"] = zl.analizador.newExpresion([
-      [numero, $[".."], numero]
-    ], "rango")
-
-    reglas["sentencia"] = zl.analizador.newExpresion([
+  a.regla("sentencia", function() {
+    this.intentar([
       ["asignacion"],
-      ["ecuacion"],
       ["llamada"],
       ["repetir"],
       ["sicondicional"],
       ["mientras"]
-    ], "sentencia")
+    ]);
+    var x = this.resultado(0);
+    var r = this.resultado(0, x, 0);
+    r.tipo = this.arbol(0, x, 0).tipo;
+    this.registrarResultado(r);
+    return this;
+  })
 
-    reglas["sentencia+"] = zl.analizador.newExpresion([
-      ["sentencia", " ", "sentencia+"],
-      ["sentencia"]
-    ], "lista de sentencias");
+  a.regla("asignacion", function() {
+    this.nombre()
+      .avanzar("<-")
+      .expresion();
+    this.registrarResultado({
+      variable: this.resultado(0),
+      valor: this.resultado(2)
+    });
+    return this;
+  });
 
-    reglas["declaracionModificador"] = zl.analizador.newExpresion([
-      [$["de"], " ", $["entrada"]],
-      [$["de"], " ", $["salida"]],
-      [$["global"]]
-    ], "declaracionModificador");
+  a.regla("llamada", function() {
+    this.nombre()
+      .avanzar("[")
+      .acumular("llamadaAsignacion").avanzarObligatorioVarios()
+      .avanzar("]")
+    var entrada = [];
+    var salida = [];
+    for (var i = 0; i < this.resultado(2).length; i++) {
+      if (this.resultado(2)[i].tipo == "entrada") {
+        entrada.push(this.resultado(2)[i]);
+      } else {
+        salida.push(this.resultado(2)[i]);
+      }
+    }
+    this.registrarResultado({
+      nombre: this.resultado(0),
+      entrada: entrada,
+      salida: salida,
+    });
+  });
 
-    reglas["declaracionModificador*"] = zl.analizador.newExpresion([
-      ["declaracionModificador", " ", "declaracionModificador*"],
-      [$["nada"]]
-    ], "declaracionModificador*");
+  a.regla("repetir", function() {
+    this.avanzar(":repetir")
+      .expresion()
+      .avanzar("veces")
+      .acumular("sentencia").avanzarObligatorioVarios()
+      .avanzar("fin")
+    this.registrarResultado({
+      veces: this.resultado(1),
+      sentencias: this.resultado(3)
+    });
+    return this;
+  });
 
-    reglas["asignacion"] = zl.analizador.newExpresion([
-      ["nombre", " ", $["<-"], " ", "expresion"],
-      ["nombre", " ", $["("], " ", "listaAcceso", " ", $[")"], " ", $["<-"], " ", "expresion"]
-    ], "asignacion");
+  a.regla("mientras", function() {
+    this.avanzar(":mientras")
+      .expresion()
+      .avanzar("hacer")
+      .acumular("sentencia").avanzarObligatorioVarios()
+      .avanzar("fin")
+    this.registrarResultado({
+      condicion: this.resultado(1),
+      sentencias: this.resultado(3)
+    });
+    return this;
+  });
 
-    reglas["ecuacion"] = zl.analizador.newExpresion([
-      ["expresion", " ", $["="], " ", "expresion"]
-    ], "ecuacion");
+  a.regla("llamadaAsignacion", function() {
+    // Entrada
+    this.avanzar("nombreSimple")
+      .intentar([
+        ["<-", "expresion"],
+        ["->", "nombre"]
+      ]);
+    var intento = this.resultado(1);
+    this.registrarResultado({
+      tipo: (intento ? "salida" : "entrada"),
+      izq: this.resultado(0),
+      der: this.resultado(1, intento, 1)
+    });
+    return this;
+  });
 
-    reglas["llamada"] = zl.analizador.newExpresion([
-      ["nombre", " ", $["->"], " ", "nombre", " ", $["->"], " ", "nombre"],
-      ["nombre", " ", $["->"], " ", "nombre"],
-      ["nombre", " ", $["["], " ", "llamadaAsignacion*", " ", $["]"]]
-    ], "llamada");
+  a.regla("sicondicional", function() {
+    // Romper la ambiguedad LL(3) entre
+    // si no x hacer
+    // si no hacer
+    try {
+      this.avanzar("si")
+        .avanzar("no")
+        .avanzar("hacer")
+    } catch (e) {
+      if (!zl.error.esError(e))
+        throw e;
+      // Si no se puede hacer el si no hacer, intentar la reducción de verdad
+      this.retroceder(this.arbol().length);
+      this.avanzar("si")
+        .expresion()
+        .avanzar("hacer")
+        .acumular("sentencia").avanzarObligatorioVarios();
+      this.intentar([
+        ["fin"],
+        ["sinocondicional"],
+        ["sino"]
+      ]);
+      var intento = this.resultado(4);
+      if (intento == 0) {
+        this.registrarResultado({
+          condicion: this.resultado(1),
+          sentencias: this.resultado(3)
+        });
+      } else {
+        this.registrarResultado({
+          condicion: this.resultado(1),
+          sentencias: this.resultado(3),
+          siguiente: this.resultado(4, intento, 0)
+        });
+      }
+      return this;
+    }
+    // Si no se llama al catch, es porque se pudo hacer un si no hacer.
+    // En el caso de si no hacer, retroceder 3 y lanzar error:
+    this.retroceder(3);
+    throw zl.error.newError(zl.error.E_SIMBOLO, this.arbol());
+  });
 
-    reglas["repetir"] = zl.analizador.newExpresion([
-      [$["repetir"], " ", "expresion", " ", $["veces"], " ", "sentencia+", " ", $["fin"]]
-    ], "repetir");
+  a.regla("sinocondicional", function() {
+    this.avanzar("o")
+      .avanzar("si")
+      .expresion()
+      .avanzar("hacer")
+      .acumular("sentencia").avanzarObligatorioVarios()
+      .intentar([
+        ["fin"],
+        ["sinocondicional"],
+        ["sino"]
+      ])
+    var intento = this.resultado(5);
+    if (intento == 0) {
+      this.registrarResultado({
+        condicion: this.resultado(2),
+        sentencias: this.resultado(4)
+      });
+    } else {
+      this.registrarResultado({
+        condicion: this.resultado(2),
+        sentencias: this.resultado(4),
+        siguiente: this.resultado(5, intento, 0)
+      });
+    }
+    return this;
+  });
 
-    reglas["mientras"] = zl.analizador.newExpresion([
-      [$["mientras"], " ", "expresion", " ", $["hacer"], " ", "sentencia+", " ", $["fin"]]
-    ], "mientras");
+  a.regla("sino", function() {
+    this.avanzar("si")
+      .avanzar("no")
+      .avanzar("hacer")
+      .acumular("sentencia").avanzarObligatorioVarios()
+      .avanzar("fin")
+    this.registrarResultado({
+      sentencias: this.resultado(3)
+    });
+    return this;
+  });
 
-    reglas["sicondicional"] = zl.analizador.newExpresion([
-      [$["si"], "_", "expresion", "_", $["hacer"], "_", "sentencia+", "_", $["fin"]],
-      [$["si"], "_", "expresion", "_", $["hacer"], "_", "sentencia+", "_", "sinocondicional"],
-      [$["si"], "_", "expresion", "_", $["hacer"], "_", "sentencia+", "_", "sino"]
-    ], "si condicional");
+  a.regla("expresion", function() {
+    this.evaluacion();
+    // Antes de intentar la expresión, se intenta encontrar el "o si"
+    try {
+      this.avanzar("o")
+        .avanzar("si");
+    } catch (e) {
+      this.retroceder(this.arbol().length - 1);
+      try {
+        this.intentar([
+            ["no"],
+            ["y"],
+            ["o"],
+            ["<"],
+            [">"],
+            ["<="],
+            [">="],
+            ["="],
+            ["<>"],
+            ["+"],
+            ["-"],
+            ["*"],
+            ["%"]
+          ])
+          .expresion();
+      } catch (e) {
+        if (this.arbol().length > 2)
+          throw e;
+        this.retroceder(1);
+      }
+      if (this.arbol().length == 1)
+        this.registrarResultado(this.resultado(0));
+      else {
+        var intento = this.resultado(1);
+        this.registrarResultado({
+          izq: this.resultado(0),
+          der: this.resultado(2),
+          op: this.resultado(1, intento, 0)
+        });
+      }
+      return this;
+    }
+    // Caso de que se encuentra "o si":
+    this.retroceder(2);
+    this.registrarResultado(this.resultado(0));
+    return this;
+  });
 
-    reglas["sinocondicional"] = zl.analizador.newExpresion([
-      [$["o"], "_", $["si"], "_", "expresion", "_", $["hacer"], "_", "sentencia+", "_", $["fin"]],
-      [$["o"], "_", $["si"], "_", "expresion", "_", $["hacer"], "_", "sentencia+", "_", "sinocondicional"],
-      [$["o"], "_", $["si"], "_", "expresion", "_", $["hacer"], "_", "sentencia+", "_", "sino"]
-    ], "si no condicional");
-
-    reglas["sino"] = zl.analizador.newExpresion([
-      [$["si"], "_", $["no"], "_", $["hacer"], "_", "sentencia+", "_", $["fin"]]
-    ], "si no");
-
-    reglas["llamadaAsignacion"] = zl.analizador.newExpresion([
-      ["nombre", " ", $["->"], " ", "nombre"],
-      ["nombre", " ", $["<-"], " ", "expresion"]
-    ], "llamadaAsignacion")
-
-    reglas["llamadaAsignacion*"] = zl.analizador.newExpresion([
-      ["llamadaAsignacion", " ", "llamadaAsignacion*"],
-      [$["nada"]]
-    ], "llamadaAsignacion*")
-
-    reglas["expresion"] = zl.analizador.newExpresion([
-      ["expresionTercera", " ", "operadorBinarioCuarto", " ", "expresion"],
-      ["expresionTercera"]
-    ], "expresion")
-
-    reglas["expresionTercera"] = zl.analizador.newExpresion([
-      ["expresionSegunda", " ", "operadorBinarioTercero", " ", "expresionTercera"],
-      ["expresionSegunda"]
-    ], "expresionTercera")
-
-    reglas["expresionSegunda"] = zl.analizador.newExpresion([
-      ["expresionPrimera", " ", "operadorBinarioSegundo", " ", "expresionSegunda"],
-      ["expresionPrimera"]
-    ], "expresionSegunda")
-
-    reglas["expresionPrimera"] = zl.analizador.newExpresion([
-      ["evaluacion", " ", "operadorBinarioPrimero", " ", "expresionPrimera"],
-      ["evaluacion"],
-      ["operadorUnario", " ", "expresion"]
-    ], "expresionPrimera")
-
-    reglas["evaluacion"] = zl.analizador.newExpresion([
-      [numero],
-      [texto],
-      [letra],
-      [$["verdadero"]],
-      [$["falso"]],
-      ["nombre", " ", $["("], "listaAcceso", $[")"]],
+  a.regla("evaluacion", function() {
+    this.intentar([
+      ["numero"],
+      ["texto"],
+      ["letra"],
+      ["verdadero"],
+      ["falso"],
+      ["nombre", "(", ")"],
       ["nombre"],
-      [$["("], " ", "expresion", " ", $[")"]]
-    ], "evaluacion")
-
-    reglas["listaAcceso"] = zl.analizador.newExpresion([
-      ["rango", " ", $[";"], " ", "listaAcceso"],
-      ["expresion", " ", $[";"], " ", "listaAcceso"],
-      ["rango"],
-      ["expresion"]
-    ], "listaAcceso")
-
-    reglas["operadorUnario"] = zl.analizador.newExpresion([
-      [$["-"]],
-      [$["+"]],
-      [$["no"]]
-    ], "operadorUnario")
-
-    reglas["operadorBinarioCuarto"] = zl.analizador.newExpresion([
-      [$["y"]],
-      [$["o"]]
-    ], "operadorBinarioCuarto")
-
-    reglas["operadorBinarioTercero"] = zl.analizador.newExpresion([
-      [$["<="]],
-      [$[">="]],
-      [$["<>"]],
-      [$["<"]],
-      [$[">"]],
-      [$["="]]
-    ], "operadorBinarioTercero")
-
-    reglas["operadorBinarioSegundo"] = zl.analizador.newExpresion([
-      [$["+"]],
-      [$["-"]]
-    ], "operadorBinarioSegundo")
-
-    reglas["operadorBinarioPrimero"] = zl.analizador.newExpresion([
-      [$["*"]],
-      [$["/"]],
-      [$["%"]]
-    ], "operadorBinarioPrimero")
-
-    // Comportamiento de las reglas:
-    reglas["nombre"].error = function(datos, opcion, posicion) {
-      var nombre = datos[0];
-      if (opcion == 0) {
-        nombre = datos[0] + datos[1] + datos[2];
-      }
-      if (nombre.toLowerCase() in palabrasReservadas) {
-        return zl.error.E_PALABRA_RESERVADA;
-      }
-    }
-
-    reglas["modulo"].postproceso = function(datos, opcion) {
-      return {
-        subrutinas: datos[1]
-      };
-    }
-
-    reglas["subrutina+"].postproceso = function(datos, opcion) {
-      if (opcion == 0)
-        return [datos[0]].concat(datos[2]);
-      else
-        return [datos[0]];
-    }
-
-    reglas["subrutina"].postproceso = function(datos, opcion) {
-      return {
-        modificadores: datos[0].modificadores,
-        nombre: datos[0].nombre,
-        datos: datos[2][0],
-        sentencias: datos[2][2]
-      };
-    }
-
-    reglas["subrutinaCabecera"].postproceso = function(datos, opcion) {
-      if (opcion == 0) {
-        return {
-          modificadores: datos[2],
-          nombre: datos[4]
-        }
-      } else if (opcion == 1) {
-        return {
-          modificadores: [],
-          nombre: datos[2]
-        }
-      }
-    }
-
-    reglas["modificador"].postproceso = function(datos, opcion) {
-      if (opcion == 2)
-        return "rapida";
-      return datos[0];
-    }
-
-    reglas["modificador+"].postproceso = function(datos, opcion) {
-      if (opcion == 0)
-        return [datos[0]].concat(datos[2]);
-      else
-        return [datos[0]];
-    }
-
-    reglas["nombre"].postproceso = function(datos, opcion) {
-      var nombre = datos[0];
-      if (opcion == 0) {
-        nombre = datos[0] + datos[1] + datos[2];
-      }
-      return nombre;
-    }
-
-    reglas["datos"].postproceso = function(datos, opcion) {
-      return datos[2];
-    }
-
-    reglas["algoritmo"].postproceso = function(datos, opcion) {
-      return datos[2];
-    }
-
-    reglas["declaracion"].postproceso = function(datos, opcion) {
-      if (opcion == 2) {
-        return {
-          nombre: datos[0],
-          tipo: datos[4],
-          modificadores: datos[6]
-        }
-      } else if (opcion == 1) {
-        return {
-          nombre: datos[0],
-          tipo: "lista",
-          dimensiones: datos[4],
-          subtipo: datos[14],
-          modificadores: datos[16]
-        }
-      } else if (opcion == 0) {
-        return {
-          nombre: datos[0],
-          tipo: "relacion",
-          clave: datos[8],
-          valor: datos[12],
-          modificadores: datos[14]
-        };
-      }
-    }
-
-    reglas["declaracion+"].postproceso = function(datos, opcion) {
-      if (opcion == 0)
-        return [datos[0]].concat(datos[2]);
-      else
-        return [datos[0]];
-    }
-
-    reglas["sentencia+"].postproceso = function(datos, opcion) {
-      if (opcion == 0)
-        return [datos[0]].concat(datos[2]);
-      else
-        return [datos[0]];
-    }
-
-    reglas["sentencia"].postproceso = function(datos, opcion) {
-      var s = datos[0];
-      if (opcion == 0) {
-        s.tipo = "asignacion";
-      } else if (opcion == 1) {
-        s.tipo = "ecuacion";
-      } else if (opcion == 2) {
-        s.tipo = "llamada";
-      } else if (opcion == 3) {
-        s.tipo = "repetir";
-      } else if (opcion == 4) {
-        s.tipo = "sicondicional";
-      } else if (opcion == 5) {
-        s.tipo = "mientras";
-      }
-      return s;
-    }
-
-    reglas["declaracionModificador"].postproceso = function(datos, opcion) {
-      return datos[datos.length - 1];
-    }
-
-    reglas["declaracionModificador*"].postproceso = function(datos, opcion) {
-      if (opcion == 0)
-        return [datos[0]].concat(datos[2]);
-      else
-        return [];
-    }
-
-    reglas["asignacion"].postproceso = function(datos, opcion) {
-      if (opcion == 0) {
-        return {
-          variable: datos[0],
-          valor: datos[4]
-        };
-      } else if (opcion == 1) {
-        return {
-          variable: datos[0],
-          acceso: datos[4],
-          valor: datos[10]
-        };
-      }
-    }
-
-    reglas["llamada"].postproceso = function(datos, opcion) {
-      if (opcion == 2) {
-        return {
-          nombre: datos[0],
-          entrada: datos[4].entrada,
-          salida: datos[4].salida
-        };
-      }
-    }
-
-    reglas["repetir"].postproceso = function(datos) {
-      return {
-        veces: datos[2],
-        sentencias: datos[6]
-      };
-    }
-
-    reglas["mientras"].postproceso = function(datos) {
-      return {
-        condicion: datos[2],
-        sentencias: datos[6]
-      };
-    }
-
-    reglas["sicondicional"].postproceso = function(datos, opcion) {
-      var d = {};
-      d.condicion = datos[2];
-      d.sentencias = datos[6];
-      if (opcion == 1 || opcion == 2) {
-        d.siguiente = datos[8];
-      }
-      return d;
-    }
-
-    reglas["sinocondicional"].postproceso = function(datos, opcion) {
-      var d = {};
-      d.condicion = datos[4];
-      d.sentencias = datos[8];
-      if (opcion == 1 || opcion == 2) {
-        d.siguiente = datos[10];
-      }
-      return d;
-    }
-
-    reglas["sino"].postproceso = function(datos, opcion) {
-      var d = {};
-      d.sentencias = datos[6];
-      return d;
-    }
-
-    reglas["llamadaAsignacion*"].postproceso = function(datos, opcion) {
-      if (opcion == 0) {
-        var resultado = datos[2];
-        if (datos[0].tipo == "entrada") {
-          resultado.entrada = [datos[0]].concat(resultado.entrada);
-        } else {
-          resultado.salida = [datos[0]].concat(resultado.salida);
-        }
-        return resultado;
-      }
-      return {
-        entrada: [],
-        salida: []
-      }
-    }
-
-    reglas["llamadaAsignacion"].postproceso = function(datos, opcion) {
-      if (opcion == 0) {
-        return {
-          tipo: "salida",
-          izq: datos[0],
-          der: datos[4]
-        };
-      }
-      return {
-        tipo: "entrada",
-        izq: datos[0],
-        der: datos[4]
-      };
-    }
-
-    reglas["expresion"].postproceso = reglas["expresionPrimera"].postproceso = reglas["expresionSegunda"].postproceso = reglas["expresionTercera"].postproceso = function(datos, opcion) {
-
-      var izq;
-      var der;
-      var op;
-      if (opcion == 0) {
-        izq = datos[0];
-        der = datos[4];
-        op = datos[2];
-      } else if (this.nombre == "expresionPrimera" && opcion == 2) {
-        der = datos[2];
-        op = datos[0];
-      }
-      // Hack, intercambiar el orden de reducción si las reglas son del mismo nivel
-      if (izq && der && der.nivel == this.nombre && der.izq) {
-        var _der = der.der;
-        var _op = der.op;
-        var _izq = {};
-        _izq.der = der.izq;
-        _izq.op = op;
-        _izq.izq = izq;
-        op = _op;
-        der = _der;
-        izq = _izq;
-      }
-      if (izq && op && der)
-        return {
-          izq: izq,
-          der: der,
-          op: op,
-          nivel: this.nombre
-        };
-      else if (der && op)
-        return {
-          der: der,
-          op: op,
-          nivel: this.nombre
-        };
-      else
-        return datos[0];
-    }
-
-    reglas["evaluacion"].postproceso = function(datos, opcion) {
-      if (opcion == 0) {
-        var partes = datos[0].split("|");
-        var num = parseInt(partes[0], partes[1]);
-        return {
-          tipo: "numero",
-          valor: num
-        };
-      } else if (opcion == 1) {
-        return {
-          tipo: "texto",
-          valor: datos[0]
-        }
-      } else if (opcion == 2) {
-        return {
-          tipo: "letra",
-          valor: datos[0]
-        }
-      } else if (opcion == 3) {
-        return {
-          tipo: "booleano",
-          valor: datos[0]
-        }
-      } else if (opcion == 4) {
-        return {
-          tipo: "booleano",
-          valor: datos[0]
-        }
-      } else if (opcion == 5) {
-        return {
-          tipo: "acceso",
-          nombre: datos[0],
-          acceso: datos[3]
-        }
-      } else if (opcion == 6) {
-        return {
-          tipo: "nombre",
-          valor: datos[0]
-        }
-      } else if (opcion == 7) {
-        return {
-          tipo: "expresion",
-          valor: datos[2]
-        }
-      }
-    }
-
-    reglas["listaAcceso"].postproceso = function(datos, opcion) {
-      if (opcion == 1) {
-        return [datos[0]].concat(datos[4]);
-      } else if (opcion == 3) {
-        return [datos[0]];
-      }
-    }
-
-    reglas["operadorUnario"].postproceso =
-      reglas["operadorBinarioCuarto"].postproceso =
-      reglas["operadorBinarioTercero"].postproceso =
-      reglas["operadorBinarioSegundo"].postproceso =
-      reglas["operadorBinarioPrimero"].postproceso = function(datos, opcion) {
-        return datos[0];
-      }
-
-
-
-    // Preparar las reglas:
-    zl.analizador.prepararReglas(reglas);
-
-    // Cargar la sintaxis
-    zl.sintaxis.sintaxisConfiguracion = zlc;
-    zl.sintaxis.reglasCodigo = reglas;
-  }
+      ["(", "expresion", ")"]
+    ]);
+    var intento = this.resultado(0);
+    if (intento != 7)
+      this.registrarResultado({
+        valor: this.resultado(0, intento, 0),
+        tipo: this.arbol(0, intento, 0).tipo
+      });
+    else
+      this.registrarResultado({
+        valor: this.resultado(0, intento, 1),
+        tipo: this.arbol(0, intento, 1).tipo
+      });
+  });
 })();

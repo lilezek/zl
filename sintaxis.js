@@ -5,19 +5,15 @@ zl.sintaxis = zl.sintaxis || {};
   "use strict";
 
   var arbolConfiguracion = function(zlcode) {
-    // TODO: stub
-    return {end: 0};
+    var analisis = zl.sintaxis.zlAnalizador.empezar(zlcode);
+    return analisis.configuracion().arbol();
   }
 
   var arbolCodigo = function(zlcode) {
-    var reglas = zl.sintaxis.reglasCodigo;
-    zl.analizador.limpiarCache(reglas);
-    var reglaPrincipal = reglas["modulo"];
-    var arbol = reglaPrincipal.reducir(zlcode);
-    if (!arbol.error) {
-      return arbol.resultado;
-    }
-    return arbol;
+    var analisis = zl.sintaxis.zlAnalizador.empezar(zlcode);
+    analisis.modulo();
+    console.log(analisis.arbol())
+    return analisis.resultado(0);
   }
 
   zl.sintaxis.arbolConfiguracion = arbolConfiguracion;

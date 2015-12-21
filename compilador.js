@@ -25,6 +25,7 @@ var zl = zl || {};
 
     // Fase 3, obtener el árbol sintáctico del resto del código:
     compilado = zl.sintaxis.arbolCodigo(zlcode);
+    console.log(compilado);
 
     // Fase 4, generar la tabla de símbolos
 
