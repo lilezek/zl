@@ -13,22 +13,67 @@ zl.semantica = zl.semantica || {};
   }
 
   function testarSubrutina(arbol, sub) {
-    // TODO: acabar esta función
-    for (var k in arbol.sentencias) {
-      var s = arbol.sentencias[k];
-      if (s.tipo == "llamada") {
+    // TODO: comprobar partes de la cabecera
+    testarSentencias(arbol.sentencias, sub);
+  }
+
+  function testarSentencias(arbol, sub) {
+    for (var k in arbol) {
+      var s = arbol[k];
+      if (s.tipo == "asignacion") {
+        var tipoizq = sub.declaraciones[s.variable];
+        var tipoder = testarExpresion(s.valor, sub);
+        if (!tipoizq) {
+          throw zl.error.newError(zl.error.E_NOMBRE_NO_DEFINIDO, {
+            posicion: [s.begin, s.end],
+            nombre: s.variable,
+            declaraciones: sub.declaraciones
+          });
+        }
+        tipoizq = tipoizq.tipo;
+        if (!tipoizq.esCompatible(tipoder)) {
+          throw zl.error.newError(zl.error.E_ASIGNACION_INCOMPATIBLE, {
+            esperado: tipoizq,
+            obtenido: tipoder,
+            arbol: s,
+            posicion: [s.begin, s.end]
+          });
+        }
+      } else if (s.tipo == "llamada") {
         testarLlamada(s, sub);
       } else if (s.tipo == "repetir") {
-        testarSubrutina(s, sub);
+        var tipo = testarExpresion(s.veces, sub);
+        if (tipo.nombre != "numero") {
+          throw zl.error.newError(zl.error.E_VECES_NO_NUMERICO, {
+            arbol: s,
+            posicion: [s.veces.begin, s.veces.end],
+            tipo: tipo
+          });
+        }
+        testarSentencias(s.sentencias, sub);
+      } else if (s.tipo == "mientras") {
+        var tipo = testarExpresion(s.condicion, sub);
+        if (tipo.nombre != "booleano") {
+          throw zl.error.newError(zl.error.E_CONDICION_NO_BOOLEANA, {
+            arbol: s,
+            posicion: [s.condicion.begin, s.condicion.end],
+            tipo: tipo
+          });
+        }
+        testarSentencias(s.sentencias, sub);
       } else if (s.tipo == "sicondicional") {
         while (s) {
           if (s.condicion) {
             var tipo = testarExpresion(s.condicion, sub);
             if (tipo.nombre != "booleano") {
-              throw zl.error.newError(zl.error.E_CONDICION_NO_BOOLEANA, {});
+              throw zl.error.newError(zl.error.E_CONDICION_NO_BOOLEANA, {
+                arbol: s,
+                posicion: [s.condicion.begin, s.condicion.end],
+                tipo: tipo
+              });
             }
           }
-          testarSubrutina(s, sub);
+          testarSentencias(s.sentencias, sub);
           s = s.siguiente;
         }
       }
@@ -41,7 +86,7 @@ zl.semantica = zl.semantica || {};
     var n = arbol.nombre;
     var llamada = programa.subrutinaPorNombre(n);
     if (!llamada)
-      throw zl.error.newError(zl.error.LLAMADA_NOMBRE_NO_ENCONTRADO, {
+      throw zl.error.newError(zl.error.E_LLAMADA_NOMBRE_NO_ENCONTRADO, {
         arbol: arbol,
         tabla: programa
       });
@@ -103,6 +148,10 @@ zl.semantica = zl.semantica || {};
       return modulo.tipoPorNombre("texto");
     } else if (arbol.tipo == "expresion") {
       return testarExpresion(arbol.valor, sub);
+    } else if (arbol.tipo == "verdadero") {
+      return modulo.tipoPorNombre("booleano");
+    } else if (arbol.tipo == "falso") {
+      return modulo.tipoPorNombre("booleano");
     } else if (arbol.tipo == "nombre") {
       var dato = sub.declaraciones[arbol.valor.toLowerCase()];
       // TODO: Añadir más información al error

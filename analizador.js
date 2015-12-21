@@ -118,7 +118,6 @@ zl.analizador = zl.analizador || {};
   Analisis.prototype.saltar = function() {
     while (/\s/.test(this.texto.substr(this.posicion, 1)))
       this.posicion++;
-    //TODO: comentarios
     if (this.texto.substr(this.posicion, 2) == "//") {
       while (this.texto.substr(this.posicion, 1) != "\n")
         this.posicion++;

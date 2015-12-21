@@ -191,7 +191,7 @@ zl.sintaxis = zl.sintaxis || {};
   a.regla("llamada", function() {
     this.nombre()
       .avanzar("[")
-      .acumular("llamadaAsignacion").avanzarObligatorioVarios()
+      .acumular("llamadaAsignacion").avanzarVarios()
       .avanzar("]")
     var entrada = [];
     var salida = [];

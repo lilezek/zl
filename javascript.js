@@ -111,7 +111,7 @@ zl.javascript = zl.javascript || {};
         ",function(arg,done) {var $zlr;" +
         zl.javascript.llamadaSalida(compilado.salida, simbolo);
     } else if (compilado.tipo == "mientras") {
-      var tempcallback = "$zlt_" + simbolo.pedirNombreTemporal();
+      var tempcallback = "$zlt_" + pedirNombreTemporal();
       resultado = "done(null,$zlr);}, function(arg,done){var $zlr;" +
         "function " + tempcallback + "(arg){" +
         "if (" + zl.javascript.expresion(compilado.condicion, simbolo) + "){" +
@@ -218,8 +218,10 @@ zl.javascript = zl.javascript || {};
       return compilado.valor;
     } else if (compilado.tipo == "letra") {
       return compilado.valor;
-    } else if (compilado.tipo == "boleano") {
-      return "" + (compilado.valor == "verdadero");
+    } else if (compilado.tipo == "verdadero") {
+      return "true";
+    } else if (compilado.tipo == "falso") {
+      return "false";
     } else if (compilado.tipo == "acceso") {
       return zl.javascript.nombre(compilado.nombre) + zl.javascript.listaAcceso(compilado.acceso);
     } else if (compilado.tipo == "nombre") {

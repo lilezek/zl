@@ -17,6 +17,9 @@ zl.ejecucion = zl.ejecucion || {};
         opbinario: {
           '>': {
             'numero': 'booleano'
+          },
+          '+': {
+            'numero': 'numero'
           }
         }
       });
@@ -103,6 +106,55 @@ zl.ejecucion = zl.ejecucion || {};
       mod.registrar(mostrar);
     }
 
+    // Mostrar numero:
+    {
+      var mostrarnumero = zl.entorno.newSubrutina(mod);
+      var declmensaje = zl.entorno.newDeclaracion(mostrarnumero);
+
+      zl.writeJson(declmensaje, {
+        nombre: "mensaje",
+        tipo: numero,
+        modificadores: declresultado.M_ENTRADA
+      });
+
+      zl.writeJson(mostrarnumero, {
+        nombre: "mostrarnumero",
+        modificadores: {
+          es: true
+        },
+        declaraciones: {
+          mensaje: declmensaje
+        }
+      });
+      mostrar.serializar();
+      mod.registrar(mostrarnumero);
+    }
+
+    // leer Numero:
+    {
+      var leerNumero = zl.entorno.newSubrutina(mod);
+      var declmensaje = zl.entorno.newDeclaracion(leerNumero);
+
+      zl.writeJson(declmensaje, {
+        nombre: "mensaje",
+        tipo: numero,
+        modificadores: declresultado.M_SALIDA
+      });
+
+      zl.writeJson(leerNumero, {
+        nombre: "leernumero",
+        modificadores: {
+          es: true,
+          asincrono: true
+        },
+        declaraciones: {
+          mensaje: declmensaje
+        }
+      });
+      leerNumero.serializar();
+      mod.registrar(leerNumero);
+    }
+
     // TODO: acabar el módulo
     mod.serializar();
     return mod;
@@ -167,6 +219,13 @@ var $zl_mostrar = function(arg, callback) {
   outWrite(arg.mensaje + "\n");
   callback(null, {});
 }
+
+// mensaje es Texto de Entrada
+var $zl_mostrarnumero = function(arg, callback) {
+  outWrite(arg.mensaje + "\n");
+  callback(null, {});
+}
+
 
 var $zl_mostrarnumero = function(arg, callback) {
   outWrite(arg.mensaje.toPrecision(7) + "\n");

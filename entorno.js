@@ -84,6 +84,8 @@ zl.entorno = zl.entorno || {};
       if (this.tipos[k].nombre == nombre)
         return this.tipos[k];
     }
+    if (this.padre && this.padre.modulos["$internal"] === this)
+      return null;
     // Si no está en el módulo, mirar en los internos:
     return (
     this.padre ?  this.padre.modulos["$internal"].tipoPorNombre(nombre) :
@@ -250,8 +252,14 @@ zl.entorno = zl.entorno || {};
   Declaracion.prototype.rellenarDesdeArbol = function(arbol) {
     this.nombre = arbol.nombre.toLowerCase();
     this.posicion = [arbol.begin, arbol.end];
-    // TODO: Para obtener el tipo, hay que irse al Programa padre:
     this.tipo = this.padre.padre.tipoPorNombre(arbol.tipo);
+    if (!this.tipo) {
+      // TODO: Añadir una lista de tipos que sí existen.
+      throw zl.error.newError(zl.error.E_TIPO_NO_EXISTE, {
+        posicion: [arbol.begin, arbol.end],
+        tipo: arbol.tipo
+      });
+    }
     for (var j = 0; j < arbol.modificadores.length; j++) {
       var mod = arbol.modificadores[j].toLowerCase();
       if (mod == "salida") {

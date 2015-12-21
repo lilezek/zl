@@ -72,23 +72,14 @@
 // Código de prueba con varios errores
 Subrutina Externa Inicio
 Datos
-  t es Texto
-  minumero es Numero Global
+  n es Numero
+  total es Numero
 Algoritmo
-  Repetir 100 veces
-    aleatorio [
-    resultado -> mnumero
-      min <- 0
-      max <- "100"
-    ]
-    Si minmuero > "50" hacer
-      t <- "Cara"
-    o si t hacer
-  		t <- x
-    si no hacer
-      t <- "Cruz""
-    Fin
-  	mostrar [ msg <- t ]
+  total <- 0
+  Mientras verdadero hacer
+    leerNumero [ mensaje -> n ]
+    total <- total + n
+    mostrarNumero [ mensaje <- total ]
   Fin
 Fin</textarea>
     <div class="v divisor"></div>
