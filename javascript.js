@@ -55,10 +55,10 @@ zl.javascript = zl.javascript || {};
     if (!simbolo.modificadores.externa)
       resultado += "var ";
 
-    resultado += zl.javascript.nombre(compilado.nombre, simbolo) + "=function(arg, done){" +
+    resultado += zl.javascript.nombre(compilado.nombre, simbolo) + "=function(arg, done){var $zlr;" +
       zl.javascript.datos(compilado.datos, simbolo.declaraciones) +
       "async.waterfall([function(c){c(null,arg);}," +
-      "function(arg,done){var $zlr = {};" +
+      "function(arg,done){$zlr = {};" +
       zl.javascript.sentencias(compilado.sentencias, simbolo) +
       "done(null, $zlr);}],done);"
 
@@ -104,36 +104,49 @@ zl.javascript = zl.javascript || {};
       resultado += "=" +
         zl.javascript.expresion(compilado.valor);
     } else if (compilado.tipo == "llamada") {
-      resultado = "$zlr = " +
-        zl.javascript.llamadaEntrada(compilado.entrada, simbolo) +
-        ";done(null,$zlr);}," +
-        zl.javascript.nombre(compilado.nombre, simbolo) +
-        ",function(arg,done) {var $zlr;" +
-        zl.javascript.llamadaSalida(compilado.salida, simbolo);
+      resultado = zl.javascript.llamada(compilado, simbolo);
     } else if (compilado.tipo == "mientras") {
-      var tempcallback = "$zlt_" + pedirNombreTemporal();
-      resultado = "done(null,$zlr);}, function(arg,done){var $zlr;" +
+      resultado = zl.javascript.mientras(compilado, simbolo);
+    } else if (compilado.tipo == "repetir") {
+      resultado = zl.javascript.repetir(compilado, simbolo);
+    } else if (compilado.tipo == "sicondicional") {
+      resultado = zl.javascript.sicondicional(compilado, simbolo);
+    }
+    return resultado + ";";
+  }
+
+  zl.javascript.llamada = function(compilado, simbolo) {
+    if (compilado.asincrono)
+      return ";done(null," + zl.javascript.llamadaEntrada(compilado.entrada, simbolo) + ");}," +
+        zl.javascript.nombre(compilado.nombre, simbolo) +
+        ",function(arg,done) {var $zlr = arg;" +
+        zl.javascript.llamadaSalida(compilado.salida, simbolo);
+    else
+      return "$zlr = " + zl.javascript.nombre(compilado.nombre, simbolo) + "(" +
+        zl.javascript.llamadaEntrada(compilado.entrada, simbolo) + ");" +
+        zl.javascript.llamadaSalida(compilado.salida, simbolo);
+  }
+
+  zl.javascript.mientras = function(compilado, simbolo) {
+    var tempcallback = "$zlt_" + pedirNombreTemporal();
+    if (compilado.asincrono) {
+      return "done(null,$zlr);}, function(arg,done){$zlr;" +
         "function " + tempcallback + "(arg){" +
         "if (" + zl.javascript.expresion(compilado.condicion, simbolo) + "){" +
         "async.waterfall([function(c){c(null,arg);},function(arg,done){" +
         zl.javascript.sentencias(compilado.sentencias, simbolo) +
         ";done(null,$zlr);}]," + tempcallback + ");}" +
         "else {done(null, arg);}" +
-        "}" + tempcallback + "(arg,done);},function(arg,done){var $zlr;";
-    } else if (compilado.tipo == "repetir") {
-      var tempvar = "$zlt_" + pedirNombreTemporal();
-      var tempcallback = "$zlt_" + pedirNombreTemporal();
-      resultado = "done(null,$zlr);}, function(arg,done){var $zlr;" +
-        "var " + tempvar + "=" + zl.javascript.expresion(compilado.veces, simbolo) + ";" +
-        "function " + tempcallback + "(arg){" +
-        "if (" + tempvar + "--){" +
-        "async.waterfall([function(c){c(null,arg);},function(arg,done){" +
-        zl.javascript.sentencias(compilado.sentencias, simbolo) +
-        ";done(null,$zlr);}]," + tempcallback + ");}" +
-        "else {done(null, arg);}" +
-        "}" + tempcallback + "(arg,done);},function(arg,done){var $zlr;";
-    } else if (compilado.tipo == "sicondicional") {
-      var siguiente = compilado.siguiente;
+        "}" + tempcallback + "(arg,done);},function(arg,done){$zlr;";
+    } else {
+      //TODO: El mientras síncrono.
+    }
+  }
+
+  zl.javascript.sicondicional = function(compilado, simbolo) {
+    var siguiente = compilado.siguiente;
+    var resultado = "";
+    if (compilado.asincrono) {
       resultado = "done(null,$zlr);}, function(arg, done){var $zlr;" +
         "if(" + zl.javascript.expresion(compilado.condicion) + "){" +
         "async.waterfall([function(c){c(null,arg);},function(arg,done){" +
@@ -156,8 +169,44 @@ zl.javascript = zl.javascript || {};
         siguiente = siguiente.siguiente;
       }
       resultado += "}, function(arg, done){var $zlr;";
+    } else {
+      resultado = "if(" + zl.javascript.expresion(compilado.condicion) + "){" +
+        zl.javascript.sentencias(compilado.sentencias) +
+        "}";
+      while (siguiente) {
+        if (siguiente.condicion)
+          resultado += "else if(" + zl.javascript.expresion(siguiente.condicion) + "){" +
+          zl.javascript.sentencias(siguiente.sentencias) +
+          "}";
+        else
+          resultado += "else{" +
+          zl.javascript.sentencias(siguiente.sentencias) +
+          "}";
+        siguiente = siguiente.siguiente;
+      }
     }
-    return resultado + ";";
+    return resultado;
+  }
+
+  zl.javascript.repetir = function(compilado, simbolo) {
+    console.log(compilado);
+    var tempvar = "$zlt_" + pedirNombreTemporal();
+    if (compilado.asincrono) {
+      var tempcallback = "$zlt_" + pedirNombreTemporal();
+      return "done(null,$zlr);}, function(arg,done){$zlr;" +
+        "var " + tempvar + "=" + zl.javascript.expresion(compilado.veces, simbolo) + ";" +
+        "function " + tempcallback + "(arg){" +
+        "if (" + tempvar + "--){" +
+        "async.waterfall([function(c){c(null,arg);},function(arg,done){" +
+        zl.javascript.sentencias(compilado.sentencias, simbolo) +
+        ";done(null,$zlr);}]," + tempcallback + ");}" +
+        "else {done(null, arg);}" +
+        "}" + tempcallback + "(arg,done);},function(arg,done){$zlr;";
+    } else
+      return "var " + tempvar + "=" + zl.javascript.expresion(compilado.veces, simbolo) + ";" +
+        "while(" + tempvar + "--){" +
+        zl.javascript.sentencias(compilado.sentencias, simbolo) +
+        "}";
   }
 
   zl.javascript.llamadaEntrada = function(compilado, simbolo) {
@@ -174,7 +223,7 @@ zl.javascript = zl.javascript || {};
   zl.javascript.llamadaSalida = function(compilado, simbolo) {
     var resultado = "";
     for (var i = 0; i < compilado.length; i++) {
-      resultado += ";" + zl.javascript.nombre(compilado[i].der) + "=arg." + compilado[i].izq;
+      resultado += ";" + zl.javascript.nombre(compilado[i].der) + "=$zlr." + compilado[i].izq;
     }
     return resultado;
   }
@@ -242,7 +291,7 @@ zl.javascript = zl.javascript || {};
   zl.javascript.dato = function(dato, simbolo) {
     var resultado = "var " + zl.javascript.nombre(dato.nombre);
     if (dato.modificadores & dato.M_ENTRADA)
-      resultado += "=arg." + dato.nombre;
+      resultado += "=$zlr." + dato.nombre;
     if (!(dato.modificadores & dato.M_ENTRADA) && dato.tipo == "relacion") {
       resultado += "={}";
     }

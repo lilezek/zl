@@ -14,10 +14,16 @@ zl.semantica = zl.semantica || {};
 
   function testarSubrutina(arbol, sub) {
     // TODO: comprobar partes de la cabecera
-    testarSentencias(arbol.sentencias, sub);
+    var asincrono = testarSentencias(arbol.sentencias, sub);
+    // TODO: Convertir en asincronas las subrutinas que usan esta.
+    if (asincrono)
+      sub.modificadores.asincrono = true;
   }
 
   function testarSentencias(arbol, sub) {
+    // Comprobar si el árbol debe ser asíncrono.
+    // Útil si se va a compilar a lenguajes como javascript.
+    var asincrono = false;
     for (var k in arbol) {
       var s = arbol[k];
       if (s.tipo == "asignacion") {
@@ -40,7 +46,8 @@ zl.semantica = zl.semantica || {};
           });
         }
       } else if (s.tipo == "llamada") {
-        testarLlamada(s, sub);
+        s.asincrono = testarLlamada(s, sub);
+        asincrono = asincrono || s.asincrono;
       } else if (s.tipo == "repetir") {
         var tipo = testarExpresion(s.veces, sub);
         if (tipo.nombre != "numero") {
@@ -50,7 +57,8 @@ zl.semantica = zl.semantica || {};
             tipo: tipo
           });
         }
-        testarSentencias(s.sentencias, sub);
+        s.asincrono = testarSentencias(s.sentencias, sub);
+        asincrono = asincrono || s.asincrono;
       } else if (s.tipo == "mientras") {
         var tipo = testarExpresion(s.condicion, sub);
         if (tipo.nombre != "booleano") {
@@ -60,7 +68,8 @@ zl.semantica = zl.semantica || {};
             tipo: tipo
           });
         }
-        testarSentencias(s.sentencias, sub);
+        s.asincrono = testarSentencias(s.sentencias, sub);
+        asincrono = asincrono || s.asincrono;
       } else if (s.tipo == "sicondicional") {
         while (s) {
           if (s.condicion) {
@@ -73,11 +82,13 @@ zl.semantica = zl.semantica || {};
               });
             }
           }
-          testarSentencias(s.sentencias, sub);
+          s.asincrono = testarSentencias(s.sentencias, sub);
+          asincrono = asincrono || s.asincrono;
           s = s.siguiente;
         }
       }
     }
+    return asincrono;
   }
 
   function testarLlamada(arbol, sub) {
@@ -85,6 +96,7 @@ zl.semantica = zl.semantica || {};
     // TODO: Acabar esta función
     var n = arbol.nombre;
     var llamada = programa.subrutinaPorNombre(n);
+
     if (!llamada)
       throw zl.error.newError(zl.error.E_LLAMADA_NOMBRE_NO_ENCONTRADO, {
         arbol: arbol,
@@ -137,6 +149,12 @@ zl.semantica = zl.semantica || {};
         });
       }
     }
+    // Esto es útil para testarSentencia:
+    if (llamada.modificadores.asincrono === true) {
+      arbol.asincrono = true;
+      return true;
+    }
+    return false;
   }
 
   // Esta función devuelve el tipo de la expresión, si pasó el test.

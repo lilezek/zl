@@ -54,7 +54,7 @@ zl.sintaxis = zl.sintaxis || {};
   a.simbolo("+", /^\+/);
   a.simbolo("-");
   a.simbolo("*", /^\*/);
-  a.simbolo("/");
+  a.simbolo("/",/^\//);
   a.simbolo(")", /^\)/);
   a.simbolo("(", /^\(/);
   a.simbolo("[", /^\[/);
@@ -355,6 +355,7 @@ zl.sintaxis = zl.sintaxis || {};
             ["+"],
             ["-"],
             ["*"],
+            ["/"],
             ["%"]
           ])
           .expresion();

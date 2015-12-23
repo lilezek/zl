@@ -18,7 +18,31 @@ zl.ejecucion = zl.ejecucion || {};
           '>': {
             'numero': 'booleano'
           },
+          '=': {
+            'numero': 'booleano'
+          },
+          '<': {
+            'numero': 'booleano'
+          },
+          '<=': {
+            'numero': 'booleano'
+          },
+          '>=': {
+            'numero': 'booleano'
+          },
           '+': {
+            'numero': 'numero'
+          },
+          '-': {
+            'numero': 'numero'
+          },
+          '*': {
+            'numero': 'numero'
+          },
+          '/': {
+            'numero': 'numero'
+          },
+          '%': {
             'numero': 'numero'
           }
         }
@@ -29,7 +53,12 @@ zl.ejecucion = zl.ejecucion || {};
       });
 
       zl.writeJson(texto, {
-        nombre: "texto"
+        nombre: "texto",
+        opbinario: {
+          '=' : {
+            'texto': 'booleano'
+          }
+        }
       });
 
       numero.serializar();
@@ -215,31 +244,28 @@ var $zl_tipos = {
 };
 
 // mensaje es Texto de Entrada
-var $zl_mostrar = function(arg, callback) {
+var $zl_mostrar = function(arg) {
   outWrite(arg.mensaje + "\n");
-  callback(null, {});
 }
 
 // mensaje es Texto de Entrada
-var $zl_mostrarnumero = function(arg, callback) {
+var $zl_mostrarnumero = function(arg) {
   outWrite(arg.mensaje + "\n");
-  callback(null, {});
 }
 
 
-var $zl_mostrarnumero = function(arg, callback) {
+var $zl_mostrarnumero = function(arg) {
   outWrite(arg.mensaje.toPrecision(7) + "\n");
-  callback(null, {});
 }
 
 var $zl_leernumero = function(arg, callback) {
   inRead(function cbck(err, value) {
-    var x = parseInt(value);
+    var x = parseFloat(value);
     if (isNaN(x))
-      isRead(cbck);
+      inRead(cbck);
     else
       callback(null, {
-        mensaje: parseInt(value)
+        mensaje: x
       });
   });
 }
@@ -253,13 +279,12 @@ var $zl_leer = function(arg, callback) {
   });
 }
 
-var $zl_aleatorio = function(arg, callback) {
-  callback(null, {
+var $zl_aleatorio = function(arg) {
+  return {
     resultado: Math.round((Math.random() * (arg.maximo - arg.minimo)) + arg.minimo)
-  });
+  };
 }
 
-var $zl_limpiar = function(arg, callback) {
+var $zl_limpiar = function(arg) {
   $("#output").get(0).innerHTML = "";
-  callback(null, {});
 }

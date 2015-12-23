@@ -98,7 +98,7 @@ zl.analizador = zl.analizador || {};
 
   Analisis.prototype.propagarError = function(error) {
     if (this.arbol().length)
-      this.arbol().end = this.arbol(this.arbol().length-1).end;
+      this.arbol().end = this.arbol(this.arbol().length - 1).end;
     this.nodoPadre();
     error.traza = this.arbol();
     return error;
@@ -106,8 +106,10 @@ zl.analizador = zl.analizador || {};
 
   Analisis.prototype.registrarResultado = function(resultado) {
     this.nodoActual.resultado = resultado;
-    resultado.begin = this.nodoActual.begin;
-    resultado.end = this.nodoActual.end;
+    if (typeof resultado === "object") {
+      resultado.begin = this.nodoActual.begin;
+      resultado.end = this.nodoActual.end;
+    }
   };
 
   Analisis.prototype.resultado = function() {

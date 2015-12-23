@@ -30,7 +30,7 @@ zl.error = zl.error || {};
     if (texto.substr(posicion, 2) == "//") {
       while (texto.substr(posicion, 1) != "\n")
         posicion++;
-      zl.error.saltarsaltar(texto, posicion);
+      zl.error.saltar(texto, posicion);
     }
     return posicion;
   }

@@ -18,7 +18,6 @@
   <script src="error.js"></script>
   <script src="configuracion.js"></script>
   <script src="sintaxis.js"></script>
-  <script src="generadorarbol.js"></script>
   <script src="entorno.js"></script>
   <script src="semantica.js"></script>
   <script src="compilador.js"></script>
@@ -69,17 +68,39 @@
 <body>
   <div class="main">
 <textarea class="editor" id="editor">
-// Código de prueba con varios errores
+// Código que mezcla entrada/salida bloqueante
+// con cálculo computacional.
 Subrutina Externa Inicio
 Datos
-  n es Numero
+  cantidad es Numero
+  tirada es Numero
   total es Numero
+  caras es Numero
+  cruces es Numero
 Algoritmo
+  caras <- 0
+  cruces <- 0
   total <- 0
   Mientras verdadero hacer
-    leerNumero [ mensaje -> n ]
-    total <- total + n
-    mostrarNumero [ mensaje <- total ]
+    mostrar [ mensaje <- "Escribe cuantas tiradas de cara o cruz quieres calcular" ]
+    leerNumero [ mensaje -> cantidad ]
+    total <- total + cantidad
+		Repetir cantidad veces
+      aleatorio [
+        minimo <- 1
+        maximo <- 2
+        resultado -> tirada
+      ]
+      Si tirada = 1 hacer
+        caras <- caras + 1
+      si no hacer
+        cruces <- cruces + 1
+      Fin
+    Fin
+      mostrar [ mensaje <- "Probabilidades:\n\tCruz:" ]
+    	mostrarNumero [ mensaje <- cruces / total*100 ]
+    	mostrar [ mensaje <- "\tCara:" ]
+    	mostrarNumero [ mensaje <- caras / total*100 ]
   Fin
 Fin</textarea>
     <div class="v divisor"></div>
@@ -182,11 +203,11 @@ Fin</textarea>
         $("#input").prop("disabled",false);
         $("#input").keypress(function (e) {
           if (e.which == 13) {
+            $(this).off("keypress");
             var v = $("#input").val();
             $("#input").val("");
             $("#input").prop('disabled', true);
             callback(null, v);
-            $(this).off("keypress");
           }
         });
         $("#input").focus();
