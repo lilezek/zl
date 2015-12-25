@@ -55,7 +55,7 @@ zl.javascript = zl.javascript || {};
     if (!simbolo.modificadores.externa)
       resultado += "var ";
 
-    resultado += zl.javascript.nombre(compilado.nombre, simbolo) + "=function(arg, done){var $zlr;" +
+    resultado += zl.javascript.nombre(compilado.nombre, simbolo) + "=function(arg, done){var $zlr = arg;" +
       zl.javascript.datos(compilado.datos, simbolo.declaraciones) +
       "async.waterfall([function(c){c(null,arg);}," +
       "function(arg,done){$zlr = {};" +
@@ -119,7 +119,7 @@ zl.javascript = zl.javascript || {};
     if (compilado.asincrono)
       return ";done(null," + zl.javascript.llamadaEntrada(compilado.entrada, simbolo) + ");}," +
         zl.javascript.nombre(compilado.nombre, simbolo) +
-        ",function(arg,done) {var $zlr = arg;" +
+        ",function(arg,done) {$zlr = arg;" +
         zl.javascript.llamadaSalida(compilado.salida, simbolo);
     else
       return "$zlr = " + zl.javascript.nombre(compilado.nombre, simbolo) + "(" +
@@ -130,14 +130,14 @@ zl.javascript = zl.javascript || {};
   zl.javascript.mientras = function(compilado, simbolo) {
     var tempcallback = "$zlt_" + pedirNombreTemporal();
     if (compilado.asincrono) {
-      return "done(null,$zlr);}, function(arg,done){$zlr;" +
+      return "done(null,$zlr);}, function(arg,done){$zlr = arg;" +
         "function " + tempcallback + "(arg){" +
         "if (" + zl.javascript.expresion(compilado.condicion, simbolo) + "){" +
         "async.waterfall([function(c){c(null,arg);},function(arg,done){" +
         zl.javascript.sentencias(compilado.sentencias, simbolo) +
         ";done(null,$zlr);}]," + tempcallback + ");}" +
         "else {done(null, arg);}" +
-        "}" + tempcallback + "(arg,done);},function(arg,done){$zlr;";
+        "}" + tempcallback + "(arg,done);},function(arg,done){$zlr = arg;";
     } else {
       //TODO: El mientras síncrono.
     }
@@ -147,7 +147,7 @@ zl.javascript = zl.javascript || {};
     var siguiente = compilado.siguiente;
     var resultado = "";
     if (compilado.asincrono) {
-      resultado = "done(null,$zlr);}, function(arg, done){var $zlr;" +
+      resultado = "done(null,$zlr);}, function(arg, done){$zlr = arg;" +
         "if(" + zl.javascript.expresion(compilado.condicion) + "){" +
         "async.waterfall([function(c){c(null,arg);},function(arg,done){" +
         zl.javascript.sentencias(compilado.sentencias) +
@@ -168,7 +168,7 @@ zl.javascript = zl.javascript || {};
           "}";
         siguiente = siguiente.siguiente;
       }
-      resultado += "}, function(arg, done){var $zlr;";
+      resultado += "}, function(arg, done){$zlr = arg;";
     } else {
       resultado = "if(" + zl.javascript.expresion(compilado.condicion) + "){" +
         zl.javascript.sentencias(compilado.sentencias) +
@@ -189,22 +189,21 @@ zl.javascript = zl.javascript || {};
   }
 
   zl.javascript.repetir = function(compilado, simbolo) {
-    console.log(compilado);
     var tempvar = "$zlt_" + pedirNombreTemporal();
     if (compilado.asincrono) {
       var tempcallback = "$zlt_" + pedirNombreTemporal();
-      return "done(null,$zlr);}, function(arg,done){$zlr;" +
+      return "done(null,$zlr);}, function(arg,done){$zlr = arg;" +
         "var " + tempvar + "=" + zl.javascript.expresion(compilado.veces, simbolo) + ";" +
         "function " + tempcallback + "(arg){" +
-        "if (" + tempvar + "--){" +
+        "if (" + tempvar + "-- > 1){" +
         "async.waterfall([function(c){c(null,arg);},function(arg,done){" +
         zl.javascript.sentencias(compilado.sentencias, simbolo) +
         ";done(null,$zlr);}]," + tempcallback + ");}" +
         "else {done(null, arg);}" +
-        "}" + tempcallback + "(arg,done);},function(arg,done){$zlr;";
+        "}" + tempcallback + "(arg,done);},function(arg,done){$zlr = arg;";
     } else
       return "var " + tempvar + "=" + zl.javascript.expresion(compilado.veces, simbolo) + ";" +
-        "while(" + tempvar + "--){" +
+        "while(" + tempvar + "-- > 1){" +
         zl.javascript.sentencias(compilado.sentencias, simbolo) +
         "}";
   }

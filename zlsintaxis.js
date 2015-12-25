@@ -135,7 +135,7 @@ zl.sintaxis = zl.sintaxis || {};
     this.registrarResultado({
       nombre: this.resultado(0),
       tipo: this.resultado(2),
-      modificadores: [].slice(this.resultado(3))
+      modificadores: this.resultado(3)
     });
     return this;
   });

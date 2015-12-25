@@ -3,36 +3,19 @@ zl.entorno = zl.entorno || {};
 
 (function() {
   "use strict";
-
-  function Programa() {
-    this.modulos = {
-      "$internal": modInterno // Módulo interno
-    };
-    modInterno.padre = this;
-    return this;
-  }
-
-  Programa.prototype.registrarModulo = function(mod) {
-    if (mod.serial == "")
-      mod.serializar();
-    this.modulos[mod.serial] = mod;
-    mod.padre = this;
-  }
-
-  Programa.prototype.subrutinaPorNombre = function(nombre) {
-    nombre = nombre.split(".");
-    if (nombre.length == 1)
-      return this.modulos["$internal"].subrutinaPorNombre(nombre[0]);
-    return this.modulos[nombre[0]].subrutinaPorNombre(nombre[1]);
-  }
-
-  function Modulo(programa) {
-    // Programa padre:
-    this.padre = programa || null;
+  function Modulo(padre) {
+    this.padre = padre || null;
 
     this.subrutinas = {};
     this.tipos = {};
     this.globales = {};
+
+
+    this.importes = {
+      "$internal": modInterno
+    };
+
+    this.moduloInterno = modInterno;
 
     // Por defecto: representa el código escrito en el propio editor.
     this.fuente = "/";
@@ -47,7 +30,8 @@ zl.entorno = zl.entorno || {};
     var x =
     r instanceof Subrutina  ? this.registrarSubrutina(r)  :
     r instanceof Tipo       ? this.registrarTipo(r)       :
-    "Solo se pueden registrar subrutinas o tipos";
+    r instanceof Modulo     ? this.registrarModulo(r)     :
+    "Solo se pueden registrar subrutinas, tipos o modulos";
     if (x)
       throw x;
   }
@@ -58,6 +42,10 @@ zl.entorno = zl.entorno || {};
 
   Modulo.prototype.registrarTipo = function(tipo) {
     this.tipos[tipo.nombre] = tipo;
+  }
+
+  Modulo.prototype.registrarModulo = function(modulo) {
+    this.importes[modulo.nombre] = modulo;
   }
 
   Modulo.prototype.esIgual = function(mod) {
@@ -71,9 +59,18 @@ zl.entorno = zl.entorno || {};
 
   Modulo.prototype.subrutinaPorNombre = function(nombre) {
     nombre = nombre.toLowerCase();
-    for (var k in this.subrutinas) {
-      if (this.subrutinas[k].nombre == nombre)
+    nombre = nombre.split(".");
+    if (nombre.length > 1) {
+      return this.importes[nombre[0]].subrutinaPorNombre(nombre.slice(1,nombre.length).join("."));
+    }
+    else {
+      nombre = nombre[0];
+      for (var k in this.subrutinas) {
+        if (this.subrutinas[k].nombre == nombre)
         return this.subrutinas[k];
+      }
+      if (this.moduloInterno)
+        return this.moduloInterno.subrutinaPorNombre(nombre);
     }
     return null;
   }
@@ -84,13 +81,10 @@ zl.entorno = zl.entorno || {};
       if (this.tipos[k].nombre == nombre)
         return this.tipos[k];
     }
-    if (this.padre && this.padre.modulos["$internal"] === this)
-      return null;
-    // Si no está en el módulo, mirar en los internos:
-    return (
-    this.padre ?  this.padre.modulos["$internal"].tipoPorNombre(nombre) :
-                  null
-    );
+    // Si no está en el módulo el tipo, estará en $internal.
+    if (this.importes["$internal"])
+      return this.importes["$internal"].tipoPorNombre(nombre);
+    return null;
   }
 
   Modulo.prototype.serializar = function() {
@@ -262,12 +256,12 @@ zl.entorno = zl.entorno || {};
     }
     for (var j = 0; j < arbol.modificadores.length; j++) {
       var mod = arbol.modificadores[j].toLowerCase();
-      if (mod == "salida") {
+      if (mod.indexOf("salida") > -1) {
         if (this.modificadores & this.M_SALIDA)
           throw zl.error.newError(zl.error.E_MODIFICADOR_REPETIDO, arbol);
         this.modificadores |= this.M_SALIDA;
       }
-      if (mod == "entrada") {
+      if (mod.indexOf("entrada") > -1) {
         if (this.modificadores & this.M_ENTRADA)
           throw zl.error.newError(zl.error.E_MODIFICADOR_REPETIDO, arbol);
         this.modificadores |= this.M_ENTRADA;
@@ -319,10 +313,6 @@ zl.entorno = zl.entorno || {};
   Declaracion.prototype.M_ENTRADA = 0x01;
   Declaracion.prototype.M_SALIDA = 0x02;
   Declaracion.prototype.M_GLOBAL = 0x04;
-
-  zl.entorno.newPrograma = function() {
-    return new Programa();
-  }
 
   zl.entorno.newModulo = function(a) {
     return new Modulo(a);

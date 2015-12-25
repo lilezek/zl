@@ -5,7 +5,7 @@ var zl = zl || {};
 
   // Genera código javascript a partir de código
   // en zl
-  zl.Compilar = function(zlcode, programa) {
+  zl.Compilar = function(zlcode, moduloPadre) {
     zlcode = zlcode.trim();
     var compilado;
     // Fase 1, obtener el árbol sintáctico de la configuración:
@@ -25,15 +25,11 @@ var zl = zl || {};
 
     // Fase 3, obtener el árbol sintáctico del resto del código:
     compilado = zl.sintaxis.arbolCodigo(zlcode);
-    console.log(compilado);
 
     // Fase 4, generar la tabla de símbolos
 
-    // Generar el programa si no existe
-    programa = programa || zl.entorno.newPrograma();
-
     // Construir este módulo
-    var mod = zl.entorno.newModulo(programa);
+    var mod = zl.entorno.newModulo(moduloPadre);
     mod.rellenarDesdeArbol(compilado);
 
     // Fase 5, comprobaciones semánticas (tipos compatibles, uso de nombres que
@@ -46,7 +42,7 @@ var zl = zl || {};
     // Fase 7, generación del código de salida
     return {
       javascript: zl.javascript.modulo(compilado, mod),
-      tabla: programa
+      tabla: moduloPadre
     };
   }
 })();

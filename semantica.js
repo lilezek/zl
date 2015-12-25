@@ -92,15 +92,15 @@ zl.semantica = zl.semantica || {};
   }
 
   function testarLlamada(arbol, sub) {
-    var programa = sub.padre.padre;
+    var modulo = sub.padre;
     // TODO: Acabar esta función
     var n = arbol.nombre;
-    var llamada = programa.subrutinaPorNombre(n);
-
+    var llamada = modulo.subrutinaPorNombre(n);
     if (!llamada)
       throw zl.error.newError(zl.error.E_LLAMADA_NOMBRE_NO_ENCONTRADO, {
         arbol: arbol,
-        tabla: programa
+        // TODO:
+        tabla: {todo: "todo"}
       });
     for (var k in arbol.entrada) {
       var decl = arbol.entrada[k];
@@ -108,6 +108,20 @@ zl.semantica = zl.semantica || {};
       var nombre = decl.izq;
       if (nombre.toLowerCase() in llamada.declaraciones) {
         var decl2 = llamada.declaraciones[nombre.toLowerCase()];
+        if (!(decl2.modificadores & decl2.M_ENTRADA) && decl2.modificadores & decl2.M_SALIDA) {
+          throw zl.error.newError(zl.error.E_FLECHA_INCORRECTA, {
+            esperado: "->",
+            obtenido: "<-",
+            dato: decl2,
+            posicion: [decl.begin, decl.end]
+          });
+        }
+        if (decl2.modificadores === decl2.M_LOCAL) {
+          throw zl.error.newError(zl.error.E_ACCESO_A_DATO_LOCAL, {
+            dato: decl2,
+            posicion: [decl.begin, decl.end]
+          });
+        }
         if (!decl2.tipo.esCompatible(tipo))
           throw zl.error.newError(zl.error.E_LLAMADA_DATO_INCOMPATIBLE, {
             esperado: decl2.tipo,
@@ -135,6 +149,20 @@ zl.semantica = zl.semantica || {};
       var nombre = decl.izq;
       if (nombre.toLowerCase() in llamada.declaraciones) {
         var decl2 = llamada.declaraciones[nombre.toLowerCase()];
+        if (!(decl2.modificadores & decl2.M_SALIDA) && decl2.modificadores & decl2.M_ENTRADA) {
+          throw zl.error.newError(zl.error.E_FLECHA_INCORRECTA, {
+            esperado: "<-",
+            obtenido: "->",
+            dato: decl2,
+            posicion: [decl.begin, decl.end]
+          });
+        }
+        if (decl2.modificadores === decl2.M_LOCAL) {
+          throw zl.error.newError(zl.error.E_ACCESO_A_DATO_LOCAL, {
+            dato: decl2,
+            posicion: [decl.begin, decl.end]
+          });
+        }
         if (!decl2.tipo.esCompatible(tipo))
           throw zl.error.newError(zl.error.E_LLAMADA_DATO_INCOMPATIBLE, {
             esperado: decl2.tipo,

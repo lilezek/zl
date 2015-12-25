@@ -1,12 +1,11 @@
 # Tabla de símbolos
 
-* Programa
-  * Conjunto de módulos
 * Módulo
   * Conjunto de subrutinas
   * Conjunto de declaraciones globales
   * Camino al código fuente, si existe
   * Conjunto de tipos definidos
+  * Conjunto de otros módulos importados
 * Subrutina
   * Nombre
   * Modificadores

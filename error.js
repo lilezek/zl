@@ -67,7 +67,6 @@ zl.error = zl.error || {};
   }
 
   zl.error.obtenerMensaje = function(error, zlcodigo) {
-    console.log(error);
     if (error.tipo == zl.error.E_PALABRA_RESERVADA) {
       var hojas = error.hojas();
       var palabra = hojas[hojas.length - 2].resultado;
@@ -177,6 +176,8 @@ zl.error = zl.error || {};
   zl.error.E_VECES_NO_NUMERICO = 16;
   zl.error.E_ASIGNACION_INCOMPATIBLE = 17;
   zl.error.E_TIPO_NO_EXISTE = 18;
+  zl.error.E_FLECHA_INCORRECTA = 19;
+  zl.error.E_ACCESO_A_DATO_LOCAL = 20;
 
   zl.error.newError = function(a, b) {
     return new Error(a, b);
