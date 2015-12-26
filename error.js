@@ -86,6 +86,7 @@ zl.error = zl.error || {};
     } else if (error.tipo == zl.error.E_LLAMADA_NOMBRE_NO_ENCONTRADO) {
       return "Subrutina con nombre '" + error.traza["arbol"].nombre + "' no encontrada";
     } else if (error.tipo == zl.error.E_LLAMADA_DATO_INCOMPATIBLE) {
+      console.log(error);
       var t = error.traza;
       return zl.error.posicionCaracter(zlcodigo, t.posicion[0]).linea + ".\tEl dato '" + t.dato.nombre + "' ha sido introducido con un valor de tipo '" + t.obtenido.nombre + "'\n" +
         "\t\tpero debería ser de tipo '" + t.esperado.nombre + "'.";
@@ -148,11 +149,11 @@ zl.error = zl.error || {};
       //"10 > 15"
     }
     if (error.tipo == zl.error.E_SIMBOLO) {
-      console.log(error);
       return "Error genérico:\n\n" +
         error.apuntador(zlcodigo);
     }
     return Object.keys(zl.error).filter(function(key) {
+      console.log(error);
       return zl.error[key] === error.tipo
     })[0];
   }
@@ -178,6 +179,8 @@ zl.error = zl.error || {};
   zl.error.E_TIPO_NO_EXISTE = 18;
   zl.error.E_FLECHA_INCORRECTA = 19;
   zl.error.E_ACCESO_A_DATO_LOCAL = 20;
+  zl.error.E_LECTURA_ILEGAL = 21;
+  zl.error.E_ESCRITURA_ILEGAL = 22;
 
   zl.error.newError = function(a, b) {
     return new Error(a, b);

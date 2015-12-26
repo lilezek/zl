@@ -11,6 +11,8 @@ zl.ejecucion = zl.ejecucion || {};
     var numero = zl.entorno.newTipo(mod);
     var booleano = zl.entorno.newTipo(mod);
     var texto = zl.entorno.newTipo(mod);
+    var relacion = zl.entorno.newTipo(mod);
+    var lista = zl.entorno.newTipo(mod);
     {
       zl.writeJson(numero, {
         nombre: "numero",
@@ -61,6 +63,14 @@ zl.ejecucion = zl.ejecucion || {};
         }
       });
 
+      zl.writeJson(lista, {
+        nombre: "lista"
+      });
+
+      zl.writeJson(relacion, {
+        nombre: "relacion"
+      });
+
       numero.serializar();
       booleano.serializar();
       texto.serializar();
@@ -68,6 +78,8 @@ zl.ejecucion = zl.ejecucion || {};
       mod.registrar(numero);
       mod.registrar(booleano);
       mod.registrar(texto);
+      mod.registrar(relacion);
+      mod.registrar(lista);
     }
 
 

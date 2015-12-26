@@ -129,14 +129,35 @@ zl.sintaxis = zl.sintaxis || {};
   a.regla("declaracion", function() {
     this.nombre()
       .avanzar("es")
-      .nombre()
+      .intentar([
+        ["relacion", "de", "nombre", "a", "nombre"],
+        ["lista","de","nombre"],
+        ["nombre"]
+      ])
       .acumular("decModificador")
       .avanzarVarios();
-    this.registrarResultado({
-      nombre: this.resultado(0),
-      tipo: this.resultado(2),
-      modificadores: this.resultado(3)
-    });
+    var intento = this.resultado(2);
+    if (intento == 2) {
+      this.registrarResultado({
+        nombre: this.resultado(0),
+        tipo: this.resultado(2,intento,0),
+        modificadores: this.resultado(3)
+      });
+    } else if (intento == 1) {
+      this.registrarResultado({
+        nombre: this.resultado(0),
+        tipo: "lista",
+        subtipo: this.resultado(2,intento,2),
+        modificadores: this.resultado(3)
+      });
+    } else if (intento == 0) {
+      this.registrarResultado({
+        nombre: this.resultado(0),
+        tipo: "relacion",
+        subtipo: this.resultado(2,intento,2),
+        modificadores: this.resultado(3)
+      });
+    }
     return this;
   });
 

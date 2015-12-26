@@ -27,16 +27,22 @@ zl.semantica = zl.semantica || {};
     for (var k in arbol) {
       var s = arbol[k];
       if (s.tipo == "asignacion") {
-        var tipoizq = sub.declaraciones[s.variable];
+        var varizq = sub.declaraciones[s.variable];
         var tipoder = testarExpresion(s.valor, sub);
-        if (!tipoizq) {
+        if (!varizq) {
           throw zl.error.newError(zl.error.E_NOMBRE_NO_DEFINIDO, {
             posicion: [s.begin, s.end],
             nombre: s.variable,
             declaraciones: sub.declaraciones
           });
         }
-        tipoizq = tipoizq.tipo;
+        if (varizq.modificadores === varizq.M_ENTRADA) {
+          throw zl.error.newError(zl.error.E_ESCRITURA_ILEGAL, {
+            declaracion: varizq,
+            posicion: [s.begin, s.end]
+          });
+        }
+        var tipoizq = varizq.tipo;
         if (!tipoizq.esCompatible(tipoder)) {
           throw zl.error.newError(zl.error.E_ASIGNACION_INCOMPATIBLE, {
             esperado: tipoizq,
@@ -140,12 +146,7 @@ zl.semantica = zl.semantica || {};
 
     for (var k in arbol.salida) {
       var decl = arbol.salida[k];
-      var tipo = testarExpresion({
-        tipo: "nombre",
-        valor: decl.der,
-        begin: decl.begin,
-        end: decl.end
-      }, sub);
+      var der = sub.declaraciones[decl.der];
       var nombre = decl.izq;
       if (nombre.toLowerCase() in llamada.declaraciones) {
         var decl2 = llamada.declaraciones[nombre.toLowerCase()];
@@ -163,7 +164,7 @@ zl.semantica = zl.semantica || {};
             posicion: [decl.begin, decl.end]
           });
         }
-        if (!decl2.tipo.esCompatible(tipo))
+        if (!decl2.tipo.esCompatible(der.tipo))
           throw zl.error.newError(zl.error.E_LLAMADA_DATO_INCOMPATIBLE, {
             esperado: decl2.tipo,
             obtenido: tipo,
@@ -173,6 +174,19 @@ zl.semantica = zl.semantica || {};
         throw zl.error.newError(zl.error.E_LLAMADA_DATO_INEXISTENTE, {
           dato: decl,
           subrutina: llamada,
+          posicion: [decl.begin, decl.end]
+        });
+      }
+      if (!der) {
+        throw zl.error.newError(zl.error.E_NOMBRE_NO_DEFINIDO, {
+          nombre: decl.der,
+          posicion: [decl.begin, decl.end],
+          declaraciones: sub.declaraciones
+        });
+      }
+      if (der.modificadores === der.M_ENTRADA) {
+        throw zl.error.newError(zl.error.E_ESCRITURA_ILEGAL, {
+          declaracion: der,
           posicion: [decl.begin, decl.end]
         });
       }
@@ -206,6 +220,11 @@ zl.semantica = zl.semantica || {};
           nombre: arbol.valor,
           posicion: [arbol.begin, arbol.end],
           declaraciones: sub.declaraciones
+        });
+      if (dato.modificadores === dato.M_SALIDA)
+        throw zl.error.newError(zl.error.E_LECTURA_ILEGAL, {
+          declaracion: dato,
+          posicion: [arbol.begin, arbol.end]
         });
       return dato.tipo;
     }
