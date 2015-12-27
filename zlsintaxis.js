@@ -86,15 +86,26 @@ zl.sintaxis = zl.sintaxis || {};
   a.token("falso", /^falso/i, 1);
   a.token("subModificador", /^(es|rapida|rápida|externa|constante|funcion|asíncrona|asincrona)/i, 2);
   a.token("decModificador", /^((?:de\s+entrada)|(?:de\s+salida)|global)/i, 3);
-  a.token("numero", /^((?:[0-1]+(?:\|2))|(?:[0-9A-Fa-f]+(?:\|16))|(?:[0-9]+(?:\|10)?))/i, 4);
-  a.token("texto", /^\"([^"\\]|\\.|\\\n)*\"/i, 5);
-  a.token("letra", /^\'([^'\\]|\\.|\\\n)*\'/i, 6);
-  a.token("nombreSimple", /^([A-Za-záéíóúÁÉÍÓÚñÑ][A-Za-záéíóúÁÉÍÓÚñÑ0-9]*)/, 7);
+  a.token("entero", /^((?:[0-1]+(?:\|2))|(?:[0-9A-Fa-f]+(?:\|16))|(?:[0-9]+(?:\|10)?))/i, 4);
+  a.token("decimal", /^(\d+\.\d+)/i, 5);
+  a.token("texto", /^\"([^"\\]|\\.|\\\n)*\"/i, 6);
+  a.token("letra", /^\'([^'\\]|\\.|\\\n)*\'/i, 7);
+  a.token("nombreSimple", /^([A-Za-záéíóúÁÉÍÓÚñÑ][A-Za-záéíóúÁÉÍÓÚñÑ0-9]*)/, 8);
 
 
   // Y Las reglas:
   a.regla("configuracion", function() {
     // TODO: Stub
+    return this;
+  });
+
+  a.regla("numero", function() {
+    this.intentar([
+      ["decimal"],
+      ["entero"]
+    ]);
+    var intento = this.resultado(0);
+    this.registrarResultado(this.resultado(0,intento,0));
     return this;
   });
 
@@ -199,11 +210,16 @@ zl.sintaxis = zl.sintaxis || {};
   })
 
   a.regla("asignacion", function() {
-    this.nombre()
+    this.intentar([
+      ["nombre", "(","listaAcceso",")"],
+      ["nombre"]
+    ])
       .avanzar("<-")
       .expresion();
+    var intento = this.resultado(0);
     this.registrarResultado({
-      variable: this.resultado(0),
+      variable: this.resultado(0,intento,0),
+      acceso: (intento ? null : this.resultado(0,intento,2)),
       valor: this.resultado(2)
     });
     return this;
@@ -261,6 +277,7 @@ zl.sintaxis = zl.sintaxis || {};
     this.avanzar("nombreSimple")
       .intentar([
         ["<-", "expresion"],
+        ["->", "nombre", "(", "listaAcceso", ")"]
         ["->", "nombre"]
       ]);
     var intento = this.resultado(1);
@@ -410,7 +427,7 @@ zl.sintaxis = zl.sintaxis || {};
       ["letra"],
       ["verdadero"],
       ["falso"],
-      ["nombre", "(", ")"],
+      ["nombre", "(", "listaAcceso", ")"],
       ["nombre"],
       ["(", "expresion", ")"]
     ]);
@@ -425,5 +442,40 @@ zl.sintaxis = zl.sintaxis || {};
         valor: this.resultado(0, intento, 1),
         tipo: this.arbol(0, intento, 1).tipo
       });
+    return this;
+  });
+
+  a.regla("listaAcceso", function() {
+    this.acceso()
+      .acumular(";")
+      .acumular("acceso").avanzarVarios();
+    var resultado = [this.resultado(0)];
+    for (var i = 0; i < this.resultado(1).length; i++) {
+      resultado.push(this.resultado(1)[i][1]);
+    }
+    this.registrarResultado(resultado);
+    console.log(this.arbol());
+    return this;
+  });
+
+  a.regla("acceso", function() {
+    this.intentar([
+      ["rango"],
+      ["expresion"]
+    ]);
+    var intento = this.resultado(0);
+    this.registrarResultado(this.resultado(0,intento,0));
+    return this;
+  });
+
+  a.regla("rango", function() {
+    this.avanzar("entero")
+      .avanzar("..")
+      .avanzar("entero");
+    this.registrarResultado({
+      minimo: this.resultado(0),
+      maximo: this.resultado(2)
+    })
+    return this;
   });
 })();

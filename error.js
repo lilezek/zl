@@ -149,6 +149,7 @@ zl.error = zl.error || {};
       //"10 > 15"
     }
     if (error.tipo == zl.error.E_SIMBOLO) {
+      console.log(error);
       return "Error genérico:\n\n" +
         error.apuntador(zlcodigo);
     }
