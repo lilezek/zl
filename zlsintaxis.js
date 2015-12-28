@@ -277,7 +277,7 @@ zl.sintaxis = zl.sintaxis || {};
     this.avanzar("nombreSimple")
       .intentar([
         ["<-", "expresion"],
-        ["->", "nombre", "(", "listaAcceso", ")"]
+        ["->", "nombre", "(", "listaAcceso", ")"],
         ["->", "nombre"]
       ]);
     var intento = this.resultado(1);

@@ -72,6 +72,7 @@ zl.analizador = zl.analizador || {};
     this.nodoActual = new Nodo({});
     for (var k in this.analizador.reglas) {
       this[k] = async.apply(function(k, t) {
+        var ass = t.pilaAcumulados.length;
         t.pilaAcumulados.push(t.acumulado);
         t.acumulado = [];
         t.nuevoNodo({
@@ -85,11 +86,17 @@ zl.analizador = zl.analizador || {};
         } catch (e) {
           if (!zl.error.esError(e))
             throw e;
+          t.acumulado = t.pilaAcumulados.pop();
           throw t.propagarError(e);
         }
         t.nodoActual.end = t.posicion;
         t.nodoPadre();
         t.acumulado = t.pilaAcumulados.pop();
+        if (ass != t.pilaAcumulados.length)
+          throw JSON.stringify({
+            mensaje: "Aserto inválido: el número de push y pop son distintos.",
+            regla: k
+          });
         return x;
       }, k, this);
     }
@@ -158,7 +165,6 @@ zl.analizador = zl.analizador || {};
   }
 
   Analisis.prototype.avanzarUno = function() {
-
     var id = this.acumulado.shift();
     var regex = this.analizador.simbolos[id] || this.analizador.tokens[id];
     if (!regex) {
@@ -318,6 +324,7 @@ zl.analizador = zl.analizador || {};
     });
     for (var i = 0; i < intentos.length; i++) {
       try {
+        console.log(intentos[i]);
         this.acumulado = intentos[i];
         this.avanzarTodos();
         this.registrarResultado(i);
