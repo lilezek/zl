@@ -3,6 +3,7 @@ zl.entorno = zl.entorno || {};
 
 (function() {
   "use strict";
+
   function Modulo(padre) {
     this.padre = padre || null;
 
@@ -26,12 +27,12 @@ zl.entorno = zl.entorno || {};
     return this;
   }
 
-  Modulo.prototype.registrar = function (r) {
+  Modulo.prototype.registrar = function(r) {
     var x =
-    r instanceof Subrutina  ? this.registrarSubrutina(r)  :
-    r instanceof Tipo       ? this.registrarTipo(r)       :
-    r instanceof Modulo     ? this.registrarModulo(r)     :
-    "Solo se pueden registrar subrutinas, tipos o modulos";
+      r instanceof Subrutina ? this.registrarSubrutina(r) :
+      r instanceof Tipo ? this.registrarTipo(r) :
+      r instanceof Modulo ? this.registrarModulo(r) :
+      "Solo se pueden registrar subrutinas, tipos o modulos";
     if (x)
       throw x;
   }
@@ -61,13 +62,12 @@ zl.entorno = zl.entorno || {};
     nombre = nombre.toLowerCase();
     nombre = nombre.split(".");
     if (nombre.length > 1) {
-      return this.importes[nombre[0]].subrutinaPorNombre(nombre.slice(1,nombre.length).join("."));
-    }
-    else {
+      return this.importes[nombre[0]].subrutinaPorNombre(nombre.slice(1, nombre.length).join("."));
+    } else {
       nombre = nombre[0];
       for (var k in this.subrutinas) {
         if (this.subrutinas[k].nombre == nombre)
-        return this.subrutinas[k];
+          return this.subrutinas[k];
       }
       if (this.moduloInterno)
         return this.moduloInterno.subrutinaPorNombre(nombre);
@@ -125,11 +125,10 @@ zl.entorno = zl.entorno || {};
 
   Modulo.prototype.registrarGlobal = function(decl) {
     var nombre = decl.nombre.toLowerCase();
-    if (nombre in this.globales){
-        if (!decl.esCompatible(this.globales[nombre]))
-          throw zl.error.newError(zl.error.E_GLOBALES_INCOMPATIBLES, [decl, this.globales[nombre]]);
-    }
-    else
+    if (nombre in this.globales) {
+      if (!decl.esCompatible(this.globales[nombre]))
+        throw zl.error.newError(zl.error.E_GLOBALES_INCOMPATIBLES, [decl, this.globales[nombre]]);
+    } else
       this.globales[nombre] = decl;
     return true;
   }
@@ -224,6 +223,13 @@ zl.entorno = zl.entorno || {};
 
     this.nombre = "";
     this.tipo = null;
+    // Información de genericidad
+    // Ahora mismo es útil para listas y relaciones.
+    this.genericidad = {
+      subtipo: null, // Subtipo si es lista
+      clave: null, // Clave si es relación
+      valor: null // Valor si es relación
+    };
     this.modificadores = 0x00;
     this.posicion = [0, 0];
 
@@ -271,6 +277,14 @@ zl.entorno = zl.entorno || {};
           throw zl.error.newError(zl.error.E_USO_INDEBIDO_MODIFICADOR_GLOBAL, arbol);
         this.modificadores |= this.M_GLOBAL;
       }
+    }
+    // Genericidad:
+    // TODO: Comprobar que los subtipos existen y emitir el error indicado si no.
+    if (this.tipo.nombre === "lista")
+      this.genericidad.subtipo = this.padre.padre.tipoPorNombre(arbol.subtipo);
+    if (this.tipo.nombre === "relacion") {
+      this.genericidad.clave = this.padre.padre.tipoPorNombre(arbol.clave);
+      this.genericidad.valor = this.padre.padre.tipoPorNombre(arbol.valor);
     }
     this.serializar();
   }
@@ -330,6 +344,235 @@ zl.entorno = zl.entorno || {};
     return new Tipo(a);
   }
 
+  // El módulo interno contiene las funciones básicas del lenguaje.
+  // Recibe un módulo y devuelve el mismo módulo con las transformaciones oportunas.
+  var moduloInterno = function(mod) {
+    // Tipos básicos:
+    var numero = zl.entorno.newTipo(mod);
+    var booleano = zl.entorno.newTipo(mod);
+    var texto = zl.entorno.newTipo(mod);
+    var relacion = zl.entorno.newTipo(mod);
+    var lista = zl.entorno.newTipo(mod); {
+      zl.writeJson(numero, {
+        nombre: "numero",
+        opbinario: {
+          '>': {
+            'numero': 'booleano'
+          },
+          '=': {
+            'numero': 'booleano'
+          },
+          '<': {
+            'numero': 'booleano'
+          },
+          '<=': {
+            'numero': 'booleano'
+          },
+          '>=': {
+            'numero': 'booleano'
+          },
+          '+': {
+            'numero': 'numero'
+          },
+          '-': {
+            'numero': 'numero'
+          },
+          '*': {
+            'numero': 'numero'
+          },
+          '/': {
+            'numero': 'numero'
+          },
+          '%': {
+            'numero': 'numero'
+          }
+        }
+      });
+
+      zl.writeJson(booleano, {
+        nombre: "booleano"
+      });
+
+      zl.writeJson(texto, {
+        nombre: "texto",
+        opbinario: {
+          '=': {
+            'texto': 'booleano'
+          },
+          '+': {
+            'texto': 'texto'
+          }
+        }
+      });
+
+      zl.writeJson(lista, {
+        nombre: "lista"
+      });
+
+      zl.writeJson(relacion, {
+        nombre: "relacion"
+      });
+
+      numero.serializar();
+      booleano.serializar();
+      texto.serializar();
+
+      mod.registrar(numero);
+      mod.registrar(booleano);
+      mod.registrar(texto);
+      mod.registrar(relacion);
+      mod.registrar(lista);
+    }
+
+
+    // Aleatorio:
+    {
+      var aleatorio = zl.entorno.newSubrutina(mod);
+      var declresultado = zl.entorno.newDeclaracion(aleatorio);
+      var declminimo = zl.entorno.newDeclaracion(aleatorio);
+      var declmaximo = zl.entorno.newDeclaracion(aleatorio);
+
+      zl.writeJson(declresultado, {
+        nombre: "resultado",
+        tipo: numero,
+        modificadores: declresultado.M_SALIDA
+      });
+
+      zl.writeJson(declmaximo, {
+        nombre: "maximo",
+        tipo: numero,
+        modificadores: declmaximo.M_ENTRADA
+      });
+
+      zl.writeJson(declminimo, {
+        nombre: "minimo",
+        tipo: numero,
+        modificadores: declminimo.M_ENTRADA
+      });
+
+      zl.writeJson(aleatorio, {
+        nombre: "aleatorio",
+        modificadores: {
+          externa: true,
+          es: true
+        },
+        declaraciones: {
+          resultado: declresultado,
+          minimo: declminimo,
+          maximo: declmaximo
+        }
+      });
+      aleatorio.serializar();
+      mod.registrar(aleatorio);
+    }
+
+    // Mostrar:
+    {
+      var mostrar = zl.entorno.newSubrutina(mod);
+      var declmensaje = zl.entorno.newDeclaracion(mostrar);
+
+      zl.writeJson(declmensaje, {
+        nombre: "mensaje",
+        tipo: texto,
+        modificadores: declresultado.M_ENTRADA
+      });
+
+      zl.writeJson(mostrar, {
+        nombre: "mostrar",
+        modificadores: {
+          externa: true,
+          es: true
+        },
+        declaraciones: {
+          mensaje: declmensaje
+        }
+      });
+      mostrar.serializar();
+      mod.registrar(mostrar);
+    }
+
+    // Mostrar numero:
+    {
+      var mostrarnumero = zl.entorno.newSubrutina(mod);
+      var declmensaje = zl.entorno.newDeclaracion(mostrarnumero);
+
+      zl.writeJson(declmensaje, {
+        nombre: "mensaje",
+        tipo: numero,
+        modificadores: declresultado.M_ENTRADA
+      });
+
+      zl.writeJson(mostrarnumero, {
+        nombre: "mostrarnumero",
+        modificadores: {
+          externa: true,
+          es: true
+        },
+        declaraciones: {
+          mensaje: declmensaje
+        }
+      });
+      mostrar.serializar();
+      mod.registrar(mostrarnumero);
+    }
+
+    // leer Numero:
+    {
+      var leerNumero = zl.entorno.newSubrutina(mod);
+      var declmensaje = zl.entorno.newDeclaracion(leerNumero);
+
+      zl.writeJson(declmensaje, {
+        nombre: "mensaje",
+        tipo: numero,
+        modificadores: declresultado.M_SALIDA
+      });
+
+      zl.writeJson(leerNumero, {
+        nombre: "leernumero",
+        modificadores: {
+          externa: true,
+          es: true,
+          asincrono: true
+        },
+        declaraciones: {
+          mensaje: declmensaje
+        }
+      });
+      leerNumero.serializar();
+      mod.registrar(leerNumero);
+    }
+
+    // leer texto:
+    {
+      var leer = zl.entorno.newSubrutina(mod);
+      var declmensaje = zl.entorno.newDeclaracion(leer);
+
+      zl.writeJson(declmensaje, {
+        nombre: "mensaje",
+        tipo: texto,
+        modificadores: declresultado.M_SALIDA
+      });
+
+      zl.writeJson(leer, {
+        nombre: "leer",
+        modificadores: {
+          externa: true,
+          es: true,
+          asincrono: true
+        },
+        declaraciones: {
+          mensaje: declmensaje
+        }
+      });
+      leer.serializar();
+      mod.registrar(leer);
+    }
+
+    // TODO: acabar el módulo
+    mod.serializar();
+    return mod;
+  }
+
   // Módulo interno
-  var modInterno = zl.ejecucion.moduloInterno(new Modulo());
+  var modInterno = moduloInterno(new Modulo());
 })();

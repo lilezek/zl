@@ -68,52 +68,46 @@
 <body>
   <div class="main">
 <textarea class="editor" id="editor">
-Subrutina Vector
-Datos
-  i es Numero de entrada
-  j es Numero de entrada
-  k es Numero de entrada
-  resultado es lista de Numero de Salida
-Algoritmo
-	resultado(1) <- i
-  resultado(2) <- j
-  resultado(3) <- k
-Fin
-
-// Código que mezcla entrada/salida bloqueante
-// con cálculo computacional.
 Subrutina Externa Inicio
 Datos
-  cantidad es Numero
-  tirada es Numero
-  total es Numero
-  caras es Numero
-  cruces es Numero
+  total es Numero global
+  caras es Numero global
+  cruces es Numero global
 Algoritmo
   caras <- 0
   cruces <- 0
   total <- 0
-  Mientras verdadero hacer
-    mostrar [ mensaje <- "Escribe cuantas tiradas de cara o cruz quieres calcular" ]
-    leerNumero [ mensaje -> cantidad ]
-    total <- total + cantidad
-		Repetir cantidad veces
-      aleatorio [
-        minimo <- 1
-        maximo <- 2
-        resultado -> tirada
-      ]
-      Si tirada = 1 hacer
-        caras <- caras + 1
-      si no hacer
-        cruces <- cruces + 1
-      Fin
+Fin
+
+// Código que mezcla entrada/salida bloqueante
+// con cálculo computacional.
+Subrutina Externa Fotograma
+Datos
+  cantidad es Numero
+  tirada es Numero
+  total es Numero global
+  caras es Numero global
+  cruces es Numero global
+Algoritmo
+  mostrar [ mensaje <- "Escribe cuantas tiradas de cara o cruz quieres calcular" ]
+  leerNumero [ mensaje -> cantidad ]
+  total <- total + cantidad
+	Repetir cantidad veces
+    aleatorio [
+      minimo <- 1
+      maximo <- 2
+      resultado -> tirada
+    ]
+    Si tirada = 1 hacer
+      caras <- caras + 1
+    si no hacer
+      cruces <- cruces + 1
     Fin
-      mostrar [ mensaje <- "Probabilidades:\n\tCruz:" ]
-    	mostrarNumero [ mensaje <- cruces / total*100 ]
-    	mostrar [ mensaje <- "\tCara:" ]
-    	mostrarNumero [ mensaje <- caras / total*100 ]
   Fin
+  mostrar [ mensaje <- "Probabilidades:\n\tCruz:" ]
+	mostrarNumero [ mensaje <- cruces / total*100 ]
+	mostrar [ mensaje <- "\tCara:" ]
+	mostrarNumero [ mensaje <- caras / total*100 ]
 Fin</textarea>
     <div class="v divisor"></div>
     <div class="compilation">
@@ -154,8 +148,21 @@ Fin</textarea>
       var lasttimeout = null;
       var minify = false;
 
+      var carga = null;
       $("#run").click(function() {
-        zl.Ejecutar(lastjs);
+        if (!carga) {
+          $("#run").html("Abortar");
+          carga = zl.Cargar(lastjs);
+          carga.$alAcabar = function() {
+            carga = null;
+            $("#run").html("Empezar");
+          }
+          zl.Ejecutar(carga);
+        } else {
+          zl.Abortar(carga);
+          carga = null;
+          $("#run").html("Empezar");
+        }
       });
 
       $("#min").click(function() {
@@ -189,8 +196,13 @@ Fin</textarea>
       Compile(editor.getValue());
 
       function download() {
+        var zip = new JSZip();
         zip.file("codigo.zl",editor.getValue());
         zip.file("zl.comp.js", lastjs);
+        zip.file("estilo.css", zipestilo);
+        zip.file("ejecucion.js", zipejecucion);
+        zip.file("arrastrame a google chrome o firefox.index", zipindex);
+
         var content = zip.generate({type: "blob"});
         saveAs(content, "programa.zip");
       }
@@ -225,16 +237,38 @@ Fin</textarea>
         $("#input").focus();
       }
 
+      var abortRead = function() {
+        $("#input").off("keypress");
+        $("#input").val("");
+        $("#input").prop('disabled', true);
+      }
 
-      // Dejar este código al final, que no funciona en entorno local
-      var zip;
-      JSZipUtils.getBinaryContent('entorno.zip', function(err, data) {
-        if(err) {
-          throw err; // or handle err
+      var zipindex;
+      var zipestilo;
+      $.ajax("entornoEjecucion/estilo.css",{
+        dataType: "text",
+        type: "get",
+        success: function(data) {
+          zipestilo = data;
         }
-
-        zip = new JSZip(data);
       });
+
+      $.ajax("entornoEjecucion/index.html",{
+        dataType: "text",
+        type: "get",
+        success: function(data) {
+          zipindex = data;
+        }
+      });
+
+      $.ajax("ejecucion.js",{
+        dataType: "text",
+        type: "get",
+        success: function(data) {
+          zipejecucion = data;
+        }
+      });
+
     </script>
 </body>
 

@@ -20,7 +20,7 @@ CodeMirror.defineSimpleMode("zl", {
     // Rules are matched in the order in which they appear, so there is
     // no ambiguity between this one and the one above
     {
-      regex: /(?:o|y|no|mientras)\b/i,
+      regex: /(?:o|y|no|mientras|repetir)\b/i,
       token: "keyword"
     }, {
       regex: /verdadero|falso/i,

@@ -9,6 +9,7 @@ zl.sintaxis = zl.sintaxis || {};
     for (var k in json) {
       obj[k] = json[k];
     }
+    return obj;
   }
 
   var palabrasReservadas = {
@@ -54,7 +55,7 @@ zl.sintaxis = zl.sintaxis || {};
   a.simbolo("+", /^\+/);
   a.simbolo("-");
   a.simbolo("*", /^\*/);
-  a.simbolo("/",/^\//);
+  a.simbolo("/", /^\//);
   a.simbolo(")", /^\)/);
   a.simbolo("(", /^\(/);
   a.simbolo("[", /^\[/);
@@ -105,7 +106,7 @@ zl.sintaxis = zl.sintaxis || {};
       ["entero"]
     ]);
     var intento = this.resultado(0);
-    this.registrarResultado(this.resultado(0,intento,0));
+    this.registrarResultado(this.resultado(0, intento, 0));
     return this;
   });
 
@@ -142,7 +143,7 @@ zl.sintaxis = zl.sintaxis || {};
       .avanzar("es")
       .intentar([
         ["relacion", "de", "nombre", "a", "nombre"],
-        ["lista","de","nombre"],
+        ["lista", "de", "nombre"],
         ["nombre"]
       ])
       .acumular("decModificador")
@@ -151,21 +152,22 @@ zl.sintaxis = zl.sintaxis || {};
     if (intento == 2) {
       this.registrarResultado({
         nombre: this.resultado(0),
-        tipo: this.resultado(2,intento,0),
+        tipo: this.resultado(2, intento, 0),
         modificadores: this.resultado(3)
       });
     } else if (intento == 1) {
       this.registrarResultado({
         nombre: this.resultado(0),
         tipo: "lista",
-        subtipo: this.resultado(2,intento,2),
+        subtipo: this.resultado(2, intento, 2),
         modificadores: this.resultado(3)
       });
     } else if (intento == 0) {
       this.registrarResultado({
         nombre: this.resultado(0),
         tipo: "relacion",
-        subtipo: this.resultado(2,intento,2),
+        clave: this.resultado(2, intento, 2),
+        valor: this.resultado(2, intento, 4),
         modificadores: this.resultado(3)
       });
     }
@@ -211,15 +213,15 @@ zl.sintaxis = zl.sintaxis || {};
 
   a.regla("asignacion", function() {
     this.intentar([
-      ["nombre", "(","listaAcceso",")"],
-      ["nombre"]
-    ])
+        ["nombre", "(", "listaAcceso", ")"],
+        ["nombre"]
+      ])
       .avanzar("<-")
       .expresion();
     var intento = this.resultado(0);
     this.registrarResultado({
-      variable: this.resultado(0,intento,0),
-      acceso: (intento ? null : this.resultado(0,intento,2)),
+      variable: this.resultado(0, intento, 0),
+      acceso: (intento ? null : this.resultado(0, intento, 2)),
       valor: this.resultado(2)
     });
     return this;
@@ -432,15 +434,21 @@ zl.sintaxis = zl.sintaxis || {};
       ["(", "expresion", ")"]
     ]);
     var intento = this.resultado(0);
-    if (intento != 7)
-      this.registrarResultado({
-        valor: this.resultado(0, intento, 0),
-        tipo: this.arbol(0, intento, 0).tipo
-      });
-    else
+    if (intento == 7)
       this.registrarResultado({
         valor: this.resultado(0, intento, 1),
         tipo: this.arbol(0, intento, 1).tipo
+      });
+    else if (intento == 5) {
+      this.registrarResultado({
+        nombre: this.resultado(0, intento, 0),
+        acceso: this.resultado(0, intento, 2),
+        tipo: "acceso"
+      });
+    } else
+      this.registrarResultado({
+        valor: this.resultado(0, intento, 0),
+        tipo: this.arbol(0, intento, 0).tipo
       });
     return this;
   });
@@ -454,7 +462,6 @@ zl.sintaxis = zl.sintaxis || {};
       resultado.push(this.resultado(1)[i][1]);
     }
     this.registrarResultado(resultado);
-    console.log(this.arbol());
     return this;
   });
 
@@ -464,7 +471,10 @@ zl.sintaxis = zl.sintaxis || {};
       ["expresion"]
     ]);
     var intento = this.resultado(0);
-    this.registrarResultado(this.resultado(0,intento,0));
+    this.registrarResultado({
+      valor: this.resultado(0, intento, 0),
+      tipo: (intento ? "expresion" : "rango")
+    });
     return this;
   });
 

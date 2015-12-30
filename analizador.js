@@ -324,7 +324,6 @@ zl.analizador = zl.analizador || {};
     });
     for (var i = 0; i < intentos.length; i++) {
       try {
-        console.log(intentos[i]);
         this.acumulado = intentos[i];
         this.avanzarTodos();
         this.registrarResultado(i);

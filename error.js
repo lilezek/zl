@@ -182,6 +182,7 @@ zl.error = zl.error || {};
   zl.error.E_ACCESO_A_DATO_LOCAL = 20;
   zl.error.E_LECTURA_ILEGAL = 21;
   zl.error.E_ESCRITURA_ILEGAL = 22;
+  zl.error.E_INDICE_NO_LISTA_NO_RELACION = 23;
 
   zl.error.newError = function(a, b) {
     return new Error(a, b);

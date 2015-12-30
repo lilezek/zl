@@ -43,6 +43,18 @@ zl.semantica = zl.semantica || {};
           });
         }
         var tipoizq = varizq.tipo;
+        if (s.acceso && tipoizq.nombre != "lista" && tipoizq.nombre != "relacion") {
+          throw zl.error.newError(zl.error.E_INDICE_NO_LISTA_NO_RELACION, {
+            posicion: [s.begin, s.end],
+            nombre: s.variable,
+            tipo: tipoizq
+          });
+        }
+        // TODO: Comprobar el tipo de la clave
+        if (s.acceso && tipoizq.nombre === "lista")
+          tipoizq = varizq.genericidad.subtipo;
+        if (s.acceso && tipoizq.nombre === "relacion")
+          tipoizq = varizq.genericidad.valor;
         if (!tipoizq.esCompatible(tipoder)) {
           throw zl.error.newError(zl.error.E_ASIGNACION_INCOMPATIBLE, {
             esperado: tipoizq,
@@ -106,7 +118,9 @@ zl.semantica = zl.semantica || {};
       throw zl.error.newError(zl.error.E_LLAMADA_NOMBRE_NO_ENCONTRADO, {
         arbol: arbol,
         // TODO:
-        tabla: {todo: "todo"}
+        tabla: {
+          todo: "todo"
+        }
       });
     for (var k in arbol.entrada) {
       var decl = arbol.entrada[k];
@@ -212,6 +226,22 @@ zl.semantica = zl.semantica || {};
       return modulo.tipoPorNombre("booleano");
     } else if (arbol.tipo == "falso") {
       return modulo.tipoPorNombre("booleano");
+    } else if (arbol.tipo == "acceso") {
+      var tipo = testarExpresion({
+        tipo: "nombre",
+        valor: arbol.nombre
+      }, sub);
+      if (tipo.nombre != "lista" && tipo.nombre != "relacion")
+        throw zl.error.newError(zl.error.E_INDICE_NO_LISTA_NO_RELACION, {
+          posicion: [arbol.begin, arbol.end],
+          nombre: arbol.nombre,
+          tipo: tipo
+        });
+      var dato = sub.declaraciones[arbol.nombre.toLowerCase()];
+      if (tipo.nombre === "lista")
+        return dato.genericidad.subtipo;
+      if (tipo.nombre === "relacion")
+        return dato.genericidad.valor;
     } else if (arbol.tipo == "nombre") {
       var dato = sub.declaraciones[arbol.valor.toLowerCase()];
       // TODO: Añadir más información al error
@@ -226,7 +256,8 @@ zl.semantica = zl.semantica || {};
           declaracion: dato,
           posicion: [arbol.begin, arbol.end]
         });
-      return dato.tipo;
+      if (dato.tipo)
+        return dato.tipo;
     }
     // Expresiones complejas
     else if (!arbol.tipo && arbol.op && arbol.der) {
