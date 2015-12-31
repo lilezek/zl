@@ -214,7 +214,13 @@ zl.semantica = zl.semantica || {};
   }
 
   // Esta función devuelve el tipo de la expresión, si pasó el test.
+
   function testarExpresion(arbol, sub) {
+    // TODO: hack
+    return arbol.tipofinal = _testarExpresion(arbol, sub);
+  }
+
+  function _testarExpresion(arbol, sub) {
     var modulo = sub.padre;
     if (arbol.tipo == "numero") {
       return modulo.tipoPorNombre("numero");
@@ -288,7 +294,7 @@ zl.semantica = zl.semantica || {};
             posizq: [arbol.izq.begin, arbol.izq.end],
             posder: [arbol.der.begin, arbol.der.end]
           });
-        return modulo.tipoPorNombre(tipores);
+        return modulo.tipoPorNombre(tipores.resultado);
       }
     }
   }

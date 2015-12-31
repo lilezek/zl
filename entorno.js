@@ -357,34 +357,68 @@ zl.entorno = zl.entorno || {};
         nombre: "numero",
         opbinario: {
           '>': {
-            'numero': 'booleano'
+            'numero': {
+              resultado: 'booleano',
+              alias: ''
+            }
           },
           '=': {
-            'numero': 'booleano'
+            'numero': {
+              resultado: 'booleano',
+              alias: ''
+            }
           },
           '<': {
-            'numero': 'booleano'
+            'numero': {
+              resultado: 'booleano',
+              alias: ''
+            }
           },
           '<=': {
-            'numero': 'booleano'
+            'numero': {
+              resultado: 'booleano',
+              alias: ''
+            }
           },
           '>=': {
-            'numero': 'booleano'
+            'numero': {
+              resultado: 'booleano',
+              alias: ''
+            }
           },
           '+': {
-            'numero': 'numero'
+            'numero': {
+              resultado: 'numero',
+              alias: ''
+            }
           },
           '-': {
-            'numero': 'numero'
+            'numero': {
+              resultado: 'numero',
+              alias: ''
+            }
           },
           '*': {
-            'numero': 'numero'
+            'numero': {
+              resultado: 'numero',
+              alias: ''
+            },
+            'texto': {
+              resultado: 'texto',
+              alias: 'productoTexto'
+            }
           },
           '/': {
-            'numero': 'numero'
+            'numero': {
+              resultado: 'numero',
+              alias: ''
+            }
           },
           '%': {
-            'numero': 'numero'
+            'numero': {
+              resultado: 'numero',
+              alias: ''
+            }
           }
         }
       });
@@ -400,7 +434,16 @@ zl.entorno = zl.entorno || {};
             'texto': 'booleano'
           },
           '+': {
-            'texto': 'texto'
+            'texto': {
+              resultado: 'texto',
+              alias: ''
+            }
+          },
+          '*': {
+            'numero': {
+              resultado: 'texto',
+              alias: 'productoTexto'
+            }
           }
         }
       });

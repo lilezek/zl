@@ -70,44 +70,20 @@
 <textarea class="editor" id="editor">
 Subrutina Externa Inicio
 Datos
-  total es Numero global
-  caras es Numero global
-  cruces es Numero global
+  tamaño es Numero
+  matriz es Texto
 Algoritmo
-  caras <- 0
-  cruces <- 0
-  total <- 0
-Fin
-
-// Código que mezcla entrada/salida bloqueante
-// con cálculo computacional.
-Subrutina Externa Fotograma
-Datos
-  cantidad es Numero
-  tirada es Numero
-  total es Numero global
-  caras es Numero global
-  cruces es Numero global
-Algoritmo
-  mostrar [ mensaje <- "Escribe cuantas tiradas de cara o cruz quieres calcular" ]
-  leerNumero [ mensaje -> cantidad ]
-  total <- total + cantidad
-	Repetir cantidad veces
-    aleatorio [
-      minimo <- 1
-      maximo <- 2
-      resultado -> tirada
-    ]
-    Si tirada = 1 hacer
-      caras <- caras + 1
-    si no hacer
-      cruces <- cruces + 1
-    Fin
-  Fin
-  mostrar [ mensaje <- "Probabilidades:\n\tCruz:" ]
-	mostrarNumero [ mensaje <- cruces / total*100 ]
-	mostrar [ mensaje <- "\tCara:" ]
-	mostrarNumero [ mensaje <- caras / total*100 ]
+  mostrar [
+  	mensaje <- "¿De que tamaño quieres dibujar la matriz cuadrada?"
+  ]
+  leerNumero [
+  	mensaje -> tamaño
+  ]
+  matriz <- ("#" * tamaño) + "\n"
+  matriz <- matriz * tamaño
+  mostrar [
+  	mensaje <- matriz
+  ]
 Fin</textarea>
     <div class="v divisor"></div>
     <div class="compilation">

@@ -236,11 +236,19 @@ zl.javascript = zl.javascript || {};
 
   zl.javascript.expresion = function(compilado, simbolo) {
     // Operaciones con dos operadores:
+    // TODO: Comprobar si la operación no es simple, sino que tiene
+    // un alias en javascript.
     var operador = zl.javascript.operador(compilado.op, simbolo);
     if (compilado.izq && compilado.der) {
       var izq = zl.javascript.expresion(compilado.izq);
       var der = zl.javascript.expresion(compilado.der);
-
+      var tipoizq = compilado.izq.tipofinal;
+      var tipoder = compilado.der.tipofinal;
+      var alias = tipoizq.opbinario[compilado.op][tipoder.nombre].alias;
+      // TODO: poner el módulo antes del alias correctamente.
+      if (alias.length > 0) {
+        return "$in." + alias + "({izq:"+izq+",der:"+der+"})"
+      }
       return izq + " " + operador + " " + der;
     } else if (compilado.der && operador) {
       var der = (compilado.der.tipo.indexOf("expresion") > -1 ?
@@ -259,6 +267,8 @@ zl.javascript = zl.javascript || {};
       return "||";
     if (compilado == "y")
       return "&&";
+    if (compilado == "no")
+      return "!";
     return compilado;
   }
 

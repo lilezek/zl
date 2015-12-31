@@ -47,6 +47,25 @@ zl.ejecucion = zl.ejecucion || {};
     $("#output").get(0).innerHTML = "";
   }
 
+  rte.productoTexto = function(arg) {
+    var texto =
+      typeof arg.izq === "string" ? arg.izq : arg.der;
+
+    var veces =
+      typeof arg.izq === "number" ? arg.izq : arg.der;
+    return (function ttimes(t, n) {
+      // Hack: decimal a entero
+      n = ~~n;
+      if (n === 0)
+        return "";
+      var x = ttimes(t, n / 2);
+      if (n % 2 === 0)
+        return x + x;
+      else
+        return x + x + t;
+    })(texto, veces);
+  }
+
   rte.$alAcabar = function() {
 
   }
@@ -54,23 +73,13 @@ zl.ejecucion = zl.ejecucion || {};
   rte.$tipos = {
     "numero": {
       constructor: function(v) {
-        return {
-          v: v || 0,
-          tipo: "numero"
-        }
+        return v || 0;
       },
-      '>': {
-        "numero": function(izq, der) {
-          return $zl_tipos["booleano"].constructor(izq.v > der.v);
-        }
-      }
+      '>': null
     },
     "booleano": {
       constructor: function(v) {
-        return {
-          v: v || false,
-          tipo: "booleano"
-        }
+        return v || false;
       }
     }
   };
@@ -118,6 +127,6 @@ zl.ejecucion = zl.ejecucion || {};
     delete carga.$abortar;
     // Romper la ejecución de los fotogramas:
     clearInterval(carga.$interval);
-  }
 
+  }
 })();
