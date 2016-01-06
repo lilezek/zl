@@ -11,7 +11,7 @@ var codigos = {
 };
 
 for (var k in codigos) {
-  
+
 }
 
 describe('Compilando las pruebas', function() {
