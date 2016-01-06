@@ -1,0 +1,23 @@
+{
+  "name": "zl",
+  "version": "0.8.0",
+  "description": "Conjunto de herramientas para el lenguaje ZL.",
+  "main": "zl.js",
+  "scripts": {
+    "test": "mocha test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lilezek/zl"
+  },
+  "keywords": [
+    "zl",
+    "compiler",
+    "compilador"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lilezek/zl/issues"
+  }
+}

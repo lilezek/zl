@@ -1,8 +1,7 @@
-var zl = zl || {};
-zl.error = zl.error || {};
-
-(function() {
+var modulo = function(zl) {
   "use strict";
+
+  zl.error = zl.error || {};
 
   function Error(tipo, traza) {
     this.tipo = tipo;
@@ -86,7 +85,7 @@ zl.error = zl.error || {};
     } else if (error.tipo == zl.error.E_LLAMADA_NOMBRE_NO_ENCONTRADO) {
       return "Subrutina con nombre '" + error.traza["arbol"].nombre + "' no encontrada";
     } else if (error.tipo == zl.error.E_LLAMADA_DATO_INCOMPATIBLE) {
-      console.log(error);
+      zl.log(error);
       var t = error.traza;
       return zl.error.posicionCaracter(zlcodigo, t.posicion[0]).linea + ".\tEl dato '" + t.dato.nombre + "' ha sido introducido con un valor de tipo '" + t.obtenido.nombre + "'\n" +
         "\t\tpero debería ser de tipo '" + t.esperado.nombre + "'.";
@@ -149,12 +148,12 @@ zl.error = zl.error || {};
       //"10 > 15"
     }
     if (error.tipo == zl.error.E_SIMBOLO) {
-      console.log(error);
+      zl.log(error);
       return "Error genérico:\n\n" +
         error.apuntador(zlcodigo);
     }
     return Object.keys(zl.error).filter(function(key) {
-      console.log(error);
+      zl.log(error);
       return zl.error[key] === error.tipo
     })[0];
   }
@@ -191,4 +190,11 @@ zl.error = zl.error || {};
   zl.error.esError = function(err) {
     return err && err.constructor && err.constructor.name === "Error";
   }
-})();
+  return zl;
+}
+
+if (typeof module !== "undefined")
+  module.exports = modulo;
+else {
+  this.zl = modulo(this.zl || {});
+}

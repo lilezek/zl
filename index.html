@@ -3,6 +3,12 @@
 <head>
   <meta charset="utf-8">
   <link rel="stylesheet" href="index.css">
+
+  <script>
+    // Activar debug:
+    this.zl = {log : function() { console.log.apply(console, arguments); }};
+  </script>
+
   <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
   <script src="http://jsbeautifier.org/js/lib/beautify.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/async/1.5.0/async.min.js"></script>
@@ -12,6 +18,7 @@
   <script src="jsziputils.js"></script>
   <script src="https://codemirror.net/addon/mode/simple.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.8.0/codemirror.css">
+  <script src="utils.js"></script>
   <script src="analizador.js"></script>
   <script src="zlsintaxis.js"></script>
   <script src="ejecucion.js"></script>
@@ -102,6 +109,7 @@ Fin</textarea>
     </div>
 
     <script>
+
       var editor = CodeMirror.fromTextArea($("#editor").get(0), {
         lineNumbers: true,
         mode: "zl",

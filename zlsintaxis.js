@@ -1,16 +1,7 @@
-var zl = zl || {};
-zl.sintaxis = zl.sintaxis || {};
-
-(function() {
+var modulo = function(zl) {
   "use strict";
 
-  // Función auxiliar que sobreescribe un objeto con un json
-  zl.writeJson = function(obj, json) {
-    for (var k in json) {
-      obj[k] = json[k];
-    }
-    return obj;
-  }
+  zl.sintaxis = zl.sintaxis || {};
 
   var palabrasReservadas = {
     "no": true,
@@ -488,4 +479,11 @@ zl.sintaxis = zl.sintaxis || {};
     })
     return this;
   });
-})();
+  return zl;
+}
+
+if (typeof module !== "undefined")
+  module.exports = modulo;
+else {
+  this.zl = modulo(this.zl || {});
+}

@@ -1,8 +1,6 @@
-var zl = zl || {};
-zl.semantica = zl.semantica || {};
-
-(function() {
+var modulo = function(zl) {
   "use strict";
+  zl.semantica = zl.semantica || {};
 
   zl.semantica.testarModulo = function(arbol, modulo) {
     var programa = modulo.padre;
@@ -298,4 +296,11 @@ zl.semantica = zl.semantica || {};
       }
     }
   }
-})();
+  return zl;
+}
+
+if (typeof module !== "undefined")
+  module.exports = modulo;
+else {
+  this.zl = modulo(this.zl || {});
+}

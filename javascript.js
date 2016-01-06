@@ -1,9 +1,7 @@
-var zl = zl || {};
-zl.javascript = zl.javascript || {};
-
-(function() {
+var modulo = function(zl) {
   "use strict";
 
+  zl.javascript = zl.javascript || {};
   // Función auxiliar
   // Genera nombres temporales para que no se repitan
   var temporal = 0;
@@ -309,4 +307,11 @@ zl.javascript = zl.javascript || {};
     }
     return resultado + ";";
   }
-})();
+  return zl;
+}
+
+if (typeof module !== "undefined")
+  module.exports = modulo;
+else {
+  this.zl = modulo(this.zl || {});
+}

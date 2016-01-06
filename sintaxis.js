@@ -1,8 +1,12 @@
-var zl = zl || {};
-zl.sintaxis = zl.sintaxis || {};
-
-(function(){
+var modulo = function(zl) {
   "use strict";
+
+
+  zl.sintaxis = zl.sintaxis || {};
+
+  if (typeof require !== "undefined") {
+    require("./zlsintaxis")(zl);
+  }
 
   var arbolConfiguracion = function(zlcode) {
     var analisis = zl.sintaxis.zlAnalizador.empezar(zlcode);
@@ -12,10 +16,18 @@ zl.sintaxis = zl.sintaxis || {};
   var arbolCodigo = function(zlcode) {
     var analisis = zl.sintaxis.zlAnalizador.empezar(zlcode);
     analisis.modulo();
-    console.log(analisis.arbol())
+    zl.log(analisis.arbol())
     return analisis.resultado(0);
   }
 
   zl.sintaxis.arbolConfiguracion = arbolConfiguracion;
   zl.sintaxis.arbolCodigo = arbolCodigo;
-})();
+
+  return zl;
+}
+
+if (typeof module !== "undefined")
+  module.exports = modulo;
+else {
+  this.zl = modulo(this.zl || {});
+}

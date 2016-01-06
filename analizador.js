@@ -5,11 +5,9 @@
   http://javascript.crockford.com/tdop/tdop.html
 */
 
-var zl = zl || {};
-zl.analizador = zl.analizador || {};
-
-(function() {
+var modulo = function(zl, async) {
   "use strict";
+  zl.analizador = zl.analizador || {};
 
   function Analizador() {
     this.simbolos = {};
@@ -387,4 +385,11 @@ zl.analizador = zl.analizador || {};
   zl.analizador.newAnalizador = function() {
     return new Analizador();
   }
-})();
+  return zl;
+}
+
+if (typeof module !== "undefined")
+  module.exports = modulo;
+else {
+  this.zl = modulo(this.zl || {}, async);
+}

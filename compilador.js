@@ -1,7 +1,15 @@
-var zl = zl || {};
+var modulo = function(zl) {
+  "use strict";
 
-(function() {
-  //  "use strict";
+  if (typeof require !== "undefined") {
+    require("./utils")(zl);
+    require("./error")(zl);
+    require("./entorno")(zl);
+    require("./analizador")(zl, require("async"));
+    require("./sintaxis")(zl);
+    require("./semantica")(zl);
+    require("./javascript")(zl);
+  }
 
   // Genera código javascript a partir de código
   // en zl
@@ -45,4 +53,11 @@ var zl = zl || {};
       tabla: moduloPadre
     };
   }
-})();
+  return zl;
+}
+
+if (typeof module !== "undefined")
+  module.exports = modulo;
+else {
+  this.zl = modulo(this.zl || {});
+}

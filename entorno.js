@@ -1,8 +1,7 @@
-var zl = zl || {};
-zl.entorno = zl.entorno || {};
-
-(function() {
+modulo = function(zl) {
   "use strict";
+
+  zl.entorno = zl.entorno || {};
 
   function Modulo(padre) {
     this.padre = padre || null;
@@ -618,4 +617,12 @@ zl.entorno = zl.entorno || {};
 
   // Módulo interno
   var modInterno = moduloInterno(new Modulo());
-})();
+
+  return zl;
+}
+
+if (typeof module !== "undefined")
+  module.exports = modulo;
+else {
+  this.zl = modulo(this.zl || {});
+}
