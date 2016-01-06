@@ -4,7 +4,7 @@
   "description": "Conjunto de herramientas para el lenguaje ZL.",
   "main": "zl.js",
   "scripts": {
-    "test": "mocha test.js"
+    "test": "./node_modules/mocha/bin/mocha"
   },
   "repository": {
     "type": "git",
@@ -19,5 +19,10 @@
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/lilezek/zl/issues"
+  },
+  "dependencies": {
+    "async": "1.5.1",
+    "chai": "3.4.1",
+    "mocha": "2.3.4"
   }
 }
