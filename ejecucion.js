@@ -66,6 +66,12 @@ zl.ejecucion = zl.ejecucion || {};
     })(texto, veces);
   }
 
+  rte.construirLista = function(dimensiones) {
+    // TODO: Usar las dimensiones para construir el array.
+    var r = [];
+    return r;
+  }
+
   rte.$alAcabar = function() {
 
   }

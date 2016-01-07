@@ -134,7 +134,7 @@ var modulo = function(zl) {
       .avanzar("es")
       .intentar([
         ["relacion", "de", "nombre", "a", "nombre"],
-        ["lista", "de", "nombre"],
+        ["lista", "(", "listaAcceso", ")", "de", "nombre"],
         ["nombre"]
       ])
       .acumular("decModificador")
@@ -150,7 +150,8 @@ var modulo = function(zl) {
       this.registrarResultado({
         nombre: this.resultado(0),
         tipo: "lista",
-        subtipo: this.resultado(2, intento, 2),
+        dimensiones: this.resultado(2, intento, 2),
+        subtipo: this.resultado(2, intento, 5),
         modificadores: this.resultado(3)
       });
     } else if (intento == 0) {

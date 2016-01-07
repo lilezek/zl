@@ -77,20 +77,18 @@
 <textarea class="editor" id="editor">
 Subrutina Externa Inicio
 Datos
-  tamaño es Numero
-  matriz es Texto
+  sopa es Lista(4) de Texto
 Algoritmo
-  mostrar [
-  	mensaje <- "¿De que tamaño quieres dibujar la matriz cuadrada?"
-  ]
-  leerNumero [
-  	mensaje -> tamaño
-  ]
-  matriz <- ("#" * tamaño) + "\n"
-  matriz <- matriz * tamaño
-  mostrar [
-  	mensaje <- matriz
-  ]
+  sopa(1) <- "hjas"
+  sopa(2) <- "kojf"
+  sopa(3) <- "zplq"
+  sopa(4) <- "ñria"
+
+  mostrar [ mensaje <- "Encuentra la palabra" ]
+  mostrar [ mensaje <- sopa(1) ]
+  mostrar [ mensaje <- sopa(2) ]
+  mostrar [ mensaje <- sopa(3) ]
+  mostrar [ mensaje <- sopa(4) ]
 Fin</textarea>
     <div class="v divisor"></div>
     <div class="compilation">

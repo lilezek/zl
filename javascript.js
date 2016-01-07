@@ -96,7 +96,7 @@ var modulo = function(zl) {
     if (compilado.tipo == "asignacion") {
       resultado = zl.javascript.nombre(compilado.variable, simbolo);
       if (compilado.acceso)
-        resultado += zl.javascript.listaAcceso(compilado.acceso);
+        resultado += zl.javascript.listaAcceso(compilado.acceso, simbolo.declaraciones[resultado]);
       resultado += "=" +
         zl.javascript.expresion(compilado.valor);
     } else if (compilado.tipo == "llamada") {
@@ -250,11 +250,11 @@ var modulo = function(zl) {
       return izq + " " + operador + " " + der;
     } else if (compilado.der && operador) {
       var der = (compilado.der.tipo.indexOf("expresion") > -1 ?
-        zl.javascript.expresion(compilado.der) :
-        zl.javascript.evaluacion(compilado.der));
+        zl.javascript.expresion(compilado.der, simbolo) :
+        zl.javascript.evaluacion(compilado.der, simbolo));
       return operador + der;
     } else {
-      return zl.javascript.evaluacion(compilado);
+      return zl.javascript.evaluacion(compilado, simbolo);
     }
   }
 
@@ -282,7 +282,8 @@ var modulo = function(zl) {
     } else if (compilado.tipo == "falso") {
       return "false";
     } else if (compilado.tipo == "acceso") {
-      return zl.javascript.nombre(compilado.nombre) + zl.javascript.listaAcceso(compilado.acceso);
+      var r = zl.javascript.nombre(compilado.nombre);
+      return r + zl.javascript.listaAcceso(compilado.acceso, simbolo.declaraciones[r]);
     } else if (compilado.tipo == "nombre") {
       return zl.javascript.nombre(compilado.valor);
     } else if (compilado.tipo == "expresion") {
@@ -302,8 +303,8 @@ var modulo = function(zl) {
     var resultado = "var " + zl.javascript.nombre(dato.nombre);
     if (dato.modificadores & dato.M_ENTRADA)
       resultado += "=$zlr." + dato.nombre;
-    if (!(dato.modificadores & dato.M_ENTRADA) && dato.tipo == "relacion") {
-      resultado += "={}";
+    if (!(dato.modificadores & dato.M_ENTRADA) && dato.tipo.constr !== "") {
+      resultado += "=$in."+dato.tipo.constr+"()";
     }
     return resultado + ";";
   }

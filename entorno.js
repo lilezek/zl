@@ -296,6 +296,9 @@ modulo = function(zl) {
     // Métodos:
     this.metodos = {};
 
+    // Constructor:
+    this.constr = "";
+
     // Operaciones con el tipo:
     // Unarias
     this.opunario = {};
@@ -448,7 +451,8 @@ modulo = function(zl) {
       });
 
       zl.writeJson(lista, {
-        nombre: "lista"
+        nombre: "lista",
+        constr: "construirLista"
       });
 
       zl.writeJson(relacion, {

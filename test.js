@@ -8,7 +8,8 @@ var assert = chai.assert;
 var fs = require('fs');
 
 var codigos = {
-  '1': ""
+  'basico': "",
+  'lista': ""
 };
 
 for (var k in codigos) {

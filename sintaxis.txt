@@ -40,7 +40,7 @@
 <algoritmo> ::= "algoritmo" <_> (<sentencia> <_>)+
 
 <declaracion> ::= <nombre> <_> "es" <_> <nombre> (<_> <declaracionModificador>)*
-    | <nombre> <_> "(" <_> <listaDecl> <_> ")" "es" <_> "lista" <_> "de" <_> <nombre> (<_> <declaracionModificador>)*
+    | <nombre> <_> "es" <_> "lista" "(" <_> <listaDecl> <_> ")" <_> "de" <_> <nombre> (<_> <declaracionModificador>)*
     | <nombre> <_> "es" <_> "relacion" <_> "de" <_> <nombre> <_> "a" <_>  (<_> <declaracionModificador>)*
 
 <listaDecl> ::= <rango> <_> ";" <_> <listaDecl>

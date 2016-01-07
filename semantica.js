@@ -51,7 +51,7 @@ var modulo = function(zl) {
         // TODO: Comprobar el tipo de la clave
         if (s.acceso && tipoizq.nombre === "lista")
           tipoizq = varizq.genericidad.subtipo;
-        if (s.acceso && tipoizq.nombre === "relacion")
+        else if (s.acceso && tipoizq.nombre === "relacion")
           tipoizq = varizq.genericidad.valor;
         if (!tipoizq.esCompatible(tipoder)) {
           throw zl.error.newError(zl.error.E_ASIGNACION_INCOMPATIBLE, {

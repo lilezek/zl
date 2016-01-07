@@ -69,6 +69,8 @@ var modulo = function(zl) {
     if (error.tipo == zl.error.E_PALABRA_RESERVADA) {
       var hojas = error.hojas();
       var palabra = hojas[hojas.length - 2].resultado;
+      if (palabra === "$error$")
+        console.log(error);
       return "En la línea " + zl.error.posicionCaracter(zlcodigo, error.traza.end).linea +
         " se usa como nombre la palabra reservada '" + palabra + "'"
     } else if (error.tipo == zl.error.E_GLOBALES_INCOMPATIBLES) {
