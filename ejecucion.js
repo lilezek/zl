@@ -1,23 +1,44 @@
-var zl = zl || {};
-zl.ejecucion = zl.ejecucion || {};
-
-(function() {
+var modulo = function(zl) {
   "use strict";
 
-  var rte = window.$zl_rte = {};
+  // Dependencias en NodeJS
+  if (!zl.io && typeof require !== "undefined") {
+    require("./njsio")(zl);
+  }
+
+  // Async en NodeJS
+  if (!zl.async && typeof require !== "undefined") {
+    zl.async = require("async");
+  }
+
+  // Async en web
+  if (typeof async !== "undefined" && !zl.async) {
+    zl.async = async;
+  }
+
+  if (!zl.async) {
+    console.error("Se requiere async para la ejecución.");
+    return zl;
+  }
+
+  zl.ejecucion = zl.ejecucion || {};
+
+  var rte = {};
+  if (typeof window !== "undefined")
+    window.$zl_rte = rte;
 
   // mensaje es Texto de Entrada
   rte.mostrar = function(arg) {
-    outWrite(arg.mensaje + "\n");
+    zl.io.outWrite(arg.mensaje + "\n");
   }
 
   rte.mostrarnumero = function(arg) {
-    outWrite(arg.mensaje.toPrecision(7) + "\n");
+    zl.io.outWrite(arg.mensaje.toPrecision(7) + "\n");
   }
 
   rte.leernumero = function(arg, callback) {
     rte.$ultimorte.$abortar = abortRead;
-    inRead(function cbck(err, value) {
+    zl.io.inRead(function cbck(err, value) {
       var x = parseFloat(value);
       if (isNaN(x))
         inRead(cbck);
@@ -30,7 +51,7 @@ zl.ejecucion = zl.ejecucion || {};
 
   rte.leer = function(arg, callback) {
     rte.$ultimorte.$abortar = abortRead;
-    inRead(function(err, value) {
+    zl.io.inRead(function(err, value) {
       callback(null, {
         mensaje: value
       });
@@ -44,7 +65,7 @@ zl.ejecucion = zl.ejecucion || {};
   }
 
   rte.limpiar = function(arg) {
-    $("#output").get(0).innerHTML = "";
+    zl.io.limpiar();
   }
 
   rte.productoTexto = function(arg) {
@@ -75,6 +96,8 @@ zl.ejecucion = zl.ejecucion || {};
   rte.$alAcabar = function() {
 
   }
+
+  rte.async = zl.async;
 
   rte.$tipos = {
     "numero": {
@@ -133,6 +156,12 @@ zl.ejecucion = zl.ejecucion || {};
     delete carga.$abortar;
     // Romper la ejecución de los fotogramas:
     clearInterval(carga.$interval);
-
   }
-})();
+}
+
+if (typeof module !== "undefined") {
+  module.exports = modulo;
+}
+else {
+  this.zl = modulo(this.zl || {});
+}

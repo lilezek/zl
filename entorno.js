@@ -1,4 +1,4 @@
-modulo = function(zl) {
+var modulo = function(zl) {
   "use strict";
 
   zl.entorno = zl.entorno || {};

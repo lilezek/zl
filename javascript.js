@@ -53,7 +53,7 @@ var modulo = function(zl) {
 
     resultado += zl.javascript.nombre(compilado.nombre, simbolo) + "=function(arg, done){var $zlr = arg;" +
       zl.javascript.datos(compilado.datos, simbolo.declaraciones) +
-      "async.waterfall([function(c){c(null,arg);}," +
+      "$in.async.waterfall([function(c){c(null,arg);}," +
       "function(arg,done){$zlr = {};" +
       zl.javascript.sentencias(compilado.sentencias, simbolo) +
       "done(null, $zlr);}],done);"
@@ -134,7 +134,7 @@ var modulo = function(zl) {
       return "done(null,$zlr);}, function(arg,done){$zlr = arg;" +
         "function " + tempcallback + "(arg){" +
         "if (" + zl.javascript.expresion(compilado.condicion, simbolo) + "){" +
-        "async.waterfall([function(c){c(null,arg);},function(arg,done){" +
+        "$in.async.waterfall([function(c){c(null,arg);},function(arg,done){" +
         zl.javascript.sentencias(compilado.sentencias, simbolo) +
         ";done(null,$zlr);}]," + tempcallback + ");}" +
         "else {done(null, arg);}" +
@@ -150,20 +150,20 @@ var modulo = function(zl) {
     if (compilado.asincrono) {
       resultado = "done(null,$zlr);}, function(arg, done){$zlr = arg;" +
         "if(" + zl.javascript.expresion(compilado.condicion, simbolo) + "){" +
-        "async.waterfall([function(c){c(null,arg);},function(arg,done){" +
+        "$in.async.waterfall([function(c){c(null,arg);},function(arg,done){" +
         zl.javascript.sentencias(compilado.sentencias, simbolo) +
         "done(null, arg);}],done);" +
         "}";
       while (siguiente) {
         if (siguiente.condicion)
           resultado += "else if(" + zl.javascript.expresion(siguiente.condicion, simbolo) + "){" +
-          "async.waterfall([function(c){c(null,arg);},function(arg,done){" +
+          "$in.async.waterfall([function(c){c(null,arg);},function(arg,done){" +
           zl.javascript.sentencias(siguiente.sentencias, simbolo) +
           "done(null,arg);}],done);" +
           "}";
         else
           resultado += "else{" +
-          "async.waterfall([function(c){c(null,arg);},function(arg,done){" +
+          "$in.async.waterfall([function(c){c(null,arg);},function(arg,done){" +
           zl.javascript.sentencias(siguiente.sentencias,simbolo) +
           "done(null,arg);}],done);" +
           "}";
@@ -197,7 +197,7 @@ var modulo = function(zl) {
         "var " + tempvar + "=" + zl.javascript.expresion(compilado.veces, simbolo) + ";" +
         "function " + tempcallback + "(arg){" +
         "if (" + tempvar + "-- >= 1){" +
-        "async.waterfall([function(c){c(null,arg);},function(arg,done){" +
+        "$in.async.waterfall([function(c){c(null,arg);},function(arg,done){" +
         zl.javascript.sentencias(compilado.sentencias, simbolo) +
         ";done(null,$zlr);}]," + tempcallback + ");}" +
         "else {done(null, arg);}" +

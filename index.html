@@ -197,7 +197,9 @@ Fin</textarea>
         isBottom = (t.scrollTop+$this.innerHeight() >= t.scrollHeight);
       };
 
-      var outWrite = function(html) {
+      zl.io = zl.io || {};
+
+      zl.io.outWrite = function(html) {
         var t = $("#output").get(0);
         t.innerHTML += html;
         if (isBottom) {
@@ -205,7 +207,7 @@ Fin</textarea>
         }
       }
 
-      var inRead = function(callback) {
+      zl.io.inRead = function(callback) {
         $("#input").prop("disabled",false);
         $("#input").keypress(function (e) {
           if (e.which == 13) {
@@ -219,10 +221,14 @@ Fin</textarea>
         $("#input").focus();
       }
 
-      var abortRead = function() {
+      zl.io.abortRead = function() {
         $("#input").off("keypress");
         $("#input").val("");
         $("#input").prop('disabled', true);
+      }
+
+      zl.io.limpiar = function() {
+        $("#output").get(0).innerHTML = "";
       }
 
       var zipindex;

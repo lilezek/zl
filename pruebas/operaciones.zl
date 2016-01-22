@@ -1,0 +1,12 @@
+Subrutina Externa Inicio
+Datos
+  i es Numero
+  j es Numero
+  k es Numero
+Algoritmo
+  i <- 5
+  j <- 6
+  k <- 7
+  // Resultado 32
+  mostrarNumero [ mensaje <- (i*j+k)-i ]
+Fin
