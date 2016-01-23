@@ -2,14 +2,17 @@ var modulo = function(zl) {
   "use strict";
   zl.io = zl.io || {};
   zl.test = zl.test || {};
-  zl.test.lineas = [];
+  zl.test.output = [];
+  zl.test.input = [];
 
   zl.io.outWrite = function(msg) {
-    zl.test.lineas.push(msg);
+    zl.test.output.push(msg);
   }
 
   zl.io.inRead = function(callback) {
-    //TODO: Stub
+    callback(null, {
+      mensaje: zl.test.input.shift()
+    });
   }
 
   zl.io.abortRead = function() {
@@ -17,7 +20,8 @@ var modulo = function(zl) {
   }
 
   zl.io.limpiar = function() {
-    zl.test.lineas = [];
+    zl.test.output = [];
+    zl.test.input = [];
   }
 
   return zl;

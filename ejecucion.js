@@ -1,4 +1,4 @@
-var modulo = function(zl) {
+var modulo = function(zl, async) {
   "use strict";
 
   // Dependencias en NodeJS
@@ -7,16 +7,11 @@ var modulo = function(zl) {
   }
 
   // Async en NodeJS
-  if (!zl.async && typeof require !== "undefined") {
-    zl.async = require("async");
+  if (!async && typeof require !== "undefined") {
+    async = require("async");
   }
 
-  // Async en web
-  if (typeof async !== "undefined" && !zl.async) {
-    zl.async = async;
-  }
-
-  if (!zl.async) {
+  if (!async) {
     console.error("Se requiere async para la ejecución.");
     return zl;
   }
@@ -97,7 +92,7 @@ var modulo = function(zl) {
 
   }
 
-  rte.async = zl.async;
+  rte.async = async;
 
   rte.$tipos = {
     "numero": {
@@ -163,5 +158,5 @@ if (typeof module !== "undefined") {
   module.exports = modulo;
 }
 else {
-  this.zl = modulo(this.zl || {});
+  this.zl = modulo(this.zl || {}, async);
 }

@@ -14,7 +14,9 @@ var codigos = {
   'basico': "",
   'lista': "",
   'operaciones': "",
-  'asincrono': ""
+  'asincrono': "",
+  'entradasalidanumero': "",
+  'ordenoperaciones': ""
 };
 
 for (var k in codigos) {
@@ -50,8 +52,8 @@ describe('Ejecución de pruebas', function() {
       var zlcodigo = zl.Compilar(codigo).javascript;
       var carga = zl.Cargar(zlcodigo);
       zl.Ejecutar(carga);
-      for (var i = 0; i < zl.test.lineas.length; i++) {
-        expect(zl.test.lineas[i]).to.be.a("string");
+      for (var i = 0; i < zl.test.output.length; i++) {
+        expect(zl.test.output[i]).to.be.a("string");
       }
     }
   });
@@ -63,6 +65,30 @@ describe('Emisión de valores correctos', function() {
     var zlcodigo = zl.Compilar(codigo).javascript;
     var carga = zl.Cargar(zlcodigo);
     zl.Ejecutar(carga);
-    expect(zl.test.lineas[0]).to.equal("32.00000\n");
+    expect(zl.test.output[0]).to.equal("32.00000\n");
   });
 });
+
+describe('Pruebas de entrada/salida', function() {
+  it('Entrada/salida de números', function() {
+    var codigo = codigos["entradasalidanumero"];
+    var zlcodigo = zl.Compilar(codigo).javascript;
+    var carga = zl.Cargar(zlcodigo);
+    var aleatorio = ~~(Math.random()*10000);
+    zl.test.input.push(aleatorio);
+    zl.Ejecutar(carga);
+    expect(zl.test.output[0]).to.equal(aleatorio.toPrecision(7)+"\n");
+  });
+});
+
+describe('Orden de los operadores', function() {
+  it('Orden básico de los operadores aritméticos', function() {
+    var codigo = codigos["ordenoperaciones"];
+    var zlcodigo = zl.Compilar(codigo).javascript;
+    var carga = zl.Cargar(zlcodigo);
+    var aleatorio = ~~(Math.random()*10000);
+    zl.test.input.push(aleatorio);
+    zl.Ejecutar(carga);
+    expect(zl.test.output[0]).to.equal((3.1 - aleatorio + 4 * 2).toPrecision(7)+"\n");
+  });
+})

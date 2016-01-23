@@ -1,0 +1,7 @@
+Subrutina Externa Inicio
+Datos
+  x es Numero
+Algoritmo
+  leerNumero [ mensaje -> x ]
+  mostrarNumero [ mensaje <- x ]
+fin
