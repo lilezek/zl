@@ -13,7 +13,8 @@ var fs = require('fs');
 var codigos = {
   'basico': "",
   'lista': "",
-  'operaciones': ""
+  'operaciones': "",
+  'asincrono': ""
 };
 
 for (var k in codigos) {

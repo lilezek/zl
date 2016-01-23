@@ -51,13 +51,18 @@ var modulo = function(zl) {
     else
       resultado += "this.";
 
-    resultado += zl.javascript.nombre(compilado.nombre, simbolo) + "=function(arg, done){var $zlr = arg;" +
-      zl.javascript.datos(compilado.datos, simbolo.declaraciones) +
-      "$in.async.waterfall([function(c){c(null,arg);}," +
-      "function(arg,done){$zlr = {};" +
-      zl.javascript.sentencias(compilado.sentencias, simbolo) +
-      "done(null, $zlr);}],done);"
-
+    if (simbolo.modificadores.asincrono) {
+      resultado += zl.javascript.nombre(compilado.nombre, simbolo) + "=function(arg, done){var $zlr=arg;" +
+        zl.javascript.datos(compilado.datos, simbolo.declaraciones) +
+        "$in.async.waterfall([function(c){c(null,arg);}," +
+        "function(arg,done){$zlr = {};" +
+        zl.javascript.sentencias(compilado.sentencias, simbolo) +
+        "done(null, $zlr);}],done);";
+    } else {
+      resultado += zl.javascript.nombre(compilado.nombre, simbolo) + "=function(arg, done){var $zlr=arg;" +
+        zl.javascript.datos(compilado.datos, simbolo.declaraciones) +
+        zl.javascript.sentencias(compilado.sentencias, simbolo);
+    }
     var coma = "";
     for (var k in simbolo.datos) {
       var dato = simbolo.datos[k];
@@ -116,7 +121,7 @@ var modulo = function(zl) {
     var sub = simbolo.padre.subrutinaPorNombre(nombre);
     // TODO: Generar correctamente los nombres importados
     if ("externa" in sub.modificadores)
-      nombre = "$in."+nombre;
+      nombre = "$in." + nombre;
     if (compilado.asincrono)
       return ";done(null," + zl.javascript.llamadaEntrada(compilado.entrada, simbolo) + ");}," +
         nombre +
@@ -164,7 +169,7 @@ var modulo = function(zl) {
         else
           resultado += "else{" +
           "$in.async.waterfall([function(c){c(null,arg);},function(arg,done){" +
-          zl.javascript.sentencias(siguiente.sentencias,simbolo) +
+          zl.javascript.sentencias(siguiente.sentencias, simbolo) +
           "done(null,arg);}],done);" +
           "}";
         siguiente = siguiente.siguiente;
@@ -245,7 +250,7 @@ var modulo = function(zl) {
       var alias = tipoizq.opbinario[compilado.op][tipoder.nombre].alias;
       // TODO: poner el módulo antes del alias correctamente.
       if (alias.length > 0) {
-        return "$in." + alias + "({izq:"+izq+",der:"+der+"})"
+        return "$in." + alias + "({izq:" + izq + ",der:" + der + "})"
       }
       return izq + " " + operador + " " + der;
     } else if (compilado.der && operador) {
@@ -304,7 +309,7 @@ var modulo = function(zl) {
     if (dato.modificadores & dato.M_ENTRADA)
       resultado += "=$zlr." + dato.nombre;
     if (!(dato.modificadores & dato.M_ENTRADA) && dato.tipo.constr !== "") {
-      resultado += "=$in."+dato.tipo.constr+"()";
+      resultado += "=$in." + dato.tipo.constr + "()";
     }
     return resultado + ";";
   }

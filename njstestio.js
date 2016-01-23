@@ -5,7 +5,6 @@ var modulo = function(zl) {
   zl.test.lineas = [];
 
   zl.io.outWrite = function(msg) {
-    console.log(msg);
     zl.test.lineas.push(msg);
   }
 
@@ -18,7 +17,6 @@ var modulo = function(zl) {
   }
 
   zl.io.limpiar = function() {
-    console.log("limpiando");
     zl.test.lineas = [];
   }
 
