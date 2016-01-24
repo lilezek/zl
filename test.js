@@ -70,25 +70,33 @@ describe('Emisión de valores correctos', function() {
 });
 
 describe('Pruebas de entrada/salida', function() {
-  it('Entrada/salida de números', function() {
+  var aleatorio = ~~(Math.random()*10000);
+  beforeEach(function(done) {
     var codigo = codigos["entradasalidanumero"];
     var zlcodigo = zl.Compilar(codigo).javascript;
     var carga = zl.Cargar(zlcodigo);
-    var aleatorio = ~~(Math.random()*10000);
-    zl.test.input.push(aleatorio);
+    carga.$alAcabar = done;
+    zl.test.input.push(""+aleatorio);
     zl.Ejecutar(carga);
+  });
+
+  it('Entrada/salida de número '+aleatorio, function() {
     expect(zl.test.output[0]).to.equal(aleatorio.toPrecision(7)+"\n");
   });
 });
 
 describe('Orden de los operadores', function() {
-  it('Orden básico de los operadores aritméticos', function() {
+  var aleatorio = ~~(Math.random()*10000);
+  beforeEach(function(done) {
     var codigo = codigos["ordenoperaciones"];
     var zlcodigo = zl.Compilar(codigo).javascript;
     var carga = zl.Cargar(zlcodigo);
-    var aleatorio = ~~(Math.random()*10000);
-    zl.test.input.push(aleatorio);
+    carga.$alAcabar = done;
+    zl.test.input.push(""+aleatorio);
     zl.Ejecutar(carga);
-    expect(zl.test.output[0]).to.equal((3.1 - aleatorio + 4 * 2).toPrecision(7)+"\n");
+  });
+
+  it('Orden básico de los operadores aritméticos con número '+aleatorio, function() {
+      expect(zl.test.output[0]).to.equal((3.1 - aleatorio + 4 * 2).toPrecision(7)+"\n");
   });
 })

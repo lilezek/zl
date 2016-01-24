@@ -13,6 +13,5 @@ var modulo = function(zl) {
 if (typeof module !== "undefined")
   module.exports = modulo;
 else {
-  this.zl = this.zl || {};
-  modulo(this.zl);
+  this.zl = modulo(this.zl || {});
 }

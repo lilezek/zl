@@ -10,9 +10,10 @@ var modulo = function(zl) {
   }
 
   zl.io.inRead = function(callback) {
-    callback(null, {
-      mensaje: zl.test.input.shift()
-    });
+    if (zl.test.input.length)
+      callback(null, zl.test.input.shift());
+    else
+      callback(null, "");
   }
 
   zl.io.abortRead = function() {
@@ -21,7 +22,7 @@ var modulo = function(zl) {
 
   zl.io.limpiar = function() {
     zl.test.output = [];
-    zl.test.input = [];
+    //zl.test.input = [];
   }
 
   return zl;

@@ -48,9 +48,13 @@ var modulo = function(zl) {
     // TODO: sin hacer
 
     // Fase 7, generación del código de salida
+    var inicio = mod.subrutinaPorNombre("inicio");
+    var fotograma = mod.subrutinaPorNombre("fotograma");
     return {
       javascript: zl.javascript.modulo(compilado, mod),
-      tabla: moduloPadre
+      tabla: mod,
+      inicioAsincrono: (inicio || false) && (inicio.modificadores.asincrono || false),
+      fotogramaAsincrono: (fotograma || false) && (fotograma.modificadores.asincrono || false)
     };
   }
   return zl;

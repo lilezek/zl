@@ -32,11 +32,11 @@ var modulo = function(zl, async) {
   }
 
   rte.leernumero = function(arg, callback) {
-    rte.$ultimorte.$abortar = abortRead;
+    rte.$ultimorte.$abortar = zl.io.abortRead;
     zl.io.inRead(function cbck(err, value) {
       var x = parseFloat(value);
       if (isNaN(x))
-        inRead(cbck);
+        zl.io.inRead(cbck);
       else
         callback(null, {
           mensaje: x
@@ -45,7 +45,7 @@ var modulo = function(zl, async) {
   }
 
   rte.leer = function(arg, callback) {
-    rte.$ultimorte.$abortar = abortRead;
+    rte.$ultimorte.$abortar = zl.io.abortRead;
     zl.io.inRead(function(err, value) {
       callback(null, {
         mensaje: value
@@ -135,7 +135,7 @@ var modulo = function(zl, async) {
         "$t.fotograma({},function(){$t.$interval = setInterval(cbck," + 1 / zl.configuracion.fps * 1000 + ")})" +
         "}," + 1 / zl.configuracion.fps * 1000 + ");";
     } else {
-      ejecucion += "$t.$alAcabar();";
+      ejecucion += "$t.$alAcabar(null);";
     }
     if (typeof carga.inicio === "function") {
       ejecucion += "});";
@@ -152,6 +152,7 @@ var modulo = function(zl, async) {
     // Romper la ejecución de los fotogramas:
     clearInterval(carga.$interval);
   }
+  return zl;
 }
 
 if (typeof module !== "undefined") {

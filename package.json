@@ -23,6 +23,8 @@
   "dependencies": {
     "async": "1.5.1",
     "chai": "3.4.1",
-    "mocha": "2.3.4"
+    "js-beautify": "1.5.10",
+    "mocha": "2.3.4",
+    "uglify-js": "2.6.1"
   }
 }
