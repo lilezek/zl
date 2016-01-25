@@ -163,9 +163,15 @@ var modulo = function(zl, async) {
   }
 
   Analisis.prototype.avanzarUno = function() {
+    if (this.acumulado.length == 0) {
+      throw "No se puede avanzar uno porque hay 0 acumulados";
+    }
     var id = this.acumulado.shift();
     var regex = this.analizador.simbolos[id] || this.analizador.tokens[id];
     if (!regex) {
+      if (typeof this[id] === "undefined") {
+        throw "Id: '" + id + "' sin definir";
+      }
       return this[id].apply(this, []);
     }
     regex = regex.regex;

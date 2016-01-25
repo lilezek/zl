@@ -70,7 +70,7 @@ var modulo = function(zl) {
   a.simbolo("lista");
   a.simbolo("a");
   a.simbolo("..");
-  a.simbolo(";");
+  a.simbolo(",");
 
   // Los distintos tokens:
 
@@ -447,7 +447,7 @@ var modulo = function(zl) {
 
   a.regla("listaAcceso", function() {
     this.acceso()
-      .acumular(";")
+      .acumular(",")
       .acumular("acceso").avanzarVarios();
     var resultado = [this.resultado(0)];
     for (var i = 0; i < this.resultado(1).length; i++) {

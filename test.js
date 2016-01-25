@@ -11,12 +11,13 @@ var assert = chai.assert;
 var fs = require('fs');
 
 var codigos = {
-  'basico': "",
-  'lista': "",
-  'operaciones': "",
-  'asincrono': "",
-  'entradasalidanumero': "",
-  'ordenoperaciones': ""
+  'basico': '',
+  'lista': '',
+  'operaciones': '',
+  'asincrono': '',
+  'entradasalidanumero': '',
+  'ordenoperaciones': '',
+  'listabidimensional': ''
 };
 
 for (var k in codigos) {
@@ -65,7 +66,7 @@ describe('Emisión de valores correctos', function() {
     var zlcodigo = zl.Compilar(codigo).javascript;
     var carga = zl.Cargar(zlcodigo);
     zl.Ejecutar(carga);
-    expect(zl.test.output[0]).to.equal("32.00000\n");
+    expect(zl.test.output[0]).to.equal((32).toPrecision(7)+"\n");
   });
 });
 

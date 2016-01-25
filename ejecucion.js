@@ -83,8 +83,14 @@ var modulo = function(zl, async) {
   }
 
   rte.construirLista = function(dimensiones) {
-    // TODO: Usar las dimensiones para construir el array.
+    // TODO: Construir la lista usando el constructor del tipo, no ceros para rellenar.
     var r = [];
+    for (var i = 0; i < dimensiones.length; i++) {
+      // TODO: comprimir las listas
+      for (var j = 0; j < dimensiones[i][1]+1; j++) {
+        r.push(0)
+      }
+    }
     return r;
   }
 

@@ -1,0 +1,9 @@
+Subrutina Externa Inicio
+Datos
+  cuadrado es Lista(1..2,1..2) de Letra
+Algoritmo
+  cuadrado(1,1) <- '#'
+  cuadrado(1,2) <- '#'
+  cuadrado(2,1) <- '#'
+  cuadrado(2,2) <- '#'
+Fin

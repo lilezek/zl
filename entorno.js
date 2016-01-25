@@ -279,8 +279,16 @@ var modulo = function(zl) {
     }
     // Genericidad:
     // TODO: Comprobar que los subtipos existen y emitir el error indicado si no.
-    if (this.tipo.nombre === "lista")
+    if (this.tipo.nombre === "lista") {
       this.genericidad.subtipo = this.padre.padre.tipoPorNombre(arbol.subtipo);
+      this.genericidad.dimensiones = [];
+      for (var i = 0; i < arbol.dimensiones.length; i++) {
+        if (arbol.dimensiones[i].tipo === 'expresion') {
+          this.genericidad.dimensiones.push([1,parseInt(arbol.dimensiones[i].valor.valor)]);
+        } else
+          this.genericidad.dimensiones.push([parseInt(arbol.dimensiones[i].valor.minimo),parseInt(arbol.dimensiones[i].valor.maximo)]);
+      }
+    }
     if (this.tipo.nombre === "relacion") {
       this.genericidad.clave = this.padre.padre.tipoPorNombre(arbol.clave);
       this.genericidad.valor = this.padre.padre.tipoPorNombre(arbol.valor);
@@ -353,6 +361,7 @@ var modulo = function(zl) {
     var numero = zl.entorno.newTipo(mod);
     var booleano = zl.entorno.newTipo(mod);
     var texto = zl.entorno.newTipo(mod);
+    var letra = zl.entorno.newTipo(mod);
     var relacion = zl.entorno.newTipo(mod);
     var lista = zl.entorno.newTipo(mod); {
       zl.writeJson(numero, {
@@ -450,6 +459,15 @@ var modulo = function(zl) {
         }
       });
 
+      zl.writeJson(letra, {
+        nombre: "letra",
+        opbinario: {
+          '=': {
+            'letra': 'booleano'
+          },
+        }
+      });
+
       zl.writeJson(lista, {
         nombre: "lista",
         constr: "construirLista"
@@ -466,6 +484,7 @@ var modulo = function(zl) {
       mod.registrar(numero);
       mod.registrar(booleano);
       mod.registrar(texto);
+      mod.registrar(letra);
       mod.registrar(relacion);
       mod.registrar(lista);
     }

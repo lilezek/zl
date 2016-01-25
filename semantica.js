@@ -224,6 +224,8 @@ var modulo = function(zl) {
       return modulo.tipoPorNombre("numero");
     } else if (arbol.tipo == "texto") {
       return modulo.tipoPorNombre("texto");
+    } else if (arbol.tipo == "letra") {
+      return modulo.tipoPorNombre("letra");
     } else if (arbol.tipo == "expresion") {
       return testarExpresion(arbol.valor, sub);
     } else if (arbol.tipo == "verdadero") {

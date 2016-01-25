@@ -49,7 +49,7 @@ var modulo = function(zl) {
     if (!simbolo.modificadores.externa)
       resultado += "var ";
     else
-      resultado += "this.";
+      resultado += "$in.";
 
     if (simbolo.modificadores.asincrono) {
       resultado += zl.javascript.nombre(compilado.nombre, simbolo) + "=function(arg, done){var $zlr=arg;" +
@@ -129,7 +129,7 @@ var modulo = function(zl) {
         zl.javascript.llamadaSalida(compilado.salida, simbolo);
     else
       return "$zlr = " + nombre + "(" +
-        zl.javascript.llamadaEntrada(compilado.entrada, simbolo) + ");" +
+        zl.javascript.llamadaEntrada(compilado.entrada, simbolo) + ")" +
         zl.javascript.llamadaSalida(compilado.salida, simbolo);
   }
 
@@ -299,7 +299,10 @@ var modulo = function(zl) {
   zl.javascript.listaAcceso = function(compilado, simbolo) {
     var resultado = "";
     for (var i = 0; i < compilado.length; i++) {
-      resultado += "[" + zl.javascript.expresion(compilado[i]) + "]";
+      var expresion = zl.javascript.expresion(compilado[i]);
+      // Quitar los paréntesis de la expresión:
+      expresion = expresion.substring(1, expresion.length-1);
+      resultado += "[" + expresion + "]";
     }
     return resultado;
   }
@@ -309,7 +312,12 @@ var modulo = function(zl) {
     if (dato.modificadores & dato.M_ENTRADA)
       resultado += "=$zlr." + dato.nombre;
     if (!(dato.modificadores & dato.M_ENTRADA) && dato.tipo.constr !== "") {
-      resultado += "=$in." + dato.tipo.constr + "()";
+      resultado += "=$in." + dato.tipo.constr + "(";
+      // Pasar las dimensiones al constructor si es una lista:
+      if (dato.tipo.nombre === "lista") {
+        resultado += JSON.stringify(dato.genericidad.dimensiones);
+      }
+      resultado += ")";
     }
     return resultado + ";";
   }
