@@ -43,7 +43,7 @@
     | <nombre> <_> "es" <_> "lista" "(" <_> <listaDecl> <_> ")" <_> "de" <_> <nombre> (<_> <declaracionModificador>)*
     | <nombre> <_> "es" <_> "relacion" <_> "de" <_> <nombre> <_> "a" <_>  (<_> <declaracionModificador>)*
 
-<listaDecl> ::= <rango> <_> ";" <_> <listaDecl>
+<listaDecl> ::= <rango> <_> "," <_> <listaDecl>
     | <rango>
 
 <rango> ::= <numero> <_> ".." <_> <numero>
@@ -104,8 +104,8 @@
     | <nombre>
     | "(" <_> <expresion> <_> ")"
 
-<listaAcceso> ::= <rango> <_> ";" <_> <listaAcceso>
-    | <expresion> <_> ";" <_> <listaAcceso>
+<listaAcceso> ::= <rango> <_> "," <_> <listaAcceso>
+    | <expresion> <_> "," <_> <listaAcceso>
     | <rango>
     | <expresion>
 
