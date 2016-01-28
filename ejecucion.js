@@ -84,13 +84,53 @@ var modulo = function(zl, async) {
 
   rte.construirLista = function(dimensiones) {
     // TODO: Construir la lista usando el constructor del tipo, no ceros para rellenar.
-    var r = [];
-    for (var i = 0; i < dimensiones.length; i++) {
-      // TODO: comprimir las listas
-      for (var j = 0; j < dimensiones[i][1]+1; j++) {
-        r.push(0)
+    var r = {
+      v: [],
+      offsets: [],
+      get: function construirLista$get() {
+        var resultado = this.v;
+        for (var i = 0; i < arguments.length; i++) {
+          resultado = resultado[arguments[i]-this.offsets[i]];
+          if (typeof resultado === "undefined" || resultado === null)
+            throw zl.error.newError(zl.error.E_EJECUCION_INDICE_DESCONTROLADO, {
+              array: this.v,
+              indices: Array.prototype.slice(arguments)
+            })
+        }
+        return resultado;
+      },
+      set: function construirLista$set(valor) {
+        var resultado = this.v;
+        var i;
+        for (i = 1; i < arguments.length-1; i++) {
+          resultado = resultado[arguments[i]-this.offsets[i-1]];
+          if (typeof resultado === "undefined" || resultado === null)
+            throw zl.error.newError(zl.error.E_EJECUCION_INDICE_DESCONTROLADO, {
+              array: this.v,
+              indices: Array.prototype.slice(arguments)
+            })
+        }
+        if (typeof resultado[arguments[i]-this.offsets[i-1]] === "undefined" || resultado[arguments[i]-this.offsets[i-1]] === null)
+          throw zl.error.newError(zl.error.E_EJECUCION_INDICE_DESCONTROLADO, {
+            array: this.v,
+            indices: Array.prototype.slice(arguments)
+          });
+        resultado[arguments[i]-this.offsets[i-1]] = valor;
       }
-    }
+    };
+
+    r.v = (function _generarArray(dim, i) {
+      if (i == dim.length) {
+        return 0;
+      } else {
+        var resultado = [];
+        r.offsets[i] = dim[i][0];
+        for (var j = dim[i][0]; j <= dim[i][1]; j++) {
+            resultado.push(_generarArray(dim,i+1));
+        }
+        return resultado;
+      }
+    })(dimensiones,0);
     return r;
   }
 
@@ -163,7 +203,6 @@ var modulo = function(zl, async) {
 
 if (typeof module !== "undefined") {
   module.exports = modulo;
-}
-else {
+} else {
   this.zl = modulo(this.zl || {}, async);
 }

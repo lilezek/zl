@@ -101,9 +101,9 @@ var modulo = function(zl) {
     if (compilado.tipo == "asignacion") {
       resultado = zl.javascript.nombre(compilado.variable, simbolo);
       if (compilado.acceso)
-        resultado += zl.javascript.listaAcceso(compilado.acceso, simbolo.declaraciones[resultado]);
-      resultado += "=" +
-        zl.javascript.expresion(compilado.valor);
+        resultado += ".set("+zl.javascript.expresion(compilado.valor)+zl.javascript.listaAccesoAsignacion(compilado.acceso, simbolo.declaraciones[resultado])+")";
+      else
+        resultado += "=" + zl.javascript.expresion(compilado.valor);
     } else if (compilado.tipo == "llamada") {
       resultado = zl.javascript.llamada(compilado, simbolo);
     } else if (compilado.tipo == "mientras") {
@@ -297,12 +297,24 @@ var modulo = function(zl) {
   }
 
   zl.javascript.listaAcceso = function(compilado, simbolo) {
+    var resultado = ".get(";
+    for (var i = 0; i < compilado.length; i++) {
+      var expresion = zl.javascript.expresion(compilado[i]);
+      // Quitar los paréntesis de la expresión:
+      expresion = expresion.substring(1, expresion.length - 1);
+      resultado += expresion;
+    }
+    resultado += ")";
+    return resultado;
+  }
+
+  zl.javascript.listaAccesoAsignacion = function(compilado, simbolo) {
     var resultado = "";
     for (var i = 0; i < compilado.length; i++) {
       var expresion = zl.javascript.expresion(compilado[i]);
       // Quitar los paréntesis de la expresión:
-      expresion = expresion.substring(1, expresion.length-1);
-      resultado += "[" + expresion + "]";
+      expresion = expresion.substring(1, expresion.length - 1);
+      resultado += "," + expresion;
     }
     return resultado;
   }

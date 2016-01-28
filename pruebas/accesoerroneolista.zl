@@ -1,0 +1,16 @@
+Subrutina Externa Inicio
+Datos
+  sopa es Lista(4) de Texto
+Algoritmo
+  sopa(1) <- "hjas"
+  sopa(2) <- "kojf"
+  sopa(3) <- "zplq"
+  sopa(4) <- "ñria"
+
+  mostrar [ mensaje <- "Encuentra la palabra" ]
+  mostrar [ mensaje <- sopa(1) ]
+  mostrar [ mensaje <- sopa(2) ]
+  mostrar [ mensaje <- sopa(3) ]
+  // 10 es un índice fuera de lugar
+  mostrar [ mensaje <- sopa(10) ]
+Fin

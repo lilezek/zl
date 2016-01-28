@@ -17,7 +17,7 @@ var codigos = {
   'asincrono': '',
   'entradasalidanumero': '',
   'ordenoperaciones': '',
-  'listabidimensional': ''
+  'listabidimensional': '',
 };
 
 for (var k in codigos) {
@@ -66,38 +66,52 @@ describe('Emisión de valores correctos', function() {
     var zlcodigo = zl.Compilar(codigo).javascript;
     var carga = zl.Cargar(zlcodigo);
     zl.Ejecutar(carga);
-    expect(zl.test.output[0]).to.equal((32).toPrecision(7)+"\n");
+    expect(zl.test.output[0]).to.equal((32).toPrecision(7) + "\n");
   });
 });
 
 describe('Pruebas de entrada/salida', function() {
-  var aleatorio = ~~(Math.random()*10000);
+  var aleatorio = ~~(Math.random() * 10000);
   beforeEach(function(done) {
     var codigo = codigos["entradasalidanumero"];
     var zlcodigo = zl.Compilar(codigo).javascript;
     var carga = zl.Cargar(zlcodigo);
     carga.$alAcabar = done;
-    zl.test.input.push(""+aleatorio);
+    zl.test.input.push("" + aleatorio);
     zl.Ejecutar(carga);
   });
 
-  it('Entrada/salida de número '+aleatorio, function() {
-    expect(zl.test.output[0]).to.equal(aleatorio.toPrecision(7)+"\n");
+  it('Entrada/salida de número ' + aleatorio, function() {
+    expect(zl.test.output[0]).to.equal(aleatorio.toPrecision(7) + "\n");
   });
 });
 
 describe('Orden de los operadores', function() {
-  var aleatorio = ~~(Math.random()*10000);
+  var aleatorio = ~~(Math.random() * 10000);
   beforeEach(function(done) {
     var codigo = codigos["ordenoperaciones"];
     var zlcodigo = zl.Compilar(codigo).javascript;
     var carga = zl.Cargar(zlcodigo);
     carga.$alAcabar = done;
-    zl.test.input.push(""+aleatorio);
+    zl.test.input.push("" + aleatorio);
     zl.Ejecutar(carga);
   });
 
-  it('Orden básico de los operadores aritméticos con número '+aleatorio, function() {
-      expect(zl.test.output[0]).to.equal((3.1 - aleatorio + 4 * 2).toPrecision(7)+"\n");
+  it('Orden básico de los operadores aritméticos con número ' + aleatorio, function() {
+    expect(zl.test.output[0]).to.equal((3.1 - aleatorio + 4 * 2).toPrecision(7) + "\n");
   });
 })
+
+describe('Pruebas erróneas con listas', function() {
+  var c1 = fs.readFileSync("pruebas/accesoerroneolista.zl").toString();
+
+  it('Acceso a una posición que está fuera del array', function() {
+    try {
+      var zlcodigo = zl.Compilar(c1);
+      var carga = zl.Cargar(zlcodigo);
+      zl.Ejecutar(carga);
+    } catch (e) {
+      expect(e.tipo).to.equal(zl.error.E_EJECUCION_INDICE_DESCONTROLADO);
+    }
+  });
+});
