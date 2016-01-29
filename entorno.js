@@ -74,6 +74,15 @@ var modulo = function(zl) {
     return null;
   }
 
+  Modulo.prototype.subrutinaPorPosicion = function(pos) {
+    for (var k in this.subrutinas) {
+      if (this.subrutinas[k].posicionSubrutina[0] <= pos
+        && this.subrutinas[k].posicionSubrutina[1] >= pos)
+        return this.subrutinas[k];
+    }
+    return null;
+  }
+
   Modulo.prototype.tipoPorNombre = function(nombre) {
     nombre = nombre.toLowerCase();
     for (var k in this.tipos) {

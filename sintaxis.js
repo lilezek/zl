@@ -20,8 +20,15 @@ var modulo = function(zl) {
     return analisis.resultado(0);
   }
 
+  var arbolExpresion = function(zlcode) {
+    var analisis = zl.sintaxis.zlAnalizador.empezar(zlcode);
+    analisis.expresion();
+    return analisis.resultado(0);
+  }
+
   zl.sintaxis.arbolConfiguracion = arbolConfiguracion;
   zl.sintaxis.arbolCodigo = arbolCodigo;
+  zl.sintaxis.arbolExpresion = arbolExpresion;
 
   return zl;
 }

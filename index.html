@@ -77,18 +77,22 @@
 <textarea class="editor" id="editor">
 Subrutina Externa Inicio
 Datos
-  sopa es Lista(4) de Texto
+  piramide es Texto
+  tam es Numero
+  i es Numero
 Algoritmo
-  sopa(1) <- "hjas"
-  sopa(2) <- "kojf"
-  sopa(3) <- "zplq"
-  sopa(4) <- "ñria"
-
-  mostrar [ mensaje <- "Encuentra la palabra" ]
-  mostrar [ mensaje <- sopa(1) ]
-  mostrar [ mensaje <- sopa(2) ]
-  mostrar [ mensaje <- sopa(3) ]
-  mostrar [ mensaje <- sopa(4) ]
+  mostrar [ mensaje <- "Escribe el tamaño de la pirámide" ]
+  leerNumero [ mensaje -> tam ]
+  piramide <- ""
+  i <- 1
+	Mientras i <= tam hacer
+    // Pulsa Ctrl+F9 y selecciona 'piramide'
+    piramide <- piramide + (" "*((tam-i)/2)) + ("#"*i) + (" "*((tam-i)/2))
+    piramide <- piramide + "\n"
+    i <- i + 2
+    pausar
+  Fin
+  mostrar [mensaje <- piramide]
 Fin</textarea>
     <div class="v divisor"></div>
     <div class="compilation">
@@ -100,8 +104,8 @@ Fin</textarea>
         <button class="run" id="run">
           Empezar
         </button>
-        <button class="min" id="min">
-          Activar compresión
+        <button class="continue" id="continue" disabled="disabled">
+          Continuar
         </button>
       </div>
     </div>
@@ -121,9 +125,14 @@ Fin</textarea>
         }
         lasttimeout = setTimeout(Compile, 500, editor.getValue());
       });
+      editor.on("cursorActivity", function(){setTimeout(evaluar,20); return true;});
+
+      var evaluando = false;
       editor.addKeyMap({
         "Ctrl-S": download,
-        "Cmd-S": download
+        "Cmd-S": download,
+        "Ctrl-F9": function(){evaluando = !evaluando;},
+        "Cmd-F9": function(){evaluando = !evaluando;}
       });
 
       var lastjs = "";
@@ -132,6 +141,8 @@ Fin</textarea>
 
       var carga = null;
       $("#run").click(function() {
+        var compilation = $("#content").get(0);
+        var zlcode = editor.getValue();
         if (!carga) {
           $("#run").html("Abortar");
           carga = zl.Cargar(lastjs);
@@ -139,33 +150,41 @@ Fin</textarea>
             carga = null;
             $("#run").html("Empezar");
           }
-          zl.Ejecutar(carga);
+          try {
+            zl.Ejecutar(carga);
+          } catch (e) {
+            if (zl.error.esError(e))
+              compilation.innerHTML = zl.error.obtenerMensaje(e, zlcode);
+            else
+              throw e;
+          }
         } else {
           zl.Abortar(carga);
           carga = null;
+
           $("#run").html("Empezar");
+          compilation.innerHTML = "";
         }
       });
 
-      $("#min").click(function() {
-        if (minify) {
-          $(this).html("Activar compresión");
-        } else {
-          $(this).html("Desactivar compresión");
-        }
-        minify = !minify;
+      var continuarCallback;
+      var ultimoArg;
+      var ultimoEntorno;
+      $("#continue").click(function() {
+        $("#continue").prop('disabled', true);
+        continuarCallback(null, ultimoArg);
       });
 
+      var lastCompilation;
       function Compile(zlcode) {
         lasttimeout = null;
         var compilation = $("#content").get(0);
-        var comp;
         try {
-          comp = zl.Compilar(zlcode);
+          lastCompilation = zl.Compilar(zlcode);
           if (minify)
-            lastjs = js_beautify(uglify(js_beautify(comp.javascript)));
+            lastjs = js_beautify(uglify(js_beautify(lastCompilation.javascript)));
           else
-            lastjs = js_beautify(comp.javascript);
+            lastjs = js_beautify(lastCompilation.javascript);
           compilation.innerHTML = lastjs;
 
         } catch (e) {
@@ -183,12 +202,11 @@ Fin</textarea>
         zip.file("zl.comp.js", lastjs);
         zip.file("estilo.css", zipestilo);
         zip.file("ejecucion.js", zipejecucion);
-        zip.file("arrastrame a google chrome o firefox.index", zipindex);
+        zip.file("arrastrame a google chrome o firefox.html", zipindex);
 
         var content = zip.generate({type: "blob"});
         saveAs(content, "programa.zip");
       }
-
 
       var isBottom = true;
       $("#output").get(0).onscroll = function(ev) {
@@ -219,6 +237,7 @@ Fin</textarea>
           }
         });
         $("#input").focus();
+        evaluar();
       }
 
       zl.io.abortRead = function() {
@@ -229,6 +248,27 @@ Fin</textarea>
 
       zl.io.limpiar = function() {
         $("#output").get(0).innerHTML = "";
+      }
+
+      zl.io.pause = function(arg, entorno, callback) {
+        $("#continue").prop('disabled', false);
+        continuarCallback = callback;
+        ultimoEntorno = entorno;
+        ultimoArg = arg;
+        evaluar();
+      }
+
+      zl.io.abortPause = function() {
+        $("#continue").prop('disabled', true);
+      }
+
+      function evaluar() {
+        if (evaluando && carga && lastCompilation && ultimoEntorno) {
+          var subrutina = lastCompilation.tabla.subrutinaPorPosicion(editor.getCursor().ch);
+          var compilation = $("#content").get(0);
+          compilation.innerHTML = "La expresión \n\t"+editor.getSelection()+"\n"+
+            "Equivale a:\n"+zl.Evaluar(editor.getSelection(), subrutina, carga, ultimoEntorno);
+        }
       }
 
       var zipindex;
@@ -256,7 +296,6 @@ Fin</textarea>
           zipejecucion = data;
         }
       });
-
     </script>
 </body>
 

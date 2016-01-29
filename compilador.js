@@ -57,6 +57,33 @@ var modulo = function(zl) {
       fotogramaAsincrono: (fotograma || false) && (fotograma.modificadores.asincrono || false)
     };
   }
+
+  // Genera código javascript a partir de código
+  // en zl
+  zl.Evaluar = function(zlcode, subrutina, carga, locales) {
+    zlcode = zlcode.trim();
+    if (!zlcode.length)
+      return "No hay código seleccionado";
+    try {
+      // Fase 1, obtener el árbol sintáctico de la expresión:
+      var compilado = zl.sintaxis.arbolExpresion(zlcode);
+
+      // Fase 2, parsing semántico
+      zl.semantica.testarExpresion(compilado, subrutina);
+
+      // Fase 3, obtener el código javascript:
+      var javascript = zl.javascript.expresion(compilado, modulo);
+    } catch (e) {
+      if (zl.error.esError(e))
+        return "El código seleccionado no es una expresión."
+      throw e;
+    }
+    console.log(locales, carga);
+    return Function("var $local=this.local;var $in=this.carga;return ("+javascript+");").call({
+      local: locales,
+      carga: carga
+    });
+  }
   return zl;
 }
 

@@ -53,6 +53,7 @@
     | <repetir>
     | <sicondicional>
     | <mientras>
+    | "pausar"
 
 <declaracionModificador> ::= "de" <_> "entrada"
     | "de" <_> "salida"

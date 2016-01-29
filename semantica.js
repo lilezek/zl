@@ -102,6 +102,9 @@ var modulo = function(zl) {
           asincrono = asincrono || s.asincrono;
           s = s.siguiente;
         }
+      } else if (s.tipo == "pausar") {
+        s.asincrono = true;
+        asincrono = true;
       }
     }
     return asincrono;
@@ -298,6 +301,8 @@ var modulo = function(zl) {
       }
     }
   }
+  zl.semantica.testarExpresion = testarExpresion;
+
   return zl;
 }
 

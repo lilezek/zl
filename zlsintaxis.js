@@ -26,7 +26,8 @@ var modulo = function(zl) {
     "de": true,
     "datos": true,
     "algoritmo": true,
-    "global": true
+    "global": true,
+    "pausar": true
   };
 
   // Usando el analizador que he construido, genero los símbolos del lenguaje
@@ -71,6 +72,7 @@ var modulo = function(zl) {
   a.simbolo("a");
   a.simbolo("..");
   a.simbolo(",");
+  a.simbolo("pausar");
 
   // Los distintos tokens:
 
@@ -194,11 +196,17 @@ var modulo = function(zl) {
       ["llamada"],
       ["repetir"],
       ["sicondicional"],
-      ["mientras"]
+      ["mientras"],
+      ["pausar"]
     ]);
     var x = this.resultado(0);
     var r = this.resultado(0, x, 0);
-    r.tipo = this.arbol(0, x, 0).tipo;
+    if (x == 5)
+      r = {
+        tipo: "pausar"
+      };
+    else
+      r.tipo = this.arbol(0, x, 0).tipo;
     this.registrarResultado(r);
     return this;
   })
@@ -378,12 +386,12 @@ var modulo = function(zl) {
             ["no"],
             ["y"],
             ["o"],
-            ["<"],
-            [">"],
             ["<="],
             [">="],
-            ["="],
             ["<>"],
+            ["<"],
+            [">"],
+            ["="],
             ["+"],
             ["-"],
             ["*"],
