@@ -20,7 +20,7 @@ CodeMirror.defineSimpleMode("zl", {
     // Rules are matched in the order in which they appear, so there is
     // no ambiguity between this one and the one above
     {
-      regex: /(?:o|y|no|mientras|repetir)\b/i,
+      regex: /(?:o|y|no|mientras|repetir|pausar)\b/i,
       token: "keyword"
     }, {
       regex: /verdadero|falso/i,
@@ -31,9 +31,6 @@ CodeMirror.defineSimpleMode("zl", {
     }, {
       regex: /\/\/.*/,
       token: "comment"
-    }, {
-      regex: /\/(?:[^\\]|\\.)*?\//,
-      token: "variable-3"
     },
     // A next property will cause the mode to move to a different state
     {
