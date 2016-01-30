@@ -147,7 +147,9 @@ var modulo = function(zl) {
         "else {done(null, arg);}" +
         "}" + tempcallback + "(arg,done);},function(arg,done){$zlr = arg;";
     } else {
-      //TODO: El mientras síncrono.
+      return "while("+ zl.javascript.expresion(compilado.condicion, simbolo)+"){"+
+      zl.javascript.sentencias(compilado.sentencias, simbolo)+
+      "}";
     }
   }
 

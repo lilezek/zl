@@ -96,7 +96,7 @@ Algoritmo
 Fin</textarea>
     <div class="v divisor"></div>
     <div class="compilation">
-      <textarea class="content" id="content" readonly="readonly"></textarea>
+      <textarea class="helparea" id="helparea" readonly="readonly"></textarea>
       <div class="h divisor"></div>
       <textarea class="output" id="output" readonly="readonly"></textarea>
       <input type="text" class="input" id="input" disabled="disabled">
@@ -141,7 +141,7 @@ Fin</textarea>
 
       var carga = null;
       $("#run").click(function() {
-        var compilation = $("#content").get(0);
+        var compilation = $("#helparea").get(0);
         var zlcode = editor.getValue();
         if (!carga) {
           $("#run").html("Abortar");
@@ -178,7 +178,7 @@ Fin</textarea>
       var lastCompilation;
       function Compile(zlcode) {
         lasttimeout = null;
-        var compilation = $("#content").get(0);
+        var compilation = $("#helparea").get(0);
         try {
           lastCompilation = zl.Compilar(zlcode);
           if (minify)
@@ -265,7 +265,7 @@ Fin</textarea>
       function evaluar() {
         if (evaluando && carga && lastCompilation && ultimoEntorno) {
           var subrutina = lastCompilation.tabla.subrutinaPorPosicion(editor.getCursor().ch);
-          var compilation = $("#content").get(0);
+          var compilation = $("#helparea").get(0);
           compilation.innerHTML = "La expresión \n\t"+editor.getSelection()+"\n"+
             "Equivale a:\n"+zl.Evaluar(editor.getSelection(), subrutina, carga, ultimoEntorno);
         }
