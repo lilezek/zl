@@ -17,6 +17,7 @@ body, html {
   flex: 1;
   -webkit-flex-flow: row nowrap;
   flex-flow: row nowrap;
+  max-height: 100%;
 }
 
 .CodeMirror {
@@ -24,7 +25,7 @@ body, html {
   -webkit-flex: 1;
   flex: 1;
   font-size: 14px;
-  
+
 }
 
 .compilation {
@@ -34,18 +35,21 @@ body, html {
   flex-flow: column nowrap;
   -webkit-flex: 1;
   flex: 1;
+  max-width: 50%;
 }
 
 .helparea {
   -webkit-flex: 1;
   flex: 1;
   font-family: monospace;
+  overflow: auto;
 }
 
 .output {
   -webkit-flex: 1;
   flex: 1;
   font-family: monospace;
+  overflow: auto;
 }
 
 .run {
@@ -68,4 +72,27 @@ body, html {
 .continue, .run {
   -webkit-flex: 1;
   flex: 1;
+}
+
+.error {
+  position: relative;
+  margin-left: 50px;
+}
+
+.error::before {
+  content: "";
+  border-left: 1px solid;
+  border-color: #333333;
+  left: -20px;
+  position: absolute;
+  height: 100%;
+}
+
+.error > .linea {
+  position: relative;
+  left: -48px;
+  display: inline-block;
+  width: 0;
+  font-weight: bold;
+  text-decoration: underline;
 }

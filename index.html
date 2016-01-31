@@ -96,7 +96,7 @@ Algoritmo
 Fin</textarea>
     <div class="v divisor"></div>
     <div class="compilation">
-      <textarea class="helparea" id="helparea" readonly="readonly"></textarea>
+      <div class="helparea" id="helparea" readonly="readonly"></div>
       <div class="h divisor"></div>
       <div class="output" id="output"></div>
       <input type="text" class="input" id="input" disabled="disabled">
@@ -186,11 +186,11 @@ Fin</textarea>
             lastjs = js_beautify(uglify(js_beautify(lastCompilation.javascript)));
           else
             lastjs = js_beautify(lastCompilation.javascript);
-          compilation.innerHTML = lastjs;
+          compilation.innerHTML = textToHtml(lastjs);
 
         } catch (e) {
           if (zl.error.esError(e))
-            compilation.innerHTML = zl.error.obtenerMensaje(e, zlcode);
+            compilation.innerHTML = zl.error.obtenerMensajeHtml(e, zlcode).getHtml();
           else
             throw e;
         }
@@ -220,7 +220,7 @@ Fin</textarea>
 
       zl.io.outWrite = function(html) {
         var t = $("#output").get(0);
-        t.innerHTML += html.replace(/\n/g, "<br>").replace(/ /g, "&nbsp;");
+        t.innerHTML += textToHtml(html)
         if (isBottom) {
           t.scrollTop = t.scrollHeight;
         }
@@ -270,6 +270,10 @@ Fin</textarea>
           compilation.innerHTML = "La expresión \n\t"+editor.getSelection()+"\n"+
             "Equivale a:\n"+zl.Evaluar(editor.getSelection(), subrutina, carga, ultimoEntorno);
         }
+      }
+
+      function textToHtml(text) {
+        return text.replace(/\n/g, "<br>").replace(/ /g, "&nbsp;");
       }
 
       var zipindex;

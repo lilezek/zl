@@ -143,7 +143,7 @@ var modulo = function(zl) {
         "\t" + zl.error.linea(zlcodigo, linea).trim() + "\n" +
         "dentro:\n" +
         "\t" + zlcodigo.substring(t.posicion[0], t.posicion[1]).trim() + "\n" +
-        "debería ser un número, o una expresión que genere un número,\n"+
+        "debería ser un número, o una expresión que genere un número,\n" +
         "sin embargo es un/a '" + t.tipo.nombre + "'.";
       // TODO: generar ejemplos automáticos con la expresión.
       //"Ejemplos correctos:\n"
@@ -159,6 +159,40 @@ var modulo = function(zl) {
       return zl.error[key] === error.tipo
     })[0];
   }
+
+  function TarjetaError(error, zlcodigo) {
+    if (error.tipo == zl.error.E_SIMBOLO) {
+      var hojas = error.hojas();
+      this.posicion = hojas[hojas.length - 1].end;
+      this.linea = zl.error.posicionCaracter(zlcodigo, this.posicion).linea;
+      this.mensajeError = "Error genérico.";
+    } else {
+      console.log(error.traza);
+      // TODO: Unificar la información que se pasa por los errores:
+      this.posicion = (
+        (error.traza.arbol ? error.traza.arbol.begin : null) ||
+        (error.traza.posicion ? error.traza.posicion[0] : null)
+        );
+      this.linea = zl.error.posicionCaracter(zlcodigo, this.posicion).linea;
+      this.mensajeError = Object.keys(zl.error).filter(function(key) {
+        return zl.error[key] === error.tipo
+      })[0];
+    }
+    return this;
+  }
+
+  TarjetaError.prototype.getHtml = function() {
+    var html = "<div class='error'>";
+    html += "<span class='linea'>"+this.linea+"</span>"
+    html += this.mensajeError;
+    html += "</div>"
+    return html;
+  }
+
+  zl.error.obtenerMensajeHtml = function(error, zlcodigo) {
+    return new TarjetaError(error, zlcodigo);
+  }
+
 
   // distintos errores:
   zl.error.E_SIMBOLO = 1;
