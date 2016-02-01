@@ -1,0 +1,40 @@
+.error {
+  position: relative;
+  margin-left: 50px;
+}
+
+.error::before {
+  content: "";
+  border-left: 1px solid;
+  border-color: #333333;
+  left: -20px;
+  position: absolute;
+  height: 100%;
+}
+
+.error > .linea {
+  cursor: pointer;
+  position: relative;
+  left: -48px;
+  display: inline-block;
+  width: 0;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.error > .codigo {
+  background-color: #eeeeee;
+  color: green;
+}
+
+.error > .tipo {
+  text-transform: capitalize;
+  background-color: #eeeeee;
+  color: #d28f9b;
+}
+
+.error > .dato {
+  text-transform: capitalize;
+  background-color: #eeeeee;
+  color: #d28f9b;
+}

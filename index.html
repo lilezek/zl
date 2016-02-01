@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <link rel="stylesheet" href="index.css">
+  <link rel="stylesheet" href="error.css">
 
   <script>
     // Activar debug:
@@ -83,7 +84,8 @@ Datos
 Algoritmo
   mostrar [ mensaje <- "Escribe el tamaño de la pirámide" ]
   leerNumero [ mensaje -> tam ]
-  piramide <- ""
+  // Cambiar a piramide <- ""
+  piramide <- 0 + 1 + 2
   i <- 1
 	Mientras i <= tam hacer
     // Pulsa Ctrl+F9 y selecciona 'piramide'
@@ -134,6 +136,13 @@ Fin</textarea>
         "Ctrl-F9": function(){evaluando = !evaluando;},
         "Cmd-F9": function(){evaluando = !evaluando;}
       });
+
+      function saltarAlCodigo(linea, posicion) {
+        "use strict";
+        editor.setCursor(linea,posicion);
+        editor.focus();
+        return true;
+      }
 
       var lastjs = "";
       var lasttimeout = null;

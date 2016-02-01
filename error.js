@@ -29,7 +29,7 @@ var modulo = function(zl) {
     if (texto.substr(posicion, 2) == "//") {
       while (texto.substr(posicion, 1) != "\n")
         posicion++;
-      zl.error.saltar(texto, posicion);
+      posicion = zl.error.saltar(texto, posicion);
     }
     return posicion;
   }
@@ -169,24 +169,52 @@ var modulo = function(zl) {
     } else {
       console.log(error.traza);
       // TODO: Unificar la información que se pasa por los errores:
-      this.posicion = (
+      this.posicion = zl.error.saltar(zlcodigo,
         (error.traza.arbol ? error.traza.arbol.begin : null) ||
         (error.traza.posicion ? error.traza.posicion[0] : null)
-        );
-      this.linea = zl.error.posicionCaracter(zlcodigo, this.posicion).linea;
-      this.mensajeError = Object.keys(zl.error).filter(function(key) {
-        return zl.error[key] === error.tipo
-      })[0];
+      );
+      console.log(zl.error);
+      var tmp = zl.error.posicionCaracter(zlcodigo, this.posicion);
+      this.linea = tmp.linea;
+      this.columna = tmp.columna;
+      if (error.tipo === zl.error.E_ASIGNACION_INCOMPATIBLE) {
+        // TODO: Que esta división no sea necesaria
+        // TODO: Incluir la declaración del dato
+        var partes = zlcodigo.substring(this.posicion, error.traza.posicion[1]).split("<-");
+        this.mensajeError = "Error: la expresión <br>" +
+          this.htmlLinea(this.linea, this.columna) + this.htmlCodigo(partes[1]) + "<br>" +
+          "genera un valor de tipo <span class='tipo'>" + error.traza.obtenido.nombre + "</span><br>" +
+          "pero el dato <span class='dato'>" + error.traza.arbol.variable +
+          "</span> es de tipo <span class='tipo'>" + error.traza.esperado.nombre + "</span>";
+      } else {
+        zl.error.obtenerMensaje(error, zlcodigo);
+      }
     }
     return this;
   }
 
   TarjetaError.prototype.getHtml = function() {
     var html = "<div class='error'>";
-    html += "<span class='linea'>"+this.linea+"</span>"
     html += this.mensajeError;
     html += "</div>"
     return html;
+  }
+
+  TarjetaError.prototype.htmlCodigo = function(codigo) {
+    return "<span class='codigo'>"+codigo.trim()+"</span>";
+  }
+
+  TarjetaError.prototype.htmlTipo = function(tipo) {
+    return "<span class='tipo'>"+tipo.nombre+"</span>";
+  }
+
+  // TODO: Recibir el dato y no el nombre
+  TarjetaError.prototype.htmlDato = function(nombre) {
+    return "<span class='dato'>"+nombre+"</span>";
+  }
+
+  TarjetaError.prototype.htmlLinea = function(linea, columna) {
+    return "<span class='linea' onclick='return saltarAlCodigo("+(linea-1)+","+(columna)+");'>"+linea+"</span>";
   }
 
   zl.error.obtenerMensajeHtml = function(error, zlcodigo) {

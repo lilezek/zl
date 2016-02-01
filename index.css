@@ -73,26 +73,3 @@ body, html {
   -webkit-flex: 1;
   flex: 1;
 }
-
-.error {
-  position: relative;
-  margin-left: 50px;
-}
-
-.error::before {
-  content: "";
-  border-left: 1px solid;
-  border-color: #333333;
-  left: -20px;
-  position: absolute;
-  height: 100%;
-}
-
-.error > .linea {
-  position: relative;
-  left: -48px;
-  display: inline-block;
-  width: 0;
-  font-weight: bold;
-  text-decoration: underline;
-}
