@@ -12,8 +12,6 @@ var modulo = function(zl) {
     "fin": true,
     "verdadero": true,
     "falso": true,
-    "imposible": true,
-    //"nada": true,
     "veces": true,
     "repetir": true,
     "mientras": true,
@@ -252,7 +250,7 @@ var modulo = function(zl) {
     this.avanzar(":repetir")
       .expresion()
       .avanzar("veces")
-      .acumular("sentencia").avanzarObligatorioVarios()
+      .acumular("sentencia").avanzarVarios()
       .avanzar("fin")
     this.registrarResultado({
       veces: this.resultado(1),
@@ -265,7 +263,7 @@ var modulo = function(zl) {
     this.avanzar(":mientras")
       .expresion()
       .avanzar("hacer")
-      .acumular("sentencia").avanzarObligatorioVarios()
+      .acumular("sentencia").avanzarVarios()
       .avanzar("fin")
     this.registrarResultado({
       condicion: this.resultado(1),

@@ -18,7 +18,11 @@
   <script src="jszip.js"></script>
   <script src="jsziputils.js"></script>
   <script src="https://codemirror.net/addon/mode/simple.js"></script>
+  <script src="https://codemirror.net/addon/selection/active-line.js"></script>
+  <script src="show-hint.js"></script>
   <link rel="stylesheet" href="codemirror.css">
+  <link rel="stylesheet" href="https://codemirror.net/addon/hint/show-hint.css">
+  <script src="autocompletar.js"></script>
   <script src="utils.js"></script>
   <script src="analizador.js"></script>
   <script src="zlsintaxis.js"></script>
@@ -120,21 +124,43 @@ Fin</textarea>
         tabSize: 2,
         identWithTabs: false,
         smartIdent: true,
+        cursorBlinkRate: 0,
+        styleActiveLine: true
       });
-      editor.on("change", function() {
+      editor.on("change", function(cm, ev) {
         if (lasttimeout) {
           clearTimeout(lasttimeout);
         }
         lasttimeout = setTimeout(Compile, 500, editor.getValue());
+        if (ev.origin === "+input" && ev.text.join("").trim().length > 0) {
+          editor.showHint({
+            completeSingle: false
+          });
+        }
       });
-      editor.on("cursorActivity", function(){setTimeout(evaluar,20); return true;});
+      editor.on("cursorActivity", function(){
+        setTimeout(evaluar,20);
+        return true;
+      });
 
       var evaluando = false;
       editor.addKeyMap({
         "Ctrl-S": download,
         "Cmd-S": download,
         "Ctrl-F9": function(){evaluando = !evaluando;},
-        "Cmd-F9": function(){evaluando = !evaluando;}
+        "Cmd-F9": function(){evaluando = !evaluando;},
+        "Ctrl-Space": function() {
+            editor.showHint();
+        },
+        "Cmd-Space": function() {
+            editor.showHint();
+        },
+        "Ctrl-Enter": function() {
+            editor.showHint();
+        },
+        "Cmd-Enter": function() {
+            editor.showHint();
+        }
       });
 
       function saltarAlCodigo(linea, posicion) {

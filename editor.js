@@ -20,7 +20,7 @@ CodeMirror.defineSimpleMode("zl", {
     // Rules are matched in the order in which they appear, so there is
     // no ambiguity between this one and the one above
     {
-      regex: /(?:o|y|no|mientras|repetir|pausar)\b/i,
+      regex: /(?:o|y|no|mientras|repetir|pausar|algoritmo)/i,
       token: "keyword"
     }, {
       regex: /verdadero|falso/i,
@@ -43,7 +43,7 @@ CodeMirror.defineSimpleMode("zl", {
     },
     // indent and dedent properties guide autoindentation
     {
-      regex: /([\[]|hacer|veces|datos|algoritmo)/i,
+      regex: /([\[]|hacer|veces|datos)/i,
       indent: true,
       token: "keyword"
     }, {
@@ -51,7 +51,7 @@ CodeMirror.defineSimpleMode("zl", {
       dedent: true,
       token: "keyword"
     }, {
-      regex: /[a-z$][\w$]*/,
+      regex: /[a-z$][\w$]*/i,
       token: "variable"
     },
     // You can embed other modes with the mode property. This rule
