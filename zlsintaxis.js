@@ -173,17 +173,17 @@ var modulo = function(zl) {
       .avanzar("nombreSimple")
       // Datos
       .avanzar("datos")
-      .acumular("declaracion").avanzarObligatorioVarios()
+      .acumular("declaracion").avanzarVarios()
       // Algoritmo
       .avanzar("algoritmo")
-      .acumular("sentencia").avanzarObligatorioVarios()
+      .acumular("sentencia").avanzarVarios()
       // Fin
       .avanzar("fin");
     this.registrarResultado({
       nombre: this.resultado(2),
       modificadores: this.resultado(1),
-      datos: this.resultado(4),
-      sentencias: this.resultado(6)
+      datos: this.resultado(4) || [],
+      sentencias: this.resultado(6) || []
     });
     return this;
   });

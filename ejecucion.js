@@ -90,7 +90,7 @@ var modulo = function(zl, async) {
       get: function construirLista$get() {
         var resultado = this.v;
         for (var i = 0; i < arguments.length; i++) {
-          resultado = resultado[arguments[i]-this.offsets[i]];
+          resultado = resultado[arguments[i] - this.offsets[i]];
           if (typeof resultado === "undefined" || resultado === null)
             throw zl.error.newError(zl.error.E_EJECUCION_INDICE_DESCONTROLADO, {
               array: this.v,
@@ -102,20 +102,20 @@ var modulo = function(zl, async) {
       set: function construirLista$set(valor) {
         var resultado = this.v;
         var i;
-        for (i = 1; i < arguments.length-1; i++) {
-          resultado = resultado[arguments[i]-this.offsets[i-1]];
+        for (i = 1; i < arguments.length - 1; i++) {
+          resultado = resultado[arguments[i] - this.offsets[i - 1]];
           if (typeof resultado === "undefined" || resultado === null)
             throw zl.error.newError(zl.error.E_EJECUCION_INDICE_DESCONTROLADO, {
               array: this.v,
               indices: Array.prototype.slice(arguments)
             })
         }
-        if (typeof resultado[arguments[i]-this.offsets[i-1]] === "undefined" || resultado[arguments[i]-this.offsets[i-1]] === null)
+        if (typeof resultado[arguments[i] - this.offsets[i - 1]] === "undefined" || resultado[arguments[i] - this.offsets[i - 1]] === null)
           throw zl.error.newError(zl.error.E_EJECUCION_INDICE_DESCONTROLADO, {
             array: this.v,
             indices: Array.prototype.slice(arguments)
           });
-        resultado[arguments[i]-this.offsets[i-1]] = valor;
+        resultado[arguments[i] - this.offsets[i - 1]] = valor;
       }
     };
 
@@ -126,11 +126,11 @@ var modulo = function(zl, async) {
         var resultado = [];
         r.offsets[i] = dim[i][0];
         for (var j = dim[i][0]; j <= dim[i][1]; j++) {
-            resultado.push(_generarArray(dim,i+1));
+          resultado.push(_generarArray(dim, i + 1));
         }
         return resultado;
       }
-    })(dimensiones,0);
+    })(dimensiones, 0);
     return r;
   }
 
@@ -161,6 +161,8 @@ var modulo = function(zl, async) {
     }
   };
 
+  rte.$asincrono = {};
+
   zl.eval = function(codigo) {
     eval(codigo);
   }
@@ -177,20 +179,30 @@ var modulo = function(zl, async) {
     // Preparar la ejecución:
     var ejecucion = "var $t = this;";
 
-    // TODO: Distinguir si this.inicio es asíncrona o no.
     if (typeof carga.inicio === "function") {
-      ejecucion += "$t.inicio({},function() {";
+      ejecucion += "$t.inicio({}";
+      // TODO: Distinguir si this.inicio es asíncrona o no.
+      if (carga.$asincrono.inicio)
+        ejecucion += ",function() {"
+      else
+        ejecucion += ");"
     }
     // TODO: Tener en cuenta el retardo de cálculo y restárselo al interval.
+    // TODO: Poder abortar la ejecución de un código con fotograma.
     if (typeof carga.fotograma === "function") {
-      ejecucion += "$t.$interval=setInterval(function cbck(){" +
-        "clearInterval($t.$interval);" +
-        "$t.fotograma({},function(){$t.$interval = setInterval(cbck," + 1 / zl.configuracion.fps * 1000 + ")})" +
-        "}," + 1 / zl.configuracion.fps * 1000 + ");";
-    } else {
+      ejecucion += "setTimeout(function cbck(){$t.fotograma({}";
+      // TODO: Distinguir si this.fotograma es asíncrona o no.
+      if (carga.$asincrono.fotograma) {
+        ejecucion += ",function(){setTimeout(cbck," + 1 / zl.configuracion.fps * 1000 + ")})" +
+          "}," + 1 / zl.configuracion.fps * 1000 + ");";
+      } else {
+        ejecucion += ");setTimeout(cbck," + 1 / zl.configuracion.fps * 1000 + ")" +
+          "}," + 1 / zl.configuracion.fps * 1000 + ");";
+      }
+    } else if (typeof carga.inicio === "function") {
       ejecucion += "$t.$alAcabar(null);";
     }
-    if (typeof carga.inicio === "function") {
+    if (typeof carga.inicio === "function" && carga.$asincrono.inicio) {
       ejecucion += "});";
     }
     // Y Ejecutar

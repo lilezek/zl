@@ -80,37 +80,28 @@
 <body>
   <div class="main">
 <textarea class="editor" id="editor">
-Subrutina Set
+Subrutina Externa Fotograma
 Datos
-  x es Numero Global
-  n es Numero de Entrada
+	posx es Numero global
+  posy es numero global
+  x es Numero
 Algoritmo
-  pausar
-  x <- n
-Fin
-
-Subrutina Get
-Datos
-  x es Numero Global
-  n es Numero de Salida
-Algoritmo
-  pausar
-  n <- x
+  aleatorio [ minimo <- 0 maximo <- 2 resultado -> x]
+	posx <- (posx - x + 1)%50
+  aleatorio [ minimo <- 0 maximo <- 2 resultado -> x]
+	posy <- (posy - x + 1)%50
+  limpiar []
+  mostrar [ mensaje <- "\n" * (posy - 1)]
+  mostrar [ mensaje <- (" " * (posx - 1)) + "#" ]
 Fin
 
 Subrutina Externa Inicio
 Datos
-  a es Numero
-  b es Numero
+	posx es numero global
+  posy es numero global
 Algoritmo
-  leerNumero [ mensaje -> a ]
-  pausar
-  Set [ n <- a ]
-  pausar
-  Get [ n -> b ]
-  pausar
-  mostrarNumero [ mensaje <- b ]
-  pausar
+	posx <- 10
+  posy <- 10
 Fin
 </textarea>
     <div class="v divisor"></div>

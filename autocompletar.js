@@ -9,6 +9,7 @@ function applyHint(cm, data, completion) {
     .replace("%numero%", "3")
     .replace("%codigo%", "// Código aquí")
     .replace("%string%", "\"\"")
+    .replace("%nombre%", "Nombre")
     .replace(/%dato&([a-z]+)%/,"dato$1")
 
   // TODO: Identar el bloque entero correctamente
@@ -40,8 +41,12 @@ var keywords = [
     text: "mientras",
     repl: "Mientras %condicion% hacer\n%indent%%codigo%\nFin",
     hint: applyHint
+  }, {
+    displayText: "Subrutina ... ",
+    text: "subrutina",
+    repl: "Subrutina %nombre%\nDatos\n\nAlgoritmo\n\nFin",
+    hint: applyHint
   },
-  "Subrutina",
   "externa",
   "es",
   "rapida",

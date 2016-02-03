@@ -197,9 +197,12 @@ var modulo = function(zl) {
 
   Subrutina.prototype.rellenarDesdeArbol = function(arbol) {
     // Posicion de la subrutina:
+    console.log(arbol);
     this.posicionSubrutina = [arbol.begin, arbol.end];
-    this.posicionDatos = [arbol.datos[0].begin, arbol.datos[arbol.datos.length - 1].end];
-    this.posicionAlgoritmo = [arbol.sentencias[0].begin, arbol.sentencias[arbol.sentencias.length - 1].end - 3]; // El - 3 resta la palabra Fin
+    if (arbol.datos[0])
+      this.posicionDatos = [arbol.datos[0].begin, arbol.datos[arbol.datos.length - 1].end];
+    if (arbol.sentencias[0])
+      this.posicionAlgoritmo = [arbol.sentencias[0].begin, arbol.sentencias[arbol.sentencias.length - 1].end - 3]; // El - 3 resta la palabra Fin
 
     this.nombre = arbol.nombre.toLowerCase();
 
@@ -538,6 +541,22 @@ var modulo = function(zl) {
       });
       aleatorio.serializar();
       mod.registrar(aleatorio);
+    }
+
+    // Mostrar:
+    {
+      var limpiar = zl.entorno.newSubrutina(mod);
+
+      zl.writeJson(limpiar, {
+        nombre: "limpiar",
+        modificadores: {
+          externa: true,
+          es: true
+        },
+        declaraciones: {}
+      });
+      limpiar.serializar();
+      mod.registrar(limpiar);
     }
 
     // Mostrar:
