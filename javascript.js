@@ -121,7 +121,9 @@ var modulo = function(zl) {
     } else if (compilado.tipo == "sicondicional") {
       resultado = zl.javascript.sicondicional(compilado, simbolo);
     } else if (compilado.tipo == "pausar") {
-      resultado = "done(null,$salida);}, function(arg, done) {done(null, $local, $global, $entrada, $salida);}, $in.$pausar, function(arg,done){"
+      resultado = "done(null,$salida);}, function(arg, done) {done(null, $local, $global, $entrada, $salida,"+
+      ((compilado.begin+compilado.end)/2)+
+      ");}, $in.$pausar, function(arg,done){";
     }
     return resultado + ";";
   }

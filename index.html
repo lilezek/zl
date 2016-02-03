@@ -85,6 +85,7 @@ Datos
   x es Numero Global
   n es Numero de Entrada
 Algoritmo
+  pausar
   x <- n
 Fin
 
@@ -93,6 +94,7 @@ Datos
   x es Numero Global
   n es Numero de Salida
 Algoritmo
+  pausar
   n <- x
 Fin
 
@@ -104,9 +106,11 @@ Algoritmo
   leerNumero [ mensaje -> a ]
   pausar
   Set [ n <- a ]
+  pausar
   Get [ n -> b ]
   pausar
   mostrarNumero [ mensaje <- b ]
+  pausar
 Fin
 </textarea>
     <div class="v divisor"></div>
@@ -215,6 +219,7 @@ Fin
       var ultimoEntorno;
       $("#continue").click(function() {
         $("#continue").prop('disabled', true);
+        editor.removeLineClass(ultimaLineaPausar, "background", "CodeMirror-line-pausar");
         ultimoEntorno = null;
         continuarCallback(null, null);
       });
@@ -294,15 +299,18 @@ Fin
         $("#output").get(0).innerHTML = "";
       }
 
-      zl.io.pause = function($local, $global, $entrada, $salida, callback) {
+      zl.io.pause = function($local, $global, $entrada, $salida, pos, callback) {
         $("#continue").prop('disabled', false);
         continuarCallback = callback;
         ultimoEntorno = [$local, $global, $entrada, $salida];
+        ultimaLineaPausar = editor.posFromIndex(pos).line;
+        editor.addLineClass(ultimaLineaPausar, "background", "CodeMirror-line-pausar");
         evaluar();
       }
 
       zl.io.abortPause = function() {
         $("#continue").prop('disabled', true);
+        editor.removeLineClass(ultimaLineaPausar, "background", "CodeMirror-line-pausar");
       }
 
       function evaluar() {
