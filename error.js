@@ -165,7 +165,8 @@ var modulo = function(zl) {
       var hojas = error.hojas();
       this.posicion = hojas[hojas.length - 1].end;
       this.linea = zl.error.posicionCaracter(zlcodigo, this.posicion).linea;
-      this.mensajeError = "Error genérico.";
+      this.mensajeError = "Error genérico." +
+        zl.error.obtenerMensaje(error, zlcodigo);
     } else {
       console.log(error.traza);
       // TODO: Unificar la información que se pasa por los errores:
@@ -187,7 +188,7 @@ var modulo = function(zl) {
           "pero el dato <span class='dato'>" + error.traza.arbol.variable +
           "</span> es de tipo <span class='tipo'>" + error.traza.esperado.nombre + "</span>";
       } else {
-        zl.error.obtenerMensaje(error, zlcodigo);
+        this.mensajeError = zl.error.obtenerMensaje(error, zlcodigo);
       }
     }
     return this;

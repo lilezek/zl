@@ -14,11 +14,13 @@ var modulo = function(zl) {
         ">": "&gt;",
         '"': '&quot;',
         "'": '&#39;',
-        "/": '&#x2F;'
+        "/": '&#x2F;',
+        "\n": '<br>',
+        " ": '&nbsp;'
     };
 
     zl.escapeHtml = function(string) {
-        return String(string).replace(/[&<>"'\/]/g, function(s) {
+        return String(string).replace(/[&<>"'\/\n ]/g, function(s) {
             return entityMap[s];
         });
     }

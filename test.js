@@ -18,6 +18,7 @@ var codigos = {
   'entradasalidanumero': '',
   'ordenoperaciones': '',
   'listabidimensional': '',
+  'globales': ''
 };
 
 for (var k in codigos) {
@@ -85,6 +86,22 @@ describe('Pruebas de entrada/salida', function() {
     expect(zl.test.output[0]).to.equal(aleatorio.toPrecision(7) + "\n");
   });
 });
+
+describe('Pruebas con globales', function() {
+  var aleatorio = ~~(Math.random() * 10000);
+  beforeEach(function(done) {
+    var codigo = codigos["globales"];
+    var zlcodigo = zl.Compilar(codigo).javascript;
+    var carga = zl.Cargar(zlcodigo);
+    carga.$alAcabar = done;
+    zl.test.input.push("" + aleatorio);
+    zl.Ejecutar(carga);
+  });
+
+  it('Entrada/salida con globales ' + aleatorio, function() {
+    expect(zl.test.output[0]).to.equal(aleatorio.toPrecision(7) + "\n");
+  });
+})
 
 describe('Orden de los operadores', function() {
   var aleatorio = ~~(Math.random() * 10000);

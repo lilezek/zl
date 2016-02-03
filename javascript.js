@@ -14,7 +14,7 @@ var modulo = function(zl) {
   // TODO: Hacerlo a partir del simbolo
   zl.javascript.cabecera = function(compilado, simbolo) {
     var resultado = "";
-    resultado += "(function(){\"use strict\";var $in=this;";
+    resultado += "(function($in, $out){\"use strict\"; var $global={};";
     for (var k in simbolo.globales) {
       resultado += zl.javascript.dato(simbolo.globales[k], simbolo);
     }
@@ -24,7 +24,7 @@ var modulo = function(zl) {
   // Generar el final
   // TODO: Hacerlo a partir del simbolo
   zl.javascript.final = function(compilado, simbolo) {
-    var resultado = "}).call(this);";
+    var resultado = "})(this, this);";
     return resultado;
   }
 
@@ -49,19 +49,20 @@ var modulo = function(zl) {
     if (!simbolo.modificadores.externa)
       resultado += "var ";
     else
-      resultado += "$in.";
+      resultado += "$out.";
 
     if (simbolo.modificadores.asincrono) {
-      resultado += zl.javascript.nombre(compilado.nombre, simbolo) + "=function(arg, done){var $zlr=arg;var $local={};" +
+      resultado += zl.javascript.nombre(compilado.nombre, simbolo) + "=function($entrada, done){var $salida={};var $local={};" +
         zl.javascript.datos(compilado.datos, simbolo.declaraciones) +
-        "$in.async.waterfall([function(c){c(null,arg);}," +
-        "function(arg,done){$zlr = {};" +
+        "$in.async.waterfall([function(c){c(null,null);}," +
+        "function(arg,done){$salida={};" +
         zl.javascript.sentencias(compilado.sentencias, simbolo) +
-        "done(null, $zlr);}],done);";
+        "done(null, $salida);}],done);";
     } else {
-      resultado += zl.javascript.nombre(compilado.nombre, simbolo) + "=function(arg, done){var $zlr=arg;var $local={};" +
+      resultado += zl.javascript.nombre(compilado.nombre, simbolo) + "=function($entrada, done){var $salida={};var $local={};" +
         zl.javascript.datos(compilado.datos, simbolo.declaraciones) +
-        zl.javascript.sentencias(compilado.sentencias, simbolo);
+        zl.javascript.sentencias(compilado.sentencias, simbolo)+
+        "return $salida;";
     }
     var coma = "";
     for (var k in simbolo.datos) {
@@ -99,11 +100,18 @@ var modulo = function(zl) {
   zl.javascript.sentencia = function(compilado, simbolo) {
     var resultado = "";
     if (compilado.tipo == "asignacion") {
-      resultado = "$local."+zl.javascript.nombre(compilado.variable, simbolo);
+      var dato = simbolo.declaraciones[compilado.variable.toLowerCase()];
+      if (dato.modificadores === dato.M_LOCAL)
+        resultado = "$local.";
+      else if (dato.modificadores & dato.M_GLOBAL)
+        resultado = "$global.";
+      else if (dato.modificadores & dato.M_SALIDA)
+        resultado = "$salida.";
+      resultado += zl.javascript.nombre(compilado.variable, simbolo);
       if (compilado.acceso)
-        resultado += ".set("+zl.javascript.expresion(compilado.valor)+zl.javascript.listaAccesoAsignacion(compilado.acceso, simbolo.declaraciones[resultado])+")";
+        resultado += ".set("+zl.javascript.expresion(compilado.valor, simbolo)+zl.javascript.listaAccesoAsignacion(compilado.acceso, simbolo.declaraciones[resultado])+")";
       else
-        resultado += "=" + zl.javascript.expresion(compilado.valor);
+        resultado += "=" + zl.javascript.expresion(compilado.valor, simbolo);
     } else if (compilado.tipo == "llamada") {
       resultado = zl.javascript.llamada(compilado, simbolo);
     } else if (compilado.tipo == "mientras") {
@@ -113,7 +121,7 @@ var modulo = function(zl) {
     } else if (compilado.tipo == "sicondicional") {
       resultado = zl.javascript.sicondicional(compilado, simbolo);
     } else if (compilado.tipo == "pausar") {
-      resultado = "done(null,$zlr);}, function(arg, done) {done(null, arg, $local);}, $in.$pausar, function(arg,done){$zlr = arg;"
+      resultado = "done(null,$salida);}, function(arg, done) {done(null, $local, $global, $entrada, $salida);}, $in.$pausar, function(arg,done){"
     }
     return resultado + ";";
   }
@@ -127,10 +135,10 @@ var modulo = function(zl) {
     if (compilado.asincrono)
       return ";done(null," + zl.javascript.llamadaEntrada(compilado.entrada, simbolo) + ");}," +
         nombre +
-        ",function(arg,done) {$zlr = arg;" +
+        ",function(arg,done) {$salida=arg;" +
         zl.javascript.llamadaSalida(compilado.salida, simbolo);
     else
-      return "$zlr = " + nombre + "(" +
+      return "$salida=" + nombre + "(" +
         zl.javascript.llamadaEntrada(compilado.entrada, simbolo) + ")" +
         zl.javascript.llamadaSalida(compilado.salida, simbolo);
   }
@@ -138,14 +146,14 @@ var modulo = function(zl) {
   zl.javascript.mientras = function(compilado, simbolo) {
     var tempcallback = "$zlt_" + pedirNombreTemporal();
     if (compilado.asincrono) {
-      return "done(null,$zlr);}, function(arg,done){$zlr = arg;" +
+      return "done(null,$salida);}, function(arg,done){" +
         "function " + tempcallback + "(arg){" +
         "if (" + zl.javascript.expresion(compilado.condicion, simbolo) + "){" +
         "$in.async.waterfall([function(c){c(null,arg);},function(arg,done){" +
         zl.javascript.sentencias(compilado.sentencias, simbolo) +
-        ";done(null,$zlr);}]," + tempcallback + ");}" +
+        ";done(null,$salida);}]," + tempcallback + ");}" +
         "else {done(null, arg);}" +
-        "}" + tempcallback + "(arg,done);},function(arg,done){$zlr = arg;";
+        "}" + tempcallback + "(arg,done);},function(arg,done){";
     } else {
       return "while("+ zl.javascript.expresion(compilado.condicion, simbolo)+"){"+
       zl.javascript.sentencias(compilado.sentencias, simbolo)+
@@ -157,7 +165,7 @@ var modulo = function(zl) {
     var siguiente = compilado.siguiente;
     var resultado = "";
     if (compilado.asincrono) {
-      resultado = "done(null,$zlr);}, function(arg, done){$zlr = arg;" +
+      resultado = "done(null,$salida);}, function(arg, done){" +
         "if(" + zl.javascript.expresion(compilado.condicion, simbolo) + "){" +
         "$in.async.waterfall([function(c){c(null,arg);},function(arg,done){" +
         zl.javascript.sentencias(compilado.sentencias, simbolo) +
@@ -178,7 +186,7 @@ var modulo = function(zl) {
           "}";
         siguiente = siguiente.siguiente;
       }
-      resultado += "}, function(arg, done){$zlr = arg;";
+      resultado += "}, function(arg, done){";
     } else {
       resultado = "if(" + zl.javascript.expresion(compilado.condicion, simbolo) + "){" +
         zl.javascript.sentencias(compilado.sentencias, simbolo) +
@@ -202,15 +210,15 @@ var modulo = function(zl) {
     var tempvar = "$zlt_" + pedirNombreTemporal();
     if (compilado.asincrono) {
       var tempcallback = "$zlt_" + pedirNombreTemporal();
-      return "done(null,$zlr);}, function(arg,done){$zlr = arg;" +
+      return "done(null,$salida);}, function(arg,done){" +
         "var " + tempvar + "=" + zl.javascript.expresion(compilado.veces, simbolo) + ";" +
         "function " + tempcallback + "(arg){" +
         "if (" + tempvar + "-- >= 1){" +
         "$in.async.waterfall([function(c){c(null,arg);},function(arg,done){" +
         zl.javascript.sentencias(compilado.sentencias, simbolo) +
-        ";done(null,$zlr);}]," + tempcallback + ");}" +
+        ";done(null,$salida);}]," + tempcallback + ");}" +
         "else {done(null, arg);}" +
-        "}" + tempcallback + "(arg,done);},function(arg,done){$zlr = arg;";
+        "}" + tempcallback + "(arg,done);},function(arg,done){";
     } else
       return "var " + tempvar + "=" + zl.javascript.expresion(compilado.veces, simbolo) + ";" +
         "while(" + tempvar + "-- >= 1){" +
@@ -232,7 +240,7 @@ var modulo = function(zl) {
   zl.javascript.llamadaSalida = function(compilado, simbolo) {
     var resultado = "";
     for (var i = 0; i < compilado.length; i++) {
-      resultado += ";$local." + zl.javascript.nombre(compilado[i].der) + "=$zlr." + compilado[i].izq;
+      resultado += ";$local." + zl.javascript.nombre(compilado[i].der, simbolo) + "=$salida." + compilado[i].izq;
     }
     return resultado;
   }
@@ -247,8 +255,8 @@ var modulo = function(zl) {
     // un alias en javascript.
     var operador = zl.javascript.operador(compilado.op, simbolo);
     if (compilado.izq && compilado.der) {
-      var izq = zl.javascript.expresion(compilado.izq);
-      var der = zl.javascript.expresion(compilado.der);
+      var izq = zl.javascript.expresion(compilado.izq, simbolo);
+      var der = zl.javascript.expresion(compilado.der, simbolo);
       var tipoizq = compilado.izq.tipofinal;
       var tipoder = compilado.der.tipofinal;
       var alias = tipoizq.opbinario[compilado.op][tipoder.nombre].alias;
@@ -291,10 +299,27 @@ var modulo = function(zl) {
     } else if (compilado.tipo == "falso") {
       return "false";
     } else if (compilado.tipo == "acceso") {
-      var r = "$local."+zl.javascript.nombre(compilado.nombre);
+      var dato = simbolo.declaraciones[compilado.nombre.toLowerCase()];
+      var r;
+      if (dato.modificadores === dato.M_LOCAL)
+        r = "$local.";
+      else if (dato.modificadores & dato.M_GLOBAL)
+        r = "$global.";
+      else if (dato.modificadores & dato.M_SALIDA)
+        r = "$salida.";
+      r += zl.javascript.nombre(compilado.nombre, simbolo);
       return r + zl.javascript.listaAcceso(compilado.acceso, simbolo.declaraciones[r]);
     } else if (compilado.tipo == "nombre") {
-      return "$local."+zl.javascript.nombre(compilado.valor);
+      var dato = simbolo.declaraciones[compilado.valor.toLowerCase()];
+      var r;
+      if (dato.modificadores === dato.M_LOCAL)
+        r = "$local.";
+      else if (dato.modificadores & dato.M_GLOBAL)
+        r = "$global.";
+      else if (dato.modificadores & dato.M_ENTRADA)
+        r = "$entrada.";
+
+      return r+zl.javascript.nombre(compilado.valor, simbolo);
     } else if (compilado.tipo == "expresion") {
       return "(" + zl.javascript.expresion(compilado.valor, simbolo) + ")";
     }
@@ -303,7 +328,7 @@ var modulo = function(zl) {
   zl.javascript.listaAcceso = function(compilado, simbolo) {
     var resultado = ".get(";
     for (var i = 0; i < compilado.length; i++) {
-      var expresion = zl.javascript.expresion(compilado[i]);
+      var expresion = zl.javascript.expresion(compilado[i], simbolo);
       // Quitar los paréntesis de la expresión:
       expresion = expresion.substring(1, expresion.length - 1);
       resultado += expresion;
@@ -315,7 +340,7 @@ var modulo = function(zl) {
   zl.javascript.listaAccesoAsignacion = function(compilado, simbolo) {
     var resultado = "";
     for (var i = 0; i < compilado.length; i++) {
-      var expresion = zl.javascript.expresion(compilado[i]);
+      var expresion = zl.javascript.expresion(compilado[i], simbolo);
       // Quitar los paréntesis de la expresión:
       expresion = expresion.substring(1, expresion.length - 1);
       resultado += "," + expresion;
@@ -324,18 +349,26 @@ var modulo = function(zl) {
   }
 
   zl.javascript.dato = function(dato, simbolo) {
-    var resultado = "$local." + zl.javascript.nombre(dato.nombre);
-    if (dato.modificadores & dato.M_ENTRADA)
-      resultado += "=$zlr." + dato.nombre;
+    if ((dato.modificadores & dato.M_SALIDA) && (dato.modifiacores & dato.M_ENTRADA))
+        return "$salida." +zl.javascript.nombre(dato.nombre)+ "=$entrada."+zl.javascript.nombre(dato.nombre);
     if (!(dato.modificadores & dato.M_ENTRADA) && dato.tipo.constr !== "") {
-      resultado += "=$in." + dato.tipo.constr + "(";
+      var resultado;
+      if (dato.modificadores === dato.M_LOCAL)
+        resultado = "$local.";
+      else if (dato.modificadores & dato.M_SALIDA)
+        resultado = "$salida.";
+      else if (dato.modificadores & dato.M_ENTRADA)
+        resultado = "$entrada.";
+      else if (dato.modificadores & dato.M_GLOBAL)
+        resultado = "$global.";
+      resultado += zl.javascript.nombre(dato.nombre) + "=$in." + dato.tipo.constr + "(";
       // Pasar las dimensiones al constructor si es una lista:
       if (dato.tipo.nombre === "lista") {
         resultado += JSON.stringify(dato.genericidad.dimensiones);
       }
-      resultado += ")";
+      return resultado + ");";
     }
-    return resultado + ";";
+    return "";
   }
   return zl;
 }

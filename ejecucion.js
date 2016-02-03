@@ -138,11 +138,11 @@ var modulo = function(zl, async) {
 
   }
 
-  rte.$pausar = function(arg, local, callback) {
+  rte.$pausar = function($local, $global, $entrada, $salida, callback) {
     rte.$ultimorte.$abortar = function() {
       zl.io.abortPause();
     };
-    zl.io.pause(arg, local, callback);
+    zl.io.pause($local, $global, $entrada, $salida, callback);
   }
 
   rte.async = async;

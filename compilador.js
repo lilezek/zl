@@ -60,7 +60,7 @@ var modulo = function(zl) {
 
   // Genera código javascript a partir de código
   // en zl
-  zl.Evaluar = function(zlcode, subrutina, carga, locales) {
+  zl.Evaluar = function(zlcode, subrutina, carga, entorno) {
     zlcode = zlcode.trim();
     if (!zlcode.length)
       return "No hay código seleccionado";
@@ -68,19 +68,25 @@ var modulo = function(zl) {
       // Fase 1, obtener el árbol sintáctico de la expresión:
       var compilado = zl.sintaxis.arbolExpresion(zlcode);
 
+      console.log(entorno, subrutina);
+
       // Fase 2, parsing semántico
       zl.semantica.testarExpresion(compilado, subrutina);
 
       // Fase 3, obtener el código javascript:
-      var javascript = zl.javascript.expresion(compilado, modulo);
+      var javascript = zl.javascript.expresion(compilado, subrutina);
     } catch (e) {
       if (zl.error.esError(e))
         return "El código seleccionado no es una expresión."
       throw e;
     }
-    console.log(locales, carga);
-    return Function("var $local=this.local;var $in=this.carga;return ("+javascript+");").call({
-      local: locales,
+    return Function("var $local=this.local;var $global=this.global;"+
+    "var $entrada=this.entrada;var $salida=this.salida;"+
+    "var $in=this.carga;return ("+javascript+");").call({
+      local: entorno[0],
+      global: entorno[1],
+      entrada: entorno[2],
+      salida: entorno[3],
       carga: carga
     });
   }

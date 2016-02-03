@@ -1,0 +1,26 @@
+Subrutina Set
+Datos
+  x es Numero Global
+  n es Numero de Entrada
+Algoritmo
+  x <- n
+Fin
+
+Subrutina Get
+Datos
+  x es Numero Global
+  n es Numero de Salida
+Algoritmo
+  n <- x
+Fin
+
+Subrutina Externa Inicio
+Datos
+  a es Numero
+  b es Numero
+Algoritmo
+  leerNumero [ mensaje -> a ]
+  Set [ n <- a ]
+  Get [ n -> b ]
+  mostrarNumero [ mensaje <- b ]
+Fin

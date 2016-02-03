@@ -80,26 +80,35 @@
 <body>
   <div class="main">
 <textarea class="editor" id="editor">
+Subrutina Set
+Datos
+  x es Numero Global
+  n es Numero de Entrada
+Algoritmo
+  x <- n
+Fin
+
+Subrutina Get
+Datos
+  x es Numero Global
+  n es Numero de Salida
+Algoritmo
+  n <- x
+Fin
+
 Subrutina Externa Inicio
 Datos
-  piramide es Texto
-  tam es Numero
-  i es Numero
+  a es Numero
+  b es Numero
 Algoritmo
-  mostrar [ mensaje <- "Escribe el tamaño de la pirámide" ]
-  leerNumero [ mensaje -> tam ]
-  // Cambiar a piramide <- ""
-  piramide <- 0 + 1 + 2
-  i <- 1
-	Mientras i <= tam hacer
-    // Pulsa Ctrl+F9 y selecciona 'piramide'
-    piramide <- piramide + (" "*((tam-i)*0.5)) + ("#"*i) + (" "*((tam-i)*0.5))
-    piramide <- piramide + "\n"
-    i <- i + 2
-    pausar
-  Fin
-  mostrar [ mensaje <- "<marquee>" + piramide + "</marquee>" ]
-Fin</textarea>
+  leerNumero [ mensaje -> a ]
+  pausar
+  Set [ n <- a ]
+  Get [ n -> b ]
+  pausar
+  mostrarNumero [ mensaje <- b ]
+Fin
+</textarea>
     <div class="v divisor"></div>
     <div class="compilation">
       <div class="helparea" id="helparea" readonly="readonly"></div>
@@ -203,12 +212,11 @@ Fin</textarea>
       });
 
       var continuarCallback;
-      var ultimoArg;
       var ultimoEntorno;
       $("#continue").click(function() {
         $("#continue").prop('disabled', true);
         ultimoEntorno = null;
-        continuarCallback(null, ultimoArg);
+        continuarCallback(null, null);
       });
 
       var lastCompilation;
@@ -221,7 +229,7 @@ Fin</textarea>
             lastjs = js_beautify(uglify(js_beautify(lastCompilation.javascript)));
           else
             lastjs = js_beautify(lastCompilation.javascript);
-          compilation.innerHTML = textToHtml(lastjs);
+          compilation.innerHTML = zl.escapeHtml(lastjs);
 
         } catch (e) {
           if (zl.error.esError(e))
@@ -255,7 +263,7 @@ Fin</textarea>
 
       zl.io.outWrite = function(html) {
         var t = $("#output").get(0);
-        t.innerHTML += textToHtml(html)
+        t.innerHTML += zl.escapeHtml(html)
         if (isBottom) {
           t.scrollTop = t.scrollHeight;
         }
@@ -286,11 +294,10 @@ Fin</textarea>
         $("#output").get(0).innerHTML = "";
       }
 
-      zl.io.pause = function(arg, entorno, callback) {
+      zl.io.pause = function($local, $global, $entrada, $salida, callback) {
         $("#continue").prop('disabled', false);
         continuarCallback = callback;
-        ultimoEntorno = entorno;
-        ultimoArg = arg;
+        ultimoEntorno = [$local, $global, $entrada, $salida];
         evaluar();
       }
 
@@ -300,15 +307,15 @@ Fin</textarea>
 
       function evaluar() {
         if (evaluando && carga && lastCompilation && ultimoEntorno) {
-          var subrutina = lastCompilation.tabla.subrutinaPorPosicion(editor.getCursor().ch);
+          var subrutina = lastCompilation.tabla.subrutinaPorPosicion(editor.indexFromPos(editor.getCursor()));
           var compilation = $("#helparea").get(0);
+          var valor = zl.Evaluar(editor.getSelection(), subrutina, carga, ultimoEntorno);
+          if (typeof valor === "undefined") {
+            valor = "Desconocido/Sin valor";
+          }
           compilation.innerHTML = "La expresión \n\t"+editor.getSelection()+"\n"+
-            "Equivale a:\n"+zl.Evaluar(editor.getSelection(), subrutina, carga, ultimoEntorno);
+            "Equivale a:\n"+valor;
         }
-      }
-
-      function textToHtml(text) {
-        return text.replace(/\n/g, "<br>").replace(/ /g, "&nbsp;");
       }
 
       var zipindex;
