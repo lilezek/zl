@@ -242,7 +242,14 @@ var modulo = function(zl) {
   zl.javascript.llamadaSalida = function(compilado, simbolo) {
     var resultado = "";
     for (var i = 0; i < compilado.length; i++) {
-      resultado += ";$local." + zl.javascript.nombre(compilado[i].der, simbolo) + "=$salida." + compilado[i].izq;
+      var dato = simbolo.declaraciones[compilado[i].der];
+      if (dato.modificadores === dato.M_LOCAL)
+        resultado = ";$local.";
+      else if (dato.modificadores & dato.M_GLOBAL)
+        resultado = ";$global.";
+      else if (dato.modificadores & dato.M_SALIDA)
+        resultado = ";$salida.";
+      resultado += zl.javascript.nombre(dato.nombre, simbolo) + "=$salida." + compilado[i].izq;
     }
     return resultado;
   }

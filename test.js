@@ -77,6 +77,7 @@ describe('Pruebas de entrada/salida', function() {
     var codigo = codigos["entradasalidanumero"];
     var zlcodigo = zl.Compilar(codigo).javascript;
     var carga = zl.Cargar(zlcodigo);
+    carga.$asincrono.inicio = true;
     carga.$alAcabar = done;
     zl.test.input.push("" + aleatorio);
     zl.Ejecutar(carga);
@@ -93,6 +94,7 @@ describe('Pruebas con globales', function() {
     var codigo = codigos["globales"];
     var zlcodigo = zl.Compilar(codigo).javascript;
     var carga = zl.Cargar(zlcodigo);
+    carga.$asincrono.inicio = true;
     carga.$alAcabar = done;
     zl.test.input.push("" + aleatorio);
     zl.Ejecutar(carga);
@@ -109,6 +111,7 @@ describe('Orden de los operadores', function() {
     var codigo = codigos["ordenoperaciones"];
     var zlcodigo = zl.Compilar(codigo).javascript;
     var carga = zl.Cargar(zlcodigo);
+    carga.$asincrono.inicio = true;
     carga.$alAcabar = done;
     zl.test.input.push("" + aleatorio);
     zl.Ejecutar(carga);

@@ -197,7 +197,6 @@ var modulo = function(zl) {
 
   Subrutina.prototype.rellenarDesdeArbol = function(arbol) {
     // Posicion de la subrutina:
-    console.log(arbol);
     this.posicionSubrutina = [arbol.begin, arbol.end];
     if (arbol.datos[0])
       this.posicionDatos = [arbol.datos[0].begin, arbol.datos[arbol.datos.length - 1].end];

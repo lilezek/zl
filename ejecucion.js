@@ -32,21 +32,26 @@ var modulo = function(zl, async) {
   }
 
   rte.leernumero = function(arg, callback) {
+    var oldabortar = rte.$ultimorte.$abortar;
     rte.$ultimorte.$abortar = zl.io.abortRead;
     zl.io.inRead(function cbck(err, value) {
       var x = parseFloat(value);
       if (isNaN(x))
         zl.io.inRead(cbck);
-      else
+      else {
+        rte.$ultimorte.$abortar = oldabortar;
         callback(null, {
           mensaje: x
         });
+      }
     });
   }
 
   rte.leer = function(arg, callback) {
+    var oldabortar = rte.$ultimorte.$abortar;
     rte.$ultimorte.$abortar = zl.io.abortRead;
     zl.io.inRead(function(err, value) {
+      rte.$ultimorte.$abortar = oldabortar;
       callback(null, {
         mensaje: value
       });
@@ -177,7 +182,7 @@ var modulo = function(zl, async) {
 
   zl.Ejecutar = function(carga) {
     // Preparar la ejecución:
-    var ejecucion = "var $t = this;";
+    var ejecucion = "\"use strict\";var $t = this;";
 
     if (typeof carga.inicio === "function") {
       ejecucion += "$t.inicio({}";
@@ -190,13 +195,14 @@ var modulo = function(zl, async) {
     // TODO: Tener en cuenta el retardo de cálculo y restárselo al interval.
     // TODO: Poder abortar la ejecución de un código con fotograma.
     if (typeof carga.fotograma === "function") {
-      ejecucion += "setTimeout(function cbck(){$t.fotograma({}";
+      ejecucion += "var $fotograma=true;$t.$abortar=function(){$fotograma=false;};"
+      ejecucion += "setTimeout(function cbck(){if (!$fotograma)return;$t.fotograma({}";
       // TODO: Distinguir si this.fotograma es asíncrona o no.
       if (carga.$asincrono.fotograma) {
-        ejecucion += ",function(){setTimeout(cbck," + 1 / zl.configuracion.fps * 1000 + ")})" +
+        ejecucion += ",function(){setTimeout(cbck," + 1 / zl.configuracion.fps * 1000 + ");})" +
           "}," + 1 / zl.configuracion.fps * 1000 + ");";
       } else {
-        ejecucion += ");setTimeout(cbck," + 1 / zl.configuracion.fps * 1000 + ")" +
+        ejecucion += ");setTimeout(cbck," + 1 / zl.configuracion.fps * 1000 + ");" +
           "}," + 1 / zl.configuracion.fps * 1000 + ");";
       }
     } else if (typeof carga.inicio === "function") {
@@ -205,6 +211,7 @@ var modulo = function(zl, async) {
     if (typeof carga.inicio === "function" && carga.$asincrono.inicio) {
       ejecucion += "});";
     }
+
     // Y Ejecutar
     zl.eval.call(carga, ejecucion);
   }

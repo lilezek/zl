@@ -100,8 +100,8 @@ Datos
 	posx es numero global
   posy es numero global
 Algoritmo
-	posx <- 10
-  posy <- 10
+  leerNumero [ mensaje -> posx ]
+  leerNumero [ mensaje -> posy ]
 Fin
 </textarea>
     <div class="v divisor"></div>
@@ -185,6 +185,8 @@ Fin
         if (!carga) {
           $("#run").html("Abortar");
           carga = zl.Cargar(lastjs);
+          carga.$asincrono.inicio = lastCompilation.inicioAsincrono;
+          carga.$asincrono.fotograma = lastCompilation.fotogramaAsincrono;
           carga.$alAcabar = function() {
             carga = null;
             $("#run").html("Empezar");
