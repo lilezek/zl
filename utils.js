@@ -25,6 +25,24 @@ var modulo = function(zl) {
         });
     }
 
+    zl.arrayContains = function(arr, item) {
+      if (!Array.prototype.indexOf) {
+        var i = arr.length;
+        while (i--) {
+          if (arr[i] === item) {
+            return true;
+          }
+        }
+        return false;
+      }
+      return arr.indexOf(item) != -1;
+    }
+
+
+    zl.forEach = function(arr, f) {
+      for (var i = 0, e = arr.length; i < e; ++i) f(arr[i]);
+    }
+
     return zl;
 }
 

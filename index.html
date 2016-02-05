@@ -147,24 +147,22 @@ Fin
         return true;
       });
 
+
+      function autocompletar() {
+        console.log("hint");
+        editor.showHint();
+      }
+
       var evaluando = false;
       editor.addKeyMap({
         "Ctrl-S": download,
         "Cmd-S": download,
         "Ctrl-F9": function(){evaluando = !evaluando;},
         "Cmd-F9": function(){evaluando = !evaluando;},
-        "Ctrl-Space": function() {
-            editor.showHint();
-        },
-        "Cmd-Space": function() {
-            editor.showHint();
-        },
-        "Ctrl-Enter": function() {
-            editor.showHint();
-        },
-        "Cmd-Enter": function() {
-            editor.showHint();
-        }
+        "Ctrl-Space": autocompletar,
+        "Cmd-Space": autocompletar,
+        "Ctrl-Enter": autocompletar,
+        "Cmd-Enter": autocompletar
       });
 
       function saltarAlCodigo(linea, posicion) {
@@ -176,6 +174,7 @@ Fin
 
       var lastjs = "";
       var lasttimeout = null;
+      var lastCompilation = null;
       var minify = false;
 
       var carga = null;
@@ -217,12 +216,12 @@ Fin
         continuarCallback(null, null);
       });
 
-      var lastCompilation;
       function Compile(zlcode) {
         lasttimeout = null;
         var compilation = $("#helparea").get(0);
         try {
           lastCompilation = zl.Compilar(zlcode);
+          zl.autocompletar.alimentarTabla(lastCompilation.tabla);
           if (minify)
             lastjs = js_beautify(uglify(js_beautify(lastCompilation.javascript)));
           else
