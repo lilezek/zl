@@ -16,7 +16,6 @@ var modulo = function(zl) {
   var arbolCodigo = function(zlcode) {
     var analisis = zl.sintaxis.zlAnalizador.empezar(zlcode);
     analisis.modulo();
-    zl.log(analisis.arbol())
     return analisis.resultado(0);
   }
 

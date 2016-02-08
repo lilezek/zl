@@ -87,6 +87,15 @@ var modulo = function(zl, async) {
           t.acumulado = t.pilaAcumulados.pop();
           throw t.propagarError(e);
         }
+        if (k === "subrutina")
+
+        if (t.nodoActual.length) {
+          t.nodoActual.begin = t.nodoActual[0].begin;
+        }
+        if (typeof t.nodoActual.resultado === "object") {
+          t.nodoActual.resultado.begin = t.nodoActual.begin;
+          t.nodoActual.resultado.end = t.nodoActual.end;
+        }
         t.nodoActual.end = t.posicion;
         t.nodoPadre();
         t.acumulado = t.pilaAcumulados.pop();
@@ -111,10 +120,6 @@ var modulo = function(zl, async) {
 
   Analisis.prototype.registrarResultado = function(resultado) {
     this.nodoActual.resultado = resultado;
-    if (typeof resultado === "object") {
-      resultado.begin = this.nodoActual.begin;
-      resultado.end = this.nodoActual.end;
-    }
   };
 
   Analisis.prototype.resultado = function() {
@@ -182,11 +187,12 @@ var modulo = function(zl, async) {
       tipo: id,
       resultado: "$error$"
     });
-
     this.saltar();
+    var beginReal = this.posicion;
     var ocurrencia = this.texto.substring(this.posicion).match(regex);
     if (ocurrencia) {
       this.arbol().resultado = ocurrencia[0];
+      this.arbol().begin = beginReal;
       this.arbol().end = (this.posicion += ocurrencia[0].length);
     } else {
       throw this.propagarError(zl.error.newError(zl.error.E_SIMBOLO, this.arbol()));

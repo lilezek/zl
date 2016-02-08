@@ -23,17 +23,44 @@ var modulo = function(zl) {
       completion.to || data.to, "complete");
   }
 
+  var contextos = {
+    modulo: {
+      $: [],
+      configuracion: {
+        $: ["configuracion"]
+      },
+      subrutinas: {
+        $: ["subrutina"],
+        subrutina: {
+          $: [],
+          cabecera: {
+            $: ["externa", "es", "rapida"]
+          },
+          datos: {
+            $: [],
+            modificadores: {
+              $: ["entrada", "salida", "global"]
+            },
+            tipo: {
+              $: []
+            }
+          },
+          algoritmo: {
+            $: ["mientras","repetir","pausar"]
+          }
+        }
+      }
+    }
+  }
+
+  // TODO: Dejar de usar keywords y usar el contexto
   var keywords = [
-    "no",
-    "y",
-    "o",
     "hacer", {
       displayText: "Si ... hacer ...",
       text: "si",
       repl: "Si %condicion% hacer\n%indent%%codigo%\nFin",
       hint: applyHint
     },
-    "Fin",
     "verdadero",
     "falso",
     "veces", {
@@ -53,11 +80,9 @@ var modulo = function(zl) {
       hint: applyHint
     },
     "externa",
-    "es",
     "rapida",
     "entrada",
     "salida",
-    "de",
     "Datos",
     "Algoritmo",
     "global",
@@ -85,10 +110,10 @@ var modulo = function(zl) {
     var getToken = function(e, cur) {
         return e.getTokenAt(cur);
       }
+    var contexto = zl.autocompletar.contexto();
       // Find the token at the cursor
     var cur = editor.getCursor(),
       token = getToken(editor, cur);
-    console.log(token);
     if (/\b(?:string|comment)\b/.test(token.type)) return;
     token.state = CodeMirror.innerMode(editor.getMode(), token.state).state;
 
@@ -117,15 +142,15 @@ var modulo = function(zl) {
       context.push(tprop.string);
     }
     return {
-      list: getCompletions(token, context, keywords, options),
+      list: getCompletions(token, context, contexto, keywords, options),
       from: Pos(cur.line, token.start),
       to: Pos(cur.line, token.end)
     };
   });
 
-  function getCompletions(token, context, keywords, options) {
+  function getCompletions(token, context, contexto, keywords, options) {
     var start = token.string;
-    var datos = [];
+    var datos = Object.keys(ultimaTabla.subrutinas[contexto.toLowerCase()].declaraciones);
     var tipos = Object.keys(ultimaTabla.tipos).concat(
       (ultimaTabla.moduloInterno ? Object.keys(ultimaTabla.moduloInterno.tipos) : [])
     );
@@ -133,7 +158,7 @@ var modulo = function(zl) {
       (ultimaTabla.moduloInterno ? Object.keys(ultimaTabla.moduloInterno.subrutinas) : [])
     );
     // TODO: Escoger qué arrays concatenar según el contexto.
-    var options = keywords.concat(tipos).concat(datos).concat(subrutinas).filter(function(key) {
+    var options = subrutinas.concat(datos).concat(tipos).concat(keywords).filter(function(key) {
       var text = (typeof key === "string" ? key : key.text);
       return text.toLowerCase().indexOf(start.toLowerCase()) === 0;
     });
@@ -142,6 +167,18 @@ var modulo = function(zl) {
 
   zl.autocompletar.alimentarTabla = function(tabla) {
     ultimaTabla = tabla;
+  }
+
+  zl.autocompletar.contexto = function() {
+    var cur = editor.indexFromPos(editor.getCursor());
+    var sub = ultimaTabla.subrutinaPorPosicion(cur);
+    if (sub) {
+      return sub.nombre;
+    }
+    if (!sub) {
+      // TODO: Comprobar configuración.
+      return "$modulo$";
+    }
   }
 
   return zl;

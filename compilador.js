@@ -14,7 +14,6 @@ var modulo = function(zl) {
   // Genera código javascript a partir de código
   // en zl
   zl.Compilar = function(zlcode, moduloPadre) {
-    zlcode = zlcode.trim();
     var compilado;
     // Fase 1, obtener el árbol sintáctico de la configuración:
     compilado = zl.sintaxis.arbolConfiguracion(zlcode);
@@ -29,7 +28,7 @@ var modulo = function(zl) {
     }
     // Fase 2, modificar el comportamiento según la configuración:
     // TODO: está sin hacer.
-    zlcode = zlcode.substring(compilado.end).trim();
+    zlcode = zlcode.substring(compilado.end);
 
     // Fase 3, obtener el árbol sintáctico del resto del código:
     compilado = zl.sintaxis.arbolCodigo(zlcode);
