@@ -30,7 +30,12 @@ var modulo = function(zl) {
         $: ["configuracion"]
       },
       subrutinas: {
-        $: ["subrutina"],
+        $: [{
+          displayText: "Subrutina ... ",
+          text: "subrutina",
+          repl: "Subrutina %nombre%\nDatos\n\nAlgoritmo\n\nFin",
+          hint: applyHint
+        }],
         subrutina: {
           $: [],
           cabecera: {
@@ -46,72 +51,31 @@ var modulo = function(zl) {
             }
           },
           algoritmo: {
-            $: ["mientras","repetir","pausar"]
+            $: [{
+                displayText: "Mientras ... hacer ...",
+                text: "mientras",
+                repl: "Mientras %condicion% hacer\n%indent%%codigo%\nFin",
+                hint: applyHint
+              }, {
+                displayText: "Repetir ... veces ...",
+                text: "repetir",
+                repl: "Repetir %numero% veces\n%indent%%codigo%\nFin",
+                hint: applyHint
+              },
+              "pausar"
+            ]
           }
         }
       }
     }
   }
 
-  // TODO: Dejar de usar keywords y usar el contexto
-  var keywords = [
-    "hacer", {
-      displayText: "Si ... hacer ...",
-      text: "si",
-      repl: "Si %condicion% hacer\n%indent%%codigo%\nFin",
-      hint: applyHint
-    },
-    "verdadero",
-    "falso",
-    "veces", {
-      displayText: "Repetir ... veces ...",
-      text: "repetir",
-      repl: "Repetir %numero% veces\n%indent%%codigo%\nFin",
-      hint: applyHint
-    }, {
-      displayText: "Mientras ... hacer ...",
-      text: "mientras",
-      repl: "Mientras %condicion% hacer\n%indent%%codigo%\nFin",
-      hint: applyHint
-    }, {
-      displayText: "Subrutina ... ",
-      text: "subrutina",
-      repl: "Subrutina %nombre%\nDatos\n\nAlgoritmo\n\nFin",
-      hint: applyHint
-    },
-    "externa",
-    "rapida",
-    "entrada",
-    "salida",
-    "Datos",
-    "Algoritmo",
-    "global",
-    "pausar",
-    // TODO: Hacer que las subrutinas sean automáticas
-    {
-      displayText: "mostrar ...",
-      text: "mostrar",
-      repl: "mostrar [ mensaje <- %string% ]",
-      hint: applyHint
-    }, {
-      displayText: "leerNumero ...",
-      text: "leernumero",
-      repl: "leerNumero [ mensaje -> %dato&numero% ]",
-      hint: applyHint
-    }, {
-      displayText: "mostrarNumero ...",
-      text: "mostrarnumero",
-      repl: "mostrarNumero [ mensaje <- %numero% ]",
-      hint: applyHint
-    },
-  ];
-
   CodeMirror.registerHelper("hint", "zl", function scriptHint(editor, options) {
     var getToken = function(e, cur) {
-        return e.getTokenAt(cur);
-      }
+      return e.getTokenAt(cur);
+    }
     var contexto = zl.autocompletar.contexto();
-      // Find the token at the cursor
+    // Find the token at the cursor
     var cur = editor.getCursor(),
       token = getToken(editor, cur);
     if (/\b(?:string|comment)\b/.test(token.type)) return;
@@ -142,21 +106,28 @@ var modulo = function(zl) {
       context.push(tprop.string);
     }
     return {
-      list: getCompletions(token, context, contexto, keywords, options),
+      list: getCompletions(token, context, contexto, options),
       from: Pos(cur.line, token.start),
       to: Pos(cur.line, token.end)
     };
   });
 
-  function getCompletions(token, context, contexto, keywords, options) {
+  function getCompletions(token, context, contexto, options) {
+    console.log(contexto.tipo);
     var start = token.string;
-    var datos = Object.keys(ultimaTabla.subrutinas[contexto.toLowerCase()].declaraciones);
-    var tipos = Object.keys(ultimaTabla.tipos).concat(
-      (ultimaTabla.moduloInterno ? Object.keys(ultimaTabla.moduloInterno.tipos) : [])
-    );
-    var subrutinas = Object.keys(ultimaTabla.subrutinas).concat(
-      (ultimaTabla.moduloInterno ? Object.keys(ultimaTabla.moduloInterno.subrutinas) : [])
-    );
+    var sub = contexto.subrutina;
+    var tipos = [], datos = [], subrutinas = [], keywords = contexto.$.$;
+    if (contexto.tipo === "datos") {
+      tipos = Object.keys(ultimaTabla.tipos).concat(
+        (ultimaTabla.moduloInterno ? Object.keys(ultimaTabla.moduloInterno.tipos) : [])
+      );
+    }
+    else if (contexto.tipo === "algoritmo") {
+      datos = Object.keys(sub ? sub.declaraciones : {});
+      subrutinas = Object.keys(ultimaTabla.subrutinas).concat(
+        (ultimaTabla.moduloInterno ? Object.keys(ultimaTabla.moduloInterno.subrutinas) : [])
+      );
+    }
     // TODO: Escoger qué arrays concatenar según el contexto.
     var options = subrutinas.concat(datos).concat(tipos).concat(keywords).filter(function(key) {
       var text = (typeof key === "string" ? key : key.text);
@@ -172,13 +143,39 @@ var modulo = function(zl) {
   zl.autocompletar.contexto = function() {
     var cur = editor.indexFromPos(editor.getCursor());
     var sub = ultimaTabla.subrutinaPorPosicion(cur);
+    var c = contextos["modulo"];
     if (sub) {
-      return sub.nombre;
+      c = c["subrutinas"]["subrutina"];
+      if (cur >= sub.posicionCabecera[0] && cur <= sub.posicionCabecera[1]) {
+        return {
+          tipo: "cabecera",
+          subrutina: sub,
+          $: c["cabecera"]
+        };
+      } else if (cur >= sub.posicionDatos[0] && cur <= sub.posicionDatos[1]) {
+        return {
+          tipo: "datos",
+          subrutina: sub,
+          $: c["datos"]
+        };
+      } else if (cur >= sub.posicionAlgoritmo[0] && cur <= sub.posicionAlgoritmo[1]) {
+        return {
+          tipo: "algoritmo",
+          subrutina: sub,
+          $: c["algoritmo"]
+        };
+      }
+      return {
+        tipo: "subrutina",
+        subrutina: sub,
+        $: c
+      }
     }
-    if (!sub) {
-      // TODO: Comprobar configuración.
-      return "$modulo$";
-    }
+    // TODO: Comprobar configuración.
+    return {
+      tipo: "subrutinas",
+      $: c["subrutinas"]
+    };
   }
 
   return zl;

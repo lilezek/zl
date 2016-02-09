@@ -198,10 +198,9 @@ var modulo = function(zl) {
   Subrutina.prototype.rellenarDesdeArbol = function(arbol) {
     // Posicion de la subrutina:
     this.posicionSubrutina = [arbol.begin, arbol.end];
-    if (arbol.datos[0])
-      this.posicionDatos = [arbol.datos[0].begin, arbol.datos[arbol.datos.length - 1].end];
-    if (arbol.sentencias[0])
-      this.posicionAlgoritmo = [arbol.sentencias[0].begin, arbol.sentencias[arbol.sentencias.length - 1].end - 3]; // El - 3 resta la palabra Fin
+    this.posicionCabecera = arbol.secciones.cabecera;
+    this.posicionDatos = arbol.secciones.datos;
+    this.posicionAlgoritmo = arbol.secciones.algoritmo;
 
     this.nombre = arbol.nombre.toLowerCase();
 

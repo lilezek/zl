@@ -183,7 +183,12 @@ var modulo = function(zl) {
       nombre: this.resultado(2),
       modificadores: this.resultado(1),
       datos: this.resultado(4) || [],
-      sentencias: this.resultado(6) || []
+      sentencias: this.resultado(6) || [],
+      secciones: {
+        cabecera: [this.arbol(0).begin, this.arbol(2).end],
+        datos: [this.arbol(3).begin, this.arbol(4).end],
+        algoritmo: [this.arbol(5).begin, this.arbol(7).begin]
+      }
     });
     return this;
   });

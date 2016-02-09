@@ -135,7 +135,7 @@ Fin
         if (lasttimeout) {
           clearTimeout(lasttimeout);
         }
-        lasttimeout = setTimeout(Compile, 500, editor.getValue());
+        lasttimeout = setTimeout(Compile, 250, editor.getValue());
         if (ev.origin === "+input" && ev.text.join("").trim().length > 0) {
           editor.showHint({
             completeSingle: false
