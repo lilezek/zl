@@ -3,21 +3,28 @@ var modulo = function(zl) {
   zl.autocompletar = {};
   var indentUnit = "  ";
   var Pos = CodeMirror.Pos;
-  var ultimaTabla = null;
+  var ultimaTabla = zl.entorno.newModulo();
 
   function applyHint(cm, data, completion) {
+    var lineaIndent = "";
+    var cur = editor.getCursor();
+    var linea = editor.getLine(cur.line);
+    var i = 0;
+    while (/[ \t]/.test(linea[i])) {
+      lineaIndent += linea[i++];
+    }
 
     var str = completion.repl;
     // TODO: Hacer reemplazamientos inteligentes
-    str = str.replace("%condicion%", "verdadero")
-      .replace("%indent%", indentUnit)
-      .replace("%numero%", "3")
-      .replace("%codigo%", "// Código aquí")
-      .replace("%string%", "\"\"")
-      .replace("%nombre%", "Nombre")
-      .replace(/%dato&([a-z]+)%/, "dato$1")
+    str = str.replace(/%condicion%/g, "verdadero")
+      .replace(/%indent%/g, indentUnit)
+      .replace(/%numero%/g, "3")
+      .replace(/%codigo%/g, "// Código aquí")
+      .replace(/%texto%/g, "\"\"")
+      .replace(/%nombre%/g, "Nombre")
+      .replace(/%dato&([a-z]+)%/g, "dato$1")
+      .replace(/\n/g, "\n" + lineaIndent);
 
-    // TODO: Identar el bloque entero correctamente
 
     cm.replaceRange(str, completion.from || data.from,
       completion.to || data.to, "complete");
@@ -42,7 +49,8 @@ var modulo = function(zl) {
             $: ["externa", "es", "rapida"]
           },
           datos: {
-            $: [],
+            // TODO: Eliminar los modificadores:
+            $: ["entrada", "salida", "global"],
             modificadores: {
               $: ["entrada", "salida", "global"]
             },
@@ -61,7 +69,12 @@ var modulo = function(zl) {
                 text: "repetir",
                 repl: "Repetir %numero% veces\n%indent%%codigo%\nFin",
                 hint: applyHint
-              },
+              },{
+                displayText: "si ... hacer ...",
+                text: "si",
+                repl: "Si %condicion% hacer\n%indent%%codigo%\nFin",
+                hint: applyHint
+              }
               "pausar"
             ]
           }
@@ -112,20 +125,56 @@ var modulo = function(zl) {
     };
   });
 
+  function generarHintSubrutinas(mapa) {
+    var resultado = [];
+    for (var k in mapa) {
+      var sub = mapa[k];
+      var hint = {
+        displayText: sub.nombre + " ... [ ]",
+        text: sub.nombre,
+        hint: applyHint,
+        repl: sub.nombre + " ["
+      }
+      for (var h in sub.declaraciones) {
+        var decl = sub.declaraciones[h];
+        if (!(decl.modificadores & decl.M_GLOBAL) && !(decl.modificadores == decl.M_LOCAL)) {
+          hint.repl += "\n%indent%" + decl.nombre;
+          if (decl.modificadores & decl.M_ENTRADA && decl.modificadores & decl.M_SALIDA) {
+            hint.repl += " <-> ";
+            hint.repl += "%dato&";
+          } else if (decl.modificadores & decl.M_ENTRADA) {
+            hint.repl += " <- ";
+            hint.repl += "%";
+          } else if (decl.modificadores & decl.M_SALIDA) {
+            hint.repl += " -> ";
+            hint.repl += "%dato&";
+          }
+          hint.repl += decl.tipo.nombre + "%";
+        }
+      }
+      if (!/[\n\[]/.test(hint.repl[hint.repl.length-1]))
+        hint.repl += "\n";
+      hint.repl += "]";
+      resultado.push(hint);
+    }
+    return resultado;
+  }
+
   function getCompletions(token, context, contexto, options) {
-    console.log(contexto.tipo);
     var start = token.string;
     var sub = contexto.subrutina;
-    var tipos = [], datos = [], subrutinas = [], keywords = contexto.$.$;
+    var tipos = [],
+      datos = [],
+      subrutinas = [],
+      keywords = contexto.$.$;
     if (contexto.tipo === "datos") {
       tipos = Object.keys(ultimaTabla.tipos).concat(
         (ultimaTabla.moduloInterno ? Object.keys(ultimaTabla.moduloInterno.tipos) : [])
       );
-    }
-    else if (contexto.tipo === "algoritmo") {
+    } else if (contexto.tipo === "algoritmo") {
       datos = Object.keys(sub ? sub.declaraciones : {});
-      subrutinas = Object.keys(ultimaTabla.subrutinas).concat(
-        (ultimaTabla.moduloInterno ? Object.keys(ultimaTabla.moduloInterno.subrutinas) : [])
+      subrutinas = generarHintSubrutinas(ultimaTabla.subrutinas).concat(
+        (ultimaTabla.moduloInterno ? generarHintSubrutinas(ultimaTabla.moduloInterno.subrutinas) : [])
       );
     }
     // TODO: Escoger qué arrays concatenar según el contexto.

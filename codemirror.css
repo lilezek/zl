@@ -439,5 +439,9 @@ span.CodeMirror-selectedtext {
 }
 
 .CodeMirror-line-pausar {
+  background-color: #ffd55b;
+}
+
+.CodeMirror-line-error {
   background-color: #ff9e9e;
 }

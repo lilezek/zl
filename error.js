@@ -161,10 +161,11 @@ var modulo = function(zl) {
   }
 
   function TarjetaError(error, zlcodigo) {
+    this.lineas = [];
     if (error.tipo == zl.error.E_SIMBOLO) {
       var hojas = error.hojas();
       this.posicion = hojas[hojas.length - 1].end;
-      this.linea = zl.error.posicionCaracter(zlcodigo, this.posicion).linea;
+      this.lineas.push(this.linea = zl.error.posicionCaracter(zlcodigo, this.posicion).linea);
       this.mensajeError = "Error genérico." +
         zl.error.obtenerMensaje(error, zlcodigo);
     } else {
@@ -176,7 +177,7 @@ var modulo = function(zl) {
       );
       console.log(zl.error);
       var tmp = zl.error.posicionCaracter(zlcodigo, this.posicion);
-      this.linea = tmp.linea;
+      this.lineas.push(this.linea = tmp.linea);
       this.columna = tmp.columna;
       if (error.tipo === zl.error.E_ASIGNACION_INCOMPATIBLE) {
         // TODO: Que esta división no sea necesaria
@@ -216,6 +217,10 @@ var modulo = function(zl) {
 
   TarjetaError.prototype.htmlLinea = function(linea, columna) {
     return "<span class='linea' onclick='return saltarAlCodigo("+(linea-1)+","+(columna)+");'>"+linea+"</span>";
+  }
+
+  TarjetaError.prototype.lineasDeError = function() {
+    return this.lineas;
   }
 
   zl.error.obtenerMensajeHtml = function(error, zlcodigo) {

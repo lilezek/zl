@@ -163,6 +163,13 @@ var modulo = function(zl) {
       var decl = arbol.salida[k];
       var der = sub.declaraciones[decl.der];
       var nombre = decl.izq;
+      if (!der) {
+        throw zl.error.newError(zl.error.E_NOMBRE_NO_DEFINIDO, {
+          nombre: decl.der,
+          posicion: [decl.begin, decl.end],
+          declaraciones: sub.declaraciones
+        })
+      }
       if (nombre.toLowerCase() in llamada.declaraciones) {
         var decl2 = llamada.declaraciones[nombre.toLowerCase()];
         if (!(decl2.modificadores & decl2.M_SALIDA) && decl2.modificadores & decl2.M_ENTRADA) {

@@ -22,7 +22,6 @@
   <script src="show-hint.js"></script>
   <link rel="stylesheet" href="codemirror.css">
   <link rel="stylesheet" href="https://codemirror.net/addon/hint/show-hint.css">
-  <script src="autocompletar.js"></script>
   <script src="utils.js"></script>
   <script src="analizador.js"></script>
   <script src="zlsintaxis.js"></script>
@@ -35,6 +34,7 @@
   <script src="compilador.js"></script>
   <script src="javascript.js"></script>
   <script src="editor.js"></script>
+  <script src="autocompletar.js"></script>
   <script src="https://skalman.github.io/UglifyJS-online/uglify/lib/utils.js"></script>
   <script src="https://skalman.github.io/UglifyJS-online/uglify/lib/ast.js"></script>
   <script src="https://skalman.github.io/UglifyJS-online/uglify/lib/parse.js"></script>
@@ -79,31 +79,7 @@
 
 <body>
   <div class="main">
-<textarea class="editor" id="editor">
-Subrutina Externa Fotograma
-Datos
-	posx es Numero global
-  posy es numero global
-  x es Numero
-Algoritmo
-  aleatorio [ minimo <- 0 maximo <- 2 resultado -> x]
-	posx <- (posx - x + 1)%50
-  aleatorio [ minimo <- 0 maximo <- 2 resultado -> x]
-	posy <- (posy - x + 1)%50
-  limpiar []
-  mostrar [ mensaje <- "\n" * (posy - 1)]
-  mostrar [ mensaje <- (" " * (posx - 1)) + "#" ]
-Fin
-
-Subrutina Externa Inicio
-Datos
-	posx es numero global
-  posy es numero global
-Algoritmo
-  leerNumero [ mensaje -> posx ]
-  leerNumero [ mensaje -> posy ]
-Fin
-</textarea>
+<textarea class="editor" id="editor"></textarea>
     <div class="v divisor"></div>
     <div class="compilation">
       <div class="helparea" id="helparea" readonly="readonly"></div>
@@ -132,15 +108,25 @@ Fin
         styleActiveLine: true
       });
       editor.on("change", function(cm, ev) {
+        var movido = 0;
+        for (var i = 0; i < ev.text.length; i++) {
+          movido += ev.text[i].length;
+        }
+        for (var i = 0; i < ev.removed.length; i++) {
+          movido -= ev.removed[i].length;
+        }
+        if (lastCompilation)
+          lastCompilation.tabla.desplazarPosiciones(editor.indexFromPos(ev.from),movido);
         if (lasttimeout) {
           clearTimeout(lasttimeout);
         }
         lasttimeout = setTimeout(Compile, 250, editor.getValue());
-        if (ev.origin === "+input" && ev.text.join("").trim().length > 0) {
+        if (ev.origin === "+input" && /[a-zA-Z\.]/.test(ev.text)) {
           editor.showHint({
             completeSingle: false
           });
         }
+
       });
       editor.on("cursorActivity", function(){
         setTimeout(evaluar,20);
@@ -175,9 +161,12 @@ Fin
       var lasttimeout = null;
       var lastCompilation = null;
       var minify = false;
+      var errorLineas = [];
 
       var carga = null;
       $("#run").click(function() {
+        if (!lastCompilation)
+          return false;
         var compilation = $("#helparea").get(0);
         var zlcode = editor.getValue();
         if (!carga) {
@@ -192,8 +181,14 @@ Fin
           try {
             zl.Ejecutar(carga);
           } catch (e) {
-            if (zl.error.esError(e))
-              compilation.innerHTML = zl.error.obtenerMensaje(e, zlcode);
+            if (zl.error.esError(e)){
+              var tarjeta = zl.error.obtenerMensajeHtml(e, zlcode);
+              compilation.innerHTML = tarjeta.getHtml();
+              for (var i = 0; i < tarjeta.lineasDeError().length; i++) {
+                var x = tarjeta.lineasDeError()[i]-1;
+                errorLineas.push(editor.addLineClass(x, "background", "CodeMirror-line-error"));
+              }
+            }
             else
               throw e;
           }
@@ -219,6 +214,7 @@ Fin
         lasttimeout = null;
         var compilation = $("#helparea").get(0);
         try {
+          eliminarLineasError();
           lastCompilation = zl.Compilar(zlcode);
           zl.autocompletar.alimentarTabla(lastCompilation.tabla);
           if (minify)
@@ -226,14 +222,27 @@ Fin
           else
             lastjs = js_beautify(lastCompilation.javascript);
           compilation.innerHTML = zl.escapeHtml(lastjs);
-
         } catch (e) {
-          if (zl.error.esError(e))
-            compilation.innerHTML = zl.error.obtenerMensajeHtml(e, zlcode).getHtml();
+          if (zl.error.esError(e)) {
+            var tarjeta = zl.error.obtenerMensajeHtml(e, zlcode);
+            compilation.innerHTML = tarjeta.getHtml();
+            for (var i = 0; i < tarjeta.lineasDeError().length; i++) {
+              var x = tarjeta.lineasDeError()[i]-1;
+              errorLineas.push(editor.addLineClass(x, "background", "CodeMirror-line-error"));
+            }
+          }
           else
             throw e;
         }
       }
+
+      function eliminarLineasError() {
+        for (var i = 0; i < errorLineas.length; i++) {
+          editor.removeLineClass(errorLineas[i], "background", "CodeMirror-line-error");
+        }
+        errorLineas = [];
+      }
+
       Compile(editor.getValue());
 
       function download() {
