@@ -74,7 +74,7 @@ var modulo = function(zl) {
                 text: "si",
                 repl: "Si %condicion% hacer\n%indent%%codigo%\nFin",
                 hint: applyHint
-              }
+              },
               "pausar"
             ]
           }

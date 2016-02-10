@@ -19,6 +19,7 @@
   <script src="jsziputils.js"></script>
   <script src="https://codemirror.net/addon/mode/simple.js"></script>
   <script src="https://codemirror.net/addon/selection/active-line.js"></script>
+  <script src="matchbrackets.js"></script>
   <script src="show-hint.js"></script>
   <link rel="stylesheet" href="codemirror.css">
   <link rel="stylesheet" href="https://codemirror.net/addon/hint/show-hint.css">
@@ -79,7 +80,26 @@
 
 <body>
   <div class="main">
-<textarea class="editor" id="editor"></textarea>
+<textarea class="editor" id="editor">Subrutina externa Inicio
+Datos
+	a es Numero
+  b es Numero
+  n es numero
+Algoritmo
+	a <- 1
+  b <- 1
+  leernumero [
+	  mensaje -> n
+	]
+  Repetir n veces
+    a <- a + b
+    b <- a - b
+    mostrarnumero [
+      mensaje <- a
+    ]
+    pausar
+  Fin
+Fin</textarea>
     <div class="v divisor"></div>
     <div class="compilation">
       <div class="helparea" id="helparea" readonly="readonly"></div>
@@ -105,7 +125,8 @@
         identWithTabs: false,
         smartIdent: true,
         cursorBlinkRate: 0,
-        styleActiveLine: true
+        styleActiveLine: true,
+        matchBrackets: true
       });
       editor.on("change", function(cm, ev) {
         var movido = 0;
