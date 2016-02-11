@@ -7,7 +7,6 @@ var modulo = function(zl) {
     "no": true,
     "y": true,
     "o": true,
-    "hacer": true,
     "si": true,
     "fin": true,
     "verdadero": true,
@@ -425,6 +424,20 @@ var modulo = function(zl) {
     return this;
   });
 
+  a.regla("expresionUnaria", function() {
+    this.intentar([
+      ["-"],
+      ["+"],
+      ["no"]
+    ]).evaluacion();
+    var intento = this.resultado(0);
+    this.registrarResultado({
+      der: this.resultado(1),
+      op: this.resultado(0, intento, 0)
+    });
+    return this;
+  })
+
   a.regla("evaluacion", function() {
     this.intentar([
       ["numero"],
@@ -434,13 +447,19 @@ var modulo = function(zl) {
       ["falso"],
       ["nombre", "(", "listaAcceso", ")"],
       ["nombre"],
-      ["(", "expresion", ")"]
+      ["(", "expresion", ")"],
+      ["expresionUnaria"]
     ]);
     var intento = this.resultado(0);
     if (intento == 7)
       this.registrarResultado({
         valor: this.resultado(0, intento, 1),
         tipo: this.arbol(0, intento, 1).tipo
+      });
+    else if (intento == 8)
+      this.registrarResultado({
+        valor: this.resultado(0, intento, 0),
+        tipo: "expresion"
       });
     else if (intento == 5) {
       this.registrarResultado({

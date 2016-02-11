@@ -404,6 +404,14 @@ var modulo = function(zl) {
     var lista = zl.entorno.newTipo(mod); {
       zl.writeJson(numero, {
         nombre: "numero",
+        opunario: {
+          '+': {
+            resultado: 'numero'
+          },
+          '-': {
+            resultado: 'numero'
+          }
+        },
         opbinario: {
           '>': {
             'numero': {
@@ -473,7 +481,12 @@ var modulo = function(zl) {
       });
 
       zl.writeJson(booleano, {
-        nombre: "booleano"
+        nombre: "booleano",
+        opunario: {
+          'no': {
+            resultado: 'booleano'
+          }
+        },
       });
 
       zl.writeJson(texto, {

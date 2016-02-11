@@ -89,6 +89,7 @@ var modulo = function(zl) {
       } else if (s.tipo == "sicondicional") {
         while (s) {
           if (s.condicion) {
+            console.log(s.condicion);
             var tipo = testarExpresion(s.condicion, sub);
             if (tipo.nombre != "booleano") {
               throw zl.error.newError(zl.error.E_CONDICION_NO_BOOLEANA, {
@@ -279,7 +280,6 @@ var modulo = function(zl) {
     else if (!arbol.tipo && arbol.op && arbol.der) {
       var tipoder = testarExpresion(arbol.der, sub);
       var op = arbol.op;
-      // TODO: añadir las unarias
       // binarias:
       if (arbol.izq) {
         var tipoizq = testarExpresion(arbol.izq, sub);
@@ -305,6 +305,16 @@ var modulo = function(zl) {
             posder: [arbol.der.begin, arbol.der.end]
           });
         return modulo.tipoPorNombre(tipores.resultado);
+      } else /* Operaciones unarias */ {
+        var operacion = tipoder.opunario[op];
+        if (!operacion)
+          throw zl.error.newError(zl.error.E_OPERACION_NO_DEFINIDA, {
+            posicion: [arbol.begin, arbol.end],
+            op: op,
+            der: tipoder,
+            posder: [arbol.der.begin, arbol.der.end]
+          });
+        return modulo.tipoPorNombre(operacion.resultado);
       }
     }
   }

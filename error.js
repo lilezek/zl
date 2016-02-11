@@ -59,9 +59,9 @@ var modulo = function(zl) {
     var hojas = this.hojas();
     var posicion = hojas[hojas.length - 1].end;
     var pos = zl.error.posicionCaracter(codigo, posicion);
-    var resultado = pos.linea + "." + zl.error.linea(codigo, pos.linea) + "\n";
-    for (var i = 0; i < pos.columna + (pos.linea + "").length + 1; i++)
-      resultado += " ";
+    var resultado = zl.error.linea(codigo, pos.linea).replace(/ /g, "&nbsp;").replace(/\n/g, "<br>") + "<br>";
+    for (var i = 0; i < pos.columna; i++)
+      resultado += "&nbsp;";
     return resultado + "^";
   }
 
@@ -161,35 +161,111 @@ var modulo = function(zl) {
   }
 
   function TarjetaError(error, zlcodigo) {
+    console.log(error);
     this.lineas = [];
     if (error.tipo == zl.error.E_SIMBOLO) {
       var hojas = error.hojas();
       this.posicion = hojas[hojas.length - 1].end;
-      this.lineas.push(this.linea = zl.error.posicionCaracter(zlcodigo, this.posicion).linea);
-      this.mensajeError = "Error genérico." +
-        zl.error.obtenerMensaje(error, zlcodigo);
-    } else {
-      console.log(error.traza);
-      // TODO: Unificar la información que se pasa por los errores:
-      this.posicion = zl.error.saltar(zlcodigo,
-        (error.traza.arbol ? error.traza.arbol.begin : null) ||
-        (error.traza.posicion ? error.traza.posicion[0] : null)
-      );
-      console.log(zl.error);
       var tmp = zl.error.posicionCaracter(zlcodigo, this.posicion);
       this.lineas.push(this.linea = tmp.linea);
       this.columna = tmp.columna;
-      if (error.tipo === zl.error.E_ASIGNACION_INCOMPATIBLE) {
+
+      this.mensajeError = "Error genérico.<br>" +
+        this.htmlLinea(this.linea, this.columna) +
+        this.htmlCodigo(error.apuntador(zlcodigo));
+      if (this.linea > 0) {
+        this.mensajeError += "<br>" +
+          "Nota, es posible que el error esté en la línea anterior:<br>" +
+          this.htmlLinea(this.linea - 1, 999) +
+          this.htmlCodigo(zl.error.linea(zlcodigo, this.linea - 1));
+      }
+    } else {
+      // TODO: Unificar la información que se pasa por los errores:
+      this.posicion = zl.error.saltar(zlcodigo, (error.traza.arbol ? error.traza.arbol.begin : null) ||
+        (error.traza.posicion ? error.traza.posicion[0] : null)
+      );
+      var tmp = zl.error.posicionCaracter(zlcodigo, this.posicion);
+      this.lineas.push(this.linea = tmp.linea);
+      this.columna = tmp.columna;
+      this.mensajeError = "Error: en la línea <br>" +
+        this.htmlLinea(this.linea, this.columna) + this.htmlCodigo(zl.error.linea(zlcodigo, this.linea)) + "<br>";
+      if (error.tipo === zl.error.E_PALABRA_RESERVADA) {
+
+      }
+      else if (error.tipo === zl.error.E_NOMBRE_SUBRUTINA_YA_USADO) {
+
+      }
+      else if (error.tipo === zl.error.E_NOMBRE_DATO_YA_USADO) {
+
+      }
+      else if (error.tipo === zl.error.E_MODIFICADOR_REPETIDO) {
+
+      }
+      else if (error.tipo === zl.error.E_USO_INDEBIDO_MODIFICADOR_GLOBAL) {
+
+      }
+      else if (error.tipo === zl.error.E_GLOBALES_INCOMPATIBLES) {
+
+      }
+      else if (error.tipo === zl.error.E_LLAMADA_NOMBRE_NO_ENCONTRADO) {
+
+      }
+      else if (error.tipo === zl.error.E_LLAMADA_DATO_INEXISTENTE) {
+
+      }
+      else if (error.tipo === zl.error.E_LLAMADA_DATO_INCOMPATIBLE) {
+
+      }
+      else if (error.tipo === zl.error.E_LLAMADA_DATOS_INCOMPLETOS) {
+
+      }
+      else if (error.tipo === zl.error.E_NOMBRE_NO_DEFINIDO) {
+
+      }
+      else if (error.tipo === zl.error.E_OPERACION_TIPO_INCOMPATIBLE_BINARIO) {
+
+      }
+      else if (error.tipo === zl.error.E_OPERACION_NO_DEFINIDA) {
+
+      }
+      else if (error.tipo === zl.error.E_CONDICION_NO_BOOLEANA) {
+
+      }
+      else if (error.tipo === zl.error.E_VECES_NO_NUMERICO) {
+
+      }
+      else if (error.tipo === zl.error.E_ASIGNACION_INCOMPATIBLE) {
+
+      }
+      else if (error.tipo === zl.error.E_TIPO_NO_EXISTE) {
+
+      }
+      else if (error.tipo === zl.error.E_FLECHA_INCORRECTA) {
+
+      }
+      else if (error.tipo === zl.error.E_ACCESO_A_DATO_LOCAL) {
+
+      }
+      else if (error.tipo === zl.error.E_LECTURA_ILEGAL) {
+
+      }
+      else if (error.tipo === zl.error.E_ESCRITURA_ILEGAL) {
+
+      }
+      else if (error.tipo === zl.error.E_INDICE_NO_LISTA_NO_RELACION) {
+
+      }
+      else if (error.tipo === zl.error.E_EJECUCION_INDICE_DESCONTROLADO) {
+
+      }
+      else if (error.tipo === zl.error.E_ASIGNACION_INCOMPATIBLE) {
         // TODO: Que esta división no sea necesaria
         // TODO: Incluir la declaración del dato
         var partes = zlcodigo.substring(this.posicion, error.traza.posicion[1]).split("<-");
-        this.mensajeError = "Error: la expresión <br>" +
-          this.htmlLinea(this.linea, this.columna) + this.htmlCodigo(partes[1]) + "<br>" +
+        this.mensajeError +=
           "genera un valor de tipo <span class='tipo'>" + error.traza.obtenido.nombre + "</span><br>" +
           "pero el dato <span class='dato'>" + error.traza.arbol.variable +
           "</span> es de tipo <span class='tipo'>" + error.traza.esperado.nombre + "</span>";
-      } else {
-        this.mensajeError = zl.error.obtenerMensaje(error, zlcodigo);
       }
     }
     return this;
@@ -203,20 +279,20 @@ var modulo = function(zl) {
   }
 
   TarjetaError.prototype.htmlCodigo = function(codigo) {
-    return "<span class='codigo'>"+codigo.trim()+"</span>";
+    return "<span class='codigo'>" + codigo.trim() + "</span>";
   }
 
   TarjetaError.prototype.htmlTipo = function(tipo) {
-    return "<span class='tipo'>"+tipo.nombre+"</span>";
+    return "<span class='tipo'>" + tipo.nombre + "</span>";
   }
 
   // TODO: Recibir el dato y no el nombre
   TarjetaError.prototype.htmlDato = function(nombre) {
-    return "<span class='dato'>"+nombre+"</span>";
+    return "<span class='dato'>" + nombre + "</span>";
   }
 
   TarjetaError.prototype.htmlLinea = function(linea, columna) {
-    return "<span class='linea' onclick='return saltarAlCodigo("+(linea-1)+","+(columna)+");'>"+linea+"</span>";
+    return "<span class='linea' onclick='return saltarAlCodigo(" + (linea - 1) + "," + (columna) + ");'>" + linea + "</span>";
   }
 
   TarjetaError.prototype.lineasDeError = function() {
