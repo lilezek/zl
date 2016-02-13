@@ -80,25 +80,30 @@
 
 <body>
   <div class="main">
-<textarea class="editor" id="editor">Subrutina externa Inicio
+<textarea class="editor" id="editor">
+Subrutina Externa Inicio
 Datos
-	a es Numero
-  b es Numero
-  n es numero
+  inicio es Numero
+  cuenta es Texto Global
 Algoritmo
-	a <- 1
-  b <- 1
-  leernumero [
-	  mensaje -> n
-	]
-  Repetir n veces
-    a <- a + b
-    b <- a - b
-    mostrarnumero [
-      mensaje <- a
-    ]
-    pausar
+  leerNumero [
+    mensaje <- inicio
+  ]
+  Si inicio > "0" Hacer
+    cuenta <- inicio
+  Si no hacer
+    cuenta <- "0"
   Fin
+Fin
+
+Subrutina Externa Fotograma
+Datos
+	cuenta es Texto Global
+Algoritmo
+  cuenta <- cuenta + 0.1
+  mostrarnmero [
+      mensje <- cuenta
+  ]
 Fin</textarea>
     <div class="v divisor"></div>
     <div class="compilation">

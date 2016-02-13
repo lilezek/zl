@@ -582,7 +582,7 @@ var modulo = function(zl) {
       mod.registrar(aleatorio);
     }
 
-    // Mostrar:
+    // Limpiar:
     {
       var limpiar = zl.entorno.newSubrutina(mod);
 

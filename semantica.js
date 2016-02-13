@@ -89,7 +89,6 @@ var modulo = function(zl) {
       } else if (s.tipo == "sicondicional") {
         while (s) {
           if (s.condicion) {
-            console.log(s.condicion);
             var tipo = testarExpresion(s.condicion, sub);
             if (tipo.nombre != "booleano") {
               throw zl.error.newError(zl.error.E_CONDICION_NO_BOOLEANA, {
@@ -119,10 +118,9 @@ var modulo = function(zl) {
     if (!llamada)
       throw zl.error.newError(zl.error.E_LLAMADA_NOMBRE_NO_ENCONTRADO, {
         arbol: arbol,
-        // TODO:
-        tabla: {
-          todo: "todo"
-        }
+        tabla: Object.keys(modulo.subrutinas).concat(
+          (modulo.moduloInterno ? Object.keys(modulo.moduloInterno.subrutinas) : [])
+        )
       });
     for (var k in arbol.entrada) {
       var decl = arbol.entrada[k];
@@ -190,8 +188,9 @@ var modulo = function(zl) {
         if (!decl2.tipo.esCompatible(der.tipo))
           throw zl.error.newError(zl.error.E_LLAMADA_DATO_INCOMPATIBLE, {
             esperado: decl2.tipo,
-            obtenido: tipo,
-            dato: decl2
+            obtenido: der.tipo,
+            dato: decl2,
+            posicion: [decl.begin, decl.end]
           });
       } else {
         throw zl.error.newError(zl.error.E_LLAMADA_DATO_INEXISTENTE, {

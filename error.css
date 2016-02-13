@@ -38,3 +38,9 @@
   background-color: #eeeeee;
   color: #d28f9b;
 }
+
+.error > .subrutina {
+  text-transform: capitalize;
+  background-color: #eeeeee;
+  color: #d28f9b;
+}
