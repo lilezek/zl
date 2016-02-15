@@ -110,6 +110,10 @@ var modulo = function(zl, async) {
     return this;
   }
 
+  Analisis.prototype.moverCursor = function(posicion) {
+    this.posicion = posicion;
+  }
+
   Analisis.prototype.propagarError = function(error) {
     if (this.arbol().length)
       this.arbol().end = this.arbol(this.arbol().length - 1).end;

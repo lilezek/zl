@@ -17,10 +17,14 @@ CodeMirror.defineSimpleMode("zl", {
       regex: /(subrutina)(.*\s)([a-zA-Z]+)/i,
       token: ["keyword", null, "variable-2"]
     },
+    {
+      regex: /(?:fps|precision)/i,
+      token: "variable-2"
+    },
     // Rules are matched in the order in which they appear, so there is
     // no ambiguity between this one and the one above
     {
-      regex: /(?:o|y|no|mientras|repetir|pausar|algoritmo)/i,
+      regex: /(?:o|y|no|mientras|repetir|pausar|algoritmo|importar)/i,
       token: "keyword"
     }, {
       regex: /verdadero|falso/i,
@@ -43,7 +47,7 @@ CodeMirror.defineSimpleMode("zl", {
     },
     // indent and dedent properties guide autoindentation
     {
-      regex: /([\[]|hacer|veces|datos)/i,
+      regex: /([\[]|hacer|veces|datos|configuracion)/i,
       indent: true,
       token: "keyword"
     }, {

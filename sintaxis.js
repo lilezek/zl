@@ -8,13 +8,17 @@ var modulo = function(zl) {
     require("./zlsintaxis")(zl);
   }
 
-  var arbolConfiguracion = function(zlcode) {
+  var arbolConfiguracion = function(zlcode, offset) {
+    offset = offset || 0;
     var analisis = zl.sintaxis.zlAnalizador.empezar(zlcode);
-    return analisis.configuracion().arbol();
+    analisis.moverCursor(offset);
+    return analisis.configuraciones().resultado(0);
   }
 
-  var arbolCodigo = function(zlcode) {
+  var arbolCodigo = function(zlcode, offset) {
+    offset = offset || 0;
     var analisis = zl.sintaxis.zlAnalizador.empezar(zlcode);
+    analisis.moverCursor(offset);
     analisis.modulo();
     return analisis.resultado(0);
   }

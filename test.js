@@ -4,6 +4,7 @@ var zl = require('./compilador')({
 // Meter el NodeJS Test IO antes de que la ejecución cargue su propio IO
 require('./njstestio')(zl);
 require('./ejecucion')(zl);
+require('./configuracion')(zl);
 
 var chai = require('chai');
 var expect = chai.expect;
@@ -20,6 +21,12 @@ var codigos = {
   'listabidimensional': '',
   'globales': ''
 };
+
+function precision(n) {
+  return (zl.configuracion.precision > 0       ?
+    n.toPrecision(zl.configuracion.precision)  :
+    n                                          )
+}
 
 for (var k in codigos) {
   codigos[k] = fs.readFileSync("pruebas/" + k + ".zl").toString();
@@ -67,7 +74,7 @@ describe('Emisión de valores correctos', function() {
     var zlcodigo = zl.Compilar(codigo).javascript;
     var carga = zl.Cargar(zlcodigo);
     zl.Ejecutar(carga);
-    expect(zl.test.output[0]).to.equal((32).toPrecision(7) + "\n");
+    expect(zl.test.output[0]).to.equal(precision(32) + "\n");
   });
 });
 
@@ -84,7 +91,7 @@ describe('Pruebas de entrada/salida', function() {
   });
 
   it('Entrada/salida de número ' + aleatorio, function() {
-    expect(zl.test.output[0]).to.equal(aleatorio.toPrecision(7) + "\n");
+    expect(zl.test.output[0]).to.equal(precision(aleatorio) + "\n");
   });
 });
 
@@ -101,7 +108,7 @@ describe('Pruebas con globales', function() {
   });
 
   it('Entrada/salida con globales ' + aleatorio, function() {
-    expect(zl.test.output[0]).to.equal(aleatorio.toPrecision(7) + "\n");
+    expect(zl.test.output[0]).to.equal(precision(aleatorio) + "\n");
   });
 })
 
@@ -118,7 +125,7 @@ describe('Orden de los operadores', function() {
   });
 
   it('Orden básico de los operadores aritméticos con número ' + aleatorio, function() {
-    expect(zl.test.output[0]).to.equal((3.1 - aleatorio + 4 * 2).toPrecision(7) + "\n");
+    expect(zl.test.output[0]).to.equal(precision(3.1 - aleatorio + 4 * 2) + "\n");
   });
 })
 

@@ -22,13 +22,19 @@ var modulo = function(zl, async) {
   if (typeof window !== "undefined")
     window.$zl_rte = rte;
 
+  rte.$precision = function(arg) {
+    return (zl.configuracion.precision > 0 ?
+      arg.toPrecision(zl.configuracion.precision) :
+      arg);
+  }
+
   // mensaje es Texto de Entrada
   rte.mostrar = function(arg) {
     zl.io.outWrite(arg.mensaje + "\n");
   }
 
   rte.mostrarnumero = function(arg) {
-    zl.io.outWrite(arg.mensaje.toPrecision(7) + "\n");
+    zl.io.outWrite(rte.$precision(arg.mensaje) + "\n");
   }
 
   rte.leernumero = function(arg, callback) {

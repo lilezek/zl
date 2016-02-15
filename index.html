@@ -81,28 +81,27 @@
 <body>
   <div class="main">
 <textarea class="editor" id="editor">
+// Código para quemar CPU y medir la eficiencia de los
+// distintos exploradores.
+Configuracion
+  fps <- 1000
+  precision <- 0
+Fin
+
 Subrutina Externa Inicio
 Datos
-  inicio es Numero
-  cuenta es Texto Global
+  cuenta es Numero Global
 Algoritmo
-  leerNumero [
-    mensaje <- inicio
-  ]
-  Si inicio > "0" Hacer
-    cuenta <- inicio
-  Si no hacer
-    cuenta <- "0"
-  Fin
+  cuenta <- 0
 Fin
 
 Subrutina Externa Fotograma
 Datos
-	cuenta es Texto Global
+	cuenta es Numero Global
 Algoritmo
-  cuenta <- cuenta + 0.1
-  mostrarnmero [
-      mensje <- cuenta
+  cuenta <- cuenta + 1
+  mostrarnumero [
+      mensaje <- cuenta
   ]
 Fin</textarea>
     <div class="v divisor"></div>
@@ -291,10 +290,17 @@ Fin</textarea>
       };
 
       zl.io = zl.io || {};
+      zl.io.lineas = [];
 
       zl.io.outWrite = function(html) {
         var t = $("#output").get(0);
-        t.innerHTML += zl.escapeHtml(html)
+        if (zl.io.lineas.length > 50) {
+          zl.io.lineas = zl.io.lineas.slice(20);
+          zl.io.lineas.push(zl.escapeHtml(html));
+        } else {
+          zl.io.lineas.push(zl.escapeHtml(html));
+        }
+        t.innerHTML = zl.io.lineas.join('');
         if (isBottom) {
           t.scrollTop = t.scrollHeight;
         }
@@ -323,6 +329,7 @@ Fin</textarea>
 
       zl.io.limpiar = function() {
         $("#output").get(0).innerHTML = "";
+        zl.io.lineas = [];
       }
 
       zl.io.pause = function($local, $global, $entrada, $salida, pos, callback) {

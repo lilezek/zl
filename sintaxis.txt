@@ -19,8 +19,9 @@
 
 <configuraciones> ::= "configuracion" <_> (<configuracion> <_>)* "fin"
 
-<configuracion> ::= "importar" <_> <nombre>
-    | "configurar" <_> <nombre> <_> "<-" <_> <expresion>
+<configuracion> ::= "importar" <_> <texto> <_> "como" <nombre>
+    | <nombre> <_> "<-" <_> <numero>
+    | <nombre> <_> "<-" <_> <texto>
 
 <subrutina>  ::= <subrutinaCabecera> <_> <subrutinaCuerpo>
 
@@ -101,6 +102,7 @@
     | <letra>
     | "verdadero"
     | "falso"
+    | <nombre> <_> "como" <_> <nombre>
     | <nombre> <_> "(" <_> <listaAcceso> <_> ")"
     | <nombre>
     | "(" <_> <expresion> <_> ")"

@@ -15,23 +15,25 @@ var modulo = function(zl) {
   // en zl
   zl.Compilar = function(zlcode, moduloPadre) {
     var compilado;
-    // Fase 1, obtener el árbol sintáctico de la configuración:
-    compilado = zl.sintaxis.arbolConfiguracion(zlcode);
-    if (compilado.error) {
-      // En caso de error, si se pudo procesar algún token,
-      // es que hubo error en la configuración.
-      if (compilado.end > compilado.begin) {
-        return {
-          error: zl.error.obtenerMensaje(compilado, zlcode)
-        };
-      }
-    }
-    // Fase 2, modificar el comportamiento según la configuración:
-    // TODO: está sin hacer.
-    zlcode = zlcode.substring(compilado.end);
+    try {
+      // Fase 1, obtener el árbol sintáctico de la configuración:
+      compilado = zl.sintaxis.arbolConfiguracion(zlcode);
+      // Fase 2, modificar el comportamiento según la configuración:
 
+        // Array de configuraciones
+        for (var i = 0; i < compilado.length; i++) {
+          var c = compilado[i];
+          // Configuración genérica:
+          if (c.tipo === "configurar") {
+            zl.configuracion[c.nombre] = c.valor;
+          }
+        }
+    } catch (e) {
+      if (!zl.error.esError(e) || e.traza.end > 0)
+        throw e;
+    }
     // Fase 3, obtener el árbol sintáctico del resto del código:
-    compilado = zl.sintaxis.arbolCodigo(zlcode);
+    compilado = zl.sintaxis.arbolCodigo(zlcode, (compilado ? compilado.end : 0));
 
     // Fase 4, generar la tabla de símbolos
 

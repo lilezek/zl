@@ -70,6 +70,9 @@ var modulo = function(zl) {
   a.simbolo("..");
   a.simbolo(",");
   a.simbolo("pausar");
+  a.simbolo(":configuracion", /^configuracion/i);
+  a.simbolo("importar");
+  a.simbolo("como");
 
   // Los distintos tokens:
 
@@ -85,8 +88,34 @@ var modulo = function(zl) {
 
 
   // Y Las reglas:
+  a.regla("configuraciones", function() {
+    this.avanzar(":configuracion")
+      .acumular("configuracion").avanzarVarios()
+      .avanzar("fin");
+    this.registrarResultado(this.resultado(1));
+    return this;
+  });
+
   a.regla("configuracion", function() {
-    // TODO: Stub
+    this.intentar([
+      ["nombre", "<-", "texto"],
+      ["nombre", "<-", "numero"],
+      ["importar", "texto", "como", "nombre"]
+    ]);
+    var intento = this.resultado(0);
+    if (intento == 2) {
+      this.registrarResultado({
+        tipo: "importar",
+        camino: this.resultado(0,intento,1),
+        alias: this.resultado(0,intento,2)
+      })
+    } else {
+      this.registrarResultado({
+        tipo: "configurar",
+        nombre: this.resultado(0, intento, 0),
+        valor: this.resultado(0, intento, 2)
+      })
+    }
     return this;
   });
 
