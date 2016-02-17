@@ -15,9 +15,9 @@ var modulo = function(zl) {
     "repetir": true,
     "mientras": true,
     "subrutina": true,
-    "externa": true,
+    "interna": true,
+    "primitiva": true,
     "es": true,
-    "rapida": true,
     "entrada": true,
     "salida": true,
     "de": true,
@@ -59,7 +59,6 @@ var modulo = function(zl) {
   a.simbolo(":repetir", /^repetir/i);
   a.simbolo(":mientras", /^mientras/i);
   a.simbolo(":subrutina", /^subrutina/i);
-  a.simbolo("externa");
   a.simbolo("es");
   a.simbolo("de");
   a.simbolo("datos");
@@ -78,7 +77,7 @@ var modulo = function(zl) {
 
   a.token("verdadero", /^verdadero/i, 0);
   a.token("falso", /^falso/i, 1);
-  a.token("subModificador", /^(es|rapida|rápida|externa|constante|funcion|asíncrona|asincrona)/i, 2);
+  a.token("subModificador", /^(interna|primitiva)/i, 2);
   a.token("decModificador", /^((?:de\s+entrada)|(?:de\s+salida)|global)/i, 3);
   a.token("entero", /^((?:[0-1]+(?:\|2))|(?:[0-9A-Fa-f]+(?:\|16))|(?:[0-9]+(?:\|10)?))/i, 4);
   a.token("decimal", /^(\d+\.\d+)/i, 5);
@@ -207,7 +206,7 @@ var modulo = function(zl) {
       .acumular("sentencia").avanzarVarios()
       // Fin
       .avanzar("fin");
-    this.registrarResultado({
+    var sub = {
       nombre: this.resultado(2),
       modificadores: this.resultado(1),
       datos: this.resultado(4) || [],
@@ -217,7 +216,14 @@ var modulo = function(zl) {
         datos: [this.arbol(3).begin, this.arbol(4).end],
         algoritmo: [this.arbol(5).begin, this.arbol(7).begin]
       }
-    });
+    };
+    // Buscar primitiva:
+    for (var i = 0; i < sub.modificadores.length; i++) {
+      if (sub.modificadores[i].toLowerCase() === "primitiva") {
+        sub.segmentoPrimitivo = this.texto.substring(sub.secciones.algoritmo[0]+10, sub.secciones.algoritmo[1]).trim();
+      }
+    }
+    this.registrarResultado(sub);
     return this;
   });
 

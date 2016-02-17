@@ -135,9 +135,16 @@ var modulo = function(zl, async) {
     while (/\s/.test(this.texto.substr(this.posicion, 1)))
       this.posicion++;
     if (this.texto.substr(this.posicion, 2) == "//") {
-      while (this.texto.substr(this.posicion, 1) != "\n")
+      while (this.texto.substr(this.posicion, 1) != "\n" && this.posicion < this.texto.length)
         this.posicion++;
-      this.saltar()
+      this.posicion++;
+      this.saltar();
+    }
+    if (this.texto.substr(this.posicion, 2) == "/*") {
+      while (this.texto.substr(this.posicion, 2) != "*/" && this.posicion < this.texto.length)
+        this.posicion++;
+      this.posicion+=2;
+      this.saltar();
     }
     return this;
   }

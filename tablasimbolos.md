@@ -56,7 +56,7 @@ Fin
 
 Los módulos no tienen nombre *per se*. El nombre lo generará el módulo que lo necesite.
 Los módulos se pueden instanciar un número arbitrario de veces, en forma de declaración.
-Un módulo puede tener la subrutina externa **Inicio**, que se ejecutará cada vez que se instancie el módulo.
+Un módulo puede tener la subrutina **Inicio**, que se ejecutará cada vez que se instancie el módulo.
 
 Un módulo puede verse como un punto medio entre una estructura de tipo C y una clase de C++. Las subrutinas podrían ser métodos, y solo se exponen las de tipo Externo (ocultación de la implementación), y los miembros de la clase podrían ser los datos de tipo global, accesibles entre todas las subrutinas del módulo. Sin embargo, **de momento** no se ofrece herencia ni flexibilidad de ningún tipo.
 

@@ -46,22 +46,29 @@ var modulo = function(zl) {
   zl.javascript.subrutina = function(compilado, simbolo) {
     //TODO: tratar los modificadores y los datos correctamente
     var resultado = "";
-    if (!simbolo.modificadores.externa)
+    if (simbolo.modificadores.interna)
       resultado += "var ";
     else
       resultado += "$out.";
+
+    var sentencias = "";
+    if (simbolo.modificadores.primitiva) {
+      sentencias = simbolo.segmentoPrimitivo;
+    } else {
+      sentencias = zl.javascript.sentencias(compilado.sentencias, simbolo);
+    }
 
     if (simbolo.modificadores.asincrono) {
       resultado += zl.javascript.nombre(compilado.nombre, simbolo) + "=function($entrada, done){var $salida={};var $local={};" +
         zl.javascript.datos(compilado.datos, simbolo.declaraciones) +
         "$in.async.waterfall([function(c){c(null,null);}," +
         "function(arg,done){$salida={};" +
-        zl.javascript.sentencias(compilado.sentencias, simbolo) +
+        sentencias +
         "done(null, $salida);}],done);";
     } else {
       resultado += zl.javascript.nombre(compilado.nombre, simbolo) + "=function($entrada, done){var $salida={};var $local={};" +
         zl.javascript.datos(compilado.datos, simbolo.declaraciones) +
-        zl.javascript.sentencias(compilado.sentencias, simbolo)+
+        sentencias +
         "return $salida;";
     }
     var coma = "";
@@ -132,7 +139,7 @@ var modulo = function(zl) {
     var nombre = zl.javascript.nombre(compilado.nombre, simbolo);
     var sub = simbolo.padre.subrutinaPorNombre(nombre);
     // TODO: Generar correctamente los nombres importados
-    if ("externa" in sub.modificadores)
+    if (!sub.modificadores.interna)
       nombre = "$in." + nombre;
     if (compilado.asincrono)
       return ";done(null," + zl.javascript.llamadaEntrada(compilado.entrada, simbolo) + ");}," +

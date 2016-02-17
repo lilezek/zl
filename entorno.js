@@ -214,6 +214,13 @@ var modulo = function(zl) {
     for (var i = 0; i < arbol.modificadores.length; i++) {
       this.modificadores[arbol.modificadores[i].toLowerCase()] = true;
     }
+
+    // Registrar primitivas:
+    if ("primitiva" in this.modificadores) {
+      // Extraer del segmento el código:
+      this.segmentoPrimitivo = arbol.segmentoPrimitivo.substring(2,arbol.segmentoPrimitivo.length-2);
+    }
+
     // Registrar datos
     for (var i = 0; i < arbol.datos.length; i++) {
       var decl = new Declaracion(this);
@@ -569,7 +576,7 @@ var modulo = function(zl) {
       zl.writeJson(aleatorio, {
         nombre: "aleatorio",
         modificadores: {
-          externa: true,
+          interna: false,
           es: true
         },
         declaraciones: {
@@ -589,7 +596,7 @@ var modulo = function(zl) {
       zl.writeJson(limpiar, {
         nombre: "limpiar",
         modificadores: {
-          externa: true,
+          interna: false,
           es: true
         },
         declaraciones: {}
@@ -612,7 +619,7 @@ var modulo = function(zl) {
       zl.writeJson(mostrar, {
         nombre: "mostrar",
         modificadores: {
-          externa: true,
+          interna: false,
           es: true
         },
         declaraciones: {
@@ -637,7 +644,7 @@ var modulo = function(zl) {
       zl.writeJson(mostrarnumero, {
         nombre: "mostrarnumero",
         modificadores: {
-          externa: true,
+          interna: false,
           es: true
         },
         declaraciones: {
@@ -662,7 +669,7 @@ var modulo = function(zl) {
       zl.writeJson(leerNumero, {
         nombre: "leernumero",
         modificadores: {
-          externa: true,
+          interna: false,
           es: true,
           asincrono: true
         },
@@ -688,7 +695,7 @@ var modulo = function(zl) {
       zl.writeJson(leer, {
         nombre: "leer",
         modificadores: {
-          externa: true,
+          interna: false,
           es: true,
           asincrono: true
         },

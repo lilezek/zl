@@ -29,10 +29,8 @@
 
 <subrutinaCuerpo>  ::= <datos> <_> <algoritmo> <_> "fin"
 
-<modificador> ::= "externa"
-    | "es"
-    | "rápida"
-    | "rapida"
+<modificador> ::= "interna"
+    | "primitiva"
 
 <nombre> ::= <nombreSimple> (<_> "." <_> <nombre>)*
 

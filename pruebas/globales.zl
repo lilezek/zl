@@ -14,7 +14,7 @@ Algoritmo
   n <- x
 Fin
 
-Subrutina Externa Inicio
+Subrutina Inicio
 Datos
   a es Numero
   b es Numero

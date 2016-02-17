@@ -46,7 +46,7 @@ var modulo = function(zl) {
         subrutina: {
           $: [],
           cabecera: {
-            $: ["externa", "es", "rapida"]
+            $: ["interna"]
           },
           datos: {
             // TODO: Eliminar los modificadores:
