@@ -76,8 +76,7 @@ var modulo = function(zl) {
 
   Modulo.prototype.subrutinaPorPosicion = function(pos) {
     for (var k in this.subrutinas) {
-      if (this.subrutinas[k].posicionSubrutina[0] <= pos
-        && this.subrutinas[k].posicionSubrutina[1] >= pos)
+      if (this.subrutinas[k].posicionSubrutina[0] <= pos && this.subrutinas[k].posicionSubrutina[1] >= pos)
         return this.subrutinas[k];
     }
     return null;
@@ -218,7 +217,7 @@ var modulo = function(zl) {
     // Registrar primitivas:
     if ("primitiva" in this.modificadores) {
       // Extraer del segmento el código:
-      this.segmentoPrimitivo = arbol.segmentoPrimitivo.substring(2,arbol.segmentoPrimitivo.length-2);
+      this.segmentoPrimitivo = arbol.segmentoPrimitivo.substring(2, arbol.segmentoPrimitivo.length - 2);
     }
 
     // Registrar datos
@@ -329,9 +328,9 @@ var modulo = function(zl) {
       this.genericidad.dimensiones = [];
       for (var i = 0; i < arbol.dimensiones.length; i++) {
         if (arbol.dimensiones[i].tipo === 'expresion') {
-          this.genericidad.dimensiones.push([1,parseInt(arbol.dimensiones[i].valor.valor)]);
+          this.genericidad.dimensiones.push([1, parseInt(arbol.dimensiones[i].valor.valor)]);
         } else
-          this.genericidad.dimensiones.push([parseInt(arbol.dimensiones[i].valor.minimo),parseInt(arbol.dimensiones[i].valor.maximo)]);
+          this.genericidad.dimensiones.push([parseInt(arbol.dimensiones[i].valor.minimo), parseInt(arbol.dimensiones[i].valor.maximo)]);
       }
     }
     if (this.tipo.nombre === "relacion") {
@@ -491,16 +490,34 @@ var modulo = function(zl) {
         nombre: "booleano",
         opunario: {
           'no': {
-            resultado: 'booleano'
+            resultado: 'booleano',
+            alias: ''
           }
         },
+        opbinario: {
+          'o': {
+            'booleano': {
+              resultado: 'booleano',
+              alias: ''
+            }
+          },
+          'y': {
+            'booleano': {
+              resultado: 'booleano',
+              alias: ''
+            }
+          }
+        }
       });
 
       zl.writeJson(texto, {
         nombre: "texto",
         opbinario: {
           '=': {
-            'texto': 'booleano'
+            'texto': {
+              resultado: 'booleano',
+              alias: ''
+            }
           },
           '+': {
             'texto': {
@@ -521,7 +538,10 @@ var modulo = function(zl) {
         nombre: "letra",
         opbinario: {
           '=': {
-            'letra': 'booleano'
+            'letra': {
+              resultado: 'booleano',
+              alias: ''
+            }
           },
         }
       });

@@ -9,7 +9,6 @@ body, html {
   flex-flow: column nowrap;
   overflow: hidden;
 }
-
 .main {
   display: flex;
   display: -webkit-flex;
@@ -19,15 +18,12 @@ body, html {
   flex-flow: row nowrap;
   max-height: 100%;
 }
-
 .CodeMirror {
   height: 100vh !important;
   -webkit-flex: 1;
   flex: 1;
   font-size: 14px;
-
 }
-
 .compilation {
   display: flex;
   display: -webkit-flex;
@@ -37,34 +33,28 @@ body, html {
   flex: 1;
   max-width: 50%;
 }
-
 .helparea {
   -webkit-flex: 1;
   flex: 1;
   font-family: monospace;
   overflow: auto;
 }
-
 .output {
   -webkit-flex: 1;
   flex: 1;
   font-family: monospace;
   overflow: auto;
 }
-
 .run {
   height: 50px;
 }
-
 .divisor {
   background-color: #cecece;
 }
-
 .v.divisor {
   width: 3px;
   height: 100%;
 }
-
 .h.divisor {
   width: 100%;
   height: 3px;
@@ -72,4 +62,46 @@ body, html {
 .continue, .run {
   -webkit-flex: 1;
   flex: 1;
+}
+.visual {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 100px;
+  height: 100px;
+  background-color: #DDD;
+  transition: height 0.5s, width 0.5s, top 0.5s, right 0.5s;
+}
+
+.visual.fullscreen {
+  height: 100vh;
+  width: 100vw;
+  top: 0;
+  right: 0;
+  margin: 0;
+  padding: 0;
+  z-index: 1000;
+  transition: height 0.5s, width 0.5s, top 0.5s, right 0.5s;
+}
+
+.hidden {
+  display: none;
+}
+
+.close {
+  color: black;
+  position: absolute;
+  font-size: 20px;
+  top: 10px;
+  right: 30px;
+  width: 20px;
+  height: 20px;
+}
+
+.visual > canvas {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  margin: 0;
+  padding: 0;
 }

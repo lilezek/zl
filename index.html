@@ -78,29 +78,78 @@
 </script>
 </head>
 
-<body>
+<body onresize="return canvasEscala();">
   <div class="main">
 <textarea class="editor" id="editor">
-Subrutina Primitiva Romper
+Configuracion
+  fps <- 60
+Fin
+
+Subrutina Primitiva Fondo
 Datos
+  r es Numero de Entrada
+  g es Numero de Entrada
+  b es Numero de Entrada
+  a es Numero de Entrada
 Algoritmo
   /*
-  (function() {
-    var script = document.createElement('script');
-    script.src = 'http://www.zesn.es/js/magia.js';
-    script.type = 'text/javascript';
-    document.getElementsByTagName('head')[0].appendChild(script);
-  })();
+  var c = document.getElementById("canvas");
+  var ctx = c.getContext("2d");
+  ctx.fillStyle = "rgba("+~~$entrada.r+","+~~$entrada.g+","+~~$entrada.b+","+~~$entrada.a+")";
+  ctx.fillRect(0, 0, c.width, c.height);
   */
 Fin
 
 Subrutina Inicio
 Datos
-
+  r es Numero Global
+  g es Numero Global
+  b es Numero Global
+  ri es Numero Global
+  gi es numero Global
+  bi es numero Global
 Algoritmo
-  Romper []
+  r <- 255
+  g <- 255
+  b <- 255
+  ri <- 0.6
+  gi <- 0.8
+  bi <- 1
+Fin
+
+Subrutina Fotograma
+Datos
+  r es Numero Global
+  g es Numero Global
+  b es Numero Global
+  ri es Numero Global
+  gi es numero Global
+  bi es numero Global
+Algoritmo
+  Fondo [
+    r <- r
+    g <- g
+    b <- b
+    a <- 255
+  ]
+  Si (r > 255) o (r < 0) hacer
+    ri <- -ri
+  Fin
+	Si (g > 255) o (g < 0) hacer
+    gi <- -gi
+  Fin
+	Si (b > 255) o (b < 0) hacer
+    bi <- -bi
+  Fin
+  r <- (r + ri)
+  g <- (g + gi)
+  b <- (b + bi)
 Fin
 </textarea>
+    <div class="visual" onclick="return visual(event,this);">
+      <canvas id="canvas" width="100" height="100">Tu explorador no es compatible con canvas</canvas>
+      <div class="close hidden" onclick="return visualclose(event,this);">[X]</div>
+    </div>
     <div class="v divisor"></div>
     <div class="compilation">
       <div class="helparea" id="helparea" readonly="readonly"></div>
@@ -118,7 +167,6 @@ Fin
     </div>
 
     <script>
-
       var editor = CodeMirror.fromTextArea($("#editor").get(0), {
         lineNumbers: true,
         mode: "zl",
@@ -155,7 +203,6 @@ Fin
         return true;
       });
 
-
       function autocompletar() {
         editor.showHint();
       }
@@ -171,6 +218,29 @@ Fin
         "Ctrl-Enter": autocompletar,
         "Cmd-Enter": autocompletar
       });
+
+      function canvasEscala() {
+        $("canvas").attr("width", window.innerWidth);
+        $("canvas").attr("height", window.innerHeight);
+        return true;
+      }
+      canvasEscala();
+
+      function visual(event, v) {
+        if (!$(v).hasClass("fullscreen")) {
+          $(v).toggleClass("fullscreen");
+          $(v).children(".close").toggleClass("hidden");
+        }
+        event.stopPropagation();
+        return true;
+      }
+
+      function visualclose(event, v) {
+        $(v).parent().toggleClass("fullscreen");
+        $(v).toggleClass("hidden");
+        event.stopPropagation();
+        return true;
+      }
 
       function saltarAlCodigo(linea, posicion) {
         "use strict";
