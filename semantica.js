@@ -303,7 +303,6 @@ var modulo = function(zl) {
             posizq: [arbol.izq.begin, arbol.izq.end],
             posder: [arbol.der.begin, arbol.der.end]
           });
-        console.log(tipores);
         return modulo.tipoPorNombre(tipores.resultado);
       } else /* Operaciones unarias */ {
         var operacion = tipoder.opunario[op];

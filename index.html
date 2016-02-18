@@ -100,6 +100,47 @@ Algoritmo
   */
 Fin
 
+Subrutina Primitiva Elipse
+Datos
+  centrox es Numero de Entrada
+  centroy es Numero de Entrada
+  ancho es Numero de Entrada
+  alto es Numero de Entrada
+Algoritmo
+  /*
+  var c = document.getElementById("canvas");
+  var ctx = c.getContext("2d");
+  var w = $entrada.ancho >= 0 ? $entrada.ancho : 0;
+	var h = $entrada.alto >= 0 ? $entrada.alto : 0;
+  var x = $entrada.centrox;
+  var y = $entrada.centroy;
+	ctx.beginPath();
+	if (w == h) {
+		ctx.arc(x,y,w / 2, 0, 6.283185307179586, false);
+	} else {
+		var w2 = w/2;
+		var h2 = h/2;
+		x -= w2;
+		y -= h2;
+		var kappa = 0.5522848,
+		ox = (w2) * kappa, // control point offset horizontal
+		oy = (h2) * kappa, // control point offset vertical
+		xe = x + w,           // x-end
+		ye = y + h,           // y-end
+		xm = x + w2,       // x-middle
+		ym = y + h2;       // y-middle
+
+		ctx.moveTo(x, ym);
+		ctx.bezierCurveTo(x, ym - oy, xm - ox, y, xm, y);
+		ctx.bezierCurveTo(xm + ox, y, xe, ym - oy, xe, ym);
+		ctx.bezierCurveTo(xe, ym + oy, xm + ox, ye, xm, ye);
+		ctx.bezierCurveTo(xm - ox, ye, x, ym + oy, x, ym);
+	}
+	ctx.closePath();
+	ctx.stroke();
+  */
+Fin
+
 Subrutina Inicio
 Datos
   r es Numero Global
@@ -123,15 +164,18 @@ Datos
   g es Numero Global
   b es Numero Global
   ri es Numero Global
-  gi es numero Global
-  bi es numero Global
+  gi es Numero Global
+  bi es Numero Global
+  n es Numero
 Algoritmo
+  // Pintar el fondo
   Fondo [
     r <- r
     g <- g
     b <- b
     a <- 255
   ]
+  // Calcular el nuevo color de fondo
   Si (r > 255) o (r < 0) hacer
     ri <- -ri
   Fin
@@ -144,6 +188,18 @@ Algoritmo
   r <- (r + ri)
   g <- (g + gi)
   b <- (b + bi)
+
+  // Pintar los círculos
+  n <- 1
+  Repetir 50 veces
+    elipse [
+      centrox <- 300
+      centroy <- 300
+      ancho <- 8*n
+      alto <- 8*n
+    ]
+    n <- n + 1
+  Fin
 Fin
 </textarea>
     <div class="visual" onclick="return visual(event,this);">

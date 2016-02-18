@@ -64,14 +64,21 @@ body, html {
   flex: 1;
 }
 .visual {
+  z-index: 1000;
   position: absolute;
   top: 20px;
   right: 20px;
   width: 100px;
   height: 100px;
   background-color: #DDD;
-  transition: height 0.5s, width 0.5s, top 0.5s, right 0.5s;
+  transition: height 0.5s, width 0.5s, top 0.5s, right 0.5s, opacity 5s;
   cursor: pointer;
+  opacity: 0.2;
+}
+
+.visual:hover {
+  opacity: 1;
+  transition: height 0.5s, width 0.5s, top 0.5s, right 0.5s, opacity 0.5s;
 }
 
 .visual.fullscreen {
@@ -81,8 +88,8 @@ body, html {
   right: 0;
   margin: 0;
   padding: 0;
-  z-index: 1000;
-  transition: height 0.5s, width 0.5s, top 0.5s, right 0.5s;
+  transition: height 0.5s, width 0.5s, top 0.5s, right 0.5s, opacity 0.5s;
+  opacity: 1;
   cursor: auto;
 }
 
@@ -98,6 +105,7 @@ body, html {
   right: 30px;
   width: 20px;
   height: 20px;
+  cursor: pointer;
 }
 
 .visual > canvas {
