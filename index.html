@@ -82,7 +82,7 @@
   <div class="main">
 <textarea class="editor" id="editor">
 Configuracion
-  fps <- 60
+  fps <- 200
 Fin
 
 Subrutina Primitiva Fondo
@@ -141,6 +141,19 @@ Algoritmo
   */
 Fin
 
+Subrutina Primitiva Delta
+Datos
+  resultado es Numero de salida
+Algoritmo
+	/*
+  $global.lasttime = $global.lasttime || new Date();
+  var l = new Date();
+  $salida.resultado = (l - $global.lasttime)/1000;
+  $global.lasttime = l;
+  */
+Fin
+
+
 Subrutina Inicio
 Datos
   r es Numero Global
@@ -168,6 +181,13 @@ Datos
   bi es Numero Global
   n es Numero
 Algoritmo
+  // Calcular los FPS por segundo
+  Delta [
+    resultado -> n
+  ]
+  mostrarNumero [
+    mensaje <- 1/n
+  ]
   // Pintar el fondo
   Fondo [
     r <- r
