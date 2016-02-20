@@ -99,12 +99,13 @@ body, html {
 
 .close {
   color: black;
+  background-color: white;
   position: absolute;
   font-size: 20px;
   top: 10px;
   right: 30px;
-  width: 20px;
-  height: 20px;
+  width: auto;
+  height: auto;
   cursor: pointer;
 }
 

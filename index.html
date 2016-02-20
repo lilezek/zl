@@ -10,19 +10,19 @@
     this.zl = {log : function() { console.log.apply(console, arguments); }};
   </script>
 
-  <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-  <script src="http://jsbeautifier.org/js/lib/beautify.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/async/1.5.0/async.min.js"></script>
-  <script src="codemirror.js"></script>
-  <script src="filesaver.js"></script>
-  <script src="jszip.js"></script>
-  <script src="jsziputils.js"></script>
-  <script src="https://codemirror.net/addon/mode/simple.js"></script>
-  <script src="https://codemirror.net/addon/selection/active-line.js"></script>
-  <script src="matchbrackets.js"></script>
-  <script src="show-hint.js"></script>
-  <link rel="stylesheet" href="codemirror.css">
-  <link rel="stylesheet" href="https://codemirror.net/addon/hint/show-hint.css">
+  <script src="terceros/jquery-2.1.4.min.js"></script>
+  <script src="terceros/beautify.js"></script>
+  <script src="terceros/async.min.js"></script>
+  <script src="terceros/codemirror.js"></script>
+  <script src="terceros/filesaver.js"></script>
+  <script src="terceros/jszip.js"></script>
+  <script src="terceros/jsziputils.js"></script>
+  <script src="terceros/addon/mode/simple.js"></script>
+  <script src="terceros/addon/selection/active-line.js"></script>
+  <script src="terceros/matchbrackets.js"></script>
+  <script src="terceros/show-hint.js"></script>
+  <link rel="stylesheet" href="terceros/codemirror.css">
+  <link rel="stylesheet" href="terceros/addon/hint/show-hint.css">
   <script src="utils.js"></script>
   <script src="analizador.js"></script>
   <script src="zlsintaxis.js"></script>
@@ -36,13 +36,13 @@
   <script src="javascript.js"></script>
   <script src="editor.js"></script>
   <script src="autocompletar.js"></script>
-  <script src="https://skalman.github.io/UglifyJS-online/uglify/lib/utils.js"></script>
-  <script src="https://skalman.github.io/UglifyJS-online/uglify/lib/ast.js"></script>
-  <script src="https://skalman.github.io/UglifyJS-online/uglify/lib/parse.js"></script>
-  <script src="https://skalman.github.io/UglifyJS-online/uglify/lib/transform.js"></script>
-  <script src="https://skalman.github.io/UglifyJS-online/uglify/lib/scope.js"></script>
-  <script src="https://skalman.github.io/UglifyJS-online/uglify/lib/output.js"></script>
-  <script src="https://skalman.github.io/UglifyJS-online/uglify/lib/compress.js"></script>
+  <script src="terceros/uglifyjs/utils.js"></script>
+  <script src="terceros/uglifyjs/ast.js"></script>
+  <script src="terceros/uglifyjs/parse.js"></script>
+  <script src="terceros/uglifyjs/transform.js"></script>
+  <script src="terceros/uglifyjs/scope.js"></script>
+  <script src="terceros/uglifyjs/output.js"></script>
+  <script src="terceros/uglifyjs/compress.js"></script>
   <script>
   var default_options = {};
 
@@ -82,7 +82,7 @@
   <div class="main">
 <textarea class="editor" id="editor">
 Configuracion
-  fps <- 200
+  fps <- 60
 Fin
 
 Subrutina Primitiva Fondo
@@ -90,12 +90,11 @@ Datos
   r es Numero de Entrada
   g es Numero de Entrada
   b es Numero de Entrada
-  a es Numero de Entrada
 Algoritmo
   /*
   var c = document.getElementById("canvas");
   var ctx = c.getContext("2d");
-  ctx.fillStyle = "rgba("+~~$entrada.r+","+~~$entrada.g+","+~~$entrada.b+","+~~$entrada.a+")";
+  ctx.fillStyle = "rgba("+~~$entrada.r+","+~~$entrada.g+","+~~$entrada.b+",255)";
   ctx.fillRect(0, 0, c.width, c.height);
   */
 Fin
@@ -137,7 +136,60 @@ Algoritmo
 		ctx.bezierCurveTo(xm - ox, ye, x, ym + oy, x, ym);
 	}
 	ctx.closePath();
-	ctx.stroke();
+  if ($global.$estiloRelleno !== null) {
+    //ctx.globalAlpha = fillAlpha;
+    ctx.fill();
+  }
+  if ($global.$estiloBordes !== null) {
+    //ctx.globalAlpha = strokeAlpha;
+    ctx.stroke();
+  }
+  */
+Fin
+
+Subrutina Primitiva rectangulo
+Datos
+  posx es Numero de Entrada
+  posy es Numero de Entrada
+  ancho es Numero de Entrada
+  alto es Numero de Entrada
+Algoritmo
+  /*
+  var c = document.getElementById("canvas");
+  var ctx = c.getContext("2d");
+  var w = $entrada.ancho >= 0 ? $entrada.ancho : 0;
+  var h = $entrada.alto >= 0 ? $entrada.alto : 0;
+  //if (lineWidth % 2 == 1) ctx.translate(0.5,0.5);
+  ctx.beginPath();
+  ctx.rect($entrada.posx,$entrada.posy,w,h);
+  ctx.closePath();
+  if ($global.$estiloRelleno !== null) {
+    //ctx.globalAlpha = fillAlpha;
+    ctx.fill();
+  }
+  if ($global.$estiloBordes !== null) {
+    //ctx.globalAlpha = strokeAlpha;
+    ctx.stroke();
+  }
+  //if (lineWidth % 2 == 1) ctx.translate(-0.5,-0.5);
+  */
+Fin
+
+Subrutina Primitiva colorRelleno
+Datos
+  r es Numero de Entrada
+  g es Numero de Entrada
+  b es Numero de Entrada
+Algoritmo
+  /*
+  var c = document.getElementById("canvas");
+  var ctx = c.getContext("2d");
+  ctx.fillStyle = "rgb("+~~$entrada.r+","+~~$entrada.g+","+~~$entrada.b+")";
+  $global.$estiloRelleno = {
+    r: $entrada.r,
+    g: $entrada.g,
+    b: $entrada.b
+  };
   */
 Fin
 
@@ -153,73 +205,78 @@ Algoritmo
   */
 Fin
 
+// Código descubre: http://descubre.inf.um.es/editor-codigo.php?id=5343ca85fd2d49ed6e7e04cb9a3c3ba9
 
 Subrutina Inicio
 Datos
-  r es Numero Global
-  g es Numero Global
-  b es Numero Global
-  ri es Numero Global
-  gi es numero Global
-  bi es numero Global
+  px es Numero
+  py es Numero
 Algoritmo
-  r <- 255
-  g <- 255
-  b <- 255
-  ri <- 0.6
-  gi <- 0.8
-  bi <- 1
-Fin
-
-Subrutina Fotograma
-Datos
-  r es Numero Global
-  g es Numero Global
-  b es Numero Global
-  ri es Numero Global
-  gi es Numero Global
-  bi es Numero Global
-  n es Numero
-Algoritmo
-  // Calcular los FPS por segundo
-  Delta [
-    resultado -> n
-  ]
-  mostrarNumero [
-    mensaje <- 1/n
-  ]
-  // Pintar el fondo
   Fondo [
-    r <- r
-    g <- g
-    b <- b
-    a <- 255
+    r <- 0
+    g <- 0
+    b <- 0
   ]
-  // Calcular el nuevo color de fondo
-  Si (r > 255) o (r < 0) hacer
-    ri <- -ri
-  Fin
-	Si (g > 255) o (g < 0) hacer
-    gi <- -gi
-  Fin
-	Si (b > 255) o (b < 0) hacer
-    bi <- -bi
-  Fin
-  r <- (r + ri)
-  g <- (g + gi)
-  b <- (b + bi)
-
-  // Pintar los círculos
-  n <- 1
-  Repetir 50 veces
-    elipse [
-      centrox <- 300
-      centroy <- 300
-      ancho <- 8*n
-      alto <- 8*n
-    ]
-    n <- n + 1
-  Fin
+  px <- 500
+  py <- 500
+  //Alas
+  colorRelleno [
+    r <- 131
+    g <- 131
+    b <- 131
+  ]
+  rectangulo [
+    posx <- px
+    posy <- py
+    ancho <- 60
+    alto <- 25
+  ]
+  rectangulo [
+    posx <- px-60
+    posy <- py
+    ancho <- 60
+    alto <- 25
+  ]
+  colorRelleno [
+    r <- 255
+    g <- 205
+    b <- 0
+  ]
+  elipse [
+    centrox <- px+60
+    centroy <- py+10
+    ancho <- 20
+    alto <- 50
+  ]
+  elipse [
+    centrox <- px-60
+    centroy <- py+10
+    ancho <- 20
+    alto <- 50
+  ]
+  // Cuerpo
+  colorrelleno [
+    r <- 223
+    g <- 22
+    b <- 22
+  ]
+  elipse [
+    centrox <- px
+    centroy <- py
+    ancho <- 35
+    alto <- 90
+  ]
+  colorrelleno [
+    r <- 221
+    g <- 255
+    b <- 0
+  ]
+  rectangulo [
+    posx <- px-30
+    posy <- py+30
+    ancho <- 60
+    alto <- 35
+  ]
 Fin
 </textarea>
     <div class="visual" onclick="return visual(event,this);">
