@@ -63,32 +63,43 @@ body, html {
   -webkit-flex: 1;
   flex: 1;
 }
+
 .visual {
   z-index: 1000;
+  background-color: #DDD;
+  position: relative;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 50%;
+  /*transition: height 0.5s, width 0.5s, top 0.5s, right 0.5s, opacity 5s, position 0.5s;*/
+}
+
+.visual.minimized {
   position: absolute;
   top: 20px;
   right: 20px;
   width: 100px;
   height: 100px;
-  background-color: #DDD;
-  transition: height 0.5s, width 0.5s, top 0.5s, right 0.5s, opacity 5s;
-  cursor: pointer;
+  /*transition: height 0.5s, width 0.5s, top 0.5s, right 0.5s, opacity 5s, position 0.5s;*/
   opacity: 0.2;
+  cursor: pointer;
 }
 
 .visual:hover {
   opacity: 1;
-  transition: height 0.5s, width 0.5s, top 0.5s, right 0.5s, opacity 0.5s;
+  /*transition: height 0.5s, width 0.5s, top 0.5s, right 0.5s, opacity 0.5s;*/
 }
 
-.visual.fullscreen {
+.visual.maximized {
+  position: absolute;
   height: 100vh;
   width: 100vw;
   top: 0;
   right: 0;
   margin: 0;
   padding: 0;
-  transition: height 0.5s, width 0.5s, top 0.5s, right 0.5s, opacity 0.5s;
+  /*transition: height 0.5s, width 0.5s, top 0.5s, right 0.5s, opacity 0.5s;*/
   opacity: 1;
   cursor: auto;
 }
@@ -97,16 +108,25 @@ body, html {
   display: none;
 }
 
-.close {
+.minimize, .maximize {
   color: black;
   background-color: white;
   position: absolute;
   font-size: 20px;
-  top: 10px;
-  right: 30px;
+
   width: auto;
   height: auto;
   cursor: pointer;
+}
+
+.minimize {
+  top: 10px;
+  right: 30px;
+}
+
+.maximize {
+  top: 10px;
+  right: 60px;
 }
 
 .visual > canvas {

@@ -47,11 +47,11 @@ CodeMirror.defineSimpleMode("zl", {
     },
     // indent and dedent properties guide autoindentation
     {
-      regex: /([\[]|hacer|veces|datos|configuracion)/i,
+      regex: /(\[|hacer|veces|datos|configuracion)/i,
       indent: true,
       token: "keyword"
     }, {
-      regex: /([\]]|fin|si)/i,
+      regex: /(\]|fin\s|si\s|fin$|si$)/i,
       dedent: true,
       token: "keyword"
     }, {

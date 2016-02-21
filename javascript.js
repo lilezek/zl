@@ -251,11 +251,11 @@ var modulo = function(zl) {
     for (var i = 0; i < compilado.length; i++) {
       var dato = simbolo.declaraciones[compilado[i].der];
       if (dato.modificadores === dato.M_LOCAL)
-        resultado = ";$local.";
+        resultado += ";$local.";
       else if (dato.modificadores & dato.M_GLOBAL)
-        resultado = ";$global.";
+        resultado += ";$global.";
       else if (dato.modificadores & dato.M_SALIDA)
-        resultado = ";$salida.";
+        resultado += ";$salida.";
       resultado += zl.javascript.nombre(dato.nombre, simbolo) + "=$salida." + compilado[i].izq;
     }
     return resultado;

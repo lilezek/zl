@@ -3,67 +3,186 @@
 <head>
   <meta charset="utf-8">
   <link rel="stylesheet" href="estilo.css">
-  <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/async/1.5.0/async.min.js"></script>
+  <script>
+    // Activar debug:
+    this.zl = {
+      log: function() {
+        console.log.apply(console, arguments);
+      }
+    };
+  </script>
+  <script src="jquery-2.1.4.min.js"></script>
+  <script src="async.min.js"></script>
+  <script src="utils.js"></script>
   <script src="ejecucion.js"></script>
+  <script src="configuracion.js"></script>
+  <script src="entorno.js"></script>
 </head>
 
-<body>
-  <div class="main">
-    <textarea class="output" id="output" readonly="readonly"></textarea>
+<body onresize="return canvasEscala();">
+  <div class="compilation">
+    <div class="visual minimized" onclick="return visual(event,this);">
+      <canvas id="canvas" width="100" height="100">Tu explorador no es compatible con canvas</canvas>
+      <div class="close hidden" onclick="return visualclose(event,this);">[X]</div>
+    </div>
+    <div class="output" id="output"></div>
     <input type="text" class="input" id="input" disabled="disabled">
     <div style="display: flex;">
-      <button class="run" id="run" onclick="run()" disabled="disabled">
+      <button class="run" id="run">
         Empezar
+      </button>
+      <button class="continue" id="continue" disabled="disabled">
+        Continuar
       </button>
     </div>
   </div>
-</body>
 
+  <script>
+    window.onbeforeunload = function(e) {
+      return '¿Estás seguro de que quieres abandonar el programa?';
+    };
 
-<script>
-  var isBottom = true;
-  $("#output").get(0).onscroll = function(ev) {
-    $this = $("#output");
-    var t = $this.get(0);
-    isBottom = (t.scrollTop + $this.innerHeight() >= t.scrollHeight);
-  };
+    var carga = null;
+    var lastCompilation = null;
+    var zlcode;
+    $("#run").click(function() {
+      if (!lastCompilation)
+        return false;
+      if (!carga) {
+        $("#run").html("Abortar");
+        carga = zl.Cargar(lastCompilation.javascript);
+        carga.$asincrono.inicio = lastCompilation.inicioAsincrono;
+        carga.$asincrono.fotograma = lastCompilation.fotogramaAsincrono;
+        carga.$alAcabar = function() {
+            carga = null;
+            $("#run").html("Empezar");
+          }
+          // TODO: Mostrar errores de ejecución.
+        zl.Ejecutar(carga);
+      } else {
+        zl.Abortar(carga);
+        carga = null;
 
-  var outWrite = function(html) {
-    var t = $("#output").get(0);
-    t.innerHTML += html;
-    if (isBottom) {
-      t.scrollTop = t.scrollHeight;
-    }
-  }
-
-  var inRead = function(callback) {
-    $("#input").prop("disabled", false);
-    $("#input").keypress(function(e) {
-      if (e.which == 13) {
-        $(this).off("keypress");
-        var v = $("#input").val();
-        $("#input").val("");
-        $("#input").prop('disabled', true);
-        callback(null, v);
+        $("#run").html("Empezar");
       }
     });
-    $("#input").focus();
-  }
 
-  function run() {
-    "use strict";
-    zl.Ejecutar();
-  }
+    var continuarCallback;
+    var ultimoEntorno;
+    $("#continue").click(function() {
+      $("#continue").prop('disabled', true);
+      ultimoEntorno = null;
+      continuarCallback(null, null);
+    });
 
-  $.ajax("zl.comp.js", {
-    dataType: "text",
-    type: "GET",
-    success: function(data) {
-      zl.Cargar(data);
-      $("#run").prop("disabled", false);
+
+    function canvasEscala() {
+      $("canvas").attr("width", window.innerWidth);
+      $("canvas").attr("height", window.innerHeight);
+      return true;
     }
-  })
-</script>
+    canvasEscala();
+
+    function visual(event, v) {
+      if ($(v).hasClass("minimized")) {
+        $(v).removeClass("minimized");
+        $(v).addClass("fullscreen");
+        $(v).children(".close").removeClass("hidden");
+        $("#output").addClass("hidden");
+      }
+      event.stopPropagation();
+      return true;
+    }
+
+    function visualclose(event, v) {
+      $(v).parent().removeClass("fullscreen");
+      $(v).parent().addClass("minimized");
+      $(v).addClass("hidden");
+      $("#output").removeClass("hidden");
+      event.stopPropagation();
+      return true;
+    }
+
+    var isBottom = true;
+    $("#output").get(0).onscroll = function(ev) {
+      $this = $("#output");
+      var t = $this.get(0);
+      isBottom = (t.scrollTop + $this.innerHeight() >= t.scrollHeight);
+    };
+
+    zl.io = zl.io || {};
+    zl.io.lineas = [];
+
+    zl.io.outWrite = function(html) {
+      var t = $("#output").get(0);
+      if (zl.io.lineas.length > 50) {
+        zl.io.lineas = zl.io.lineas.slice(20);
+        zl.io.lineas.push(zl.escapeHtml(html));
+      } else {
+        zl.io.lineas.push(zl.escapeHtml(html));
+      }
+      t.innerHTML = zl.io.lineas.join('');
+      if (isBottom) {
+        t.scrollTop = t.scrollHeight;
+      }
+    }
+
+    zl.io.inRead = function(callback) {
+      $("#input").prop("disabled", false);
+      $("#input").keypress(function(e) {
+        if (e.which == 13) {
+          $(this).off("keypress");
+          var v = $("#input").val();
+          $("#input").val("");
+          $("#input").prop('disabled', true);
+          callback(null, v);
+        }
+      });
+      $("#input").focus();
+      evaluar();
+    }
+
+    zl.io.abortRead = function() {
+      $("#input").off("keypress");
+      $("#input").val("");
+      $("#input").prop('disabled', true);
+    }
+
+    zl.io.limpiar = function() {
+      $("#output").get(0).innerHTML = "";
+      zl.io.lineas = [];
+    }
+
+    zl.io.pause = function($local, $global, $entrada, $salida, pos, callback) {
+      $("#continue").prop('disabled', false);
+      continuarCallback = callback;
+      ultimoEntorno = [$local, $global, $entrada, $salida];
+      //ultimaLineaPausar = editor.posFromIndex(pos).line;
+      //editor.addLineClass(ultimaLineaPausar, "background", "CodeMirror-line-pausar");
+      //evaluar();
+    }
+
+    zl.io.abortPause = function() {
+      $("#continue").prop('disabled', true);
+      //editor.removeLineClass(ultimaLineaPausar, "background", "CodeMirror-line-pausar");
+    }
+
+    $.ajax("zl.comp.json", {
+      dataType: "json",
+      type: "get",
+      success: function(data) {
+        lastCompilation = data;
+      }
+    });
+
+    $.ajax("codigo.zl", {
+      dataType: "text",
+      type: "get",
+      success: function(data) {
+        zlcode = data;
+      }
+    });
+  </script>
+</body>
 
 </html>

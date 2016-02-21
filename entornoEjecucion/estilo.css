@@ -8,25 +8,101 @@ body, html {
   -webkit-flex-flow: column nowrap;
   flex-flow: column nowrap;
   overflow: hidden;
+  position: relative;
 }
-
 .main {
   display: flex;
   display: -webkit-flex;
   -webkit-flex: 1;
   flex: 1;
+  -webkit-flex-flow: row nowrap;
+  flex-flow: row nowrap;
+  max-height: 100%;
+}
+.compilation {
+  display: flex;
+  display: -webkit-flex;
   -webkit-flex-flow: column nowrap;
   flex-flow: column nowrap;
+  -webkit-flex: 1;
+  flex: 1;
+  max-height: 100%;
 }
-
 .output {
   -webkit-flex: 1;
   flex: 1;
   font-family: monospace;
+  overflow: auto;
 }
-
 .run {
   height: 50px;
+}
+.divisor {
+  background-color: #cecece;
+}
+.h.divisor {
+  width: 100%;
+  height: 3px;
+}
+.continue, .run {
   -webkit-flex: 1;
   flex: 1;
+}
+
+.visual {
+  z-index: 1000;
+  background-color: #DDD;
+  position: relative;
+  top: 0;
+  right: 0;
+  width: 100%;
+  transition: height 0.5s, width 0.5s, top 0.5s, right 0.5s, opacity 5s, position 0.5s;
+}
+
+.visual.minimized {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 100px;
+  height: 100px;
+  transition: height 0.5s, width 0.5s, top 0.5s, right 0.5s, opacity 5s, position 0.5s;
+  opacity: 0.2;
+  cursor: pointer;
+}
+
+.visual:hover {
+  opacity: 1;
+  transition: height 0.5s, width 0.5s, top 0.5s, right 0.5s, opacity 0.5s;
+}
+
+.visual.fullscreen {
+  -webkit-flex: 1;
+  flex: 1;
+  font-family: monospace;
+  overflow: auto;
+  transition: height 0.5s, width 0.5s, top 0.5s, right 0.5s, opacity 0.5s;
+}
+
+.hidden {
+  display: none;
+}
+
+.close {
+  color: black;
+  background-color: white;
+  position: absolute;
+  font-size: 20px;
+  top: 10px;
+  right: 30px;
+  width: auto;
+  height: auto;
+  cursor: pointer;
+}
+
+.visual > canvas {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  margin: 0;
+  padding: 0;
 }

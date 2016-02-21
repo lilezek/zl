@@ -145,6 +145,10 @@ var modulo = function(zl, async) {
     return r;
   }
 
+  rte.$ratonCanvas = function() {
+    return zl.io.posicionRatonCanvas();
+  }
+
   rte.$alAcabar = function() {
 
   }
