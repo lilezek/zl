@@ -178,6 +178,41 @@ var modulo = function(zl, async) {
 
   rte.$asincrono = {};
 
+  var requestAnimationFrame;
+  if (typeof window !== "undefined") {
+    requestAnimationFrame = window.requestAnimationFrame ||
+      window.mozRequestAnimationFrame ||
+      window.webkitRequestAnimationFrame ||
+      window.msRequestAnimationFrame;
+  }
+  if (!requestAnimationFrame) {
+    requestAnimationFrame = function(callback) {
+      setTimeout(callback, 1 / zl.configuracion.fps * 1000);
+    };
+  }
+
+
+  rte.$fotograma = true;
+  rte.$animStart = null;
+  rte.$siguienteFotograma = function(fotogramacbk) {
+    var self = this;
+    if (this.$fotograma) {
+      requestAnimationFrame(function(timestamp) {
+        if (!self.$animStart) self.$delta = 0;
+        self.$delta = timestamp - self.$animStart;
+        self.$animStart = timestamp;
+        if (self.$asincrono.fotograma) {
+          fotogramacbk({}, function() {
+            self.$siguienteFotograma(fotogramacbk);
+          });
+        } else {
+          fotogramacbk({});
+          self.$siguienteFotograma(fotogramacbk);
+        }
+      });
+    }
+  }
+
   zl.eval = function(codigo) {
     eval(codigo);
   }
@@ -203,18 +238,9 @@ var modulo = function(zl, async) {
         ejecucion += ");"
     }
     // TODO: Tener en cuenta el retardo de cálculo y restárselo al interval.
-    // TODO: Poder abortar la ejecución de un código con fotograma.
     if (typeof carga.fotograma === "function") {
-      ejecucion += "var $fotograma=true;$t.$abortar=function(){$fotograma=false;};"
-      ejecucion += "setTimeout(function cbck(){if (!$fotograma)return;$t.fotograma({}";
-      // TODO: Distinguir si this.fotograma es asíncrona o no.
-      if (carga.$asincrono.fotograma) {
-        ejecucion += ",function(){setTimeout(cbck," + 1 / zl.configuracion.fps * 1000 + ");})" +
-          "}," + 1 / zl.configuracion.fps * 1000 + ");";
-      } else {
-        ejecucion += ");setTimeout(cbck," + 1 / zl.configuracion.fps * 1000 + ");" +
-          "}," + 1 / zl.configuracion.fps * 1000 + ");";
-      }
+      ejecucion += "$t.$abortar=function(){$t.$fotograma=false;};"
+      ejecucion += "$t.$siguienteFotograma($t.fotograma);";
     } else if (typeof carga.inicio === "function") {
       ejecucion += "$t.$alAcabar(null);";
     }

@@ -174,6 +174,7 @@ var modulo = function(zl) {
     var siguiente = compilado.siguiente;
     var resultado = "";
     if (compilado.asincrono) {
+      var tieneElse = false;
       resultado = "done(null,$salida);}, function(arg, done){" +
         "if(" + zl.javascript.expresion(compilado.condicion, simbolo) + "){" +
         "$in.async.waterfall([function(c){c(null,arg);},function(arg,done){" +
@@ -187,13 +188,20 @@ var modulo = function(zl) {
           zl.javascript.sentencias(siguiente.sentencias, simbolo) +
           "done(null,arg);}],done);" +
           "}";
-        else
+        else {
           resultado += "else{" +
           "$in.async.waterfall([function(c){c(null,arg);},function(arg,done){" +
           zl.javascript.sentencias(siguiente.sentencias, simbolo) +
           "done(null,arg);}],done);" +
           "}";
+          tieneElse = true;
+        }
         siguiente = siguiente.siguiente;
+      }
+      if (!tieneElse) {
+        resultado += "else {"+
+        "done(null, arg);"+
+        "}";
       }
       resultado += "}, function(arg, done){";
     } else {

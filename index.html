@@ -240,13 +240,10 @@ Fin
 
 Subrutina Primitiva Delta
 Datos
-  resultado es Numero de salida
+  delta es Numero de salida
 Algoritmo
 	/*
-  $global.lasttime = $global.lasttime || new Date();
-  var l = new Date();
-  $salida.resultado = (l - $global.lasttime)/1000;
-  $global.lasttime = l;
+  $salida.delta = $in.$delta/1000;
   */
 Fin
 
@@ -301,7 +298,7 @@ Datos
   anteriory es Numero global
 Algoritmo
   delta [
-    resultado -> d
+    delta -> d
   ]
   Fondo [
     r <- 0
@@ -339,6 +336,9 @@ Algoritmo
     pos2x <- px
     pos2y <- py
   ]
+  Si px > 800 Hacer
+    pausar
+  Fin
 Fin</textarea>
     <div class="v divisor"></div>
     <div class="compilation">
@@ -437,7 +437,7 @@ Fin</textarea>
 
       function visualMinimize(event, minimize) {
         var $visual = $(minimize).parent();
-        $visual.removeClass("fullscreen");
+        $visual.removeClass("maximized");
         $visual.addClass("minimized");
         $(minimize).addClass("hidden");
         $(".maximize").addClass("hidden");
