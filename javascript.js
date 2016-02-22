@@ -130,7 +130,7 @@ var modulo = function(zl) {
     } else if (compilado.tipo == "pausar") {
       resultado = "done(null,$salida);}, function(arg, done) {done(null, $local, $global, $entrada, $salida,"+
       ((compilado.begin+compilado.end)/2)+
-      ");}, $in.$pausar, function(arg,done){";
+      ");}, $in.$impersonar($in.$pausar,$in), function(arg,done){";
     }
     return resultado + ";";
   }
@@ -143,7 +143,7 @@ var modulo = function(zl) {
       nombre = "$in." + nombre;
     if (compilado.asincrono)
       return ";done(null," + zl.javascript.llamadaEntrada(compilado.entrada, simbolo) + ");}," +
-        nombre +
+        "$in.$impersonar("+ nombre +", $in)"+
         ",function(arg,done) {$salida=arg;" +
         zl.javascript.llamadaSalida(compilado.salida, simbolo);
     else

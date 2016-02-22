@@ -38,14 +38,15 @@ var modulo = function(zl, async) {
   }
 
   rte.leernumero = function(arg, callback) {
-    var oldabortar = rte.$ultimorte.$abortar;
-    rte.$ultimorte.$abortar = zl.io.abortRead;
+    var oldabortar = this.$abortar;
+    var self = this;
+    this.$abortar = zl.io.abortRead;
     zl.io.inRead(function cbck(err, value) {
       var x = parseFloat(value);
       if (isNaN(x))
         zl.io.inRead(cbck);
       else {
-        rte.$ultimorte.$abortar = oldabortar;
+        self.$abortar = oldabortar;
         callback(null, {
           mensaje: x
         });
@@ -54,10 +55,11 @@ var modulo = function(zl, async) {
   }
 
   rte.leer = function(arg, callback) {
-    var oldabortar = rte.$ultimorte.$abortar;
-    rte.$ultimorte.$abortar = zl.io.abortRead;
+    var oldabortar = this.$abortar;
+    var self = this;
+    this.$abortar = zl.io.abortRead;
     zl.io.inRead(function(err, value) {
-      rte.$ultimorte.$abortar = oldabortar;
+      self.$abortar = oldabortar;
       callback(null, {
         mensaje: value
       });
@@ -154,13 +156,27 @@ var modulo = function(zl, async) {
   }
 
   rte.$pausar = function($local, $global, $entrada, $salida, pos, callback) {
-    rte.$ultimorte.$abortar = function() {
+    var oldabortar = this.$abortar;
+    var self = this;
+    this.$abortar = function() {
       zl.io.abortPause();
     };
-    zl.io.pause($local, $global, $entrada, $salida, pos, callback);
+    zl.io.pause($local, $global, $entrada, $salida, pos, function() {
+      self.$abortar = oldabortar;
+      callback.apply(self, arguments);
+    });
   }
 
+  // Utilidades y hacks asíncronos
   rte.async = async;
+  // Útil para generar una función que al llamarla
+  // delegará en un this distinto.
+  rte.$impersonar = function(func, thisObject) {
+    return function() {
+      func.apply(thisObject, arguments);
+    }
+  }
+
 
   rte.$tipos = {
     "numero": {
@@ -198,8 +214,10 @@ var modulo = function(zl, async) {
     var self = this;
     if (this.$fotograma) {
       requestAnimationFrame(function(timestamp) {
-        if (!self.$animStart) self.$delta = 0;
-        self.$delta = timestamp - self.$animStart;
+        if (!self.$animStart)
+          self.$delta = 0
+        else
+          self.$delta = timestamp - self.$animStart;
         self.$animStart = timestamp;
         if (self.$asincrono.fotograma) {
           fotogramacbk({}, function() {
@@ -218,7 +236,7 @@ var modulo = function(zl, async) {
   }
 
   zl.Cargar = function(javascript) {
-    var carga = rte.$ultimorte = zl.writeJson({}, rte);
+    var carga = zl.writeJson({}, rte);
     // Cargar el código:
     rte.limpiar({});
     zl.eval.call(carga, javascript);
@@ -257,8 +275,6 @@ var modulo = function(zl, async) {
     if (carga.$abortar)
       carga.$abortar();
     delete carga.$abortar;
-    // Romper la ejecución de los fotogramas:
-    clearInterval(carga.$interval);
   }
   return zl;
 }
