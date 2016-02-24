@@ -21,6 +21,7 @@ var modulo = function(zl, async) {
   }
 
   rte.$precision = function(arg) {
+    console.log(this.$configuracion);
     return (this.$configuracion.precision > 0 ?
       arg.toPrecision(this.$configuracion.precision) :
       arg);
@@ -252,6 +253,7 @@ var modulo = function(zl, async) {
     if (typeof document !== "undefined") {
       carga.$canvas = document.getElementById("canvas");
       carga.$ctx2d = carga.$canvas.getContext("2d");
+      carga.$ctx2d.font = "normal 14pt arial";
     }
     // Cargar el código:
     rte.limpiar({});

@@ -110,9 +110,8 @@ Datos
 	grosor es Numero de Entrada
 Algoritmo
 	/*
-	var w = $entrada.grosor >= 0 ? $entrada.grosor : 0;
-  //lineWidth = w;
-	$in.$ctx2d.lineWidth = w;
+  $global.$grosorLinea = $entrada.grosor >= 0 ? $entrada.grosor : 0;
+	$in.$ctx2d.lineWidth = $global.$grosorLinea;
   */
 Fin
 
@@ -176,6 +175,64 @@ Algoritmo
   if ($global.$estiloBordes) {
     //ctx.globalAlpha = strokeAlpha;
     ctx.stroke();
+  }
+  */
+Fin
+
+Subrutina Primitiva Punto
+Datos
+  posx es Numero de Entrada
+  posy es Numero de Entrada
+Algoritmo
+  /*
+  if ($global.$estiloBordes){
+    $in.$ctx2d.beginPath();
+    $in.$ctx2d.fillStyle = $global.$estiloBordes;
+    $in.$ctx2d.arc($entrada.posx, $entrada.posy, $global.$grosorLinea / 2, 0, 6.283185307179586, false);
+    $in.$ctx2d.fill();
+    $in.$ctx2d.fillStyle = $global.$estiloRelleno;
+    $in.$ctx2d.closePath();
+  }
+  */
+Fin
+
+Subrutina Primitiva Triangulo
+Datos
+  pos1x es Numero de Entrada
+  pos1y es Numero de Entrada
+  pos2x es Numero de Entrada
+  pos2y es Numero de Entrada
+  pos3x es Numero de Entrada
+  pos3y es Numero de Entrada
+Algoritmo
+  /*
+  $in.$ctx2d.beginPath();
+  $in.$ctx2d.moveTo($entrada.pos1x,$entrada.pos1y);
+  $in.$ctx2d.lineTo($entrada.pos2x,$entrada.pos2y);
+  $in.$ctx2d.lineTo($entrada.pos3x,$entrada.pos3y);
+  $in.$ctx2d.lineTo($entrada.pos1x,$entrada.pos1y);
+  $in.$ctx2d.closePath();
+  if ($global.$estiloRelleno !== null) {
+    //$in.$ctx2d.globalAlpha = fillAlpha;
+    $in.$ctx2d.fill();
+  }
+  if ($global.$estiloBordes !== null) {
+    //$in.$ctx2d.globalAlpha = strokeAlpha;
+    $in.$ctx2d.stroke();
+  }
+  */
+Fin
+
+Subrutina Primitiva DibujarTexto
+Datos
+  mensaje es Texto de Entrada
+  posx es Numero de Entrada
+  posy es Numero de Entrada
+Algoritmo
+  /*
+  if ($global.$estiloRelleno !== null) {
+    //$in.$ctx2d.globalAlpha = fillAlpha;
+    $in.$ctx2d.fillText($entrada.mensaje,$entrada.posx,$entrada.posy);
   }
   */
 Fin

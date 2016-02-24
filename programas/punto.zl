@@ -1,0 +1,26 @@
+Configuracion
+	integrar "bibliotecasZL/canvas.zl"
+Fin
+
+Subrutina Inicio
+Datos
+
+Algoritmo
+  fondo [
+    r <- 255
+    g <- 255
+    b <- 255
+  ]
+  colorborde [
+    r <- 0
+    g <- 0
+    b <- 0
+  ]
+  grosorborde [
+    grosor <- 5
+  ]
+  punto [
+    posx <- 50
+    posy <- 50
+  ]
+Fin

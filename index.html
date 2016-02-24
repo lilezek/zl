@@ -88,60 +88,16 @@ Fin
 
 Subrutina Inicio
 Datos
-	anteriorx es Numero Global
-  anteriory es Numero Global
+
 Algoritmo
-	anteriorx <- 0
-  anteriory <- 0
+
 Fin
 
 Subrutina Fotograma
 Datos
-  d es Numero
-  px es Numero
-  py es Numero
-  anteriorx es Numero global
-  anteriory es Numero global
+
 Algoritmo
-  delta [
-    delta -> d
-  ]
-  Fondo [
-    r <- 0
-    g <- 0
-    b <- 0
-  ]
-  posicionraton [
-    posx -> px
-    posy -> py
-  ]
-  anteriorx <- anteriorx + d*(px - anteriorx)*3
-  anteriory <- anteriory + d*(py - anteriory)*3
-  colorrelleno [
-    r <- 255
-    g <- 255
-    b <- 255
-  ]
-  elipse [
-    centrox <- anteriorx
-    centroy <- anteriory
-    ancho <- 50
-    alto <- 50
-  ]
-  colorBorde [
-    r <- 255
-    g <- 255
-    b <- 255
-  ]
-  grosorBorde [
-    grosor <- 3
-  ]
-  linea [
-    pos1x <- anteriorx
-    pos1y <- anteriory
-    pos2x <- px
-    pos2y <- py
-  ]
+
 Fin</textarea>
     <div class="v divisor"></div>
     <div class="compilation">
@@ -358,7 +314,7 @@ Fin</textarea>
             else
               lastjs = js_beautify(lastCompilation.javascript);
             compilation.innerHTML = zl.escapeHtml(lastjs);
-          }          
+          }
         });
       }
 

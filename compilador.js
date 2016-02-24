@@ -56,7 +56,6 @@ var modulo = function(zl, async) {
       }
     } catch (e) {
       if (!zl.error.esError(e) || e.traza.end > 0) {
-        console.log("ayyyyif (!zl.error.esErro");
         done(e);
         return;
       }
@@ -70,7 +69,7 @@ var modulo = function(zl, async) {
 
       // Construir este módulo
       var mod = zl.entorno.newModulo();
-      zl.writeJson(mod, configuraciones);
+      zl.writeJson(mod.configuracion, configuraciones);
       mod.rellenarDesdeArbol(compilado);
     } catch (e) {
       done(e);

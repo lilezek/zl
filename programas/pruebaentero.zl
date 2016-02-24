@@ -1,0 +1,30 @@
+Configuracion
+  fps <- 60
+	integrar "bibliotecasZL/basico.zl"
+Fin
+
+Subrutina Inicio
+Datos
+	n es numero
+  entero es booleano
+Algoritmo
+  mostrar [
+    mensaje <- "Pon un número:"
+  ]
+  leernumero [
+    mensaje -> n
+  ]
+  esEntero [
+    num <- n
+    resultado -> entero
+  ]
+  Si entero hacer
+    mostrar [
+      mensaje <- "Es entero"
+    ]
+  si no hacer
+    mostrar [
+      mensaje <- "No es entero"
+    ]
+  Fin
+Fin

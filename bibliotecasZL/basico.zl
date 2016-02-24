@@ -19,6 +19,69 @@ Algoritmo
   */
 Fin
 
+Subrutina Primitiva año
+Datos
+  año es Numero de Salida
+Algoritmo
+  /*
+  $salida.año = new Date().getFullYear();
+  */
+Fin
+
+Subrutina Primitiva mes
+Datos
+  mes es Numero de Salida
+Algoritmo
+  /*
+  $salida.mes = new Date().getMonth()+1;
+  */
+Fin
+
+Subrutina Primitiva dia
+Datos
+  dia es Numero de Salida
+Algoritmo
+  /*
+  $salida.dia = new Date().getDate();
+  */
+Fin
+
+Subrutina Primitiva hora
+Datos
+  hora es Numero de Salida
+Algoritmo
+  /*
+  $salida.hora = new Date().getHours();
+  */
+Fin
+
+Subrutina Primitiva minuto
+Datos
+  minuto es Numero de Salida
+Algoritmo
+  /*
+  $salida.minuto = new Date().getMinutes();
+  */
+Fin
+
+Subrutina Primitiva segundo
+Datos
+  segundo es Numero de Salida
+Algoritmo
+  /*
+  $salida.segundo = new Date().getSeconds();
+  */
+Fin
+
+Subrutina Primitiva milisegundos
+Datos
+  milisegundos es Numero de Salida
+Algoritmo
+  /*
+  //$salida.milisegundos = (new Date().getTime()) - startTime.getTime();
+  */
+Fin
+
 /*
   ****************************************
   ************ Conversiones **************
@@ -51,5 +114,39 @@ Algoritmo
   } else {
   	$salida.n = parseFloat($entrada.t);
   }
+  */
+Fin
+
+/*
+  ****************************************
+  ************* Matemáticas **************
+  ****************************************
+*/
+
+Subrutina Primitiva PI
+Datos
+  pi es Numero de salida
+Algoritmo
+  /*
+  $salida.pi = Math.PI;
+  */
+Fin
+
+Subrutina Primitiva E
+Datos
+  E es Numero de salida
+Algoritmo
+  /*
+  $salida.e = Math.E;
+  */
+Fin
+
+Subrutina Primitiva esEntero
+Datos
+  num es Numero de entrada
+  resultado es booleano de Salida
+Algoritmo
+  /*
+  $salida.resultado = ($entrada.num % 1 === 0);
   */
 Fin

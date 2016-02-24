@@ -14,7 +14,7 @@ CodeMirror.defineSimpleMode("zl", {
     // You can match multiple tokens at once. Note that the captured
     // groups must span the whole string in this case
     {
-      regex: /(subrutina)(.*\s)([a-zA-Z]+)/i,
+      regex: /(subrutina)(.*\s)([a-zñ]+)/i,
       token: ["keyword", null, "variable-2"]
     },
     {
@@ -55,7 +55,7 @@ CodeMirror.defineSimpleMode("zl", {
       dedent: true,
       token: "keyword"
     }, {
-      regex: /[a-z$][\w$]*/i,
+      regex: /[a-zñ][\w]*/i,
       token: "variable"
     },
     // You can embed other modes with the mode property. This rule
