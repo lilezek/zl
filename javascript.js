@@ -18,6 +18,12 @@ var modulo = function(zl) {
     for (var k in simbolo.globales) {
       resultado += zl.javascript.dato(simbolo.globales[k], simbolo);
     }
+    for (var k in simbolo.configuracion) {
+      if (typeof simbolo.configuracion[k] === "number")
+        resultado += "$out.$configuracion."+k+"="+simbolo.configuracion[k]+";";
+      else if (typeof simbolo.configuracion[k] === "string")
+        resultado += "$out.$configuracion."+k+"=\""+simbolo.configuracion[k]+"\";";
+    }
     return resultado;
   }
 

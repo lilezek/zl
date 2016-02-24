@@ -9,6 +9,7 @@ require('./ejecucion')(zl, async);
 var chai = require('chai');
 var expect = chai.expect;
 var assert = chai.assert;
+chai.should();
 var fs = require('fs');
 
 var codigos = {
@@ -23,10 +24,10 @@ var codigos = {
   'conversorprimitivo': ''
 };
 
-function precision(n) {
-  return (zl.configuracion.precision > 0       ?
-    n.toPrecision(zl.configuracion.precision)  :
-    n                                          )
+function precision(precision, n) {
+  return (precision > 0 ?
+    n.toPrecision(precision) :
+    n)
 }
 
 for (var k in codigos) {
@@ -34,99 +35,131 @@ for (var k in codigos) {
 }
 
 describe('Forzando errores', function() {
-  it("Código mal escrito", function() {
-    expect(zl.Compilar.bind(zl, "Subrutima Ayylmao")).to.throw();
+  it("Código mal escrito", function(done) {
+    zl.Compilar("Subrutima Ayylmao", function(err, res) {
+      expect(err).to.not.be.null;
+      done();
+    });
   });
 
-  it("Variable sin declarar", function() {
-    try {
-      zl.Compilar("Subrutina B Datos a es Numero Algoritmo c <- a Fin");
-    } catch (e) {
-      expect(e.tipo).to.equal(zl.error.E_NOMBRE_NO_DEFINIDO);
-    }
+  it("Variable sin declarar", function(done) {
+    zl.Compilar("Subrutina B Datos a es Numero Algoritmo c <- a Fin", function(err, res) {
+      if (!err) {
+        err.should.exist;
+        done();
+      } else {
+        expect(err.tipo).to.equal(zl.error.E_NOMBRE_NO_DEFINIDO);
+        done();
+      }
+    });
   });
 })
 
 describe('Compilando las pruebas', function() {
-  it('Pruebas de compilación', function() {
-    for (var k in codigos) {
-      expect(zl.Compilar(codigos[k]).javascript).to.be.a("string");
-    }
+  it('Pruebas de compilación', function(done) {
+    async.each(codigos, function(k, innerDone) {
+      zl.Compilar(k, function(err, res) {
+        expect(err).to.be.null;
+        expect(res.javascript).to.be.a("string");
+        innerDone();
+      });
+    }, function() {
+      done();
+    });
   });
 });
 
 describe('Ejecución de pruebas', function() {
   it("Los códigos emiten por pantalla strings", function() {
-    for (var k in codigos) {
-      var codigo = codigos[k];
-      var zlcodigo = zl.Compilar(codigo).javascript;
-      var carga = zl.Cargar(zlcodigo);
-      zl.Ejecutar(carga);
+    async.each(codigos, function(k, innerDone) {
+      zl.Compilar(k, function(err, res) {
+        var zlcodigo = res.javascript;
+        var carga = zl.Cargar(zlcodigo);
+        carga.$alAcabar = function() {
+          innerDone(null);
+        }
+        zl.Ejecutar(res);
+      });
+    }, function() {
       for (var i = 0; i < zl.test.output.length; i++) {
         expect(zl.test.output[i]).to.be.a("string");
       }
-    }
+      done();
+    });
   });
 });
 
 describe('Emisión de valores correctos', function() {
-  it("El código operaciones emite 32", function() {
+  var prec;
+
+  it("El código operaciones emite 32", function(done) {
     var codigo = codigos["operaciones"];
-    var zlcodigo = zl.Compilar(codigo).javascript;
-    var carga = zl.Cargar(zlcodigo);
-    zl.Ejecutar(carga);
-    expect(zl.test.output[0]).to.equal(precision(32) + "\n");
+    var zlcodigo = zl.Compilar(codigo, function(err, res) {
+      prec = res.tabla.configuracion.precision;
+      var carga = zl.Cargar(res.javascript);
+      carga.$alAcabar = function() {
+        expect(zl.test.output[0]).to.equal(precision(prec, 32) + "\n");
+        done();
+      }
+      zl.Ejecutar(carga);
+    });
   });
 });
 
 describe('Pruebas de entrada/salida', function() {
   var aleatorio = ~~(Math.random() * 10000);
-  beforeEach(function(done) {
+  var prec;
+  it('Entrada/salida de número ' + aleatorio, function(done) {
     var codigo = codigos["entradasalidanumero"];
-    var zlcodigo = zl.Compilar(codigo).javascript;
-    var carga = zl.Cargar(zlcodigo);
-    carga.$asincrono.inicio = true;
-    carga.$alAcabar = done;
-    zl.test.input.push("" + aleatorio);
-    zl.Ejecutar(carga);
-  });
-
-  it('Entrada/salida de número ' + aleatorio, function() {
-    expect(zl.test.output[0]).to.equal(precision(aleatorio) + "\n");
+    var zlcodigo = zl.Compilar(codigo, function(err, res) {
+      var carga = zl.Cargar(res.javascript);
+      prec = res.tabla.configuracion.precision;
+      carga.$asincrono.inicio = true;
+      carga.$alAcabar = function() {
+        expect(zl.test.output[0]).to.equal(precision(prec, aleatorio) + "\n");
+        done();
+      }
+      zl.test.input.push("" + aleatorio);
+      zl.Ejecutar(carga);
+    });
   });
 });
 
 describe('Pruebas con globales', function() {
   var aleatorio = ~~(Math.random() * 10000);
-  beforeEach(function(done) {
-    var codigo = codigos["globales"];
-    var zlcodigo = zl.Compilar(codigo).javascript;
-    var carga = zl.Cargar(zlcodigo);
-    carga.$asincrono.inicio = true;
-    carga.$alAcabar = done;
-    zl.test.input.push("" + aleatorio);
-    zl.Ejecutar(carga);
-  });
+  var prec;
 
   it('Entrada/salida con globales ' + aleatorio, function() {
-    expect(zl.test.output[0]).to.equal(precision(aleatorio) + "\n");
+    var codigo = codigos["globales"];
+    var zlcodigo = zl.Compilar(codigo, function(err, res) {
+      var carga = zl.Cargar(res.javascript);
+      prec = res.tabla.configuracion.precision;
+      carga.$asincrono.inicio = true;
+      carga.$alAcabar = function() {
+        expect(zl.test.output[0]).to.equal(precision(prec, aleatorio) + "\n");
+        done();
+      }
+      zl.test.input.push("" + aleatorio);
+      zl.Ejecutar(carga);
+    });
   });
 })
 
 describe('Orden de los operadores', function() {
   var aleatorio = ~~(Math.random() * 10000);
-  beforeEach(function(done) {
-    var codigo = codigos["ordenoperaciones"];
-    var zlcodigo = zl.Compilar(codigo).javascript;
-    var carga = zl.Cargar(zlcodigo);
-    carga.$asincrono.inicio = true;
-    carga.$alAcabar = done;
-    zl.test.input.push("" + aleatorio);
-    zl.Ejecutar(carga);
-  });
-
   it('Orden básico de los operadores aritméticos con número ' + aleatorio, function() {
-    expect(zl.test.output[0]).to.equal(precision(3.1 - aleatorio + 4 * 2) + "\n");
+    var codigo = codigos["ordenoperaciones"];
+    var zlcodigo = zl.Compilar(codigo, function(err, res) {
+      var carga = zl.Cargar(res.javascript);
+      prec = res.tabla.configuracion.precision;
+      carga.$asincrono.inicio = true;
+      carga.$alAcabar = function() {
+        expect(zl.test.output[0]).to.equal(precision(prec, 3.1 - aleatorio + 4 * 2) + "\n");
+        done();
+      }
+      zl.test.input.push("" + aleatorio);
+      zl.Ejecutar(carga);
+    });
   });
 })
 
@@ -134,23 +167,34 @@ describe('Pruebas erróneas con listas', function() {
   var c1 = fs.readFileSync("pruebas/accesoerroneolista.zl").toString();
 
   it('Acceso a una posición que está fuera del array', function() {
-    try {
-      var zlcodigo = zl.Compilar(c1);
-      var carga = zl.Cargar(zlcodigo);
+    zl.Compilar(c1, function(err, res) {
+      var carga = zl.Cargar(res.javascript);
+      var error;
+      carga.$alError = function(err) {
+        this.$continuar = false;
+        error = err;
+      }
+      carga.$alAcabar = function() {
+        expect(error.tipo).to.equal(zl.error.E_EJECUCION_INDICE_DESCONTROLADO);
+        done();
+      }
       zl.Ejecutar(carga);
-    } catch (e) {
-      expect(e.tipo).to.equal(zl.error.E_EJECUCION_INDICE_DESCONTROLADO);
-    }
+    });
   });
 });
 
 describe('Subrutinas conversoras', function() {
   it('Conversora primitiva de texto a numero', function() {
     var codigo = codigos["conversorprimitivo"];
-    var zlcodigo = zl.Compilar(codigo).javascript;
-    var carga = zl.Cargar(zlcodigo);
-    zl.Ejecutar(carga);
-    expect(isNaN(zl.test.output[0])).to.equal(false);
-    expect(zl.test.output[0]).to.equal(zl.test.output[1]);
+    var zlcodigo = zl.Compilar(codigo, function(err, res) {
+      var carga = zl.Cargar(res.javascript);
+      carga.$asincrono.inicio = true;
+      carga.$alAcabar = function() {
+        expect(isNaN(zl.test.output[0])).to.equal(false);
+        expect(zl.test.output[0]).to.equal(zl.test.output[1]);
+        done();
+      }
+      zl.Ejecutar(carga);
+    });
   });
 });

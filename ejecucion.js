@@ -21,8 +21,8 @@ var modulo = function(zl, async) {
   }
 
   rte.$precision = function(arg) {
-    return (zl.configuracion.precision > 0 ?
-      arg.toPrecision(zl.configuracion.precision) :
+    return (this.$configuracion.precision > 0 ?
+      arg.toPrecision(this.$configuracion.precision) :
       arg);
   }
 
@@ -202,6 +202,7 @@ var modulo = function(zl, async) {
   };
 
   rte.$asincrono = {};
+  rte.$configuracion = {};
 
   rte.$error = zl.error;
 
@@ -248,8 +249,10 @@ var modulo = function(zl, async) {
 
   zl.Cargar = function(javascript) {
     var carga = zl.writeJson({}, rte);
-    carga.$canvas = document.getElementById("canvas");
-    carga.$ctx2d = carga.$canvas.getContext("2d");
+    if (typeof document !== "undefined") {
+      carga.$canvas = document.getElementById("canvas");
+      carga.$ctx2d = carga.$canvas.getContext("2d");
+    }
     // Cargar el código:
     rte.limpiar({});
     zl.eval.call(carga, javascript);

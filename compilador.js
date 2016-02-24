@@ -55,19 +55,27 @@ var modulo = function(zl, async) {
         }
       }
     } catch (e) {
-      if (!zl.error.esError(e) || e.traza.end > 0)
+      if (!zl.error.esError(e) || e.traza.end > 0) {
+        console.log("ayyyyif (!zl.error.esErro");
         done(e);
+        return;
+      }
     }
 
-    // Fase 3, obtener el árbol sintáctico del resto del código:
-    compilado = zl.sintaxis.arbolCodigo(zlcode, (compilado ? compilado.end : 0));
+    try {
+      // Fase 3, obtener el árbol sintáctico del resto del código:
+      compilado = zl.sintaxis.arbolCodigo(zlcode, (compilado ? compilado.end : 0));
 
-    // Fase 4, generar la tabla de símbolos
+      // Fase 4, generar la tabla de símbolos
 
-    // Construir este módulo
-    var mod = zl.entorno.newModulo();
-    zl.writeJson(mod, configuraciones);
-    mod.rellenarDesdeArbol(compilado);
+      // Construir este módulo
+      var mod = zl.entorno.newModulo();
+      zl.writeJson(mod, configuraciones);
+      mod.rellenarDesdeArbol(compilado);
+    } catch (e) {
+      done(e);
+      return;
+    }
 
     // Antes de avanzar a la siguiente fase, cargar todos los
     // módulos importados.
@@ -106,15 +114,16 @@ var modulo = function(zl, async) {
           // Fase 7, generación del código de salida
           var inicio = mod.subrutinaPorNombre("inicio");
           var fotograma = mod.subrutinaPorNombre("fotograma");
-          done(null, {
-            javascript: javascript + zl.javascript.modulo(compilado, mod),
-            tabla: mod,
-            inicioAsincrono: (inicio || false) && (inicio.modificadores.asincrono || false),
-            fotogramaAsincrono: (fotograma || false) && (fotograma.modificadores.asincrono || false)
-          });
         } catch (e) {
           done(e);
+          return;
         }
+        done(null, {
+          javascript: javascript + zl.javascript.modulo(compilado, mod),
+          tabla: mod,
+          inicioAsincrono: (inicio || false) && (inicio.modificadores.asincrono || false),
+          fotogramaAsincrono: (fotograma || false) && (fotograma.modificadores.asincrono || false)
+        });
       });
   }
 
