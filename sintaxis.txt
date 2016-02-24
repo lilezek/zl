@@ -20,6 +20,7 @@
 <configuraciones> ::= "configuracion" <_> (<configuracion> <_>)* "fin"
 
 <configuracion> ::= "importar" <_> <texto> <_> "como" <nombre>
+    | "integrar" <_> <texto>
     | <nombre> <_> "<-" <_> <numero>
     | <nombre> <_> "<-" <_> <texto>
 

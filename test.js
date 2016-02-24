@@ -1,10 +1,10 @@
+var async = require("async");
 var zl = require('./compilador')({
   log: function() {}
-});
+}, async);
 // Meter el NodeJS Test IO antes de que la ejecución cargue su propio IO
 require('./njstestio')(zl);
-require('./ejecucion')(zl);
-require('./configuracion')(zl);
+require('./ejecucion')(zl, async);
 
 var chai = require('chai');
 var expect = chai.expect;

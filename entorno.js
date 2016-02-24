@@ -3,14 +3,15 @@ var modulo = function(zl) {
 
   zl.entorno = zl.entorno || {};
 
-  function Modulo(padre) {
-    this.padre = padre || null;
-
+  function Modulo() {
+    this.padre = null;
     this.subrutinas = {};
     this.tipos = {};
     this.globales = {};
-
-
+    this.configuracion = {
+      fps: 10,
+      precision: 0
+    };
     this.importes = {
       "$internal": modInterno
     };
@@ -144,6 +145,15 @@ var modulo = function(zl) {
     for (var k in this.subrutinas) {
       this.subrutinas[k].desplazarPosiciones(posicion, cantidad);
     }
+  }
+
+  Modulo.prototype.integrar = function(otroModulo) {
+    // TODO: Integrar importes, y tipos:
+    // TODO: Comprobar que no haya globales incompatibles
+    // TODO: Comprobar que no haya subrutinas repetidas
+    zl.writeJson(this.subrutinas, otroModulo.subrutinas);
+    zl.writeJson(this.tipos, otroModulo.tipos);
+    zl.writeJson(this.globales, otroModulo.globales);
   }
 
   function Subrutina(modulo) {

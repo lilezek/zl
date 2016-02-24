@@ -24,7 +24,9 @@ var modulo = function(zl) {
     "datos": true,
     "algoritmo": true,
     "global": true,
-    "pausar": true
+    "pausar": true,
+    "integrar": true,
+    "importar": true
   };
 
   // Usando el analizador que he construido, genero los símbolos del lenguaje
@@ -71,6 +73,7 @@ var modulo = function(zl) {
   a.simbolo("pausar");
   a.simbolo(":configuracion", /^configuracion/i);
   a.simbolo("importar");
+  a.simbolo("integrar");
   a.simbolo("como");
 
   // Los distintos tokens:
@@ -97,23 +100,29 @@ var modulo = function(zl) {
 
   a.regla("configuracion", function() {
     this.intentar([
+      ["importar", "texto", "como", "nombre"],
+      ["integrar", "texto"],
       ["nombre", "<-", "texto"],
-      ["nombre", "<-", "numero"],
-      ["importar", "texto", "como", "nombre"]
+      ["nombre", "<-", "numero"]
     ]);
     var intento = this.resultado(0);
-    if (intento == 2) {
+    if (intento == 0) {
       this.registrarResultado({
         tipo: "importar",
         camino: this.resultado(0,intento,1),
         alias: this.resultado(0,intento,2)
-      })
+      });
+    } else if (intento == 1) {
+      this.registrarResultado({
+        tipo: "integrar",
+        camino: this.resultado(0,intento,1)
+      });
     } else {
       this.registrarResultado({
         tipo: "configurar",
         nombre: this.resultado(0, intento, 0),
         valor: this.resultado(0, intento, 2)
-      })
+      });
     }
     return this;
   });

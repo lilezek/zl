@@ -1,0 +1,181 @@
+/*
+  Biblioteca de dibujado de ZL.
+  Para funcionar, hace falta que $in.$canvas sea un
+  DOM HTML de tipo canvas, y que $in.$ctx2d sea su contexto
+  2d.
+*/
+
+Subrutina Primitiva Fondo
+Datos
+  r es Numero de Entrada
+  g es Numero de Entrada
+  b es Numero de Entrada
+Algoritmo
+  /*
+  $in.$ctx2d.fillStyle = "rgba("+~~$entrada.r+","+~~$entrada.g+","+~~$entrada.b+",255)";
+  $in.$ctx2d.fillRect(0, 0, $in.$canvas.width, $in.$canvas.height);
+  */
+Fin
+
+Subrutina Primitiva Elipse
+Datos
+  centrox es Numero de Entrada
+  centroy es Numero de Entrada
+  ancho es Numero de Entrada
+  alto es Numero de Entrada
+Algoritmo
+  /*
+  var w = $entrada.ancho >= 0 ? $entrada.ancho : 0;
+	var h = $entrada.alto >= 0 ? $entrada.alto : 0;
+  var x = $entrada.centrox;
+  var y = $entrada.centroy;
+	$in.$ctx2d.beginPath();
+	if (w == h) {
+		$in.$ctx2d.arc(x,y,w / 2, 0, 6.283185307179586, false);
+	} else {
+		var w2 = w/2;
+		var h2 = h/2;
+		x -= w2;
+		y -= h2;
+		var kappa = 0.5522848,
+		ox = (w2) * kappa, // control point offset horizontal
+		oy = (h2) * kappa, // control point offset vertical
+		xe = x + w,           // x-end
+		ye = y + h,           // y-end
+		xm = x + w2,       // x-middle
+		ym = y + h2;       // y-middle
+
+		$in.$ctx2d.moveTo(x, ym);
+		$in.$ctx2d.bezierCurveTo(x, ym - oy, xm - ox, y, xm, y);
+		$in.$ctx2d.bezierCurveTo(xm + ox, y, xe, ym - oy, xe, ym);
+		$in.$ctx2d.bezierCurveTo(xe, ym + oy, xm + ox, ye, xm, ye);
+		$in.$ctx2d.bezierCurveTo(xm - ox, ye, x, ym + oy, x, ym);
+	}
+	$in.$ctx2d.closePath();
+  if ($global.$estiloRelleno) {
+    //$in.$ctx2d.globalAlpha = fillAlpha;
+    $in.$ctx2d.fill();
+  }
+  if ($global.$estiloBordes) {
+    //$in.$ctx2d.globalAlpha = strokeAlpha;
+    $in.$ctx2d.stroke();
+  }
+  */
+Fin
+
+Subrutina Primitiva rectangulo
+Datos
+  posx es Numero de Entrada
+  posy es Numero de Entrada
+  ancho es Numero de Entrada
+  alto es Numero de Entrada
+Algoritmo
+  /*
+  var w = $entrada.ancho >= 0 ? $entrada.ancho : 0;
+  var h = $entrada.alto >= 0 ? $entrada.alto : 0;
+  //if (lineWidth % 2 == 1) $in.$ctx2d.translate(0.5,0.5);
+  $in.$ctx2d.beginPath();
+  $in.$ctx2d.rect($entrada.posx,$entrada.posy,w,h);
+  $in.$ctx2d.closePath();
+  if ($global.$estiloRelleno) {
+    //$in.$ctx2d.globalAlpha = fillAlpha;
+    $in.$ctx2d.fill();
+  }
+  if ($global.$estiloBordes) {
+    //$in.$ctx2d.globalAlpha = strokeAlpha;
+    $in.$ctx2d.stroke();
+  }
+  //if (lineWidth % 2 == 1) $in.$ctx2d.translate(-0.5,-0.5);
+  */
+Fin
+
+Subrutina Primitiva colorRelleno
+Datos
+  r es Numero de Entrada
+  g es Numero de Entrada
+  b es Numero de Entrada
+Algoritmo
+  /*
+  $in.$ctx2d.fillStyle = "rgb("+~~$entrada.r+","+~~$entrada.g+","+~~$entrada.b+")";
+  $global.$estiloRelleno = {
+    r: $entrada.r,
+    g: $entrada.g,
+    b: $entrada.b
+  };
+  */
+Fin
+
+Subrutina Primitiva grosorBorde
+Datos
+	grosor es Numero de Entrada
+Algoritmo
+	/*
+	var w = $entrada.grosor >= 0 ? $entrada.grosor : 0;
+  //lineWidth = w;
+	$in.$ctx2d.lineWidth = w;
+  */
+Fin
+
+Subrutina Primitiva colorBorde
+Datos
+  r es Numero de entrada
+  g es Numero de entrada
+  b es Numero de entrada
+Algoritmo
+  /*
+	$global.$estiloBordes = "rgb(" + $entrada.r + "," + $entrada.g + "," + $entrada.b + ")";
+	$in.$ctx2d.strokeStyle = $global.$estiloBordes;
+	//strokeAlpha = parseFloat(a);
+  */
+Fin
+
+Subrutina Primitiva SinRelleno
+Datos
+
+Algoritmo
+	/*
+  delete $global.$estiloRelleno;
+  */
+Fin
+
+Subrutina Primitiva SinBorde
+Datos
+
+Algoritmo
+	/*
+  delete $global.$estiloBordes;
+  */
+Fin
+
+Subrutina Primitiva PosicionRaton
+Datos
+	posx es Numero de Salida
+  posy es Numero de Salida
+Algoritmo
+	/*
+	var p = $in.$ratonCanvas();
+  $salida.posx = p[0];
+  $salida.posy = p[1];
+  */
+Fin
+
+Subrutina Primitiva Linea
+Datos
+	pos1x es Numero de Entrada
+  pos1y es Numero de Entrada
+  pos2x es Numero de Entrada
+  pos2y es Numero de Entrada
+Algoritmo
+	/*
+  var c = document.getElementById("canvas");
+  var ctx = c.getContext("2d");
+  ctx.beginPath();
+  ctx.moveTo($entrada.pos1x, $entrada.pos1y);
+  ctx.lineTo($entrada.pos2x, $entrada.pos2y);
+  ctx.closePath();
+  if ($global.$estiloBordes) {
+    //ctx.globalAlpha = strokeAlpha;
+    ctx.stroke();
+  }
+  */
+Fin

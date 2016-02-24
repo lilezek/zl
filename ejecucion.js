@@ -6,10 +6,6 @@ var modulo = function(zl, async) {
     require("./njsio")(zl);
   }
 
-  // Async en NodeJS
-  if (!async && typeof require !== "undefined") {
-    async = require("async");
-  }
 
   if (!async) {
     console.error("Se requiere async para la ejecución.");
@@ -19,8 +15,10 @@ var modulo = function(zl, async) {
   zl.ejecucion = zl.ejecucion || {};
 
   var rte = {};
-  if (typeof window !== "undefined")
+  // Dependencias Web
+  if (typeof window !== "undefined") {
     window.$zl_rte = rte;
+  }
 
   rte.$precision = function(arg) {
     return (zl.configuracion.precision > 0 ?
@@ -250,6 +248,8 @@ var modulo = function(zl, async) {
 
   zl.Cargar = function(javascript) {
     var carga = zl.writeJson({}, rte);
+    carga.$canvas = document.getElementById("canvas");
+    carga.$ctx2d = carga.$canvas.getContext("2d");
     // Cargar el código:
     rte.limpiar({});
     zl.eval.call(carga, javascript);

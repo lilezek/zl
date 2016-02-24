@@ -1,6 +1,7 @@
 # Tabla de símbolos
 
 * Módulo
+  * Conjunto de configuraciones
   * Conjunto de subrutinas
   * Conjunto de declaraciones globales
   * Camino al código fuente, si existe

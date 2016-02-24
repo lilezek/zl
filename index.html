@@ -80,54 +80,67 @@
 
 <body onresize="return canvasEscala();">
   <div class="main">
-<textarea class="editor" id="editor">Subrutina Conversora Primitiva NumeroComoTexto
-Datos
-  n es Numero de Entrada
-  t es Texto de Salida
-Algoritmo
-  /*
-  $salida.t = ""+$entrada.n;
-  */
-Fin
-
-Subrutina Conversora Primitiva TextoComoNumero
-Datos
-	n es numero de salida
-  t es texto de entrada
-Algoritmo
-  /*
-  if (isNaN($entrada.t)) {
-  	$in.$alError($in.$error.newError($in.$error.E_EJECUCION_CONVERSION_INVALIDA, {
-    		tipoBase: "texto",
-        tipoObjetivo: "numero",
-       	valor: $entrada.t,
-        adicional: "No es un número válido."
-  		}));
-  } else {
-  	$salida.n = parseFloat($entrada.t);
-  }
-  */
+<textarea class="editor" id="editor">Configuracion
+  fps <- 60
+	integrar "bibliotecasZL/basico.zl"
+	integrar "bibliotecasZL/canvas.zl"
 Fin
 
 Subrutina Inicio
 Datos
-  n es Numero
-  t es Texto
+	anteriorx es Numero Global
+  anteriory es Numero Global
 Algoritmo
-  aleatorio [
-    minimo <- 0
-    maximo <- 100
-    resultado -> n
+	anteriorx <- 0
+  anteriory <- 0
+Fin
+
+Subrutina Fotograma
+Datos
+  d es Numero
+  px es Numero
+  py es Numero
+  anteriorx es Numero global
+  anteriory es Numero global
+Algoritmo
+  delta [
+    delta -> d
   ]
-  leer [
-    mensaje -> t
+  Fondo [
+    r <- 0
+    g <- 0
+    b <- 0
   ]
-  n <- n + t como Numero
-  mostrarNumero [
-    mensaje <- n
+  posicionraton [
+    posx -> px
+    posy -> py
   ]
-  mostrar [
-    mensaje <- n como Texto
+  anteriorx <- anteriorx + d*(px - anteriorx)*3
+  anteriory <- anteriory + d*(py - anteriory)*3
+  colorrelleno [
+    r <- 255
+    g <- 255
+    b <- 255
+  ]
+  elipse [
+    centrox <- anteriorx
+    centroy <- anteriory
+    ancho <- 50
+    alto <- 50
+  ]
+  colorBorde [
+    r <- 255
+    g <- 255
+    b <- 255
+  ]
+  grosorBorde [
+    grosor <- 3
+  ]
+  linea [
+    pos1x <- anteriorx
+    pos1y <- anteriory
+    pos2x <- px
+    pos2y <- py
   ]
 Fin</textarea>
     <div class="v divisor"></div>
@@ -328,27 +341,25 @@ Fin</textarea>
       function Compile(zlcode) {
         lasttimeout = null;
         var compilation = $("#helparea").get(0);
-        try {
-          eliminarLineasError();
-          lastCompilation = zl.Compilar(zlcode);
-          zl.autocompletar.alimentarTabla(lastCompilation.tabla);
-          if (minify)
-            lastjs = js_beautify(uglify(js_beautify(lastCompilation.javascript)));
-          else
-            lastjs = js_beautify(lastCompilation.javascript);
-          compilation.innerHTML = zl.escapeHtml(lastjs);
-        } catch (e) {
-          if (zl.error.esError(e)) {
+        eliminarLineasError();
+        zl.Compilar(zlcode, function(e, compilado){
+          if (e && zl.error.esError(e)) {
             var tarjeta = zl.error.obtenerMensajeHtml(e, zlcode);
             compilation.innerHTML = tarjeta.getHtml();
             for (var i = 0; i < tarjeta.lineasDeError().length; i++) {
               var x = tarjeta.lineasDeError()[i]-1;
               errorLineas.push(editor.addLineClass(x, "background", "CodeMirror-line-error"));
             }
-          }
-          else
-            throw e;
-        }
+          } else {
+            lastCompilation = compilado;
+            zl.autocompletar.alimentarTabla(lastCompilation.tabla);
+            if (minify)
+              lastjs = js_beautify(uglify(js_beautify(lastCompilation.javascript)));
+            else
+              lastjs = js_beautify(lastCompilation.javascript);
+            compilation.innerHTML = zl.escapeHtml(lastjs);
+          }          
+        });
       }
 
       function eliminarLineasError() {

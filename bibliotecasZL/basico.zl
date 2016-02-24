@@ -1,0 +1,55 @@
+/*
+  biblioteca básica de ZL.
+  Para funcionar, hace falta que $in.$delta se actualice
+  cada fotograma con el delta de tiempo entre fotograma y fotograma.
+*/
+
+/*
+  ****************************************
+  ********** Tiempo y fechas *************
+  ****************************************
+*/
+
+Subrutina Primitiva Delta
+Datos
+  delta es Numero de salida
+Algoritmo
+	/*
+  $salida.delta = $in.$delta/1000;
+  */
+Fin
+
+/*
+  ****************************************
+  ************ Conversiones **************
+  ****************************************
+*/
+
+Subrutina Conversora Primitiva NumeroComoTexto
+Datos
+  n es Numero de Entrada
+  t es Texto de Salida
+Algoritmo
+  /*
+  $salida.t = ""+$entrada.n;
+  */
+Fin
+
+Subrutina Conversora Primitiva TextoComoNumero
+Datos
+	n es numero de salida
+  t es texto de entrada
+Algoritmo
+  /*
+  if (isNaN($entrada.t)) {
+  	$in.$alError($in.$error.newError($in.$error.E_EJECUCION_CONVERSION_INVALIDA, {
+    		tipoBase: "texto",
+        tipoObjetivo: "numero",
+       	valor: $entrada.t,
+        adicional: "No es un número válido."
+  		}));
+  } else {
+  	$salida.n = parseFloat($entrada.t);
+  }
+  */
+Fin
