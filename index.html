@@ -156,6 +156,18 @@ Fin</textarea>
       window.onbeforeunload = function(e) {
         return '¿Estás seguro de que quieres abandonar el editor?';
       };
+
+      var parametrosArray = location.search.split("?");
+      var parametros = {};
+      if (parametrosArray.length > 1) {
+        parametrosArray = parametrosArray[1].split("&");
+        for (var i = 0; i < parametrosArray.length; i++) {
+          var x = parametrosArray[i].split("=");
+          parametros[x[0]] = x[1];
+        }
+      }
+      delete parametrosArray;
+
       var editor = CodeMirror.fromTextArea($("#editor").get(0), {
         lineNumbers: true,
         mode: "zl",
@@ -207,6 +219,16 @@ Fin</textarea>
         "Ctrl-Enter": autocompletar,
         "Cmd-Enter": autocompletar
       });
+
+      if (parametros["programa"]) {
+        $.ajax("programas/"+parametros["programa"],{
+          dataType: "text",
+          type: "get",
+          success: function(data) {
+            editor.setValue(data);
+          }
+        });
+      }
 
       function canvasEscala() {
         $("canvas").attr("width", window.innerWidth);

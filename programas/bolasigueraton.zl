@@ -254,7 +254,4 @@ Algoritmo
     pos2x <- px
     pos2y <- py
   ]
-  Si px > 800 Hacer
-    pausar
-  Fin
 Fin
