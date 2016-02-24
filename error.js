@@ -322,7 +322,9 @@ var modulo = function(zl) {
   zl.error.E_LECTURA_ILEGAL = 21;
   zl.error.E_ESCRITURA_ILEGAL = 22;
   zl.error.E_INDICE_NO_LISTA_NO_RELACION = 23;
-  zl.error.E_EJECUCION_INDICE_DESCONTROLADO = 24;
+  zl.error.E_CONVERSOR_NO_EXISTE = 24;
+  zl.error.E_EJECUCION_INDICE_DESCONTROLADO = 500;
+  zl.error.E_EJECUCION_CONVERSION_INVALIDA = 501;
 
   zl.error.newError = function(a, b) {
     return new Error(a, b);

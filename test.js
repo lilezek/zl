@@ -19,7 +19,8 @@ var codigos = {
   'entradasalidanumero': '',
   'ordenoperaciones': '',
   'listabidimensional': '',
-  'globales': ''
+  'globales': '',
+  'conversorprimitivo': ''
 };
 
 function precision(n) {
@@ -140,5 +141,16 @@ describe('Pruebas erróneas con listas', function() {
     } catch (e) {
       expect(e.tipo).to.equal(zl.error.E_EJECUCION_INDICE_DESCONTROLADO);
     }
+  });
+});
+
+describe('Subrutinas conversoras', function() {
+  it('Conversora primitiva de texto a numero', function() {
+    var codigo = codigos["conversorprimitivo"];
+    var zlcodigo = zl.Compilar(codigo).javascript;
+    var carga = zl.Cargar(zlcodigo);
+    zl.Ejecutar(carga);
+    expect(isNaN(zl.test.output[0])).to.equal(false);
+    expect(zl.test.output[0]).to.equal(zl.test.output[1]);
   });
 });

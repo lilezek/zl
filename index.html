@@ -26,8 +26,8 @@
   <script src="utils.js"></script>
   <script src="analizador.js"></script>
   <script src="zlsintaxis.js"></script>
-  <script src="ejecucion.js"></script>
   <script src="error.js"></script>
+  <script src="ejecucion.js"></script>
   <script src="configuracion.js"></script>
   <script src="sintaxis.js"></script>
   <script src="entorno.js"></script>
@@ -80,267 +80,56 @@
 
 <body onresize="return canvasEscala();">
   <div class="main">
-<textarea class="editor" id="editor">Configuracion
-  fps <- 60
-Fin
-
-Subrutina Primitiva Fondo
+<textarea class="editor" id="editor">Subrutina Conversora Primitiva NumeroComoTexto
 Datos
-  r es Numero de Entrada
-  g es Numero de Entrada
-  b es Numero de Entrada
+  n es Numero de Entrada
+  t es Texto de Salida
 Algoritmo
   /*
-  var c = document.getElementById("canvas");
-  var ctx = c.getContext("2d");
-  ctx.fillStyle = "rgba("+~~$entrada.r+","+~~$entrada.g+","+~~$entrada.b+",255)";
-  ctx.fillRect(0, 0, c.width, c.height);
+  $salida.t = ""+$entrada.n;
   */
 Fin
 
-Subrutina Primitiva Elipse
+Subrutina Conversora Primitiva TextoComoNumero
 Datos
-  centrox es Numero de Entrada
-  centroy es Numero de Entrada
-  ancho es Numero de Entrada
-  alto es Numero de Entrada
+	n es numero de salida
+  t es texto de entrada
 Algoritmo
   /*
-  var c = document.getElementById("canvas");
-  var ctx = c.getContext("2d");
-  var w = $entrada.ancho >= 0 ? $entrada.ancho : 0;
-	var h = $entrada.alto >= 0 ? $entrada.alto : 0;
-  var x = $entrada.centrox;
-  var y = $entrada.centroy;
-	ctx.beginPath();
-	if (w == h) {
-		ctx.arc(x,y,w / 2, 0, 6.283185307179586, false);
-	} else {
-		var w2 = w/2;
-		var h2 = h/2;
-		x -= w2;
-		y -= h2;
-		var kappa = 0.5522848,
-		ox = (w2) * kappa, // control point offset horizontal
-		oy = (h2) * kappa, // control point offset vertical
-		xe = x + w,           // x-end
-		ye = y + h,           // y-end
-		xm = x + w2,       // x-middle
-		ym = y + h2;       // y-middle
-
-		ctx.moveTo(x, ym);
-		ctx.bezierCurveTo(x, ym - oy, xm - ox, y, xm, y);
-		ctx.bezierCurveTo(xm + ox, y, xe, ym - oy, xe, ym);
-		ctx.bezierCurveTo(xe, ym + oy, xm + ox, ye, xm, ye);
-		ctx.bezierCurveTo(xm - ox, ye, x, ym + oy, x, ym);
-	}
-	ctx.closePath();
-  if ($global.$estiloRelleno) {
-    //ctx.globalAlpha = fillAlpha;
-    ctx.fill();
-  }
-  if ($global.$estiloBordes) {
-    //ctx.globalAlpha = strokeAlpha;
-    ctx.stroke();
-  }
-  */
-Fin
-
-Subrutina Primitiva rectangulo
-Datos
-  posx es Numero de Entrada
-  posy es Numero de Entrada
-  ancho es Numero de Entrada
-  alto es Numero de Entrada
-Algoritmo
-  /*
-  var c = document.getElementById("canvas");
-  var ctx = c.getContext("2d");
-  var w = $entrada.ancho >= 0 ? $entrada.ancho : 0;
-  var h = $entrada.alto >= 0 ? $entrada.alto : 0;
-  //if (lineWidth % 2 == 1) ctx.translate(0.5,0.5);
-  ctx.beginPath();
-  ctx.rect($entrada.posx,$entrada.posy,w,h);
-  ctx.closePath();
-  if ($global.$estiloRelleno) {
-    //ctx.globalAlpha = fillAlpha;
-    ctx.fill();
-  }
-  if ($global.$estiloBordes) {
-    //ctx.globalAlpha = strokeAlpha;
-    ctx.stroke();
-  }
-  //if (lineWidth % 2 == 1) ctx.translate(-0.5,-0.5);
-  */
-Fin
-
-Subrutina Primitiva colorRelleno
-Datos
-  r es Numero de Entrada
-  g es Numero de Entrada
-  b es Numero de Entrada
-Algoritmo
-  /*
-  var c = document.getElementById("canvas");
-  var ctx = c.getContext("2d");
-  ctx.fillStyle = "rgb("+~~$entrada.r+","+~~$entrada.g+","+~~$entrada.b+")";
-  $global.$estiloRelleno = {
-    r: $entrada.r,
-    g: $entrada.g,
-    b: $entrada.b
-  };
-  */
-Fin
-
-Subrutina Primitiva grosorBorde
-Datos
-	grosor es Numero de Entrada
-Algoritmo
-	/*
-	var w = $entrada.grosor >= 0 ? $entrada.grosor : 0;
-  var c = document.getElementById("canvas");
-  var ctx = c.getContext("2d");
-  //lineWidth = w;
-	ctx.lineWidth = w;
-  */
-Fin
-
-Subrutina Primitiva colorBorde
-Datos
-  r es Numero de entrada
-  g es Numero de entrada
-  b es Numero de entrada
-Algoritmo
-  /*
-  var c = document.getElementById("canvas");
-  var ctx = c.getContext("2d");
-	$global.$estiloBordes = "rgb(" + $entrada.r + "," + $entrada.g + "," + $entrada.b + ")";
-	ctx.strokeStyle = $global.$estiloBordes;
-	//strokeAlpha = parseFloat(a);
-  */
-Fin
-
-Subrutina Primitiva SinRelleno
-Datos
-
-Algoritmo
-	/*
-  delete $global.$estiloRelleno;
-  */
-Fin
-
-Subrutina Primitiva SinBorde
-Datos
-
-Algoritmo
-	/*
-  delete $global.$estiloBordes;
-  */
-Fin
-
-Subrutina Primitiva Delta
-Datos
-  delta es Numero de salida
-Algoritmo
-	/*
-  $salida.delta = $in.$delta/1000;
-  */
-Fin
-
-Subrutina Primitiva PosicionRaton
-Datos
-	posx es Numero de Salida
-  posy es Numero de Salida
-Algoritmo
-	/*
-	var p = $in.$ratonCanvas();
-  $salida.posx = p[0];
-  $salida.posy = p[1];
-  */
-Fin
-
-Subrutina Primitiva Linea
-Datos
-	pos1x es Numero de Entrada
-  pos1y es Numero de Entrada
-  pos2x es Numero de Entrada
-  pos2y es Numero de Entrada
-Algoritmo
-	/*
-  var c = document.getElementById("canvas");
-  var ctx = c.getContext("2d");
-  ctx.beginPath();
-  ctx.moveTo($entrada.pos1x, $entrada.pos1y);
-  ctx.lineTo($entrada.pos2x, $entrada.pos2y);
-  ctx.closePath();
-  if ($global.$estiloBordes) {
-    //ctx.globalAlpha = strokeAlpha;
-    ctx.stroke();
+  if (isNaN($entrada.t)) {
+  	$in.$alError($in.$error.newError($in.$error.E_EJECUCION_CONVERSION_INVALIDA, {
+    		tipoBase: "texto",
+        tipoObjetivo: "numero",
+       	valor: $entrada.t,
+        adicional: "No es un número válido."
+  		}));
+  } else {
+  	$salida.n = parseFloat($entrada.t);
   }
   */
 Fin
 
 Subrutina Inicio
 Datos
-	anteriorx es Numero Global
-  anteriory es Numero Global
+  n es Numero
+  t es Texto
 Algoritmo
-	anteriorx <- 0
-  anteriory <- 0
-Fin
-
-Subrutina Fotograma
-Datos
-  d es Numero
-  px es Numero
-  py es Numero
-  anteriorx es Numero global
-  anteriory es Numero global
-Algoritmo
-  delta [
-    delta -> d
+  aleatorio [
+    minimo <- 0
+    maximo <- 100
+    resultado -> n
   ]
-  Fondo [
-    r <- 0
-    g <- 0
-    b <- 0
+  leer [
+    mensaje -> t
   ]
-  posicionraton [
-    posx -> px
-    posy -> py
+  n <- n + t como Numero
+  mostrarNumero [
+    mensaje <- n
   ]
-  anteriorx <- anteriorx + d*(px - anteriorx)*3
-  anteriory <- anteriory + d*(py - anteriory)*3
-  colorrelleno [
-    r <- 255
-    g <- 255
-    b <- 255
+  mostrar [
+    mensaje <- n como Texto
   ]
-  elipse [
-    centrox <- anteriorx
-    centroy <- anteriory
-    ancho <- 50
-    alto <- 50
-  ]
-  colorBorde [
-    r <- 255
-    g <- 255
-    b <- 255
-  ]
-  grosorBorde [
-    grosor <- 3
-  ]
-  linea [
-    pos1x <- anteriorx
-    pos1y <- anteriory
-    pos2x <- px
-    pos2y <- py
-  ]
-  Si px > 800 Hacer
-    pausar
-  Fin
-Fin
-</textarea>
+Fin</textarea>
     <div class="v divisor"></div>
     <div class="compilation">
       <div class="visual minimized" onclick="return visualRestore(event,this);">
@@ -482,20 +271,20 @@ Fin
             carga = null;
             $("#run").html("Empezar");
           }
-          try {
-            zl.Ejecutar(carga);
-          } catch (e) {
-            if (zl.error.esError(e)){
-              var tarjeta = zl.error.obtenerMensajeHtml(e, zlcode);
-              compilation.innerHTML = tarjeta.getHtml();
-              for (var i = 0; i < tarjeta.lineasDeError().length; i++) {
-                var x = tarjeta.lineasDeError()[i]-1;
-                errorLineas.push(editor.addLineClass(x, "background", "CodeMirror-line-error"));
+          carga.$alError = function(e) {
+              this.$continuar = false;
+              if (zl.error.esError(e)){
+                var tarjeta = zl.error.obtenerMensajeHtml(e, zlcode);
+                compilation.innerHTML = tarjeta.getHtml();
+                for (var i = 0; i < tarjeta.lineasDeError().length; i++) {
+                  var x = tarjeta.lineasDeError()[i]-1;
+                  errorLineas.push(editor.addLineClass(x, "background", "CodeMirror-line-error"));
+                }
               }
-            }
-            else
-              throw e;
+              else
+                throw e;
           }
+          zl.Ejecutar(carga);
         } else {
           zl.Abortar(carga);
           carga = null;

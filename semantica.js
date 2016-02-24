@@ -242,10 +242,35 @@ var modulo = function(zl) {
       return modulo.tipoPorNombre("booleano");
     } else if (arbol.tipo == "falso") {
       return modulo.tipoPorNombre("booleano");
+    } else if (arbol.tipo == "conversion") {
+      var tipo = modulo.tipoPorNombre(arbol.tipoObjetivo);
+      if (!tipo) {
+        throw zl.error.newError(zl.error.E_TIPO_NO_EXISTE, {
+          posicion: [arbol.begin, arbol.end],
+          tipo: arbol.tipoObjetivo
+        });
+      }
+      var datoTipo = testarExpresion({
+        tipo: "nombre",
+        valor: arbol.nombre,
+        begin: arbol.begin,
+        end: arbol.end
+      }, sub);
+      if (!(tipo.nombre in datoTipo.conversiones)) {
+        throw zl.error.newError(zl.error.E_CONVERSOR_NO_EXISTE, {
+          posicion: [arbol.begin, arbol.end],
+          tipoObjetivo: arbol.tipoObjetivo,
+          tipoBase: datoTipo.nombre
+        });
+      }
+      arbol.subrutinaConversora = datoTipo.conversiones[tipo.nombre];
+      return tipo;
     } else if (arbol.tipo == "acceso") {
       var tipo = testarExpresion({
         tipo: "nombre",
-        valor: arbol.nombre
+        valor: arbol.nombre,
+        begin: arbol.begin,
+        end: arbol.end
       }, sub);
       if (tipo.nombre != "lista" && tipo.nombre != "relacion")
         throw zl.error.newError(zl.error.E_INDICE_NO_LISTA_NO_RELACION, {

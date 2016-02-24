@@ -235,6 +235,28 @@ var modulo = function(zl) {
         this.padre.registrarGlobal(decl);
       }
     }
+
+    // Registrar conversores (después de que se registren los datos):
+    if ("conversora" in this.modificadores) {
+      // TODO: añadir las comprobaciones oportunas
+      // Un dato de entrada
+      // Un dato de salida
+      // Sin datos globales
+      // ¿No asíncrona?
+      this.conversion = {};
+      this.conversion.datoEntrada = null;
+      this.conversion.datoSalida = null;
+      for (var k in this.declaraciones) {
+        if (this.declaraciones[k].modificadores == Declaracion.prototype.M_ENTRADA)
+          this.conversion.datoEntrada = this.declaraciones[k];
+        else if (this.declaraciones[k].modificadores == Declaracion.prototype.M_SALIDA)
+          this.conversion.datoSalida = this.declaraciones[k];
+      }
+      if (this.conversion.datoEntrada && this.conversion.datoSalida) {
+        this.conversion.datoEntrada.tipo.registrarConversor(this,this.conversion.datoSalida.tipo);
+      }
+    }
+
     this.serializar();
   }
 
@@ -374,6 +396,12 @@ var modulo = function(zl) {
   Tipo.prototype.serializar = function() {
     // TODO: Serializar correctamente con los métodos
     this.serial = this.nombre;
+  }
+
+  Tipo.prototype.registrarConversor = function(subrutina, tipoObjetivo) {
+    // TODO: Comprobar si el conversor está en otro módulo
+    // para preparar lo que sea necesario.
+    this.conversiones[tipoObjetivo.nombre] = subrutina;
   }
 
   // Distintos tipos de modificador.

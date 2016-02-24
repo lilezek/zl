@@ -38,32 +38,36 @@ var modulo = function(zl, async) {
   }
 
   rte.leernumero = function(arg, callback) {
-    var oldabortar = this.$abortar;
-    var self = this;
-    this.$abortar = zl.io.abortRead;
-    zl.io.inRead(function cbck(err, value) {
-      var x = parseFloat(value);
-      if (isNaN(x))
-        zl.io.inRead(cbck);
-      else {
-        self.$abortar = oldabortar;
-        callback(null, {
-          mensaje: x
-        });
-      }
-    });
+    if (this.$continuar) {
+      var oldabortar = this.$abortar;
+      var self = this;
+      this.$abortar = zl.io.abortRead;
+      zl.io.inRead(function cbck(err, value) {
+        var x = parseFloat(value);
+        if (isNaN(x))
+          zl.io.inRead(cbck);
+        else {
+          self.$abortar = oldabortar;
+          callback(null, {
+            mensaje: x
+          });
+        }
+      });
+    }
   }
 
   rte.leer = function(arg, callback) {
-    var oldabortar = this.$abortar;
-    var self = this;
-    this.$abortar = zl.io.abortRead;
-    zl.io.inRead(function(err, value) {
-      self.$abortar = oldabortar;
-      callback(null, {
-        mensaje: value
+    if (this.$continuar) {
+      var oldabortar = this.$abortar;
+      var self = this;
+      this.$abortar = zl.io.abortRead;
+      zl.io.inRead(function(err, value) {
+        self.$abortar = oldabortar;
+        callback(null, {
+          mensaje: value
+        });
       });
-    });
+    }
   }
 
   rte.aleatorio = function(arg) {
@@ -155,16 +159,23 @@ var modulo = function(zl, async) {
 
   }
 
+  rte.$alError = function(e) {
+    this.$continuar = false;
+    throw e;
+  }
+
   rte.$pausar = function($local, $global, $entrada, $salida, pos, callback) {
-    var oldabortar = this.$abortar;
-    var self = this;
-    this.$abortar = function() {
-      zl.io.abortPause();
-    };
-    zl.io.pause($local, $global, $entrada, $salida, pos, function() {
-      self.$abortar = oldabortar;
-      callback.apply(self, arguments);
-    });
+    if (this.$continuar) {
+      var oldabortar = this.$abortar;
+      var self = this;
+      this.$abortar = function() {
+        zl.io.abortPause();
+      };
+      zl.io.pause($local, $global, $entrada, $salida, pos, function() {
+        self.$abortar = oldabortar;
+        callback.apply(self, arguments);
+      });
+    }
   }
 
   // Utilidades y hacks asíncronos
@@ -194,6 +205,8 @@ var modulo = function(zl, async) {
 
   rte.$asincrono = {};
 
+  rte.$error = zl.error;
+
   var requestAnimationFrame;
   if (typeof window !== "undefined") {
     requestAnimationFrame = window.requestAnimationFrame ||
@@ -208,11 +221,11 @@ var modulo = function(zl, async) {
   }
 
 
-  rte.$fotograma = true;
+  rte.$continuar = true;
   rte.$animStart = null;
   rte.$siguienteFotograma = function(fotogramacbk) {
     var self = this;
-    if (this.$fotograma) {
+    if (this.$continuar) {
       requestAnimationFrame(function(timestamp) {
         if (!self.$animStart)
           self.$delta = 0
@@ -243,7 +256,7 @@ var modulo = function(zl, async) {
     return carga;
   }
 
-  zl.Ejecutar = function(carga) {
+  zl.Ejecutar = function(carga, errorCallback) {
     // Preparar la ejecución:
     var ejecucion = "\"use strict\";var $t = this;";
 
@@ -257,7 +270,7 @@ var modulo = function(zl, async) {
     }
     // TODO: Tener en cuenta el retardo de cálculo y restárselo al interval.
     if (typeof carga.fotograma === "function") {
-      ejecucion += "$t.$abortar=function(){$t.$fotograma=false;};"
+      ejecucion += "$t.$abortar=function(){$t.$continuar=false;};"
       ejecucion += "$t.$siguienteFotograma($t.fotograma);";
     } else if (typeof carga.inicio === "function") {
       ejecucion += "$t.$alAcabar(null);";
@@ -267,7 +280,11 @@ var modulo = function(zl, async) {
     }
 
     // Y Ejecutar
-    zl.eval.call(carga, ejecucion);
+    try {
+      zl.eval.call(carga, ejecucion);
+    } catch (e) {
+      carga.$alError(e);
+    }
   }
 
   zl.Abortar = function(carga) {
@@ -280,6 +297,7 @@ var modulo = function(zl, async) {
 }
 
 if (typeof module !== "undefined") {
+  // TODO: Ejecución ahora depende de error.
   module.exports = modulo;
 } else {
   this.zl = modulo(this.zl || {}, async);

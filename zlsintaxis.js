@@ -77,7 +77,7 @@ var modulo = function(zl) {
 
   a.token("verdadero", /^verdadero/i, 0);
   a.token("falso", /^falso/i, 1);
-  a.token("subModificador", /^(interna|primitiva)/i, 2);
+  a.token("subModificador", /^(interna|primitiva|conversora)/i, 2);
   a.token("decModificador", /^((?:de\s+entrada)|(?:de\s+salida)|global)/i, 3);
   a.token("entero", /^((?:[0-1]+(?:\|2))|(?:[0-9A-Fa-f]+(?:\|16))|(?:[0-9]+(?:\|10)?))/i, 4);
   a.token("decimal", /^(\d+\.\d+)/i, 5);
@@ -481,17 +481,18 @@ var modulo = function(zl) {
       ["verdadero"],
       ["falso"],
       ["nombre", "(", "listaAcceso", ")"],
+      ["nombre", "como", "nombre"],
       ["nombre"],
       ["(", "expresion", ")"],
       ["expresionUnaria"]
     ]);
     var intento = this.resultado(0);
-    if (intento == 7)
+    if (intento == 8)
       this.registrarResultado({
         valor: this.resultado(0, intento, 1),
         tipo: this.arbol(0, intento, 1).tipo
       });
-    else if (intento == 8)
+    else if (intento == 9)
       this.registrarResultado({
         valor: this.resultado(0, intento, 0),
         tipo: "expresion"
@@ -501,6 +502,12 @@ var modulo = function(zl) {
         nombre: this.resultado(0, intento, 0),
         acceso: this.resultado(0, intento, 2),
         tipo: "acceso"
+      });
+    } else if (intento == 6) {
+      this.registrarResultado({
+        nombre: this.resultado(0, intento, 0),
+        tipoObjetivo: this.resultado(0, intento, 2),
+        tipo: "conversion"
       });
     } else
       this.registrarResultado({

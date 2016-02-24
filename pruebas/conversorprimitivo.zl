@@ -1,0 +1,27 @@
+Subrutina Conversora Primitiva NumeroComoTexto
+Datos
+  n es Numero de Entrada
+  t es Texto de Salida
+Algoritmo
+  /*
+  $salida.t = ""+$entrada.n;
+  */
+Fin
+
+Subrutina Inicio
+Datos
+  n es Numero
+  t es Texto
+Algoritmo
+  aleatorio [
+    minimo <- 0
+    maximo <- 100
+    resultado -> n
+  ]
+  mostrarNumero [
+    mensaje <- n
+  ]
+  mostrar [
+    mensaje <- n como Texto
+  ]
+Fin
