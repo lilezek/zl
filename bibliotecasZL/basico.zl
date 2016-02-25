@@ -150,3 +150,134 @@ Algoritmo
   $salida.resultado = ($entrada.num % 1 === 0);
   */
 Fin
+
+Subrutina Primitiva RedondearBajo
+Datos
+  numero es Numero de Entrada
+  resultado es Numero de Salida
+Algoritmo
+  /*
+  $salida.resultado = Math.floor($entrada.numero);
+  */
+Fin
+
+Subrutina Primitiva RedondearAlto
+Datos
+  numero es Numero de Entrada
+  resultado es Numero de Salida
+Algoritmo
+  /*
+  $salida.resultado = Math.ceil($entrada.numero);
+  */
+Fin
+
+Subrutina Primitiva Redondear
+Datos
+  numero es Numero de Entrada
+  resultado es Numero de Salida
+Algoritmo
+  /*
+  $salida.resultado = Math.round($entrada.numero);
+  */
+Fin
+
+Subrutina Primitiva Seno
+Datos
+  numero es Numero de Entrada
+  resultado es Numero de Salida
+Algoritmo
+  /*
+  $salida.resultado = Math.sin($entrada.numero);
+  */
+Fin
+
+Subrutina Primitiva Coseno
+Datos
+  numero es Numero de Entrada
+  resultado es Numero de Salida
+Algoritmo
+  /*
+  $salida.resultado = Math.cos($entrada.numero);
+  */
+Fin
+
+Subrutina Primitiva Tangent
+Datos
+  numero es Numero de Entrada
+  resultado es Numero de Salida
+Algoritmo
+  /*
+  $salida.resultado = Math.tan($entrada.numero);
+  */
+Fin
+
+Subrutina Primitiva ArcoSeno
+Datos
+  numero es Numero de Entrada
+  resultado es Numero de Salida
+Algoritmo
+  /*
+  $salida.resultado = Math.asin($entrada.numero);
+  */
+Fin
+
+Subrutina Primitiva ArcoCoseno
+Datos
+  numero es Numero de Entrada
+  resultado es Numero de Salida
+Algoritmo
+  /*
+  $salida.resultado = Math.acos($entrada.numero);
+  */
+Fin
+
+Subrutina Primitiva ArcoTangent
+Datos
+  numero es Numero de Entrada
+  resultado es Numero de Salida
+Algoritmo
+  /*
+  $salida.resultado = Math.atan($entrada.numero);
+  */
+Fin
+
+Subrutina Primitiva RaizCuadrada
+Datos
+  numero es Numero de Entrada
+  resultado es Numero de Salida
+Algoritmo
+  /*
+  $salida.resultado = Math.sqrt($entrada.numero);
+  */
+Fin
+
+Subrutina Primitiva Absoluto
+Datos
+  numero es Numero de Entrada
+  resultado es Numero de Salida
+Algoritmo
+  /*
+  $salida.resultado = Math.abs($entrada.numero);
+  */
+Fin
+
+Subrutina Primitiva Logaritmo
+Datos
+  numero es Numero de Entrada
+  resultado es Numero de Salida
+Algoritmo
+  /*
+  $salida.resultado = Math.log($entrada.numero);
+  */
+Fin
+
+Subrutina Primitiva Potencia
+Datos
+  base es Numero de Entrada
+  exponente es Numero de Entrada
+  resultado es Numero de Salida
+Algoritmo
+  /*
+  $salida.resultado = Math.pow($entrada.base,$entrada.exponente);
+  */
+Fin

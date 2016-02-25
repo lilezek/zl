@@ -5,24 +5,53 @@ var modulo = function(zl) {
   var Pos = CodeMirror.Pos;
   var ultimaTabla = zl.entorno.newModulo();
 
+  function emparejarDatoPorTipo(subrutina, tipo, similitud, defecto) {
+    // TODO: Comprobar si ya se han escrito o leído antes.
+    var mejorPosibilidad = "";
+    var distancia = Infinity;
+    for (var k in subrutina.declaraciones) {
+      if (subrutina.declaraciones[k].tipo.nombre === tipo) {
+        var d;
+        if ((d = (new Levenshtein(similitud, subrutina.declaraciones[k].nombre)).distance) < distancia) {
+          distancia = d;
+          mejorPosibilidad = subrutina.declaraciones[k].nombre;
+        }
+      }
+    }
+    // En caso de no encontrar ninguno válido, inventarse uno
+    if (mejorPosibilidad === "")
+      return defecto;
+    return mejorPosibilidad;
+  }
+
   function applyHint(cm, data, completion) {
     var lineaIndent = "";
-    var cur = editor.getCursor();
-    var linea = editor.getLine(cur.line);
+    var cur = cm.getCursor();
+    var linea = cm.getLine(cur.line);
     var i = 0;
     while (/[ \t]/.test(linea[i])) {
       lineaIndent += linea[i++];
     }
 
-    var str = completion.repl;
     // TODO: Hacer reemplazamientos inteligentes
+    var str = completion.repl;
+    var contexto = zl.autocompletar.contexto();
     str = str.replace(/%condicion%/g, "verdadero")
       .replace(/%indent%/g, indentUnit)
-      .replace(/%numero%/g, "3")
+      .replace(/%([a-z0-9ñ]+)&numero%/g, function(match, p1) {
+        return emparejarDatoPorTipo(contexto.subrutina, "numero", p1, "3");
+      })
+      .replace(/%([a-z0-9ñ]+)&booleano%/g, function(match, p1) {
+        return emparejarDatoPorTipo(contexto.subrutina, "booleano", p1, "verdadero");
+      })
       .replace(/%codigo%/g, "// Código aquí")
-      .replace(/%texto%/g, "\"\"")
+      .replace(/%([a-z0-9ñ]+)&texto%/g, function(match, p1) {
+        return emparejarDatoPorTipo(contexto.subrutina, "texto", p1, "\"\"");
+      })
       .replace(/%nombre%/g, "Nombre")
-      .replace(/%dato&([a-z]+)%/g, "dato$1")
+      .replace(/%dato&([a-z0-9ñ]+)&([a-z0-9ñ]+)%/ig, function(match, p1, p2) {
+        return emparejarDatoPorTipo(contexto.subrutina, p2, p1, p1);
+      })
       .replace(/\n/g, "\n" + lineaIndent);
 
 
@@ -67,7 +96,7 @@ var modulo = function(zl) {
               }, {
                 displayText: "Repetir ... veces ...",
                 text: "repetir",
-                repl: "Repetir %numero% veces\n%indent%%codigo%\nFin",
+                repl: "Repetir %dato&veces&numero% veces\n%indent%%codigo%\nFin",
                 hint: applyHint
               },{
                 displayText: "si ... hacer ...",
@@ -140,16 +169,22 @@ var modulo = function(zl) {
         if (!(decl.modificadores & decl.M_GLOBAL) && !(decl.modificadores == decl.M_LOCAL)) {
           hint.repl += "\n%indent%" + decl.nombre;
           if (decl.modificadores & decl.M_ENTRADA && decl.modificadores & decl.M_SALIDA) {
-            hint.repl += " <-> ";
+            hint.repl += " <- ";
+            hint.repl += "%" + decl.nombre+"&";
+            hint.repl += decl.tipo.nombre + "%\n%indent%";
+            hint.repl += " -> ";
             hint.repl += "%dato&";
+            hint.repl += decl.tipo.nombre + "%";
           } else if (decl.modificadores & decl.M_ENTRADA) {
             hint.repl += " <- ";
-            hint.repl += "%";
+            hint.repl += "%" + decl.nombre+"&";
+            hint.repl += decl.tipo.nombre + "%";
           } else if (decl.modificadores & decl.M_SALIDA) {
             hint.repl += " -> ";
             hint.repl += "%dato&";
+            hint.repl += decl.nombre+"&";
+            hint.repl += decl.tipo.nombre + "%";
           }
-          hint.repl += decl.tipo.nombre + "%";
         }
       }
       if (!/[\n\[]/.test(hint.repl[hint.repl.length-1]))
@@ -161,6 +196,7 @@ var modulo = function(zl) {
   }
 
   function getCompletions(token, context, contexto, options) {
+    // TODO: Se puede optimizar esto muchísimo.
     var start = token.string;
     var sub = contexto.subrutina;
     var tipos = [],
@@ -179,8 +215,13 @@ var modulo = function(zl) {
     }
     // TODO: Escoger qué arrays concatenar según el contexto.
     var options = subrutinas.concat(datos).concat(tipos).concat(keywords).filter(function(key) {
-      var text = (typeof key === "string" ? key : key.text);
-      return text.toLowerCase().indexOf(start.toLowerCase()) === 0;
+      var t = (typeof key === "string" ? key : key.text);
+      return t.length >= start.length && new Levenshtein(t.substring(0,start.length), start) < start.length;
+    }).sort(function(a,b) {
+      var l = start.length;
+      var tb = (typeof b === "string" ? b : b.text).substring(0,l);
+      var ta = (typeof a === "string" ? a : a.text).substring(0,l);
+      return (new Levenshtein(ta, start) - new Levenshtein(tb, start));
     });
     return options;
   }

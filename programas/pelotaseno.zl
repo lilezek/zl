@@ -1,0 +1,43 @@
+Configuracion
+  fps <- 60
+	integrar "bibliotecasZL/basico.zl"
+	integrar "bibliotecasZL/canvas.zl"
+Fin
+
+Subrutina Inicio
+Datos
+	x es numero global
+Algoritmo
+	x <- 0
+Fin
+
+Subrutina Fotograma
+Datos
+	x es numero global
+  d es numero
+Algoritmo
+  fondo [
+    r <- 0
+    g <- 0
+    b <- 0
+  ]
+  colorrelleno [
+    r <- 255
+    g <- 255
+    b <- 255
+  ]
+  delta [
+    delta -> d
+  ]
+	x <- x + 1*d
+  seno [
+    numero <- x
+    resultado -> d
+  ]
+  elipse [
+    centrox <- 600
+    centroy <- 300-d*200
+    ancho <- 75
+    alto <- 75
+  ]
+Fin

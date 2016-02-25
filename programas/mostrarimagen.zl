@@ -1,0 +1,28 @@
+Configuracion
+  fps <- 60
+	integrar "bibliotecasZL/canvas.zl"
+Fin
+
+Subrutina Inicio
+Datos
+	url es Texto
+Algoritmo
+	fondo [
+	  r <- 255
+	  g <- 255
+	  b <- 255
+	]
+  mostrar [
+    mensaje <- "Escribe el url de una imagen:"
+  ]
+  leer [
+    mensaje -> url
+  ]
+  imagen [
+	  url <- url
+	  posx <- 0
+	  posy <- 0
+	  ancho <- 320
+	  alto <- 320
+	]
+Fin

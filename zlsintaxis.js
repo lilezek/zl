@@ -26,7 +26,8 @@ var modulo = function(zl) {
     "global": true,
     "pausar": true,
     "integrar": true,
-    "importar": true
+    "importar": true,
+    "asincrona": true
   };
 
   // Usando el analizador que he construido, genero los símbolos del lenguaje
@@ -80,7 +81,7 @@ var modulo = function(zl) {
 
   a.token("verdadero", /^verdadero/i, 0);
   a.token("falso", /^falso/i, 1);
-  a.token("subModificador", /^(interna|primitiva|conversora)/i, 2);
+  a.token("subModificador", /^(interna|primitiva|conversora|asincrona)/i, 2);
   a.token("decModificador", /^((?:de\s+entrada)|(?:de\s+salida)|global)/i, 3);
   a.token("entero", /^((?:[0-1]+(?:\|2))|(?:[0-9A-Fa-f]+(?:\|16))|(?:[0-9]+(?:\|10)?))/i, 4);
   a.token("decimal", /^(\d+\.\d+)/i, 5);

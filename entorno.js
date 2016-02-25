@@ -729,7 +729,7 @@ var modulo = function(zl) {
         modificadores: {
           interna: false,
           es: true,
-          asincrono: true
+          asincrona: true
         },
         declaraciones: {
           mensaje: declmensaje
@@ -755,7 +755,7 @@ var modulo = function(zl) {
         modificadores: {
           interna: false,
           es: true,
-          asincrono: true
+          asincrona: true
         },
         declaraciones: {
           mensaje: declmensaje

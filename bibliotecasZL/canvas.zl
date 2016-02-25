@@ -236,3 +236,55 @@ Algoritmo
   }
   */
 Fin
+
+Subrutina Primitiva CalcularAnchoTexto
+Datos
+  texto es Texto de Entrada
+  ancho es Numero de Salida
+Algoritmo
+  /*
+  $salida.ancho = $in.$ctx2d.measureText($entrada.texto).width;
+  */
+Fin
+
+Subrutina Primitiva TamañoFuenteTexto
+Datos
+  tamaño es Numero de Entrada
+Algoritmo
+  /*
+  $in.$ctx2d.font = $global.$estiloFuente = "normal "+$entrada.tamaño+"pt arial";
+  */
+Fin
+
+Subrutina Primitiva Asincrona Imagen
+Datos
+  url es Texto de Entrada
+  posx es Numero de Entrada
+  posy es Numero de Entrada
+  ancho es Numero de Entrada
+  alto es Numero de Entrada
+Algoritmo
+  /*
+  // TODO: crear la caché fuera de esta subrutina
+  $global.$cacheDeImagenes = $global.$cacheDeImagenes || {};
+  var img = $global.$cacheDeImagenes[$entrada.url];
+  if (img && img.ready) {
+    $in.$ctx2d.drawImage(img, $entrada.posx, $entrada.posy, $entrada.ancho, $entrada.alto);
+    done(null, {});
+  } else {
+    img = new Image();
+    img.onload = function() {
+      $in.$ctx2d.drawImage(img, $entrada.posx, $entrada.posy, $entrada.ancho, $entrada.alto);
+      done(null, {});
+    }
+    img.onerror = function(e) {
+      done($in.$error.newError($in.$error.E_EJECUCION_IMAGEN_NO_CARGA, {
+      		url: $entrada.url,
+          motivo: e,
+          adicional: "No se pudo cargar la imagen."
+    		}));
+    }
+    img.src = $entrada.url;
+  }
+  */
+Fin

@@ -64,7 +64,7 @@ var modulo = function(zl) {
       sentencias = zl.javascript.sentencias(compilado.sentencias, simbolo);
     }
 
-    if (simbolo.modificadores.asincrono) {
+    if (simbolo.modificadores.asincrona) {
       resultado += zl.javascript.nombre(compilado.nombre, simbolo) + "=function($entrada, done){var $salida={};var $local={};" +
         zl.javascript.datos(compilado.datos, simbolo.declaraciones) +
         "$in.async.waterfall([function(c){c(null,null);}," +

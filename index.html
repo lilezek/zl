@@ -34,6 +34,7 @@
   <script src="semantica.js"></script>
   <script src="compilador.js"></script>
   <script src="javascript.js"></script>
+  <script src="terceros/levenshtein.js"></script>
   <script src="editor.js"></script>
   <script src="autocompletar.js"></script>
   <script src="terceros/uglifyjs/utils.js"></script>
@@ -189,7 +190,7 @@ Fin</textarea>
         "Cmd-Enter": autocompletar
       });
 
-      if (parametros["programa"]) {
+      if (parametros["programa"] && parametros["programa"].indexOf("..") === -1) {
         $.ajax("programas/"+parametros["programa"],{
           dataType: "text",
           type: "get",

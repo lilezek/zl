@@ -15,7 +15,7 @@ var modulo = function(zl) {
     var asincrono = testarSentencias(arbol.sentencias, sub);
     // TODO: Convertir en asincronas las subrutinas que usan esta.
     if (asincrono)
-      sub.modificadores.asincrono = true;
+      sub.modificadores.asincrona = true;
   }
 
   function testarSentencias(arbol, sub) {
@@ -214,7 +214,7 @@ var modulo = function(zl) {
       }
     }
     // Esto es útil para testarSentencia:
-    if (llamada.modificadores.asincrono === true) {
+    if (llamada.modificadores.asincrona === true) {
       arbol.asincrono = true;
       return true;
     }
