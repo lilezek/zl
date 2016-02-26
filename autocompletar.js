@@ -278,16 +278,8 @@ var modulo = function(zl) {
         $: c
       }
     }
-    // Comprobar si no hay ninguna subrutina hasta el cursor:
-    var config = true;
-    for (var k in ultimaTabla.subrutinas) {
-        var s = ultimaTabla.subrutinas[k];
-        // Comprobar que la subrutina no esté integrada:
-        if (s.padre === ultimaTabla) {
-            if (cur > s.posicionSubrutina[0])
-                config = false;
-        }
-    }
+    // Comprobar que no está la palabra configuracion en el texto hasta el cursor:
+    var config = !(/configuracion|subrutina/gi.test(editor.getValue().substring(0,cur)));
     if (config) {
       return {
           tipo: "configuracion",
