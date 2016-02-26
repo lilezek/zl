@@ -77,8 +77,9 @@ var modulo = function(zl) {
 
   Modulo.prototype.subrutinaPorPosicion = function(pos) {
     for (var k in this.subrutinas) {
-      if (this.subrutinas[k].posicionSubrutina[0] <= pos && this.subrutinas[k].posicionSubrutina[1] >= pos)
-        return this.subrutinas[k];
+      if (this.subrutinas[k].padre === this)
+          if (this.subrutinas[k].posicionSubrutina[0] <= pos && this.subrutinas[k].posicionSubrutina[1] >= pos)
+            return this.subrutinas[k];
     }
     return null;
   }
@@ -143,7 +144,9 @@ var modulo = function(zl) {
 
   Modulo.prototype.desplazarPosiciones = function(posicion, cantidad) {
     for (var k in this.subrutinas) {
-      this.subrutinas[k].desplazarPosiciones(posicion, cantidad);
+      // Comprobar que la subrutina pertenece a este módulo o no:
+      if (this.subrutinas[k].padre === this)
+          this.subrutinas[k].desplazarPosiciones(posicion, cantidad);
     }
   }
 
@@ -271,24 +274,22 @@ var modulo = function(zl) {
   }
 
   Subrutina.prototype.desplazarPosiciones = function(posicion, cantidad) {
-    /*for (var k in this.subrutinas) {
-      this.declaraciones[k].desplazarPosiciones(posicion, cantidad);
-    }*/
-    if (this.posicionSubrutina[0] <= posicion)
+    if (this.posicionSubrutina[0] >= posicion) {
       this.posicionSubrutina[0] = this.posicionSubrutina[0] + cantidad;
-    if (this.posicionSubrutina[1] <= posicion)
+    }
+    if (this.posicionSubrutina[1] >= posicion)
       this.posicionSubrutina[1] = this.posicionSubrutina[1] + cantidad;
-    if (this.posicionCabecera[0] <= posicion)
+    if (this.posicionCabecera[0] >= posicion)
       this.posicionCabecera[0] = this.posicionCabecera[0] + cantidad;
-    if (this.posicionCabecera[1] <= posicion)
+    if (this.posicionCabecera[1] >= posicion)
       this.posicionCabecera[1] = this.posicionCabecera[1] + cantidad;
-    if (this.posicionDatos[0] <= posicion)
+    if (this.posicionDatos[0] >= posicion)
       this.posicionDatos[0] = this.posicionDatos[0] + cantidad;
-    if (this.posicionDatos[1] <= posicion)
+    if (this.posicionDatos[1] >= posicion)
       this.posicionDatos[1] = this.posicionDatos[1] + cantidad;
-    if (this.posicionAlgoritmo[0] <= posicion)
+    if (this.posicionAlgoritmo[0] >= posicion)
       this.posicionAlgoritmo[0] = this.posicionAlgoritmo[0] + cantidad;
-    if (this.posicionAlgoritmo[1] <= posicion)
+    if (this.posicionAlgoritmo[1] >= posicion)
       this.posicionAlgoritmo[1] = this.posicionAlgoritmo[1] + cantidad;
   }
 

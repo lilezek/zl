@@ -150,12 +150,14 @@ Fin</textarea>
       });
       editor.on("change", function(cm, ev) {
         var movido = 0;
+        movido += ev.text.length - 1;
         for (var i = 0; i < ev.text.length; i++) {
           movido += ev.text[i].length;
         }
         for (var i = 0; i < ev.removed.length; i++) {
           movido -= ev.removed[i].length;
         }
+        
         if (lastCompilation)
           lastCompilation.tabla.desplazarPosiciones(editor.indexFromPos(ev.from),movido);
         if (lasttimeout) {

@@ -33,9 +33,9 @@ var modulo = function(zl) {
       lineaIndent += linea[i++];
     }
 
-    // TODO: Hacer reemplazamientos inteligentes
     var str = completion.repl;
     var contexto = zl.autocompletar.contexto();
+    var colocarCursor;
     str = str.replace(/%condicion%/g, "verdadero")
       .replace(/%indent%/g, indentUnit)
       .replace(/%([a-z0-9ñ]+)&numero%/g, function(match, p1) {
@@ -52,24 +52,38 @@ var modulo = function(zl) {
       .replace(/%dato&([a-z0-9ñ]+)&([a-z0-9ñ]+)%/ig, function(match, p1, p2) {
         return emparejarDatoPorTipo(contexto.subrutina, p2, p1, p1);
       })
-      .replace(/\n/g, "\n" + lineaIndent);
+      .replace(/\n/g, "\n" + lineaIndent)
+      .replace("_", function(match, offset) {
+        colocarCursor = offset;
+        console.log(offset);
+        return "";
+      });
 
 
     cm.replaceRange(str, completion.from || data.from,
       completion.to || data.to, "complete");
+    if (colocarCursor) {
+      var x = cm.indexFromPos((completion.from || data.from))+colocarCursor;
+      cm.setCursor(cm.posFromIndex(x));
+    }
   }
 
   var contextos = {
     modulo: {
       $: [],
       configuracion: {
-        $: ["configuracion"]
+        $: [{
+          displayText: "Configuracion ...",
+          text: "configuracion",
+          repl: "Configuracion\n\nFin",
+          hint: applyHint
+        }]
       },
       subrutinas: {
         $: [{
           displayText: "Subrutina ... ",
           text: "subrutina",
-          repl: "Subrutina %nombre%\nDatos\n\nAlgoritmo\n\nFin",
+          repl: "Subrutina _%nombre%\nDatos\n\nAlgoritmo\n\nFin",
           hint: applyHint
         }],
         subrutina: {
@@ -91,17 +105,17 @@ var modulo = function(zl) {
             $: [{
                 displayText: "Mientras ... hacer ...",
                 text: "mientras",
-                repl: "Mientras %condicion% hacer\n%indent%%codigo%\nFin",
+                repl: "Mientras _%condicion% hacer\n%indent%%codigo%\nFin",
                 hint: applyHint
               }, {
                 displayText: "Repetir ... veces ...",
                 text: "repetir",
-                repl: "Repetir %dato&veces&numero% veces\n%indent%%codigo%\nFin",
+                repl: "Repetir _%dato&veces&numero% veces\n%indent%%codigo%\nFin",
                 hint: applyHint
               },{
                 displayText: "si ... hacer ...",
                 text: "si",
-                repl: "Si %condicion% hacer\n%indent%%codigo%\nFin",
+                repl: "Si _%condicion% hacer\n%indent%%codigo%\nFin",
                 hint: applyHint
               },
               "pausar"
@@ -117,6 +131,7 @@ var modulo = function(zl) {
       return e.getTokenAt(cur);
     }
     var contexto = zl.autocompletar.contexto();
+    console.log(contexto);
     // Find the token at the cursor
     var cur = editor.getCursor(),
       token = getToken(editor, cur);
@@ -124,7 +139,7 @@ var modulo = function(zl) {
     token.state = CodeMirror.innerMode(editor.getMode(), token.state).state;
 
     // If it's not a 'word-style' token, ignore the token.
-    if (!/^[\w$_]*$/.test(token.string)) {
+    if (!/^[\wñ$_]*$/i.test(token.string)) {
       token = {
         start: cur.ch,
         end: cur.ch,
@@ -136,6 +151,8 @@ var modulo = function(zl) {
       token.end = cur.ch;
       token.string = token.string.slice(0, cur.ch - token.start);
     }
+    
+    console.log(token);
 
     var tprop = token;
     // If it is a property, find out what it is a property of.
@@ -242,7 +259,7 @@ var modulo = function(zl) {
           subrutina: sub,
           $: c["cabecera"]
         };
-      } else if (cur >= sub.posicionDatos[0] && cur <= sub.posicionDatos[1]) {
+      } else if (cur >= sub.posicionDatos[0] && cur < sub.posicionAlgoritmo[0]) {
         return {
           tipo: "datos",
           subrutina: sub,
@@ -261,11 +278,27 @@ var modulo = function(zl) {
         $: c
       }
     }
-    // TODO: Comprobar configuración.
-    return {
-      tipo: "subrutinas",
-      $: c["subrutinas"]
-    };
+    // Comprobar si no hay ninguna subrutina hasta el cursor:
+    var config = true;
+    for (var k in ultimaTabla.subrutinas) {
+        var s = ultimaTabla.subrutinas[k];
+        // Comprobar que la subrutina no esté integrada:
+        if (s.padre === ultimaTabla) {
+            if (cur > s.posicionSubrutina[0])
+                config = false;
+        }
+    }
+    if (config) {
+      return {
+          tipo: "configuracion",
+          $: c["configuracion"]
+      }
+    } else {
+      return {
+        tipo: "subrutinas",
+        $: c["subrutinas"]
+      };
+    }
   }
 
   return zl;

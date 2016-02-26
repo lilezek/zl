@@ -55,7 +55,7 @@ CodeMirror.defineSimpleMode("zl", {
       dedent: true,
       token: "keyword"
     }, {
-      regex: /[a-zñ][\w]*/i,
+      regex: /[a-z][\wñ]*/i,
       token: "variable"
     },
     // You can embed other modes with the mode property. This rule
