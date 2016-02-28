@@ -201,7 +201,7 @@ Algoritmo
   */
 Fin
 
-Subrutina Primitiva Tangent
+Subrutina Primitiva Tangente
 Datos
   numero es Numero de Entrada
   resultado es Numero de Salida
@@ -231,7 +231,7 @@ Algoritmo
   */
 Fin
 
-Subrutina Primitiva ArcoTangent
+Subrutina Primitiva ArcoTangente
 Datos
   numero es Numero de Entrada
   resultado es Numero de Salida
