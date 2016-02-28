@@ -44,5 +44,7 @@ process.stdin.on('data', function(buf) {
   content += buf.toString();
 });
 process.stdin.on('end', function() {
-  console.log(beautify(uglify(zl.Compilar(content).javascript)));
+  zl.Compilar(content, {}, function(err, compilado){
+    console.log(beautify(uglify(compilado.javascript)));
+  });
 });

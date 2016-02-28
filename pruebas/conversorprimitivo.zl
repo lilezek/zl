@@ -1,3 +1,7 @@
+Configuracion
+  integrar "bibliotecasZL/basico.zl"
+Fin
+
 Subrutina Conversora Primitiva NumeroComoTexto
 Datos
   n es Numero de Entrada
@@ -19,7 +23,7 @@ Algoritmo
     resultado -> n
   ]
   mostrarNumero [
-    mensaje <- n
+    numero <- n
   ]
   mostrar [
     mensaje <- n como Texto

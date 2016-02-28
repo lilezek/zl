@@ -1,6 +1,7 @@
 Configuracion
   fps <- 60
 	integrar "bibliotecasZL/canvas.zl"
+	integrar "bibliotecasZL/basico.zl"
 Fin
 
 Subrutina Inicio

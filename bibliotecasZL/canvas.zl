@@ -1,3 +1,7 @@
+Configuracion
+  nombreModulo <- "canvas"
+Fin
+
 /*
   Biblioteca de dibujado de ZL.
   Para funcionar, hace falta que $in.$canvas sea un

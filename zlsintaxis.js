@@ -101,7 +101,7 @@ var modulo = function(zl) {
 
   a.regla("configuracion", function() {
     this.intentar([
-      ["importar", "texto", "como", "nombre"],
+      ["importar", "texto"],
       ["integrar", "texto"],
       ["nombre", "<-", "texto"],
       ["nombre", "<-", "numero"]
@@ -110,19 +110,28 @@ var modulo = function(zl) {
     if (intento == 0) {
       this.registrarResultado({
         tipo: "importar",
-        camino: this.resultado(0,intento,1),
-        alias: this.resultado(0,intento,2)
+        camino: this.resultado(0,intento,1)
       });
     } else if (intento == 1) {
       this.registrarResultado({
         tipo: "integrar",
         camino: this.resultado(0,intento,1)
       });
-    } else {
+    } else if (intento === 3){
       this.registrarResultado({
         tipo: "configurar",
         nombre: this.resultado(0, intento, 0),
-        valor: this.resultado(0, intento, 2)
+        valor: this.resultado(0, intento, 2),
+        tipoValor: "number"
+      });
+    } else if (intento === 2){
+      var valor = this.resultado(0, intento, 2);
+      valor = valor.substring(1,valor.length-1);
+      this.registrarResultado({
+        tipo: "configurar",
+        nombre: this.resultado(0, intento, 0),
+        valor: valor,
+        tipoValor: "string"
       });
     }
     return this;
@@ -139,7 +148,7 @@ var modulo = function(zl) {
   });
 
   a.regla("modulo", function() {
-    this.acumular("subrutina").avanzarObligatorioVarios();
+    this.acumular("subrutina").avanzarVarios();
     this.registrarResultado({
       subrutinas: this.resultado(0)
     });

@@ -1,8 +1,144 @@
+Configuracion
+  nombreModulo <- "basico"
+Fin
+
 /*
   biblioteca básica de ZL.
   Para funcionar, hace falta que $in.$delta se actualice
   cada fotograma con el delta de tiempo entre fotograma y fotograma.
 */
+
+/*
+  ****************************************
+  ********** Entrada y Salida ************
+  ****************************************
+*/
+
+Subrutina Primitiva Mostrar
+Datos
+  mensaje es Texto de Entrada
+Algoritmo
+  /*
+  $in.$io.outWrite($entrada.mensaje+"\n");
+  */
+Fin
+
+Subrutina Primitiva MostrarNumero
+Datos
+  numero es Numero de Entrada
+Algoritmo
+  /*
+  $in.$io.outWrite($in.$precision($entrada.numero)+"\n");
+  */
+Fin
+
+Subrutina Primitiva Asincrona Leer
+Datos
+  mensaje es Texto de Salida
+Algoritmo
+  /*
+  if ($in.$continuar) {
+    var oldabortar = $in.$abortar;
+    var self = $in;
+    $in.$abortar = $in.$io.abortRead;
+    $in.$io.inRead(function(err, value) {
+      self.$abortar = oldabortar;
+      done(null, {
+        mensaje: value
+      });
+    });
+  }
+  */
+Fin
+
+Subrutina Primitiva Asincrona LeerNumero
+Datos
+  numero es Numero de Salida
+Algoritmo
+  /*
+  if ($in.$continuar) {
+    var oldabortar = $in.$abortar;
+    var self = $in;
+    $in.$abortar = $in.$io.abortRead;
+    $in.$io.inRead(function cbck(err, value) {
+      var x = parseFloat(value);
+      if (isNaN(x))
+        $in.$io.inRead(cbck);
+      else {
+        self.$abortar = oldabortar;
+        done(null, {
+          numero: x
+        });
+      }
+    });
+  }
+  */
+Fin
+
+Subrutina Primitiva Aleatorio
+Datos
+  minimo es Numero de Entrada
+  maximo es Numero de Entrada
+  resultado es Numero de Salida
+Algoritmo
+  /*
+  $salida.resultado = Math.round((Math.random() * ($entrada.maximo - $entrada.minimo)) + $entrada.minimo);
+  */
+Fin
+
+/*
+// mensaje es Texto de Entrada
+rte.mostrarnumero = function(arg) {
+  zl.io.outWrite(rte.$precision(arg.mensaje) + "\n");
+}
+
+rte.leernumero = function(arg, callback) {
+
+}
+
+rte.leer = function(arg, callback) {
+  if ($in.$continuar) {
+    var oldabortar = this.$abortar;
+    var self = this;
+    this.$abortar = zl.io.abortRead;
+    zl.io.inRead(function(err, value) {
+      self.$abortar = oldabortar;
+      callback(null, {
+        mensaje: value
+      });
+    });
+  }
+}
+
+rte.aleatorio = function(arg) {
+  return {
+    resultado: Math.round((Math.random() * (arg.maximo - arg.minimo)) + arg.minimo)
+  };
+}
+
+rte.limpiar = function(arg) {
+  zl.io.limpiar();
+}
+
+rte.productoTexto = function(arg) {
+  var texto =
+    typeof arg.izq === "string" ? arg.izq : arg.der;
+
+  var veces =
+    typeof arg.izq === "number" ? arg.izq : arg.der;
+  return (function ttimes(t, n) {
+    // Hack: decimal a entero
+    n = ~~n;
+    if (n === 0)
+      return "";
+    var x = ttimes(t, n / 2);
+    if (n % 2 === 0)
+      return x + x;
+    else
+      return x + x + t;
+  })(texto, veces);
+}*/
+
 
 /*
   ****************************************
@@ -201,7 +337,7 @@ Algoritmo
   */
 Fin
 
-Subrutina Primitiva Tangent
+Subrutina Primitiva Tangente
 Datos
   numero es Numero de Entrada
   resultado es Numero de Salida
@@ -231,7 +367,7 @@ Algoritmo
   */
 Fin
 
-Subrutina Primitiva ArcoTangent
+Subrutina Primitiva ArcoTangente
 Datos
   numero es Numero de Entrada
   resultado es Numero de Salida

@@ -1,3 +1,7 @@
+Configuracion
+  integrar "../bibliotecasZL/basico.zl"
+Fin
+
 Subrutina Inicio
 Datos
   sopa es Lista(4) de Texto

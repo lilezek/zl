@@ -2,6 +2,7 @@ var modulo = function(zl) {
   "use strict";
 
   zl.entorno = zl.entorno || {};
+  var modInterno;
 
   function Modulo() {
     this.padre = null;
@@ -10,13 +11,18 @@ var modulo = function(zl) {
     this.globales = {};
     this.configuracion = {
       fps: 10,
-      precision: 0
-    };
-    this.importes = {
-      "$internal": modInterno
+      precision: 0,
+      nombremodulo: "$principal"
     };
 
-    this.moduloInterno = modInterno;
+    this.importes = {
+
+    };
+
+    this.integraciones = {
+    };
+    if (modInterno)
+      this.integraciones.$internal = modInterno;
 
     // Por defecto: representa el código escrito en el propio editor.
     this.fuente = "/";
@@ -69,8 +75,11 @@ var modulo = function(zl) {
         if (this.subrutinas[k].nombre == nombre)
           return this.subrutinas[k];
       }
-      if (this.moduloInterno)
-        return this.moduloInterno.subrutinaPorNombre(nombre);
+      for (var k in this.integraciones) {
+        var r = this.integraciones[k].subrutinaPorNombre(nombre);
+        if (r)
+          return r;
+      }
     }
     return null;
   }
@@ -78,8 +87,8 @@ var modulo = function(zl) {
   Modulo.prototype.subrutinaPorPosicion = function(pos) {
     for (var k in this.subrutinas) {
       if (this.subrutinas[k].padre === this)
-          if (this.subrutinas[k].posicionSubrutina[0] <= pos && this.subrutinas[k].posicionSubrutina[1] >= pos)
-            return this.subrutinas[k];
+        if (this.subrutinas[k].posicionSubrutina[0] <= pos && this.subrutinas[k].posicionSubrutina[1] >= pos)
+          return this.subrutinas[k];
     }
     return null;
   }
@@ -90,9 +99,12 @@ var modulo = function(zl) {
       if (this.tipos[k].nombre == nombre)
         return this.tipos[k];
     }
-    // Si no está en el módulo el tipo, estará en $internal.
-    if (this.importes["$internal"])
-      return this.importes["$internal"].tipoPorNombre(nombre);
+    // Si no está en el módulo el tipo, podría estar en alguna integracion.
+    for (var k in this.integraciones) {
+      var r = this.integraciones[k].tipoPorNombre(nombre);
+      if (r)
+        return r;
+    }
     return null;
   }
 
@@ -146,17 +158,23 @@ var modulo = function(zl) {
     for (var k in this.subrutinas) {
       // Comprobar que la subrutina pertenece a este módulo o no:
       if (this.subrutinas[k].padre === this)
-          this.subrutinas[k].desplazarPosiciones(posicion, cantidad);
+        this.subrutinas[k].desplazarPosiciones(posicion, cantidad);
     }
   }
 
   Modulo.prototype.integrar = function(otroModulo) {
-    // TODO: Integrar importes, y tipos:
-    // TODO: Comprobar que no haya globales incompatibles
-    // TODO: Comprobar que no haya subrutinas repetidas
-    zl.writeJson(this.subrutinas, otroModulo.subrutinas);
-    zl.writeJson(this.tipos, otroModulo.tipos);
-    zl.writeJson(this.globales, otroModulo.globales);
+    this.integraciones[otroModulo.configuracion.nombremodulo] = otroModulo;
+  }
+
+  var ovalues = Object.values || function(o) {
+    var r = [];
+    for (var k in o)
+      r.push(o[k]);
+    return r;
+  }
+
+  Modulo.prototype.arrayDeIntegraciones = function() {
+    return ovalues(this.integraciones);
   }
 
   function Subrutina(modulo) {
@@ -266,7 +284,7 @@ var modulo = function(zl) {
           this.conversion.datoSalida = this.declaraciones[k];
       }
       if (this.conversion.datoEntrada && this.conversion.datoSalida) {
-        this.conversion.datoEntrada.tipo.registrarConversor(this,this.conversion.datoSalida.tipo);
+        this.conversion.datoEntrada.tipo.registrarConversor(this, this.conversion.datoSalida.tipo);
       }
     }
 
@@ -606,174 +624,12 @@ var modulo = function(zl) {
       mod.registrar(lista);
     }
 
-
-    // Aleatorio:
-    {
-      var aleatorio = zl.entorno.newSubrutina(mod);
-      var declresultado = zl.entorno.newDeclaracion(aleatorio);
-      var declminimo = zl.entorno.newDeclaracion(aleatorio);
-      var declmaximo = zl.entorno.newDeclaracion(aleatorio);
-
-      zl.writeJson(declresultado, {
-        nombre: "resultado",
-        tipo: numero,
-        modificadores: declresultado.M_SALIDA
-      });
-
-      zl.writeJson(declmaximo, {
-        nombre: "maximo",
-        tipo: numero,
-        modificadores: declmaximo.M_ENTRADA
-      });
-
-      zl.writeJson(declminimo, {
-        nombre: "minimo",
-        tipo: numero,
-        modificadores: declminimo.M_ENTRADA
-      });
-
-      zl.writeJson(aleatorio, {
-        nombre: "aleatorio",
-        modificadores: {
-          interna: false,
-          es: true
-        },
-        declaraciones: {
-          resultado: declresultado,
-          minimo: declminimo,
-          maximo: declmaximo
-        }
-      });
-      aleatorio.serializar();
-      mod.registrar(aleatorio);
-    }
-
-    // Limpiar:
-    {
-      var limpiar = zl.entorno.newSubrutina(mod);
-
-      zl.writeJson(limpiar, {
-        nombre: "limpiar",
-        modificadores: {
-          interna: false,
-          es: true
-        },
-        declaraciones: {}
-      });
-      limpiar.serializar();
-      mod.registrar(limpiar);
-    }
-
-    // Mostrar:
-    {
-      var mostrar = zl.entorno.newSubrutina(mod);
-      var declmensaje = zl.entorno.newDeclaracion(mostrar);
-
-      zl.writeJson(declmensaje, {
-        nombre: "mensaje",
-        tipo: texto,
-        modificadores: declresultado.M_ENTRADA
-      });
-
-      zl.writeJson(mostrar, {
-        nombre: "mostrar",
-        modificadores: {
-          interna: false,
-          es: true
-        },
-        declaraciones: {
-          mensaje: declmensaje
-        }
-      });
-      mostrar.serializar();
-      mod.registrar(mostrar);
-    }
-
-    // Mostrar numero:
-    {
-      var mostrarnumero = zl.entorno.newSubrutina(mod);
-      var declmensaje = zl.entorno.newDeclaracion(mostrarnumero);
-
-      zl.writeJson(declmensaje, {
-        nombre: "mensaje",
-        tipo: numero,
-        modificadores: declresultado.M_ENTRADA
-      });
-
-      zl.writeJson(mostrarnumero, {
-        nombre: "mostrarnumero",
-        modificadores: {
-          interna: false,
-          es: true
-        },
-        declaraciones: {
-          mensaje: declmensaje
-        }
-      });
-      mostrar.serializar();
-      mod.registrar(mostrarnumero);
-    }
-
-    // leer Numero:
-    {
-      var leerNumero = zl.entorno.newSubrutina(mod);
-      var declmensaje = zl.entorno.newDeclaracion(leerNumero);
-
-      zl.writeJson(declmensaje, {
-        nombre: "mensaje",
-        tipo: numero,
-        modificadores: declresultado.M_SALIDA
-      });
-
-      zl.writeJson(leerNumero, {
-        nombre: "leernumero",
-        modificadores: {
-          interna: false,
-          es: true,
-          asincrona: true
-        },
-        declaraciones: {
-          mensaje: declmensaje
-        }
-      });
-      leerNumero.serializar();
-      mod.registrar(leerNumero);
-    }
-
-    // leer texto:
-    {
-      var leer = zl.entorno.newSubrutina(mod);
-      var declmensaje = zl.entorno.newDeclaracion(leer);
-
-      zl.writeJson(declmensaje, {
-        nombre: "mensaje",
-        tipo: texto,
-        modificadores: declresultado.M_SALIDA
-      });
-
-      zl.writeJson(leer, {
-        nombre: "leer",
-        modificadores: {
-          interna: false,
-          es: true,
-          asincrona: true
-        },
-        declaraciones: {
-          mensaje: declmensaje
-        }
-      });
-      leer.serializar();
-      mod.registrar(leer);
-    }
-
     // TODO: acabar el módulo
     mod.serializar();
     return mod;
   }
-
   // Módulo interno
-  var modInterno = moduloInterno(new Modulo());
-
+  modInterno = moduloInterno(new Modulo());
   return zl;
 }
 

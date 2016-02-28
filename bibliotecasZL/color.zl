@@ -1,0 +1,71 @@
+Subrutina Primitiva Inicio
+Datos
+  rojo es Numero de Entrada
+  verde es Numero de Entrada
+  azul es Numero de Entrada
+  opacidad es Numero de Entrada
+  r es Numero Global
+  g es Numero Global
+  b es Numero Global
+  a es Numero Global
+Algoritmo
+  /*
+  $global.r = $entrada.rojo;
+  $global.g = $entrada.verde;
+  $global.b = $entrada.azul;
+  if ($entrada.opacidad % 1 && $entrada.opacidad <= 1) {
+    $global.a = $entrada.opacidad;
+  } else {
+    $global.a = $entrada.opacidad / 256;
+  }
+  */
+Fin
+
+Subrutina Conversora Primitiva TextoComoColor
+Datos
+  t es Texto de Entrada
+  c es EsteModulo de Salida
+Algoritmo
+  /*
+  $salida.c = $out.instancia();
+  var x = $entrada.t.toLowerCase();
+  if (x === "rojo") {
+    $salida.c.inicio({
+      rojo: 255,
+      verde: 0,
+      azul: 0,
+      opacidad: 1
+    });
+  } else if (x === "verde") {
+    $salida.c.inicio({
+      rojo: 0,
+      verde: 255,
+      azul: 0,
+      opacidad: 1
+    });
+  } else if (x === "azul") {
+    $salida.c.inicio({
+      rojo: 0,
+      verde: 0,
+      azul: 255,
+      opacidad: 1
+    });
+  }
+  */
+Fin
+
+Subrutina Conversora Primitiva NumeroComoColor
+Datos
+  n es Numero de Entrada
+  c es EsteModulo de Salida
+Algoritmo
+  /*
+  $salida.c = $out.instancia();
+  $salida.c.inicio({
+    rojo: ($entrada.n & 0xFF000000) >> 24,
+    verde: ($entrada.n & 0xFF0000) >> 16,
+    azul: ($entrada.n & 0xFF00) >> 8,
+    opacidad: ($entrada.n & 0xFF) / 0xFF
+  });
+  */
+Fin

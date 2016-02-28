@@ -29,6 +29,7 @@
   <script src="error.js"></script>
   <script src="ejecucion.js"></script>
   <script src="configuracion.js"></script>
+  <script src="ensamblador.js"></script>
   <script src="sintaxis.js"></script>
   <script src="entorno.js"></script>
   <script src="semantica.js"></script>
@@ -123,12 +124,22 @@ Fin</textarea>
     </div>
 
     <script>
+      var parametrosArray = location.search.split("?");
+      var parametros = {};
+
+      var lastjs = "";
+      var lasttimeout = null;
+      var lastCompilation = null;
+      var minify = false;
+      var errorLineas = [];
+
+      var carga = null;
+
+
       window.onbeforeunload = function(e) {
         return '¿Estás seguro de que quieres abandonar el editor?';
       };
 
-      var parametrosArray = location.search.split("?");
-      var parametros = {};
       if (parametrosArray.length > 1) {
         parametrosArray = parametrosArray[1].split("&");
         for (var i = 0; i < parametrosArray.length; i++) {
@@ -157,9 +168,9 @@ Fin</textarea>
         for (var i = 0; i < ev.removed.length; i++) {
           movido -= ev.removed[i].length;
         }
-        
+
         if (lastCompilation)
-          lastCompilation.tabla.desplazarPosiciones(editor.indexFromPos(ev.from),movido);
+          lastCompilation.modulo.desplazarPosiciones(editor.indexFromPos(ev.from),movido);
         if (lasttimeout) {
           clearTimeout(lasttimeout);
         }
@@ -244,13 +255,6 @@ Fin</textarea>
         return true;
       }
 
-      var lastjs = "";
-      var lasttimeout = null;
-      var lastCompilation = null;
-      var minify = false;
-      var errorLineas = [];
-
-      var carga = null;
       $("#run").click(function() {
         if (!lastCompilation)
           return false;
@@ -301,17 +305,21 @@ Fin</textarea>
         lasttimeout = null;
         var compilation = $("#helparea").get(0);
         eliminarLineasError();
-        zl.Compilar(zlcode, function(e, compilado){
-          if (e && zl.error.esError(e)) {
-            var tarjeta = zl.error.obtenerMensajeHtml(e, zlcode);
-            compilation.innerHTML = tarjeta.getHtml();
-            for (var i = 0; i < tarjeta.lineasDeError().length; i++) {
-              var x = tarjeta.lineasDeError()[i]-1;
-              errorLineas.push(editor.addLineClass(x, "background", "CodeMirror-line-error"));
+        zl.Compilar(zlcode, {}, function(e, compilado){
+          if (e) {
+            if (zl.error.esError(e)) {
+              var tarjeta = zl.error.obtenerMensajeHtml(e, zlcode);
+              compilation.innerHTML = tarjeta.getHtml();
+              for (var i = 0; i < tarjeta.lineasDeError().length; i++) {
+                var x = tarjeta.lineasDeError()[i]-1;
+                errorLineas.push(editor.addLineClass(x, "background", "CodeMirror-line-error"));
+              }
+            } else {
+              throw e;
             }
           } else {
             lastCompilation = compilado;
-            zl.autocompletar.alimentarTabla(lastCompilation.tabla);
+            zl.autocompletar.alimentarTabla(lastCompilation.modulo);
             if (minify)
               lastjs = js_beautify(uglify(js_beautify(lastCompilation.javascript)));
             else
@@ -438,7 +446,7 @@ Fin</textarea>
 
       function evaluar() {
         if (evaluando && carga && lastCompilation && ultimoEntorno) {
-          var subrutina = lastCompilation.tabla.subrutinaPorPosicion(editor.indexFromPos(editor.getCursor()));
+          var subrutina = lastCompilation.modulo.subrutinaPorPosicion(editor.indexFromPos(editor.getCursor()));
           var compilation = $("#helparea").get(0);
           var valor = zl.Evaluar(editor.getSelection(), subrutina, carga, ultimoEntorno);
           if (typeof valor === "undefined") {

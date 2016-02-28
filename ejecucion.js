@@ -21,81 +21,9 @@ var modulo = function(zl, async) {
   }
 
   rte.$precision = function(arg) {
-    console.log(this.$configuracion);
     return (this.$configuracion.precision > 0 ?
       arg.toPrecision(this.$configuracion.precision) :
       arg);
-  }
-
-  // mensaje es Texto de Entrada
-  rte.mostrar = function(arg) {
-    zl.io.outWrite(arg.mensaje + "\n");
-  }
-
-  rte.mostrarnumero = function(arg) {
-    zl.io.outWrite(rte.$precision(arg.mensaje) + "\n");
-  }
-
-  rte.leernumero = function(arg, callback) {
-    if (this.$continuar) {
-      var oldabortar = this.$abortar;
-      var self = this;
-      this.$abortar = zl.io.abortRead;
-      zl.io.inRead(function cbck(err, value) {
-        var x = parseFloat(value);
-        if (isNaN(x))
-          zl.io.inRead(cbck);
-        else {
-          self.$abortar = oldabortar;
-          callback(null, {
-            mensaje: x
-          });
-        }
-      });
-    }
-  }
-
-  rte.leer = function(arg, callback) {
-    if (this.$continuar) {
-      var oldabortar = this.$abortar;
-      var self = this;
-      this.$abortar = zl.io.abortRead;
-      zl.io.inRead(function(err, value) {
-        self.$abortar = oldabortar;
-        callback(null, {
-          mensaje: value
-        });
-      });
-    }
-  }
-
-  rte.aleatorio = function(arg) {
-    return {
-      resultado: Math.round((Math.random() * (arg.maximo - arg.minimo)) + arg.minimo)
-    };
-  }
-
-  rte.limpiar = function(arg) {
-    zl.io.limpiar();
-  }
-
-  rte.productoTexto = function(arg) {
-    var texto =
-      typeof arg.izq === "string" ? arg.izq : arg.der;
-
-    var veces =
-      typeof arg.izq === "number" ? arg.izq : arg.der;
-    return (function ttimes(t, n) {
-      // Hack: decimal a entero
-      n = ~~n;
-      if (n === 0)
-        return "";
-      var x = ttimes(t, n / 2);
-      if (n % 2 === 0)
-        return x + x;
-      else
-        return x + x + t;
-    })(texto, veces);
   }
 
   rte.construirLista = function(dimensiones) {
@@ -220,7 +148,6 @@ var modulo = function(zl, async) {
     };
   }
 
-
   rte.$continuar = true;
   rte.$animStart = null;
   rte.$siguienteFotograma = function(fotogramacbk) {
@@ -244,45 +171,54 @@ var modulo = function(zl, async) {
     }
   }
 
+  rte.$writeJson = zl.writeJson;
+
   zl.eval = function(codigo) {
     eval(codigo);
   }
 
   zl.Cargar = function(javascript) {
     var carga = zl.writeJson({}, rte);
+    carga.$io = zl.io;
     if (typeof document !== "undefined") {
       carga.$canvas = document.getElementById("canvas");
       carga.$ctx2d = carga.$canvas.getContext("2d");
       carga.$ctx2d.font = "normal 14pt arial";
     }
     // Cargar el código:
-    rte.limpiar({});
+    zl.io.limpiar();
     zl.eval.call(carga, javascript);
     return carga;
   }
 
   zl.Ejecutar = function(carga, errorCallback) {
     // Preparar la ejecución:
-    var ejecucion = "\"use strict\";var $t = this;";
-
-    if (typeof carga.inicio === "function") {
-      ejecucion += "$t.inicio({}";
-      // TODO: Distinguir si this.inicio es asíncrona o no.
-      if (carga.$asincrono.inicio)
-        ejecucion += ",function() {"
-      else
-        ejecucion += ");"
+    var fotogramas = `
+    if (main.fotograma) {
+      self.$abortar = function() {
+        self.$continuar = false;
+      }
+      self.$siguienteFotograma(function cbk() {
+          main.fotograma({});
+      });
+    } else if (!self.$asincrono.inicio) {
+      self.$alAcabar();
     }
-    // TODO: Tener en cuenta el retardo de cálculo y restárselo al interval.
-    if (typeof carga.fotograma === "function") {
-      ejecucion += "$t.$abortar=function(){$t.$continuar=false;};"
-      ejecucion += "$t.$siguienteFotograma($t.fotograma);";
-    } else if (typeof carga.inicio === "function") {
-      ejecucion += "$t.$alAcabar(null);";
+    `
+    var ejecucion = `"use strict";
+    var main = this.new$principalModulo();
+    var self = this;
+    if (main.inicio) {
+      if (self.$asincrono.inicio) {
+        main.inicio({},function() {
+          ${fotogramas}
+        });
+      } else {
+        main.inicio({});
+        ${fotogramas}
+      }
     }
-    if (typeof carga.inicio === "function" && carga.$asincrono.inicio) {
-      ejecucion += "});";
-    }
+    `
 
     // Y Ejecutar
     try {

@@ -36,14 +36,14 @@ for (var k in codigos) {
 
 describe('Forzando errores', function() {
   it("Código mal escrito", function(done) {
-    zl.Compilar("Subrutima Ayylmao", function(err, res) {
+    zl.Compilar("Subrutima Ayylmao", {}, function(err, res) {
       expect(err).to.not.be.null;
       done();
     });
   });
 
   it("Variable sin declarar", function(done) {
-    zl.Compilar("Subrutina B Datos a es Numero Algoritmo c <- a Fin", function(err, res) {
+    zl.Compilar("Subrutina B Datos a es Numero Algoritmo c <- a Fin", {}, function(err, res) {
       if (!err) {
         err.should.exist;
         done();
@@ -58,10 +58,14 @@ describe('Forzando errores', function() {
 describe('Compilando las pruebas', function() {
   it('Pruebas de compilación', function(done) {
     async.each(codigos, function(k, innerDone) {
-      zl.Compilar(k, function(err, res) {
-        expect(err).to.be.null;
-        expect(res.javascript).to.be.a("string");
-        innerDone();
+      zl.Compilar(k, {}, function(err, res) {
+        if (err)
+          done(err);
+        else {
+          expect(err).to.be.null;
+          expect(res.javascript).to.be.a("string");
+          innerDone();
+        }
       });
     }, function() {
       done();
@@ -72,13 +76,17 @@ describe('Compilando las pruebas', function() {
 describe('Ejecución de pruebas', function() {
   it("Los códigos emiten por pantalla strings", function() {
     async.each(codigos, function(k, innerDone) {
-      zl.Compilar(k, function(err, res) {
-        var zlcodigo = res.javascript;
-        var carga = zl.Cargar(zlcodigo);
-        carga.$alAcabar = function() {
-          innerDone(null);
+      zl.Compilar(k, {}, function(err, res) {
+        if (err)
+          done(err);
+        else {
+          var zlcodigo = res.javascript;
+          var carga = zl.Cargar(zlcodigo);
+          carga.$alAcabar = function() {
+            innerDone(null);
+          }
+          zl.Ejecutar(res);
         }
-        zl.Ejecutar(res);
       });
     }, function() {
       for (var i = 0; i < zl.test.output.length; i++) {
@@ -94,14 +102,18 @@ describe('Emisión de valores correctos', function() {
 
   it("El código operaciones emite 32", function(done) {
     var codigo = codigos["operaciones"];
-    var zlcodigo = zl.Compilar(codigo, function(err, res) {
-      prec = res.tabla.configuracion.precision;
-      var carga = zl.Cargar(res.javascript);
-      carga.$alAcabar = function() {
-        expect(zl.test.output[0]).to.equal(precision(prec, 32) + "\n");
-        done();
+    var zlcodigo = zl.Compilar(codigo, {}, function(err, res) {
+      if (err)
+        done(err);
+      else {
+        prec = res.tabla.configuracion.precision;
+        var carga = zl.Cargar(res.javascript);
+        carga.$alAcabar = function() {
+          expect(zl.test.output[0]).to.equal(precision(prec, 32) + "\n");
+          done();
+        }
+        zl.Ejecutar(carga);
       }
-      zl.Ejecutar(carga);
     });
   });
 });
@@ -111,16 +123,20 @@ describe('Pruebas de entrada/salida', function() {
   var prec;
   it('Entrada/salida de número ' + aleatorio, function(done) {
     var codigo = codigos["entradasalidanumero"];
-    var zlcodigo = zl.Compilar(codigo, function(err, res) {
-      var carga = zl.Cargar(res.javascript);
-      prec = res.tabla.configuracion.precision;
-      carga.$asincrono.inicio = true;
-      carga.$alAcabar = function() {
-        expect(zl.test.output[0]).to.equal(precision(prec, aleatorio) + "\n");
-        done();
+    var zlcodigo = zl.Compilar(codigo, {}, function(err, res) {
+      if (err)
+        done(err);
+      else {
+        var carga = zl.Cargar(res.javascript);
+        prec = res.tabla.configuracion.precision;
+        carga.$asincrono.inicio = true;
+        carga.$alAcabar = function() {
+          expect(zl.test.output[0]).to.equal(precision(prec, aleatorio) + "\n");
+          done();
+        }
+        zl.test.input.push("" + aleatorio);
+        zl.Ejecutar(carga);
       }
-      zl.test.input.push("" + aleatorio);
-      zl.Ejecutar(carga);
     });
   });
 });
@@ -129,36 +145,44 @@ describe('Pruebas con globales', function() {
   var aleatorio = ~~(Math.random() * 10000);
   var prec;
 
-  it('Entrada/salida con globales ' + aleatorio, function() {
+  it('Entrada/salida con globales ' + aleatorio, function(done) {
     var codigo = codigos["globales"];
-    var zlcodigo = zl.Compilar(codigo, function(err, res) {
-      var carga = zl.Cargar(res.javascript);
-      prec = res.tabla.configuracion.precision;
-      carga.$asincrono.inicio = true;
-      carga.$alAcabar = function() {
-        expect(zl.test.output[0]).to.equal(precision(prec, aleatorio) + "\n");
-        done();
+    var zlcodigo = zl.Compilar(codigo, {}, function(err, res) {
+      if (err)
+        done(err);
+      else {
+        var carga = zl.Cargar(res.javascript);
+        prec = res.tabla.configuracion.precision;
+        carga.$asincrono.inicio = true;
+        carga.$alAcabar = function() {
+          expect(zl.test.output[0]).to.equal(precision(prec, aleatorio) + "\n");
+          done();
+        }
+        zl.test.input.push("" + aleatorio);
+        zl.Ejecutar(carga);
       }
-      zl.test.input.push("" + aleatorio);
-      zl.Ejecutar(carga);
     });
   });
 })
 
 describe('Orden de los operadores', function() {
   var aleatorio = ~~(Math.random() * 10000);
-  it('Orden básico de los operadores aritméticos con número ' + aleatorio, function() {
+  it('Orden básico de los operadores aritméticos con número ' + aleatorio, function(done) {
     var codigo = codigos["ordenoperaciones"];
-    var zlcodigo = zl.Compilar(codigo, function(err, res) {
-      var carga = zl.Cargar(res.javascript);
-      prec = res.tabla.configuracion.precision;
-      carga.$asincrono.inicio = true;
-      carga.$alAcabar = function() {
-        expect(zl.test.output[0]).to.equal(precision(prec, 3.1 - aleatorio + 4 * 2) + "\n");
-        done();
+    var zlcodigo = zl.Compilar(codigo, {}, function(err, res) {
+      if (err)
+        done(err);
+      else {
+        var carga = zl.Cargar(res.javascript);
+        prec = res.tabla.configuracion.precision;
+        carga.$asincrono.inicio = true;
+        carga.$alAcabar = function() {
+          expect(zl.test.output[0]).to.equal(precision(prec, 3.1 - aleatorio + 4 * 2) + "\n");
+          done();
+        }
+        zl.test.input.push("" + aleatorio);
+        zl.Ejecutar(carga);
       }
-      zl.test.input.push("" + aleatorio);
-      zl.Ejecutar(carga);
     });
   });
 })
@@ -166,35 +190,44 @@ describe('Orden de los operadores', function() {
 describe('Pruebas erróneas con listas', function() {
   var c1 = fs.readFileSync("pruebas/accesoerroneolista.zl").toString();
 
-  it('Acceso a una posición que está fuera del array', function() {
-    zl.Compilar(c1, function(err, res) {
-      var carga = zl.Cargar(res.javascript);
-      var error;
-      carga.$alError = function(err) {
-        this.$continuar = false;
-        error = err;
+  it('Acceso a una posición que está fuera del array', function(done) {
+    zl.Compilar(c1, {}, function(err, res) {
+      if (err)
+        done(err);
+      else {
+        var carga = zl.Cargar(res.javascript);
+        var error;
+        carga.$alError = function(err) {
+          this.$continuar = false;
+          error = err;
+        }
+        carga.$alAcabar = function() {
+          expect(error.tipo).to.equal(zl.error.E_EJECUCION_INDICE_DESCONTROLADO);
+          done();
+        }
+        zl.Ejecutar(carga);
       }
-      carga.$alAcabar = function() {
-        expect(error.tipo).to.equal(zl.error.E_EJECUCION_INDICE_DESCONTROLADO);
-        done();
-      }
-      zl.Ejecutar(carga);
     });
   });
 });
 
 describe('Subrutinas conversoras', function() {
-  it('Conversora primitiva de texto a numero', function() {
+  it('Conversora primitiva de texto a numero', function(done) {
     var codigo = codigos["conversorprimitivo"];
-    var zlcodigo = zl.Compilar(codigo, function(err, res) {
-      var carga = zl.Cargar(res.javascript);
-      carga.$asincrono.inicio = true;
-      carga.$alAcabar = function() {
-        expect(isNaN(zl.test.output[0])).to.equal(false);
-        expect(zl.test.output[0]).to.equal(zl.test.output[1]);
-        done();
+    var zlcodigo = zl.Compilar(codigo, {}, function(err, res) {
+      if (err)
+        done(err);
+      else {
+        console.log(res.javascript);
+        var carga = zl.Cargar(res.javascript);
+        carga.$asincrono.inicio = true;
+        carga.$alAcabar = function() {
+          expect(isNaN(zl.test.output[0])).to.equal(false);
+          expect(zl.test.output[0]).to.equal(zl.test.output[1]);
+          done();
+        }
+        zl.Ejecutar(carga);
       }
-      zl.Ejecutar(carga);
     });
   });
 });

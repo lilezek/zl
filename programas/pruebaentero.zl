@@ -12,7 +12,7 @@ Algoritmo
     mensaje <- "Pon un número:"
   ]
   leernumero [
-    mensaje -> n
+    numero -> n
   ]
   esEntero [
     num <- n

@@ -11,14 +11,22 @@ var modulo = function(zl, async) {
     require("./sintaxis")(zl);
     require("./semantica")(zl);
     require("./javascript")(zl);
+    var fs = require('fs');
+    cargarModulo = function(camino, ensamblados, done) {
+      fs.readFile(camino, function(err, res) {
+        if (err)
+          done(err);
+        zl.Compilar(res.toString(), ensamblados, done);
+      });
+    }
   } else {
     // Web:
-    cargarModulo = function(camino, done) {
+    cargarModulo = function(camino, ensamblados, done) {
       $.ajax(camino, {
         dataType: "text",
         type: "get",
         success: function(data) {
-          zl.Compilar(data, done);
+          zl.Compilar(data, ensamblados, done);
         },
         error: function(a, b, error) {
           done(error);
@@ -27,15 +35,47 @@ var modulo = function(zl, async) {
     }
   }
 
-  var cacheDeModulos = {};
+  // TODO: Esta funcionalidad no debería estar aquí. Debería estar en javascript.js
+  function generarIntegradoJavascript(moduloIntegrado) {
+    var nombre = moduloIntegrado.configuracion.nombremodulo;
+    return "var tmp" + nombre + "=new " + nombre + "Modulo(this);" +
+      "this.$writeJson(r,tmp" + nombre + ")";
+  }
+
+  // Esta functión, de momento, no necesita hacer nada.
+  function generarImporteJavascript(moduloImportado) {
+    return "";
+  }
+
+  function generarConstructorDeModulo(modulo) {
+    var nombre = modulo.configuracion.nombremodulo;
+    var resultado = "this.new" + nombre + "Modulo = function(){\"use strict\"" +
+      "var r = new " + nombre + "Modulo(this);";
+    var integraciones = modulo.arrayDeIntegraciones();
+    for (var i = 0; i < integraciones.length; i++) {
+      resultado += generarIntegradoJavascript(integraciones[i]) + ";";
+    }
+    resultado += "r.instancia = this.new" + nombre + "Modulo;" +
+      "return r;" +
+      "}";
+    return resultado;
+  }
+
+  var cacheDeCompilacionesPorCamino = {};
+  var cacheDeCompilacionesPorNombre = {};
 
   // Genera código javascript a partir de código
   // en zl
-  zl.Compilar = function(zlcode, done) {
+  // Devuelve un objeto con el javascript generado,
+  // el módulo (ver entorno.js) y una lista de dependencias.
+  // TODO: Cambiar el orden de los atributos
+  zl.Compilar = function(zlcode, ensamblados, done) {
     var compilado;
     var configuraciones = {};
-    var integraciones = {};
+    var integraciones = [];
     var importes = [];
+    var javascript = "";
+    ensamblados = ensamblados || {};
     try {
       // Fase 1, obtener el árbol sintáctico de la configuración:
       compilado = zl.sintaxis.arbolConfiguracion(zlcode);
@@ -46,9 +86,15 @@ var modulo = function(zl, async) {
         var c = compilado[i];
         // Configuración genérica:
         if (c.tipo === "configurar") {
-          configuraciones[c.nombre] = c.valor;
-        }
-        if (c.tipo == "integrar") {
+          if (c.tipoValor === "number")
+            configuraciones[c.nombre.toLowerCase()] = parseFloat(c.valor);
+          else
+            configuraciones[c.nombre.toLowerCase()] = c.valor;
+        } else if (c.tipo === "integrar") {
+          var camino = c.camino;
+          camino = camino.substring(1, camino.length - 1);
+          integraciones.push(camino);
+        } else if (c.tipo === "importar") {
           var camino = c.camino;
           camino = camino.substring(1, camino.length - 1);
           importes.push(camino);
@@ -61,69 +107,72 @@ var modulo = function(zl, async) {
       }
     }
 
-    try {
-      // Fase 3, obtener el árbol sintáctico del resto del código:
-      compilado = zl.sintaxis.arbolCodigo(zlcode, (compilado ? compilado.end : 0));
 
-      // Fase 4, generar la tabla de símbolos
-
-      // Construir este módulo
-      var mod = zl.entorno.newModulo();
-      zl.writeJson(mod.configuracion, configuraciones);
-      mod.rellenarDesdeArbol(compilado);
-    } catch (e) {
-      done(e);
-      return;
-    }
-
-    // Antes de avanzar a la siguiente fase, cargar todos los
-    // módulos importados.
-
-    var javascript = "";
-
-    async.eachSeries(importes, function(camino, callback) {
-        // Si ya se cargó el módulo
-        if (camino in cacheDeModulos) {
-          mod.integrar(cacheDeModulos[camino].tabla);
-          javascript += cacheDeModulos[camino].javascript;
-          callback(null);
-          // Sino, obtener el código y compilar
-        } else {
-          cargarModulo(camino, function(err, resultado) {
-            // TODO: convertir este error en un error ZL
-            if (err) {
-              done(err);
-            }
-            cacheDeModulos[camino] = resultado;
-            mod.integrar(resultado.tabla);
-            javascript += cacheDeModulos[camino].javascript;
+    // Fase 3, ensamblar cada dependencia
+    async.eachSeries(integraciones.concat(importes), function(camino, callback) {
+      // ¿Está en caché?
+      var compilacion = cacheDeCompilacionesPorCamino[camino];
+      if (compilacion) {
+        var modulo = compilacion.modulo;
+        var js = compilacion.javascript;
+        // ¿Está sin ensamblar?
+        if (!(modulo.configuracion.nombre in ensamblados)) {
+          ensamblados[modulo.configuracion.nombremodulo] = compilacion;
+          javascript += js;
+        }
+        callback(null);
+      } else {
+        cargarModulo(camino, ensamblados, function(error, compilado) {
+          if (error) {
+            done(error);
+          } else {
+            var modulo = compilado.modulo;
+            var js = compilado.javascript;
+            // Añadir a caché
+            cacheDeCompilacionesPorCamino[camino] = compilado;
+            cacheDeCompilacionesPorNombre[modulo.configuracion.nombremodulo] = compilado;
+            // Y ensamblar
+            ensamblados[modulo.configuracion.nombremodulo] = compilado;
+            javascript += js;
             callback(null);
-          });
-        }
-      },
-      function() {
-        try {
-          // Fase 5, comprobaciones semánticas (tipos compatibles, uso de nombres que
-          // están registrados, etc...).
-          zl.semantica.testarModulo(compilado, mod);
-
-          // Fase 6, optimización opcional del código generado por el árbol
-          // TODO: sin hacer
-
-          // Fase 7, generación del código de salida
-          var inicio = mod.subrutinaPorNombre("inicio");
-          var fotograma = mod.subrutinaPorNombre("fotograma");
-        } catch (e) {
-          done(e);
-          return;
-        }
-        done(null, {
-          javascript: javascript + zl.javascript.modulo(compilado, mod),
-          tabla: mod,
-          inicioAsincrono: (inicio || false) && (inicio.modificadores.asincrono || false),
-          fotogramaAsincrono: (fotograma || false) && (fotograma.modificadores.asincrono || false)
+          }
         });
-      });
+      }
+    }, function() {
+      try {
+        // Fase 4, obtener el árbol sintáctico de este módulo:
+        compilado = zl.sintaxis.arbolCodigo(zlcode, (compilado ? compilado.end : 0));
+
+        // Fase 5, generar la tabla de símbolos
+        // Construir este módulo
+        var mod = zl.entorno.newModulo();
+        zl.writeJson(mod.configuracion, configuraciones);
+        mod.rellenarDesdeArbol(compilado);
+
+        // Fase 6, introducir las integraciones en el módulo
+        for (var i = 0; i < integraciones.length; i++)
+          mod.integrar(cacheDeCompilacionesPorCamino[integraciones[i]].modulo);
+
+        // Fase 7: introducir los tipos de datos a partir de los importes
+        // TODO: Sin hacer
+
+        // Fase 8, comprobaciones semánticas (tipos compatibles, uso de nombres que
+        // están registrados, etc...).
+        zl.semantica.testarModulo(compilado, mod);
+
+        // Fase 9, optimización opcional del código generado por el árbol
+        // TODO: sin hacer
+
+        // Fase 10, generación del código de salida
+        done(null, {
+          modulo: mod,
+          javascript: javascript + zl.javascript.modulo(compilado, mod) + generarConstructorDeModulo(mod)
+        });
+      } catch (e) {
+        done(e);
+        return;
+      }
+    });
   }
 
   // Genera código javascript a partir de código
@@ -135,9 +184,6 @@ var modulo = function(zl, async) {
     try {
       // Fase 1, obtener el árbol sintáctico de la expresión:
       var compilado = zl.sintaxis.arbolExpresion(zlcode);
-
-      console.log(entorno, subrutina);
-
       // Fase 2, parsing semántico
       zl.semantica.testarExpresion(compilado, subrutina);
 

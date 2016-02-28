@@ -14,23 +14,18 @@ var modulo = function(zl) {
   // TODO: Hacerlo a partir del simbolo
   zl.javascript.cabecera = function(compilado, simbolo) {
     var resultado = "";
-    resultado += "(function($in, $out){\"use strict\"; var $global={};";
+    resultado += "function "+simbolo.configuracion.nombremodulo+"Modulo($in){\"use strict\"; var $global=this.$miembros={};";
     for (var k in simbolo.globales) {
       resultado += zl.javascript.dato(simbolo.globales[k], simbolo);
     }
-    for (var k in simbolo.configuracion) {
-      if (typeof simbolo.configuracion[k] === "number")
-        resultado += "$out.$configuracion."+k+"="+simbolo.configuracion[k]+";";
-      else if (typeof simbolo.configuracion[k] === "string")
-        resultado += "$out.$configuracion."+k+"=\""+simbolo.configuracion[k]+"\";";
-    }
+    resultado += "this.$configuracion = "+JSON.stringify(simbolo.configuracion);
     return resultado;
   }
 
   // Generar el final
   // TODO: Hacerlo a partir del simbolo
   zl.javascript.final = function(compilado, simbolo) {
-    var resultado = "})(this, this);";
+    var resultado = "}";
     return resultado;
   }
 
@@ -55,7 +50,7 @@ var modulo = function(zl) {
     if (simbolo.modificadores.interna)
       resultado += "var ";
     else
-      resultado += "$out.";
+      resultado += "this.";
 
     var sentencias = "";
     if (simbolo.modificadores.primitiva) {
@@ -64,15 +59,15 @@ var modulo = function(zl) {
       sentencias = zl.javascript.sentencias(compilado.sentencias, simbolo);
     }
 
-    if (simbolo.modificadores.asincrona) {
-      resultado += zl.javascript.nombre(compilado.nombre, simbolo) + "=function($entrada, done){var $salida={};var $local={};" +
+    if (simbolo.modificadores.asincrona && !simbolo.modificadores.primitiva) {
+      resultado += zl.javascript.nombre(compilado.nombre, simbolo) + "=function($entrada, done){var $self=this;var $salida={};var $local={};" +
         zl.javascript.datos(compilado.datos, simbolo.declaraciones) +
         "$in.async.waterfall([function(c){c(null,null);}," +
         "function(arg,done){$salida={};" +
         sentencias +
         "done(null, $salida);}],done);";
     } else {
-      resultado += zl.javascript.nombre(compilado.nombre, simbolo) + "=function($entrada, done){var $salida={};var $local={};" +
+      resultado += zl.javascript.nombre(compilado.nombre, simbolo) + "=function($entrada, done){var $self=this;var $salida={};var $local={};" +
         zl.javascript.datos(compilado.datos, simbolo.declaraciones) +
         sentencias +
         "return $salida;";
@@ -146,10 +141,10 @@ var modulo = function(zl) {
     var sub = simbolo.padre.subrutinaPorNombre(nombre);
     // TODO: Generar correctamente los nombres importados
     if (!sub.modificadores.interna)
-      nombre = "$in." + nombre;
+      nombre = "$self." + nombre;
     if (compilado.asincrono)
       return ";done(null," + zl.javascript.llamadaEntrada(compilado.entrada, simbolo) + ");}," +
-        "$in.$impersonar(" + nombre + ", $in)" +
+        "$in.$impersonar(" + nombre + ", $self)" +
         ",function(arg,done) {$salida=arg;" +
         zl.javascript.llamadaSalida(compilado.salida, simbolo);
     else
@@ -292,7 +287,7 @@ var modulo = function(zl) {
       var alias = tipoizq.opbinario[compilado.op][tipoder.nombre].alias;
       // TODO: poner el módulo antes del alias correctamente.
       if (alias.length > 0) {
-        return "$in." + alias + "({izq:" + izq + ",der:" + der + "})"
+        return "$self." + alias + "({izq:" + izq + ",der:" + der + "})"
       }
       return izq + " " + operador + " " + der;
     } else if (compilado.der && operador) {
@@ -331,7 +326,7 @@ var modulo = function(zl) {
     } else if (compilado.tipo == "conversion") {
       var subrutina = compilado.subrutinaConversora;
       // TODO: No usar $in. siempre. Comprobar de dónde viene la subrutina.
-      return "$in." + subrutina.nombre + "({" +
+      return "$self." + subrutina.nombre + "({" +
         subrutina.conversion.datoEntrada.nombre + ":" + zl.javascript.evaluacion({
           tipo: "nombre",
           valor: compilado.nombre,
