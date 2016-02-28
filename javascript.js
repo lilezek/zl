@@ -13,19 +13,19 @@ var modulo = function(zl) {
   // Generar la cabecera
   // TODO: Hacerlo a partir del simbolo
   zl.javascript.cabecera = function(compilado, simbolo) {
-    var resultado = "";
+    var resultado = "\"use strict\";";
     resultado += "function "+simbolo.configuracion.nombremodulo+"Modulo($in){\"use strict\"; var $global=this.$miembros={};";
     for (var k in simbolo.globales) {
       resultado += zl.javascript.dato(simbolo.globales[k], simbolo);
     }
-    resultado += "this.$configuracion = "+JSON.stringify(simbolo.configuracion);
+    resultado += "this.$configuracion = "+JSON.stringify(simbolo.configuracion)+";";
     return resultado;
   }
 
   // Generar el final
   // TODO: Hacerlo a partir del simbolo
   zl.javascript.final = function(compilado, simbolo) {
-    var resultado = "}";
+    var resultado = "};";
     return resultado;
   }
 

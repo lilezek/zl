@@ -1,5 +1,5 @@
 Configuracion
-  integrar "../bibliotecasZL/basico.zl"
+  integrar "bibliotecasZL/basico.zl"
 Fin
 
 Subrutina Inicio

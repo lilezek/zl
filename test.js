@@ -218,9 +218,8 @@ describe('Subrutinas conversoras', function() {
       if (err)
         done(err);
       else {
-        console.log(res.javascript);
         var carga = zl.Cargar(res.javascript);
-        carga.$asincrono.inicio = true;
+        carga.$asincrono.inicio = false;
         carga.$alAcabar = function() {
           expect(isNaN(zl.test.output[0])).to.equal(false);
           expect(zl.test.output[0]).to.equal(zl.test.output[1]);

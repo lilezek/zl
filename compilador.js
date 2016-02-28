@@ -49,7 +49,7 @@ var modulo = function(zl, async) {
 
   function generarConstructorDeModulo(modulo) {
     var nombre = modulo.configuracion.nombremodulo;
-    var resultado = "this.new" + nombre + "Modulo = function(){\"use strict\"" +
+    var resultado = "this.new" + nombre + "Modulo = function(){\"use strict\";" +
       "var r = new " + nombre + "Modulo(this);";
     var integraciones = modulo.arrayDeIntegraciones();
     for (var i = 0; i < integraciones.length; i++) {
@@ -57,7 +57,7 @@ var modulo = function(zl, async) {
     }
     resultado += "r.instancia = this.new" + nombre + "Modulo;" +
       "return r;" +
-      "}";
+      "};";
     return resultado;
   }
 

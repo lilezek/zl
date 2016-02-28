@@ -193,32 +193,30 @@ var modulo = function(zl, async) {
 
   zl.Ejecutar = function(carga, errorCallback) {
     // Preparar la ejecución:
-    var fotogramas = `
-    if (main.fotograma) {
-      self.$abortar = function() {
-        self.$continuar = false;
-      }
-      self.$siguienteFotograma(function cbk() {
-          main.fotograma({});
-      });
-    } else if (!self.$asincrono.inicio) {
-      self.$alAcabar();
-    }
-    `
     var ejecucion = `"use strict";
     var main = this.new$principalModulo();
     var self = this;
+    function iniciarSubrutina() {
+      if (main.subrutina) {
+        self.$abortar = function() {
+          self.$continuar = false;
+        }
+        self.$siguienteFotograma(main.fotograma);
+      } else {
+        self.$alAcabar(null);
+      }
+    }
     if (main.inicio) {
       if (self.$asincrono.inicio) {
-        main.inicio({},function() {
-          ${fotogramas}
+        main.inicio({}, function() {
+          iniciarSubrutina();
         });
       } else {
         main.inicio({});
-        ${fotogramas}
+        console.log("ayy");
+        iniciarSubrutina();
       }
-    }
-    `
+    }`
 
     // Y Ejecutar
     try {
