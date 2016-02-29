@@ -63,7 +63,7 @@ var modulo = function(zl) {
     cm.replaceRange(str, completion.from || data.from,
       completion.to || data.to, "complete");
     if (colocarCursor) {
-      var x = cm.indexFromPos((completion.from || data.from))+colocarCursor;
+      var x = cm.indexFromPos((completion.from || data.from)) + colocarCursor;
       cm.setCursor(cm.posFromIndex(x));
     }
   }
@@ -112,7 +112,7 @@ var modulo = function(zl) {
                 text: "repetir",
                 repl: "Repetir _%dato&veces&numero% veces\n%indent%%codigo%\nFin",
                 hint: applyHint
-              },{
+              }, {
                 displayText: "si ... hacer ...",
                 text: "si",
                 repl: "Si _%condicion% hacer\n%indent%%codigo%\nFin",
@@ -131,7 +131,6 @@ var modulo = function(zl) {
       return e.getTokenAt(cur);
     }
     var contexto = zl.autocompletar.contexto();
-    console.log(contexto);
     // Find the token at the cursor
     var cur = editor.getCursor(),
       token = getToken(editor, cur);
@@ -151,8 +150,6 @@ var modulo = function(zl) {
       token.end = cur.ch;
       token.string = token.string.slice(0, cur.ch - token.start);
     }
-    
-    console.log(token);
 
     var tprop = token;
     // If it is a property, find out what it is a property of.
@@ -171,45 +168,40 @@ var modulo = function(zl) {
     };
   });
 
-  function generarHintSubrutinas(mapa) {
-    var resultado = [];
-    for (var k in mapa) {
-      var sub = mapa[k];
-      var hint = {
-        displayText: sub.nombre + " ... [ ]",
-        text: sub.nombre,
-        hint: applyHint,
-        repl: sub.nombre + " ["
-      }
-      for (var h in sub.declaraciones) {
-        var decl = sub.declaraciones[h];
-        if (!(decl.modificadores & decl.M_GLOBAL) && !(decl.modificadores == decl.M_LOCAL)) {
-          hint.repl += "\n%indent%" + decl.nombre;
-          if (decl.modificadores & decl.M_ENTRADA && decl.modificadores & decl.M_SALIDA) {
-            hint.repl += " <- ";
-            hint.repl += "%" + decl.nombre+"&";
-            hint.repl += decl.tipo.nombre + "%\n%indent%";
-            hint.repl += " -> ";
-            hint.repl += "%dato&";
-            hint.repl += decl.tipo.nombre + "%";
-          } else if (decl.modificadores & decl.M_ENTRADA) {
-            hint.repl += " <- ";
-            hint.repl += "%" + decl.nombre+"&";
-            hint.repl += decl.tipo.nombre + "%";
-          } else if (decl.modificadores & decl.M_SALIDA) {
-            hint.repl += " -> ";
-            hint.repl += "%dato&";
-            hint.repl += decl.nombre+"&";
-            hint.repl += decl.tipo.nombre + "%";
-          }
+  function generarHintSubrutina(sub) {
+    var hint = {
+      displayText: sub.nombre + " ... [ ]",
+      text: sub.nombre,
+      hint: applyHint,
+      repl: sub.nombre + " ["
+    }
+    for (var h in sub.declaraciones) {
+      var decl = sub.declaraciones[h];
+      if (!(decl.modificadores & decl.M_GLOBAL) && !(decl.modificadores == decl.M_LOCAL)) {
+        hint.repl += "\n%indent%" + decl.nombre;
+        if (decl.modificadores & decl.M_ENTRADA && decl.modificadores & decl.M_SALIDA) {
+          hint.repl += " <- ";
+          hint.repl += "%" + decl.nombre + "&";
+          hint.repl += decl.tipo.nombre + "%\n%indent%";
+          hint.repl += " -> ";
+          hint.repl += "%dato&";
+          hint.repl += decl.tipo.nombre + "%";
+        } else if (decl.modificadores & decl.M_ENTRADA) {
+          hint.repl += " <- ";
+          hint.repl += "%" + decl.nombre + "&";
+          hint.repl += decl.tipo.nombre + "%";
+        } else if (decl.modificadores & decl.M_SALIDA) {
+          hint.repl += " -> ";
+          hint.repl += "%dato&";
+          hint.repl += decl.nombre + "&";
+          hint.repl += decl.tipo.nombre + "%";
         }
       }
-      if (!/[\n\[]/.test(hint.repl[hint.repl.length-1]))
-        hint.repl += "\n";
-      hint.repl += "]";
-      resultado.push(hint);
     }
-    return resultado;
+    if (!/[\n\[]/.test(hint.repl[hint.repl.length - 1]))
+      hint.repl += "\n";
+    hint.repl += "]";
+    return hint;
   }
 
   function getCompletions(token, context, contexto, options) {
@@ -221,23 +213,19 @@ var modulo = function(zl) {
       subrutinas = [],
       keywords = contexto.$.$;
     if (contexto.tipo === "datos") {
-      tipos = Object.keys(ultimaTabla.tipos).concat(
-        (ultimaTabla.moduloInterno ? Object.keys(ultimaTabla.moduloInterno.tipos) : [])
-      );
+      tipos = ultimaTabla.arrayDeTipos().map(arr => arr.nombre);
     } else if (contexto.tipo === "algoritmo") {
       datos = Object.keys(sub ? sub.declaraciones : {});
-      subrutinas = generarHintSubrutinas(ultimaTabla.subrutinas).concat(
-        (ultimaTabla.moduloInterno ? generarHintSubrutinas(ultimaTabla.moduloInterno.subrutinas) : [])
-      );
+      subrutinas = ultimaTabla.arrayDeSubrutinas().map(generarHintSubrutina);
     }
     // TODO: Escoger qué arrays concatenar según el contexto.
     var options = subrutinas.concat(datos).concat(tipos).concat(keywords).filter(function(key) {
       var t = (typeof key === "string" ? key : key.text);
-      return t.length >= start.length && new Levenshtein(t.substring(0,start.length), start) < start.length;
-    }).sort(function(a,b) {
+      return t.length >= start.length && new Levenshtein(t.substring(0, start.length), start) < start.length;
+    }).sort(function(a, b) {
       var l = start.length;
-      var tb = (typeof b === "string" ? b : b.text).substring(0,l);
-      var ta = (typeof a === "string" ? a : a.text).substring(0,l);
+      var tb = (typeof b === "string" ? b : b.text).substring(0, l);
+      var ta = (typeof a === "string" ? a : a.text).substring(0, l);
       return (new Levenshtein(ta, start) - new Levenshtein(tb, start));
     });
     return options;
@@ -279,11 +267,11 @@ var modulo = function(zl) {
       }
     }
     // Comprobar que no está la palabra configuracion en el texto hasta el cursor:
-    var config = !(/configuracion|subrutina/gi.test(editor.getValue().substring(0,cur)));
+    var config = !(/configuracion|subrutina/gi.test(editor.getValue().substring(0, cur)));
     if (config) {
       return {
-          tipo: "configuracion",
-          $: c["configuracion"]
+        tipo: "configuracion",
+        $: c["configuracion"]
       }
     } else {
       return {

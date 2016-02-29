@@ -213,7 +213,6 @@ var modulo = function(zl, async) {
         });
       } else {
         main.inicio({});
-        console.log("ayy");
         iniciarSubrutina();
       }
     }`

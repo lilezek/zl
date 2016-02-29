@@ -177,6 +177,32 @@ var modulo = function(zl) {
     return ovalues(this.integraciones);
   }
 
+  Modulo.prototype.arrayDeSubrutinas = function() {
+    var r = [];
+    for (var k in this.subrutinas) {
+      r.push(this.subrutinas[k]);
+    }
+    for (var k in this.integraciones) {
+      for (var k2 in this.integraciones[k].subrutinas) {
+        r.push(this.integraciones[k].subrutinas[k2]);
+      }
+    }
+    return r;
+  }
+
+  Modulo.prototype.arrayDeTipos = function() {
+    var r = [];
+    for (var k in this.tipos) {
+      r.push(this.tipos[k]);
+    }
+    for (var k in this.integraciones) {
+      for (var k2 in this.integraciones[k].tipos) {
+        r.push(this.integraciones[k].tipos[k2]);
+      }
+    }
+    return r;
+  }
+
   function Subrutina(modulo) {
     // Módulo padre
     this.padre = modulo || null;
