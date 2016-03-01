@@ -147,7 +147,8 @@ var modulo = function(zl, async) {
 
   rte.$continuar = true;
   rte.$animStart = null;
-  rte.$siguienteFotograma = function(fotogramacbk) {
+  rte.$siguienteFotograma = function(fotogramacbk, main) {
+    console.log(fotogramacbk, this);
     var self = this;
     if (this.$continuar) {
       requestAnimationFrame(function(timestamp) {
@@ -192,7 +193,7 @@ var modulo = function(zl, async) {
 
   zl.Ejecutar = function(carga) {
     // Preparar la ejecución:
-    var ejecucion = '"use strict";\nvar main = this.new$principalModulo();\nvar self = this;\nfunction iniciarSubrutina() {\n  if (main.subrutina) {\n    self.$abortar = function() {\n      self.$continuar = false;\n    }\n    self.$siguienteFotograma(main.fotograma);\n  } else {\n    self.$alAcabar(null);\n  }\n}\nif (main.inicio) {\n  if (self.$asincrono.inicio) {\n    main.inicio({}, function() {\n      iniciarSubrutina();\n    });\n  } else {\n    main.inicio({});\n    iniciarSubrutina();\n  }\n}else self.$alAcabar();';
+    var ejecucion = '"use strict";\nvar main = this.new$principalModulo();\nvar self = this;\nfunction iniciarFotograma() {\n  if (main.fotograma) {\n    self.$abortar = function() {\n      self.$continuar = false;\n    }\n    self.$siguienteFotograma(self.$impersonar(main.fotograma,main));\n  } else {\n    self.$alAcabar(null);\n  }\n}\nif (main.inicio) {\n  if (self.$asincrono.inicio) {\n    main.inicio({}, function() {\n      iniciarFotograma();\n    });\n  } else {\n    main.inicio({});\n    iniciarFotograma();\n  }\n}else self.$alAcabar();';
 
     // Y Ejecutar
     try {

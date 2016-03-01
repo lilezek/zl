@@ -151,6 +151,7 @@ Datos
   delta es Numero de salida
 Algoritmo
 	/*
+  console.log($in);
   $salida.delta = $in.$delta/1000;
   */
 Fin
