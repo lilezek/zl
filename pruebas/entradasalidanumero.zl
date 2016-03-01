@@ -1,7 +1,11 @@
+Configuracion
+  integrar "bibliotecasZL/basico.zl"
+Fin
+
 Subrutina Inicio
 Datos
   x es Numero
 Algoritmo
-  leerNumero [ mensaje -> x ]
-  mostrarNumero [ mensaje <- x ]
+  leerNumero [ numero -> x ]
+  mostrarNumero [ numero <- x ]
 fin

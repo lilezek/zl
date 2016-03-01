@@ -124,7 +124,7 @@ var modulo = function(zl, async) {
       } else {
         cargarModulo(camino, ensamblados, function(error, compilado) {
           if (error) {
-            done(error);
+            callback(error);
           } else {
             var modulo = compilado.modulo;
             var js = compilado.javascript;
@@ -138,8 +138,8 @@ var modulo = function(zl, async) {
           }
         });
       }
-    }, function() {
-      try {
+    }, function(error) {
+      if (!error) try {
         // Fase 4, obtener el árbol sintáctico de este módulo:
         compilado = zl.sintaxis.arbolCodigo(zlcode, (compilado ? compilado.end : 0));
 
@@ -162,15 +162,14 @@ var modulo = function(zl, async) {
 
         // Fase 9, optimización opcional del código generado por el árbol
         // TODO: sin hacer
-
+      } catch (e) {
+        error = e;
+      } finally {
         // Fase 10, generación del código de salida
-        done(null, {
+        done(error, error ? null : {
           modulo: mod,
           javascript: javascript + zl.javascript.modulo(compilado, mod) + generarConstructorDeModulo(mod)
         });
-      } catch (e) {
-        done(e);
-        return;
       }
     });
   }

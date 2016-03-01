@@ -2,16 +2,6 @@ Configuracion
   integrar "bibliotecasZL/basico.zl"
 Fin
 
-Subrutina Conversora Primitiva NumeroComoTexto
-Datos
-  n es Numero de Entrada
-  t es Texto de Salida
-Algoritmo
-  /*
-  $salida.t = ""+$entrada.n;
-  */
-Fin
-
 Subrutina Inicio
 Datos
   n es Numero
