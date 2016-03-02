@@ -28,8 +28,6 @@
   <script src="zlsintaxis.js"></script>
   <script src="error.js"></script>
   <script src="ejecucion.js"></script>
-  <script src="configuracion.js"></script>
-  <script src="ensamblador.js"></script>
   <script src="sintaxis.js"></script>
   <script src="entorno.js"></script>
   <script src="semantica.js"></script>
@@ -102,16 +100,52 @@ Fin
 
 Subrutina Inicio
 Datos
-
+	acum es Numero Global
 Algoritmo
-
+  acum <- 0
+	fondo [
+	  r <- 255
+	  g <- 255
+	  b <- 255
+	]
+  colorborde [
+    r <- 0
+    g <- 0
+    b <- 0
+  ]
+  grosorborde [
+    grosor <- 3
+  ]
+  linea [
+    pos1x <- 200
+    pos1y <- 500
+    pos2x <- 1100
+    pos2y <- 500
+  ]
 Fin
 
 Subrutina Fotograma
 Datos
-
+	px es Numero
+  acum es Numero Global
+  d es Numero
 Algoritmo
-
+  delta [
+    delta -> d
+  ]
+  acum <- acum + d
+  Si acum >= 0.1 hacer
+    acum <- 0
+    aleatorio [
+	  minimo <- 200
+	  maximo <- 1100
+	  resultado -> px
+    ]
+    punto [
+      posx <- px
+      posy <- 450
+    ]
+  Fin
 Fin</textarea>
     <div class="v divisor"></div>
     <div class="compilation">

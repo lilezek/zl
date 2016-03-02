@@ -130,9 +130,6 @@ var modulo = function(zl, async) {
     }
   };
 
-  rte.$asincrono = {};
-  rte.$configuracion = {};
-
   rte.$error = zl.error;
 
   var requestAnimationFrame;
@@ -150,7 +147,8 @@ var modulo = function(zl, async) {
 
   rte.$continuar = true;
   rte.$animStart = null;
-  rte.$siguienteFotograma = function(fotogramacbk) {
+  rte.$siguienteFotograma = function(fotogramacbk, main) {
+    console.log(fotogramacbk, this);
     var self = this;
     if (this.$continuar) {
       requestAnimationFrame(function(timestamp) {
@@ -180,6 +178,8 @@ var modulo = function(zl, async) {
   zl.Cargar = function(javascript) {
     var carga = zl.writeJson({}, rte);
     carga.$io = zl.io;
+    carga.$asincrono = {};
+    carga.$configuracion = {};
     if (typeof document !== "undefined") {
       carga.$canvas = document.getElementById("canvas");
       carga.$ctx2d = carga.$canvas.getContext("2d");
@@ -191,31 +191,9 @@ var modulo = function(zl, async) {
     return carga;
   }
 
-  zl.Ejecutar = function(carga, errorCallback) {
+  zl.Ejecutar = function(carga) {
     // Preparar la ejecución:
-    var ejecucion = `"use strict";
-    var main = this.new$principalModulo();
-    var self = this;
-    function iniciarSubrutina() {
-      if (main.subrutina) {
-        self.$abortar = function() {
-          self.$continuar = false;
-        }
-        self.$siguienteFotograma(main.fotograma);
-      } else {
-        self.$alAcabar(null);
-      }
-    }
-    if (main.inicio) {
-      if (self.$asincrono.inicio) {
-        main.inicio({}, function() {
-          iniciarSubrutina();
-        });
-      } else {
-        main.inicio({});
-        iniciarSubrutina();
-      }
-    }`
+    var ejecucion = '"use strict";\nvar main = this.new$principalModulo();\nvar self = this;\nfunction iniciarFotograma() {\n  if (main.fotograma) {\n    self.$abortar = function() {\n      self.$continuar = false;\n    }\n    self.$siguienteFotograma(self.$impersonar(main.fotograma,main));\n  } else {\n    self.$alAcabar(null);\n  }\n}\nif (main.inicio) {\n  if (self.$asincrono.inicio) {\n    main.inicio({}, function() {\n      iniciarFotograma();\n    });\n  } else {\n    main.inicio({});\n    iniciarFotograma();\n  }\n}else self.$alAcabar();';
 
     // Y Ejecutar
     try {

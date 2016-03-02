@@ -1,3 +1,7 @@
+Configuracion
+  integrar "bibliotecasZL/basico.zl"
+Fin
+
 Subrutina Set
 Datos
   x es Numero Global
@@ -19,8 +23,8 @@ Datos
   a es Numero
   b es Numero
 Algoritmo
-  leerNumero [ mensaje -> a ]
+  leerNumero [ numero -> a ]
   Set [ n <- a ]
   Get [ n -> b ]
-  mostrarNumero [ mensaje <- b ]
+  mostrarNumero [ numero <- b ]
 Fin
