@@ -30,6 +30,9 @@ var modulo = function(zl) {
     // La serialización para distinguirlo de otro módulo
     this.serial = "";
 
+    // Este Modulo como tipo:
+    this.estetipo = new Tipo(this);
+
     return this;
   }
 
@@ -95,6 +98,10 @@ var modulo = function(zl) {
 
   Modulo.prototype.tipoPorNombre = function(nombre) {
     nombre = nombre.toLowerCase();
+    // Tipo especial EsteTipo:
+    if (nombre === "estemodulo") {
+      return this.estetipo;
+    }
     for (var k in this.tipos) {
       if (this.tipos[k].nombre == nombre)
         return this.tipos[k];
@@ -121,9 +128,8 @@ var modulo = function(zl) {
 
     this.serial = subs.join("#").toLowerCase();
 
-    // Después de serializar, añadir al programa el módulo
-    if (this.padre)
-      this.padre.modulos[this.serial] = this;
+    // Después de serializar, generar el estetipo
+    this.estetipo = new Tipo(this);
   }
 
   Modulo.prototype.rellenarDesdeArbol = function(arbol) {
@@ -141,6 +147,7 @@ var modulo = function(zl) {
         this.subrutinas[sub.nombre] = sub;
       }
     }
+
     this.serializar();
   }
 
@@ -419,7 +426,7 @@ var modulo = function(zl) {
 
   function Tipo(modulo) {
     var self = this;
-    this.padre = modulo;
+    this.modulo = modulo;
     this.nombre = "";
 
     // Métodos:
@@ -439,6 +446,16 @@ var modulo = function(zl) {
 
     // Serialización:
     this.serial = "";
+
+    if (modulo) {
+      this.nombre = this.modulo.configuracion.nombremodulo;
+      this.metodos = this.modulo.subrutinas;
+      for (var k in this.metodos) {
+        if (this.metodos[k].modificadores.conversora);
+          // TODO: añadir conversores.
+      }
+      this.serializar();
+    }
 
     return this;
   }
@@ -485,12 +502,12 @@ var modulo = function(zl) {
   // Recibe un módulo y devuelve el mismo módulo con las transformaciones oportunas.
   var moduloInterno = function(mod) {
     // Tipos básicos:
-    var numero = zl.entorno.newTipo(mod);
-    var booleano = zl.entorno.newTipo(mod);
-    var texto = zl.entorno.newTipo(mod);
-    var letra = zl.entorno.newTipo(mod);
-    var relacion = zl.entorno.newTipo(mod);
-    var lista = zl.entorno.newTipo(mod); {
+    var numero = zl.entorno.newTipo(null);
+    var booleano = zl.entorno.newTipo(null);
+    var texto = zl.entorno.newTipo(null);
+    var letra = zl.entorno.newTipo(null);
+    var relacion = zl.entorno.newTipo(null);
+    var lista = zl.entorno.newTipo(null); {
       zl.writeJson(numero, {
         nombre: "numero",
         opunario: {

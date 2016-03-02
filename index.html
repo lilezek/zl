@@ -85,7 +85,19 @@
 <textarea class="editor" id="editor">Configuracion
   fps <- 60
 	integrar "bibliotecasZL/basico.zl"
-	integrar "bibliotecasZL/canvas.zl"
+  importar "bibliotecasZL/color.zl"
+Fin
+
+Subrutina Primitiva MostrarColor
+Datos
+  c es Color de Entrada
+Algoritmo
+  /*
+  this.$io.outWrite($entrada.c.r + "" +
+    $entrada.c.g + "" +
+    $entrada.c.b + "" +
+  "\n");
+  */
 Fin
 
 Subrutina Inicio

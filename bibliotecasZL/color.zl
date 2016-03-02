@@ -1,3 +1,8 @@
+Configuracion
+  nombreModulo <- "color"
+  integrar "bibliotecasZL/basico.zl"
+Fin
+
 Subrutina Primitiva Inicio
 Datos
   rojo es Numero de Entrada

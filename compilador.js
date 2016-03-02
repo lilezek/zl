@@ -146,24 +146,27 @@ var modulo = function(zl, async) {
         // Fase 5, generar la tabla de símbolos
         // Construir este módulo
         var mod = zl.entorno.newModulo();
-        zl.writeJson(mod.configuracion, configuraciones);
-        mod.rellenarDesdeArbol(compilado);
 
         // Fase 6, introducir las integraciones en el módulo
         for (var i = 0; i < integraciones.length; i++)
           mod.integrar(cacheDeCompilacionesPorCamino[integraciones[i]].modulo);
 
         // Fase 7: introducir los tipos de datos a partir de los importes
-        // TODO: Sin hacer
+        for (var i = 0; i < importes.length; i++)
+          mod.registrarTipo(cacheDeCompilacionesPorCamino[importes[i]].modulo.estetipo);
 
-        // Fase 8, comprobaciones semánticas (tipos compatibles, uso de nombres que
+        // Fase 8: rellenar el módulo a partir del árbol sintáctico
+        zl.writeJson(mod.configuracion, configuraciones);
+        mod.rellenarDesdeArbol(compilado);
+
+        // Fase 9, comprobaciones semánticas (tipos compatibles, uso de nombres que
         // están registrados, etc...).
         zl.semantica.testarModulo(compilado, mod);
 
-        // Fase 9, optimización opcional del código generado por el árbol
+        // Fase 10, optimización opcional del código generado por el árbol
         // TODO: sin hacer
 
-        // Fase 10, generación del código de salida
+        // Fase 11, generación del código de salida
         done(null, {
           modulo: mod,
           javascript: javascript + zl.javascript.modulo(compilado, mod) + generarConstructorDeModulo(mod)
