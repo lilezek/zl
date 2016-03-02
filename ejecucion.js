@@ -148,7 +148,6 @@ var modulo = function(zl, async) {
   rte.$continuar = true;
   rte.$animStart = null;
   rte.$siguienteFotograma = function(fotogramacbk, main) {
-    console.log(fotogramacbk, this);
     var self = this;
     if (this.$continuar) {
       requestAnimationFrame(function(timestamp) {

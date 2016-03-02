@@ -131,40 +131,31 @@ var modulo = function(zl) {
       return e.getTokenAt(cur);
     }
     var contexto = zl.autocompletar.contexto();
-    // Find the token at the cursor
+    // Encontrar el token.
     var cur = editor.getCursor(),
-      token = getToken(editor, cur);
-    if (/\b(?:string|comment)\b/.test(token.type)) return;
-    token.state = CodeMirror.innerMode(editor.getMode(), token.state).state;
+      end = editor.indexFromPos(cur),
+      begin = end-1,
+      t = editor.getValue(),
+      token = "";
 
-    // If it's not a 'word-style' token, ignore the token.
-    if (!/^[\wñ$_]*$/i.test(token.string)) {
-      token = {
-        start: cur.ch,
-        end: cur.ch,
-        string: "",
-        state: token.state,
-        type: token.string == "." ? "property" : null
+    while (/[a-záéíóúñ0-9\.]/i.test(t[begin])) {
+      begin--;
+    } begin++;
+    token = t.substring(begin,end);
+    // Comprobar que no tenga más de un punto, ni que esté compuesto
+    // solo por números:
+    var partes = token.split(".");
+    if (partes.length <= 2 && isNaN(partes[0]) && (!partes[1] || isNaN(partes[1]))) {
+      return {
+        list: getCompletions(token, contexto, options),
+        from: editor.posFromIndex(begin + (partes.length == 2 ? partes[0].length+1 : 0)),
+        to: editor.posFromIndex(end)
       };
-    } else if (token.end > cur.ch) {
-      token.end = cur.ch;
-      token.string = token.string.slice(0, cur.ch - token.start);
-    }
-
-    var tprop = token;
-    // If it is a property, find out what it is a property of.
-    while (tprop.type == "property") {
-      tprop = getToken(editor, Pos(cur.line, tprop.start));
-      if (tprop.string != ".") return;
-      tprop = getToken(editor, Pos(cur.line, tprop.start));
-      // TODO: mejorar el contexto.
-      if (!context) var context = [];
-      context.push(tprop.string);
     }
     return {
-      list: getCompletions(token, context, contexto, options),
-      from: Pos(cur.line, token.start),
-      to: Pos(cur.line, token.end)
+      list: [],
+      from: editor.posFromIndex(begin),
+      to: editor.posFromIndex(end)
     };
   });
 
@@ -204,24 +195,38 @@ var modulo = function(zl) {
     return hint;
   }
 
-  function getCompletions(token, context, contexto, options) {
+  function getCompletions(start, contexto, options) {
     // TODO: Se puede optimizar esto muchísimo.
-    var start = token.string;
+    // TODO: Una vez optimizado, hacer Levenshtein con el principio
+    // y con la palabra completa, y coger una mezcla de los resultados.
     var sub = contexto.subrutina;
     var tipos = [],
-      datos = [],
-      subrutinas = [],
+      datos = Object.keys(sub ? sub.declaraciones : {}),
+      subrutinas = ultimaTabla.arrayDeSubrutinas(),
       keywords = contexto.$.$;
+    // Nombre compuesto:
+    if (sub && start.indexOf(".") > -1) {
+      var r = start.split(".");
+      var dato = sub.declaraciones[r[0].toLowerCase()];
+      if (dato && dato.tipo.modulo) {
+        subrutinas = dato.tipo.modulo.arrayDeSubrutinasPropias();
+        start = r[1];
+        keywords = [];
+        datos = [];
+      }
+    }
     if (contexto.tipo === "datos") {
       tipos = ultimaTabla.arrayDeTipos().map(arr => arr.nombre);
     } else if (contexto.tipo === "algoritmo") {
-      datos = Object.keys(sub ? sub.declaraciones : {});
-      subrutinas = ultimaTabla.arrayDeSubrutinas().map(generarHintSubrutina);
+      subrutinas = subrutinas.map(generarHintSubrutina);
     }
     // TODO: Escoger qué arrays concatenar según el contexto.
     var options = subrutinas.concat(datos).concat(tipos).concat(keywords).filter(function(key) {
+      // Si start es vacío, no filtrar nada:
+      if (!start.length)
+        return true;
       var t = (typeof key === "string" ? key : key.text);
-      return t.length >= start.length && new Levenshtein(t.substring(0, start.length), start) < start.length;
+      return t.length >= start.length && new Levenshtein(t.substring(0, start.length), start) < start.length*0.8;
     }).sort(function(a, b) {
       var l = start.length;
       var tb = (typeof b === "string" ? b : b.text).substring(0, l);

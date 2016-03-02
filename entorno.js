@@ -9,18 +9,33 @@ var modulo = function(zl) {
     this.subrutinas = {};
     this.tipos = {};
     this.globales = {};
+
     this.configuracion = {
       fps: 10,
       precision: 0,
       nombremodulo: "$principal"
     };
 
+    Object.defineProperty(this,"nombre", {
+      get : function() {
+        return this.configuracion.nombremodulo;
+      },
+      set : function(value) {
+        this.configuracion.nombremodulo = value;
+      }
+    });
+
+    Object.defineProperty(this, "interno", {
+      get : function() {
+        return this.nombre === "$internal";
+      }
+    });
+
     this.importes = {
 
     };
 
-    this.integraciones = {
-    };
+    this.integraciones = {};
     if (modInterno)
       this.integraciones.$internal = modInterno;
 
@@ -69,20 +84,14 @@ var modulo = function(zl) {
 
   Modulo.prototype.subrutinaPorNombre = function(nombre) {
     nombre = nombre.toLowerCase();
-    nombre = nombre.split(".");
-    if (nombre.length > 1) {
-      return this.importes[nombre[0]].subrutinaPorNombre(nombre.slice(1, nombre.length).join("."));
-    } else {
-      nombre = nombre[0];
-      for (var k in this.subrutinas) {
-        if (this.subrutinas[k].nombre == nombre)
-          return this.subrutinas[k];
-      }
-      for (var k in this.integraciones) {
-        var r = this.integraciones[k].subrutinaPorNombre(nombre);
-        if (r)
-          return r;
-      }
+    for (var k in this.subrutinas) {
+      if (this.subrutinas[k].nombre == nombre)
+        return this.subrutinas[k];
+    }
+    for (var k in this.integraciones) {
+      var r = this.integraciones[k].subrutinaPorNombre(nombre);
+      if (r)
+        return r;
     }
     return null;
   }
@@ -173,15 +182,18 @@ var modulo = function(zl) {
     this.integraciones[otroModulo.configuracion.nombremodulo] = otroModulo;
   }
 
-  var ovalues = Object.values || function(o) {
+  var ovalues = Object.values || function(o,f) {
     var r = [];
     for (var k in o)
-      r.push(o[k]);
+      if (f(k, o[k]))
+        r.push(o[k]);
     return r;
   }
 
   Modulo.prototype.arrayDeIntegraciones = function() {
-    return ovalues(this.integraciones);
+    return ovalues(this.integraciones, function(k,v) {
+      return !v.interno;
+    });
   }
 
   Modulo.prototype.arrayDeSubrutinas = function() {
@@ -193,6 +205,14 @@ var modulo = function(zl) {
       for (var k2 in this.integraciones[k].subrutinas) {
         r.push(this.integraciones[k].subrutinas[k2]);
       }
+    }
+    return r;
+  }
+
+  Modulo.prototype.arrayDeSubrutinasPropias = function() {
+    var r = [];
+    for (var k in this.subrutinas) {
+      r.push(this.subrutinas[k]);
     }
     return r;
   }
@@ -452,8 +472,9 @@ var modulo = function(zl) {
       this.metodos = this.modulo.subrutinas;
       for (var k in this.metodos) {
         if (this.metodos[k].modificadores.conversora);
-          // TODO: añadir conversores.
+        // TODO: añadir conversores.
       }
+      this.constr = "new"+modulo.nombre+"Modulo";
       this.serializar();
     }
 
@@ -501,178 +522,179 @@ var modulo = function(zl) {
   // El módulo interno contiene las funciones básicas del lenguaje.
   // Recibe un módulo y devuelve el mismo módulo con las transformaciones oportunas.
   var moduloInterno = function(mod) {
-    // Tipos básicos:
-    var numero = zl.entorno.newTipo(null);
-    var booleano = zl.entorno.newTipo(null);
-    var texto = zl.entorno.newTipo(null);
-    var letra = zl.entorno.newTipo(null);
-    var relacion = zl.entorno.newTipo(null);
-    var lista = zl.entorno.newTipo(null); {
-      zl.writeJson(numero, {
-        nombre: "numero",
-        opunario: {
-          '+': {
-            resultado: 'numero'
-          },
-          '-': {
-            resultado: 'numero'
-          }
-        },
-        opbinario: {
-          '>': {
-            'numero': {
-              resultado: 'booleano',
-              alias: ''
-            }
-          },
-          '=': {
-            'numero': {
-              resultado: 'booleano',
-              alias: ''
-            }
-          },
-          '<': {
-            'numero': {
-              resultado: 'booleano',
-              alias: ''
-            }
-          },
-          '<=': {
-            'numero': {
-              resultado: 'booleano',
-              alias: ''
-            }
-          },
-          '>=': {
-            'numero': {
-              resultado: 'booleano',
-              alias: ''
-            }
-          },
-          '+': {
-            'numero': {
-              resultado: 'numero',
-              alias: ''
-            }
-          },
-          '-': {
-            'numero': {
-              resultado: 'numero',
-              alias: ''
-            }
-          },
-          '*': {
-            'numero': {
-              resultado: 'numero',
-              alias: ''
+      // Tipos básicos:
+      var numero = zl.entorno.newTipo(null);
+      var booleano = zl.entorno.newTipo(null);
+      var texto = zl.entorno.newTipo(null);
+      var letra = zl.entorno.newTipo(null);
+      var relacion = zl.entorno.newTipo(null);
+      var lista = zl.entorno.newTipo(null); {
+        zl.writeJson(numero, {
+          nombre: "numero",
+          opunario: {
+            '+': {
+              resultado: 'numero'
             },
-            'texto': {
-              resultado: 'texto',
-              alias: 'productoTexto'
+            '-': {
+              resultado: 'numero'
             }
           },
-          '/': {
-            'numero': {
-              resultado: 'numero',
-              alias: ''
-            }
-          },
-          '%': {
-            'numero': {
-              resultado: 'numero',
-              alias: ''
+          opbinario: {
+            '>': {
+              'numero': {
+                resultado: 'booleano',
+                alias: ''
+              }
+            },
+            '=': {
+              'numero': {
+                resultado: 'booleano',
+                alias: ''
+              }
+            },
+            '<': {
+              'numero': {
+                resultado: 'booleano',
+                alias: ''
+              }
+            },
+            '<=': {
+              'numero': {
+                resultado: 'booleano',
+                alias: ''
+              }
+            },
+            '>=': {
+              'numero': {
+                resultado: 'booleano',
+                alias: ''
+              }
+            },
+            '+': {
+              'numero': {
+                resultado: 'numero',
+                alias: ''
+              }
+            },
+            '-': {
+              'numero': {
+                resultado: 'numero',
+                alias: ''
+              }
+            },
+            '*': {
+              'numero': {
+                resultado: 'numero',
+                alias: ''
+              },
+              'texto': {
+                resultado: 'texto',
+                alias: 'productoTexto'
+              }
+            },
+            '/': {
+              'numero': {
+                resultado: 'numero',
+                alias: ''
+              }
+            },
+            '%': {
+              'numero': {
+                resultado: 'numero',
+                alias: ''
+              }
             }
           }
-        }
-      });
+        });
 
-      zl.writeJson(booleano, {
-        nombre: "booleano",
-        opunario: {
-          'no': {
-            resultado: 'booleano',
-            alias: ''
-          }
-        },
-        opbinario: {
-          'o': {
-            'booleano': {
+        zl.writeJson(booleano, {
+          nombre: "booleano",
+          opunario: {
+            'no': {
               resultado: 'booleano',
               alias: ''
             }
           },
-          'y': {
-            'booleano': {
-              resultado: 'booleano',
-              alias: ''
+          opbinario: {
+            'o': {
+              'booleano': {
+                resultado: 'booleano',
+                alias: ''
+              }
+            },
+            'y': {
+              'booleano': {
+                resultado: 'booleano',
+                alias: ''
+              }
             }
           }
-        }
-      });
+        });
 
-      zl.writeJson(texto, {
-        nombre: "texto",
-        opbinario: {
-          '=': {
-            'texto': {
-              resultado: 'booleano',
-              alias: ''
-            }
-          },
-          '+': {
-            'texto': {
-              resultado: 'texto',
-              alias: ''
-            }
-          },
-          '*': {
-            'numero': {
-              resultado: 'texto',
-              alias: 'productoTexto'
+        zl.writeJson(texto, {
+          nombre: "texto",
+          opbinario: {
+            '=': {
+              'texto': {
+                resultado: 'booleano',
+                alias: ''
+              }
+            },
+            '+': {
+              'texto': {
+                resultado: 'texto',
+                alias: ''
+              }
+            },
+            '*': {
+              'numero': {
+                resultado: 'texto',
+                alias: 'productoTexto'
+              }
             }
           }
-        }
-      });
+        });
 
-      zl.writeJson(letra, {
-        nombre: "letra",
-        opbinario: {
-          '=': {
-            'letra': {
-              resultado: 'booleano',
-              alias: ''
-            }
-          },
-        }
-      });
+        zl.writeJson(letra, {
+          nombre: "letra",
+          opbinario: {
+            '=': {
+              'letra': {
+                resultado: 'booleano',
+                alias: ''
+              }
+            },
+          }
+        });
 
-      zl.writeJson(lista, {
-        nombre: "lista",
-        constr: "construirLista"
-      });
+        zl.writeJson(lista, {
+          nombre: "lista",
+          constr: "construirLista"
+        });
 
-      zl.writeJson(relacion, {
-        nombre: "relacion"
-      });
+        zl.writeJson(relacion, {
+          nombre: "relacion"
+        });
 
-      numero.serializar();
-      booleano.serializar();
-      texto.serializar();
+        numero.serializar();
+        booleano.serializar();
+        texto.serializar();
 
-      mod.registrar(numero);
-      mod.registrar(booleano);
-      mod.registrar(texto);
-      mod.registrar(letra);
-      mod.registrar(relacion);
-      mod.registrar(lista);
+        mod.registrar(numero);
+        mod.registrar(booleano);
+        mod.registrar(texto);
+        mod.registrar(letra);
+        mod.registrar(relacion);
+        mod.registrar(lista);
+      }
+
+      // TODO: acabar el módulo
+      mod.serializar();
+      return mod;
     }
-
-    // TODO: acabar el módulo
-    mod.serializar();
-    return mod;
-  }
-  // Módulo interno
+    // Módulo interno
   modInterno = moduloInterno(new Modulo());
+  modInterno.nombre = "$internal";
   return zl;
 }
 

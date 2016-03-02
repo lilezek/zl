@@ -15,13 +15,13 @@ Datos
   a es Numero Global
 Algoritmo
   /*
-  $global.r = $entrada.rojo;
-  $global.g = $entrada.verde;
-  $global.b = $entrada.azul;
-  if ($entrada.opacidad % 1 && $entrada.opacidad <= 1) {
-    $global.a = $entrada.opacidad;
+  this.$miembros.r = $entrada.rojo;
+  this.$miembros.g = $entrada.verde;
+  this.$miembros.b = $entrada.azul;
+  if ($entrada.opacidad <= 1) {
+    this.$miembros.a = $entrada.opacidad;
   } else {
-    $global.a = $entrada.opacidad / 256;
+    this.$miembros.a = $entrada.opacidad / 0xFF;
   }
   */
 Fin

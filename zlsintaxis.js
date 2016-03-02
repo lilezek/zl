@@ -35,9 +35,9 @@ var modulo = function(zl) {
   var a = zl.sintaxis.zlAnalizador = zl.analizador.newAnalizador();
   a.simbolo("<-");
   a.simbolo(".", /^\./);
-  a.simbolo("no");
-  a.simbolo("y");
-  a.simbolo("o");
+  a.simbolo("no",/^no[^a-záéíóúñ0-9]/i);
+  a.simbolo("y",/^y[^a-záéíóúñ0-9]/i);
+  a.simbolo("o",/^o[^a-záéíóúñ0-9]/i);
   a.simbolo("<");
   a.simbolo(">");
   a.simbolo("<=");
@@ -87,7 +87,7 @@ var modulo = function(zl) {
   a.token("decimal", /^(\d+\.\d+)/i, 5);
   a.token("texto", /^\"([^"\\]|\\.|\\\n)*\"/i, 6);
   a.token("letra", /^\'([^'\\]|\\.|\\\n)*\'/i, 7);
-  a.token("nombreSimple", /^([A-Za-záéíóúÁÉÍÓÚñÑ][A-Za-záéíóúÁÉÍÓÚñÑ0-9]*)/, 8);
+  a.token("nombreSimple", /^([a-záéíóúñ][a-záéíóúñ0-9]*)/i, 8);
 
 
   // Y Las reglas:

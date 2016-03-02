@@ -112,15 +112,22 @@ var modulo = function(zl) {
 
   function testarLlamada(arbol, sub) {
     var modulo = sub.padre;
-    // TODO: Acabar esta función
     var n = arbol.nombre;
+    // El módulo no siempre es sub.padre,
+    // sino que puede ser otro módulo:
+    if (n.indexOf('.') > -1) {
+      // TODO: comprobar si el tipo es primitivo.
+      // TODO: comprobar si el nombre no existe.
+      // TODO: comprobar si la subrutina es interna.
+      var r = n.split('.');
+      n = r[1];
+      modulo = sub.declaraciones[r[0].toLowerCase()].tipo.modulo;
+    }
     var llamada = modulo.subrutinaPorNombre(n);
     if (!llamada)
       throw zl.error.newError(zl.error.E_LLAMADA_NOMBRE_NO_ENCONTRADO, {
         arbol: arbol,
-        tabla: Object.keys(modulo.subrutinas).concat(
-          (modulo.moduloInterno ? Object.keys(modulo.moduloInterno.subrutinas) : [])
-        )
+        tabla: modulo.arrayDeSubrutinas()
       });
     for (var k in arbol.entrada) {
       var decl = arbol.entrada[k];

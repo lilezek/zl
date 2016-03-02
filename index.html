@@ -91,61 +91,26 @@ Datos
   c es Color de Entrada
 Algoritmo
   /*
-  this.$io.outWrite($entrada.c.r + "" +
-    $entrada.c.g + "" +
-    $entrada.c.b + "" +
-  "\n");
+  $in.$io.outWrite("r:" + $entrada.c.$miembros.r + " g:" +
+    $entrada.c.$miembros.g + " b:" +
+    $entrada.c.$miembros.b + " a:" +
+    $entrada.c.$miembros.a + "\n");
   */
 Fin
 
 Subrutina Inicio
 Datos
-	acum es Numero Global
+	c es Color
 Algoritmo
-  acum <- 0
-	fondo [
-	  r <- 255
-	  g <- 255
-	  b <- 255
-	]
-  colorborde [
-    r <- 0
-    g <- 0
-    b <- 0
+	c.inicio [
+  	rojo <- 255
+    verde <- 255
+    azul <- 255
+    opacidad <- 255
   ]
-  grosorborde [
-    grosor <- 3
+  mostrarcolor [
+    c <- c
   ]
-  linea [
-    pos1x <- 200
-    pos1y <- 500
-    pos2x <- 1100
-    pos2y <- 500
-  ]
-Fin
-
-Subrutina Fotograma
-Datos
-	px es Numero
-  acum es Numero Global
-  d es Numero
-Algoritmo
-  delta [
-    delta -> d
-  ]
-  acum <- acum + d
-  Si acum >= 0.1 hacer
-    acum <- 0
-    aleatorio [
-	  minimo <- 200
-	  maximo <- 1100
-	  resultado -> px
-    ]
-    punto [
-      posx <- px
-      posy <- 450
-    ]
-  Fin
 Fin</textarea>
     <div class="v divisor"></div>
     <div class="compilation">
