@@ -131,6 +131,7 @@ var modulo = function(zl, async) {
   };
 
   rte.$error = zl.error;
+  rte.$colores = zl.tablaColores;
 
   var requestAnimationFrame;
   if (typeof window !== "undefined") {
@@ -192,7 +193,7 @@ var modulo = function(zl, async) {
 
   zl.Ejecutar = function(carga) {
     // Preparar la ejecución:
-    var ejecucion = '"use strict";\nvar main = this.new$principalModulo();\nvar self = this;\nfunction iniciarFotograma() {\n  if (main.fotograma) {\n    self.$abortar = function() {\n      self.$continuar = false;\n    }\n    self.$siguienteFotograma(self.$impersonar(main.fotograma,main));\n  } else {\n    self.$alAcabar(null);\n  }\n}\nif (main.inicio) {\n  if (self.$asincrono.inicio) {\n    main.inicio({}, function() {\n      iniciarFotograma();\n    });\n  } else {\n    main.inicio({});\n    iniciarFotograma();\n  }\n}else self.$alAcabar();';
+    var ejecucion = '"use strict";\nvar main = new this.$principal(this);\nvar self = this;\nfunction iniciarFotograma() {\n  if (main.fotograma) {\n    self.$abortar = function() {\n      self.$continuar = false;\n    }\n    self.$siguienteFotograma(self.$impersonar(main.fotograma,main));\n  } else {\n    self.$alAcabar(null);\n  }\n}\nif (main.inicio) {\n  if (self.$asincrono.inicio) {\n    main.inicio({}, function() {\n      iniciarFotograma();\n    });\n  } else {\n    main.inicio({});\n    iniciarFotograma();\n  }\n}else self.$alAcabar();';
 
     // Y Ejecutar
     try {

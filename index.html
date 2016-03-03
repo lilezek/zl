@@ -91,7 +91,7 @@ Datos
   c es Color de Entrada
 Algoritmo
   /*
-  $in.$io.outWrite("r:" + $entrada.c.$miembros.r + " g:" +
+  $exterior.$io.outWrite("r:" + $entrada.c.$miembros.r + " g:" +
     $entrada.c.$miembros.g + " b:" +
     $entrada.c.$miembros.b + " a:" +
     $entrada.c.$miembros.a + "\n");
@@ -101,17 +101,15 @@ Fin
 Subrutina Inicio
 Datos
 	c es Color
+  t es Texto
 Algoritmo
-	c.inicio [
-  	rojo <- 255
-    verde <- 255
-    azul <- 255
-    opacidad <- 255
-  ]
+  t <- "rojo"
+	c <- t como Color
   mostrarcolor [
     c <- c
   ]
-Fin</textarea>
+Fin
+</textarea>
     <div class="v divisor"></div>
     <div class="compilation">
       <div class="visual minimized" onclick="return visualRestore(event,this);">

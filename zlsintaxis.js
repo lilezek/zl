@@ -500,6 +500,7 @@ var modulo = function(zl) {
       ["verdadero"],
       ["falso"],
       ["nombre", "(", "listaAcceso", ")"],
+      // TODO: No forzar a que sea un nombre
       ["nombre", "como", "nombre"],
       ["nombre"],
       ["(", "expresion", ")"],

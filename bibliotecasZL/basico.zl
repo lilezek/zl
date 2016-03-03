@@ -4,7 +4,7 @@ Fin
 
 /*
   biblioteca básica de ZL.
-  Para funcionar, hace falta que $in.$delta se actualice
+  Para funcionar, hace falta que $exterior.$delta se actualice
   cada fotograma con el delta de tiempo entre fotograma y fotograma.
 */
 
@@ -19,7 +19,7 @@ Datos
   mensaje es Texto de Entrada
 Algoritmo
   /*
-  $in.$io.outWrite($entrada.mensaje+"\n");
+  $exterior.$io.outWrite($entrada.mensaje+"\n");
   */
 Fin
 
@@ -28,7 +28,7 @@ Datos
   numero es Numero de Entrada
 Algoritmo
   /*
-  $in.$io.outWrite($in.$precision($entrada.numero)+"\n");
+  $exterior.$io.outWrite($exterior.$precision($entrada.numero)+"\n");
   */
 Fin
 
@@ -37,11 +37,11 @@ Datos
   mensaje es Texto de Salida
 Algoritmo
   /*
-  if ($in.$continuar) {
-    var oldabortar = $in.$abortar;
-    var self = $in;
-    $in.$abortar = $in.$io.abortRead;
-    $in.$io.inRead(function(err, value) {
+  if ($exterior.$continuar) {
+    var oldabortar = $exterior.$abortar;
+    var self = $exterior;
+    $exterior.$abortar = $exterior.$io.abortRead;
+    $exterior.$io.inRead(function(err, value) {
       self.$abortar = oldabortar;
       done(null, {
         mensaje: value
@@ -56,14 +56,14 @@ Datos
   numero es Numero de Salida
 Algoritmo
   /*
-  if ($in.$continuar) {
-    var oldabortar = $in.$abortar;
-    var self = $in;
-    $in.$abortar = $in.$io.abortRead;
-    $in.$io.inRead(function cbck(err, value) {
+  if ($exterior.$continuar) {
+    var oldabortar = $exterior.$abortar;
+    var self = $exterior;
+    $exterior.$abortar = $exterior.$io.abortRead;
+    $exterior.$io.inRead(function cbck(err, value) {
       var x = parseFloat(value);
       if (isNaN(x))
-        $in.$io.inRead(cbck);
+        $exterior.$io.inRead(cbck);
       else {
         self.$abortar = oldabortar;
         done(null, {
@@ -97,7 +97,7 @@ rte.leernumero = function(arg, callback) {
 }
 
 rte.leer = function(arg, callback) {
-  if ($in.$continuar) {
+  if ($exterior.$continuar) {
     var oldabortar = this.$abortar;
     var self = this;
     this.$abortar = zl.io.abortRead;
@@ -151,8 +151,7 @@ Datos
   delta es Numero de salida
 Algoritmo
 	/*
-  console.log($in);
-  $salida.delta = $in.$delta/1000;
+  $salida.delta = $exterior.$delta/1000;
   */
 Fin
 
@@ -242,7 +241,7 @@ Datos
 Algoritmo
   /*
   if (isNaN($entrada.t)) {
-  	$in.$alError($in.$error.newError($in.$error.E_EJECUCION_CONVERSION_INVALIDA, {
+  	$exterior.$alError($exterior.$error.newError($exterior.$error.E_EJECUCION_CONVERSION_INVALIDA, {
     		tipoBase: "texto",
         tipoObjetivo: "numero",
        	valor: $entrada.t,

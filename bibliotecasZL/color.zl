@@ -32,27 +32,21 @@ Datos
   c es EsteModulo de Salida
 Algoritmo
   /*
-  $salida.c = $out.instancia();
+  $salida.c = new $exterior.color($exterior);
   var x = $entrada.t.toLowerCase();
-  if (x === "rojo") {
+  if (x in $exterior.$colores) {
     $salida.c.inicio({
-      rojo: 255,
-      verde: 0,
-      azul: 0,
+      rojo: $exterior.$colores[x].r,
+      verde: $exterior.$colores[x].g,
+      azul: $exterior.$colores[x].b,
       opacidad: 1
     });
-  } else if (x === "verde") {
+  } else if ((x + " 1") in $exterior.$colores) {
+    x = x + " 1";
     $salida.c.inicio({
-      rojo: 0,
-      verde: 255,
-      azul: 0,
-      opacidad: 1
-    });
-  } else if (x === "azul") {
-    $salida.c.inicio({
-      rojo: 0,
-      verde: 0,
-      azul: 255,
+      rojo: $exterior.$colores[x].r,
+      verde: $exterior.$colores[x].g,
+      azul: $exterior.$colores[x].b,
       opacidad: 1
     });
   }

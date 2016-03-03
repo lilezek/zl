@@ -35,32 +35,6 @@ var modulo = function(zl, async) {
     }
   }
 
-  // TODO: Esta funcionalidad no debería estar aquí. Debería estar en javascript.js
-  function generarIntegradoJavascript(moduloIntegrado) {
-    var nombre = moduloIntegrado.configuracion.nombremodulo;
-    return "var tmp" + nombre + "=new " + nombre + "Modulo(this);" +
-      "this.$writeJson(r,tmp" + nombre + ")";
-  }
-
-  // Esta functión, de momento, no necesita hacer nada.
-  function generarImporteJavascript(moduloImportado) {
-    return "";
-  }
-
-  function generarConstructorDeModulo(modulo) {
-    var nombre = modulo.configuracion.nombremodulo;
-    var resultado = "this.new" + nombre + "Modulo = function(){\"use strict\";" +
-      "var r = new " + nombre + "Modulo(this);";
-    var integraciones = modulo.arrayDeIntegraciones();
-    for (var i = 0; i < integraciones.length; i++) {
-      resultado += generarIntegradoJavascript(integraciones[i]) + ";";
-    }
-    resultado += "r.instancia = this.new" + nombre + "Modulo;" +
-      "return r;" +
-      "};";
-    return resultado;
-  }
-
   var cacheDeCompilacionesPorCamino = {};
   var cacheDeCompilacionesPorNombre = {};
 
@@ -172,7 +146,7 @@ var modulo = function(zl, async) {
         // Fase 11, generación del código de salida
       done(error, error ? null : {
         modulo: mod,
-        javascript: javascript + zl.javascript.modulo(compilado, mod) + generarConstructorDeModulo(mod)
+        javascript: javascript + zl.javascript.modulo(compilado, mod)
       });
     });
   }

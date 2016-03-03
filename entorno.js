@@ -468,13 +468,22 @@ var modulo = function(zl) {
     this.serial = "";
 
     if (modulo) {
-      this.nombre = this.modulo.configuracion.nombremodulo;
+      // El nombre dependa directamente del modulo:
+      delete this.nombre;
+      Object.defineProperty(this, "nombre", {
+        get: function() {
+          return this.modulo.configuracion.nombremodulo;
+        },
+        set: function(value) {
+          this.modulo.configuracion.nombremodulo = value;
+        }
+      })
       this.metodos = this.modulo.subrutinas;
       for (var k in this.metodos) {
         if (this.metodos[k].modificadores.conversora);
         // TODO: añadir conversores.
       }
-      this.constr = "new"+modulo.nombre+"Modulo";
+      this.constr = modulo.nombre;
       this.serializar();
     }
 
