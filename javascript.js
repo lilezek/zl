@@ -60,14 +60,14 @@ var modulo = function(zl) {
     }
 
     if (simbolo.modificadores.asincrona && !simbolo.modificadores.primitiva) {
-      resultado += zl.javascript.nombre(compilado.nombre, simbolo) + "=function($entrada, done){var $salida={};var $local={};" +
+      resultado += zl.javascript.nombre(compilado.nombre, simbolo) + "=function($entrada, done){var $self = this; var $salida={};var $local={};" +
         zl.javascript.datos(compilado.datos, simbolo.declaraciones) +
         "$in.async.waterfall([function(c){c(null,null);}," +
         "function(arg,done){$salida={};" +
         sentencias +
         "done(null, $salida);}],done);";
     } else {
-      resultado += zl.javascript.nombre(compilado.nombre, simbolo) + "=function($entrada, done){var $salida={};var $local={};" +
+      resultado += zl.javascript.nombre(compilado.nombre, simbolo) + "=function($entrada, done){var $self = this; var $salida={};var $local={};" +
         zl.javascript.datos(compilado.datos, simbolo.declaraciones) +
         sentencias +
         "return $salida;";
@@ -124,7 +124,7 @@ var modulo = function(zl) {
     } else if (compilado.tipo == "sicondicional") {
       resultado = zl.javascript.sicondicional(compilado, simbolo);
     } else if (compilado.tipo == "pausar") {
-      resultado = "done(null,$salida);}, function(arg, done) {done(null, $local, this.$miembros, $entrada, $salida," +
+      resultado = "done(null,$salida);}, function(arg, done) {done(null, $local, $self.$miembros, $entrada, $salida," +
         ((compilado.begin + compilado.end) / 2) +
         ");}, $in.$impersonar($in.$pausar,$in), function(arg,done){";
     }
@@ -142,15 +142,15 @@ var modulo = function(zl) {
       nombre = zl.javascript.datoprefijo(dato, simbolo) + nombre;
     }
     else if (!sub.modificadores.interna)
-      nombre = "this." + nombre;
+      nombre = "$self." + nombre;
     if (compilado.asincrono)
       return ";done(null," + zl.javascript.llamadaEntrada(compilado.entrada, simbolo) + ");}," +
-        "$in.$impersonar(" + nombre + ", this)" +
+        "$in.$impersonar(" + nombre + ", $self)" +
         ",function(arg,done) {$salida=arg;" +
         zl.javascript.llamadaSalida(compilado.salida, simbolo);
     else
       return "$salida=" + nombre + "(" +
-        zl.javascript.llamadaEntrada(compilado.entrada, simbolo) + ")" +
+        zl.javascript.llamadaEntrada(compilado.entrada, simbolo) + ");" +
         zl.javascript.llamadaSalida(compilado.salida, simbolo);
   }
 
@@ -283,7 +283,7 @@ var modulo = function(zl) {
       var alias = tipoizq.opbinario[compilado.op][tipoder.nombre].alias;
       // TODO: poner el módulo antes del alias correctamente.
       if (alias.length > 0) {
-        return "this." + alias + "({izq:" + izq + ",der:" + der + "})"
+        return "$self." + alias + "({izq:" + izq + ",der:" + der + "})"
       }
       return izq + " " + operador + " " + der;
     } else if (compilado.der && operador) {
