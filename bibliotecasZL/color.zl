@@ -32,6 +32,7 @@ Datos
   c es EsteModulo de Salida
 Algoritmo
   /*
+  console.log($exterior.$colores);
   $salida.c = new $exterior.color($exterior);
   var x = $entrada.t.toLowerCase();
   if (x in $exterior.$colores) {

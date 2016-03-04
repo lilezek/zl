@@ -38,24 +38,26 @@ var modulo = function(zl) {
     var colocarCursor;
     str = str.replace(/%condicion%/g, "verdadero")
       .replace(/%indent%/g, indentUnit)
-      .replace(/%([a-z0-9ñ]+)&numero%/g, function(match, p1) {
+      .replace(/%([a-z0-9ñáéíóú]+)&numero%/ig, function(match, p1) {
         return emparejarDatoPorTipo(contexto.subrutina, "numero", p1, "3");
       })
-      .replace(/%([a-z0-9ñ]+)&booleano%/g, function(match, p1) {
+      .replace(/%([a-z0-9ñáéíóú]+)&booleano%/ig, function(match, p1) {
         return emparejarDatoPorTipo(contexto.subrutina, "booleano", p1, "verdadero");
       })
       .replace(/%codigo%/g, "// Código aquí")
-      .replace(/%([a-z0-9ñ]+)&texto%/g, function(match, p1) {
+      .replace(/%([a-z0-9ñáéíóú]+)&texto%/ig, function(match, p1) {
         return emparejarDatoPorTipo(contexto.subrutina, "texto", p1, "\"\"");
       })
+      .replace(/%([a-z0-9ñáéíóú]+)&([a-z0-9ñáéíóú]+)%/ig, function(match, p1, p2){
+        return emparejarDatoPorTipo(contexto.subrutina, p2, p1, p2);
+      })
       .replace(/%nombre%/g, "Nombre")
-      .replace(/%dato&([a-z0-9ñ]+)&([a-z0-9ñ]+)%/ig, function(match, p1, p2) {
+      .replace(/%dato&([a-z0-9ñáéíóú]+)&([a-z0-9ñáéíóú]+)%/ig, function(match, p1, p2) {
         return emparejarDatoPorTipo(contexto.subrutina, p2, p1, p1);
       })
       .replace(/\n/g, "\n" + lineaIndent)
       .replace("_", function(match, offset) {
         colocarCursor = offset;
-        console.log(offset);
         return "";
       });
 
