@@ -56,11 +56,11 @@ Algoritmo
 		$exterior.$ctx2d.bezierCurveTo(xm - ox, ye, x, ym + oy, x, ym);
 	}
 	$exterior.$ctx2d.closePath();
-  if ($global.$estiloRelleno) {
+  if ($self.$miembros.$estiloRelleno) {
     //$exterior.$ctx2d.globalAlpha = fillAlpha;
     $exterior.$ctx2d.fill();
   }
-  if ($global.$estiloBordes) {
+  if ($self.$miembros.$estiloBordes) {
     //$exterior.$ctx2d.globalAlpha = strokeAlpha;
     $exterior.$ctx2d.stroke();
   }
@@ -81,11 +81,11 @@ Algoritmo
   $exterior.$ctx2d.beginPath();
   $exterior.$ctx2d.rect($entrada.posx,$entrada.posy,w,h);
   $exterior.$ctx2d.closePath();
-  if ($global.$estiloRelleno) {
+  if ($self.$miembros.$estiloRelleno) {
     //$exterior.$ctx2d.globalAlpha = fillAlpha;
     $exterior.$ctx2d.fill();
   }
-  if ($global.$estiloBordes) {
+  if ($self.$miembros.$estiloBordes) {
     //$exterior.$ctx2d.globalAlpha = strokeAlpha;
     $exterior.$ctx2d.stroke();
   }
@@ -101,7 +101,8 @@ Datos
 Algoritmo
   /*
   $exterior.$ctx2d.fillStyle = "rgb("+~~$entrada.r+","+~~$entrada.g+","+~~$entrada.b+")";
-  $global.$estiloRelleno = {
+  console.log($self, $self.$miembros);
+  $self.$miembros.$estiloRelleno = {
     r: $entrada.r,
     g: $entrada.g,
     b: $entrada.b
@@ -114,8 +115,8 @@ Datos
 	grosor es Numero de Entrada
 Algoritmo
 	/*
-  $global.$grosorLinea = $entrada.grosor >= 0 ? $entrada.grosor : 0;
-	$exterior.$ctx2d.lineWidth = $global.$grosorLinea;
+  $self.$miembros.$grosorLinea = $entrada.grosor >= 0 ? $entrada.grosor : 0;
+	$exterior.$ctx2d.lineWidth = $self.$miembros.$grosorLinea;
   */
 Fin
 
@@ -126,8 +127,8 @@ Datos
   b es Numero de entrada
 Algoritmo
   /*
-	$global.$estiloBordes = "rgb(" + $entrada.r + "," + $entrada.g + "," + $entrada.b + ")";
-	$exterior.$ctx2d.strokeStyle = $global.$estiloBordes;
+	$self.$miembros.$estiloBordes = "rgb(" + $entrada.r + "," + $entrada.g + "," + $entrada.b + ")";
+	$exterior.$ctx2d.strokeStyle = $self.$miembros.$estiloBordes;
 	//strokeAlpha = parseFloat(a);
   */
 Fin
@@ -137,7 +138,7 @@ Datos
 
 Algoritmo
 	/*
-  delete $global.$estiloRelleno;
+  delete $self.$miembros.$estiloRelleno;
   */
 Fin
 
@@ -146,7 +147,7 @@ Datos
 
 Algoritmo
 	/*
-  delete $global.$estiloBordes;
+  delete $self.$miembros.$estiloBordes;
   */
 Fin
 
@@ -176,7 +177,7 @@ Algoritmo
   ctx.moveTo($entrada.pos1x, $entrada.pos1y);
   ctx.lineTo($entrada.pos2x, $entrada.pos2y);
   ctx.closePath();
-  if ($global.$estiloBordes) {
+  if ($self.$miembros.$estiloBordes) {
     //ctx.globalAlpha = strokeAlpha;
     ctx.stroke();
   }
@@ -189,12 +190,12 @@ Datos
   posy es Numero de Entrada
 Algoritmo
   /*
-  if ($global.$estiloBordes){
+  if ($self.$miembros.$estiloBordes){
     $exterior.$ctx2d.beginPath();
-    $exterior.$ctx2d.fillStyle = $global.$estiloBordes;
-    $exterior.$ctx2d.arc($entrada.posx, $entrada.posy, $global.$grosorLinea / 2, 0, 6.283185307179586, false);
+    $exterior.$ctx2d.fillStyle = $self.$miembros.$estiloBordes;
+    $exterior.$ctx2d.arc($entrada.posx, $entrada.posy, $self.$miembros.$grosorLinea / 2, 0, 6.283185307179586, false);
     $exterior.$ctx2d.fill();
-    $exterior.$ctx2d.fillStyle = $global.$estiloRelleno;
+    $exterior.$ctx2d.fillStyle = $self.$miembros.$estiloRelleno;
     $exterior.$ctx2d.closePath();
   }
   */
@@ -216,11 +217,11 @@ Algoritmo
   $exterior.$ctx2d.lineTo($entrada.pos3x,$entrada.pos3y);
   $exterior.$ctx2d.lineTo($entrada.pos1x,$entrada.pos1y);
   $exterior.$ctx2d.closePath();
-  if ($global.$estiloRelleno !== null) {
+  if ($self.$miembros.$estiloRelleno !== null) {
     //$exterior.$ctx2d.globalAlpha = fillAlpha;
     $exterior.$ctx2d.fill();
   }
-  if ($global.$estiloBordes !== null) {
+  if ($self.$miembros.$estiloBordes !== null) {
     //$exterior.$ctx2d.globalAlpha = strokeAlpha;
     $exterior.$ctx2d.stroke();
   }
@@ -234,7 +235,7 @@ Datos
   posy es Numero de Entrada
 Algoritmo
   /*
-  if ($global.$estiloRelleno !== null) {
+  if ($self.$miembros.$estiloRelleno !== null) {
     //$exterior.$ctx2d.globalAlpha = fillAlpha;
     $exterior.$ctx2d.fillText($entrada.mensaje,$entrada.posx,$entrada.posy);
   }
@@ -256,7 +257,7 @@ Datos
   tamaño es Numero de Entrada
 Algoritmo
   /*
-  $exterior.$ctx2d.font = $global.$estiloFuente = "normal "+$entrada.tamaño+"pt arial";
+  $exterior.$ctx2d.font = $self.$miembros.$estiloFuente = "normal "+$entrada.tamaño+"pt arial";
   */
 Fin
 
@@ -270,8 +271,8 @@ Datos
 Algoritmo
   /*
   // TODO: crear la caché fuera de esta subrutina
-  $global.$cacheDeImagenes = $global.$cacheDeImagenes || {};
-  var img = $global.$cacheDeImagenes[$entrada.url];
+  $self.$miembros.$cacheDeImagenes = $self.$miembros.$cacheDeImagenes || {};
+  var img = $self.$miembros.$cacheDeImagenes[$entrada.url];
   if (img && img.ready) {
     $exterior.$ctx2d.drawImage(img, $entrada.posx, $entrada.posy, $entrada.ancho, $entrada.alto);
     done(null, {});

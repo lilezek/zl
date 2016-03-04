@@ -83,33 +83,68 @@
 <textarea class="editor" id="editor">Configuracion
   fps <- 60
 	integrar "bibliotecasZL/basico.zl"
+  integrar "bibliotecasZL/canvas.zl"
   importar "bibliotecasZL/color.zl"
 Fin
 
-Subrutina Primitiva MostrarColor
+Subrutina Primitiva FondoColor
 Datos
-  c es Color de Entrada
+  fondo es Color de Entrada
 Algoritmo
   /*
-  $exterior.$io.outWrite("r:" + $entrada.c.$miembros.r + " g:" +
-    $entrada.c.$miembros.g + " b:" +
-    $entrada.c.$miembros.b + " a:" +
-    $entrada.c.$miembros.a + "\n");
+  $exterior.canvasPrototipo.fondo($entrada.fondo.$miembros);
+  */
+Fin
+
+Subrutina Primitiva CirculoColor
+Datos
+  circulo es Color de Entrada
+  centrox es Numero de Entrada
+  centroy es Numero de Entrada
+  radio es Numero de Entrada
+Algoritmo
+  /*
+  $exterior.canvasPrototipo.colorrelleno.call($self,$entrada.circulo.$miembros);
+  $exterior.canvasPrototipo.elipse.call($self, {
+  	centrox: $entrada.centrox,
+    centroy: $entrada.centroy,
+    ancho: $entrada.radio,
+    alto: $entrada.radio
+  });
   */
 Fin
 
 Subrutina Inicio
 Datos
-	c es Color
-  t es Texto
 Algoritmo
-  t <- "rojo"
-	c <- t como Color
-  mostrarcolor [
-    c <- c
-  ]
 Fin
-</textarea>
+
+Subrutina Fotograma
+Datos
+	fondo es Color
+  circulo es Color
+  t es Texto
+  px es Numero
+  py es Numero
+Algoritmo
+  t <- "blanco"
+	fondo <- t como Color
+  t <- "naranja"
+  circulo <- t como color
+  fondocolor [
+    fondo <- fondo
+  ]
+  posicionraton [
+    posx -> px
+    posy -> py
+  ]
+  circulocolor [
+    circulo <- circulo
+    centrox <- px
+    centroy <- py
+    radio <- 100
+  ]
+Fin</textarea>
     <div class="v divisor"></div>
     <div class="compilation">
       <div class="visual minimized" onclick="return visualRestore(event,this);">

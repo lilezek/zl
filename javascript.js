@@ -262,7 +262,7 @@ var modulo = function(zl) {
     for (var i = 0; i < compilado.length; i++) {
       var dato = simbolo.declaraciones[compilado[i].der];
       resultado += zl.javascript.datoprefijo(dato, simbolo);
-      resultado += zl.javascript.nombre(dato.nombre, simbolo) + "=$salida." + compilado[i].izq;
+      resultado += zl.javascript.nombre(dato.nombre, simbolo) + "=$salida." + compilado[i].izq+";";
     }
     return resultado;
   }
