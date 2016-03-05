@@ -33,3 +33,59 @@ Algoritmo
   $salida.posy = $self.$miembros.py;
   */
 Fin
+
+Subrutina Primitiva OperadorSuma PuntoSumaPunto
+Datos
+  izquierda es EsteModulo de Entrada
+  derecha es EsteModulo de Entrada
+  resultado es EsteModulo de Salida
+Algoritmo
+  /*
+  $salida.resultado.$miembros = {
+    px: $entrada.izquierda.$miembros.px + $entrada.derecha.$miembros.px,
+    py: $entrada.izquierda.$miembros.py + $entrada.derecha.$miembros.py
+  }
+  */
+Fin
+
+Subrutina Primitiva OperadorResta PuntoRestaPunto
+Datos
+  izquierda es EsteModulo de Entrada
+  derecha es EsteModulo de Entrada
+  resultado es EsteModulo de Salida
+Algoritmo
+  /*
+  $salida.resultado.$miembros = {
+    px: $entrada.izquierda.$miembros.px - $entrada.derecha.$miembros.px,
+    py: $entrada.izquierda.$miembros.py - $entrada.derecha.$miembros.py
+  }
+  */
+Fin
+
+Subrutina Primitiva OperadorProducto PuntoProductoNumero
+Datos
+  izquierda es EsteModulo de Entrada
+  derecha es Numero de Entrada
+  resultado es EsteModulo de Salida
+Algoritmo
+  /*
+  $salida.resultado.$miembros = {
+    px: $entrada.izquierda.$miembros.px * $entrada.derecha,
+    py: $entrada.izquierda.$miembros.py * $entrada.derecha
+  }
+  */
+Fin
+
+Subrutina Primitiva OperadorProducto NumeroProductoPunto
+Datos
+  izquierda es Numero de Entrada
+  derecha es EsteModulo de Entrada
+  resultado es EsteModulo de Salida
+Algoritmo
+  /*
+  $salida.resultado.$miembros = {
+    px: $entrada.derecha.$miembros.px * $entrada.izquierda,
+    py: $entrada.derecha.$miembros.py * $entrada.izquierda
+  }
+  */
+Fin

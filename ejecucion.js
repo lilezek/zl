@@ -116,20 +116,6 @@ var modulo = function(zl, async) {
   }
 
 
-  rte.$tipos = {
-    "numero": {
-      constructor: function(v) {
-        return v || 0;
-      },
-      '>': null
-    },
-    "booleano": {
-      constructor: function(v) {
-        return v || false;
-      }
-    }
-  };
-
   rte.$error = zl.error;
   rte.$colores = zl.tablaColores;
 

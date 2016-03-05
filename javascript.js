@@ -298,9 +298,13 @@ var modulo = function(zl) {
       var tipoizq = compilado.izq.tipofinal;
       var tipoder = compilado.der.tipofinal;
       var alias = tipoizq.opbinario[compilado.op][tipoder.nombre].alias;
-      // TODO: poner el módulo antes del alias correctamente.
+      var modulo = tipoizq.opbinario[compilado.op][tipoder.nombre].modulo;
       if (alias.length > 0) {
-        return "$self." + alias + "({izq:" + izq + ",der:" + der + "})"
+        var resultado = "$exterior.";
+        if (modulo) {
+          resultado += modulo+"Prototipo.";
+        }
+        return resultado + alias + "({izquierda:" + izq + ",derecha:" + der + "}).resultado"
       }
       return izq + " " + operador + " " + der;
     } else if (compilado.der && operador) {

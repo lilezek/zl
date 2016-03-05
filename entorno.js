@@ -137,8 +137,6 @@ var modulo = function(zl) {
 
     this.serial = subs.join("#").toLowerCase();
 
-    // Después de serializar, generar el estetipo
-    this.estetipo = new Tipo(this);
   }
 
   Modulo.prototype.rellenarDesdeArbol = function(arbol) {
@@ -320,7 +318,8 @@ var modulo = function(zl) {
       }
     }
 
-    // Registrar conversores (después de que se registren los datos):
+    // Registrar conversores y operaciones (después de que se registren los datos):
+    // Conversores
     if ("conversora" in this.modificadores) {
       // TODO: añadir las comprobaciones oportunas
       // Un dato de entrada
@@ -338,6 +337,28 @@ var modulo = function(zl) {
       }
       if (this.conversion.datoEntrada && this.conversion.datoSalida) {
         this.conversion.datoEntrada.tipo.registrarConversor(this, this.conversion.datoSalida.tipo);
+      }
+    }
+    // Operaciones
+    for (var k in this.modificadores) {
+      // Operaciones binarias
+      if (k.indexOf("operador") > -1 && k.indexOf("operadorunario") == -1) {
+        // TODO: añadir las comprobaciones oportunas
+        // Dos datos de entrada izquierda y derecha
+        // Un dato de salida resultado
+        // Sin datos globales
+        // ¿No asíncrona?
+        var operador = ({
+          "suma": "+",
+          "resta": "-",
+          "producto": "*"
+        })[k.substr(8)]
+        var izquierda = this.declaraciones.izquierda.tipo;
+        var derecha = this.declaraciones.derecha.tipo;
+        var resultado = this.declaraciones.resultado.tipo;
+        var modulo = this.padre;
+        var alias = this.nombre;
+        izquierda.registrarOperadorBinario(operador, derecha, resultado, modulo, alias);
       }
     }
 
@@ -477,13 +498,16 @@ var modulo = function(zl) {
         set: function(value) {
           this.modulo.configuracion.nombremodulo = value;
         }
+      });
+
+      delete this.constr;
+      Object.defineProperty(this, "constr", {
+        get: function() {
+          return this.nombre;
+        },
       })
+
       this.metodos = this.modulo.subrutinas;
-      for (var k in this.metodos) {
-        if (this.metodos[k].modificadores.conversora);
-        // TODO: añadir conversores.
-      }
-      this.constr = modulo.nombre;
       this.serializar();
     }
 
@@ -504,6 +528,16 @@ var modulo = function(zl) {
     // TODO: Comprobar si el conversor está en otro módulo
     // para preparar lo que sea necesario.
     this.conversiones[tipoObjetivo.nombre] = subrutina;
+  }
+
+  Tipo.prototype.registrarOperadorBinario = function(operador, otroTipo, resultado, modulo, alias) {
+    // TODO: Comprobar que no esté ya registrado
+    this.opbinario[operador] = this.opbinario[operador] || {};
+    this.opbinario[operador][otroTipo.nombre] = {
+      resultado: resultado.nombre,
+      alias: alias,
+      modulo: modulo.nombre
+    }
   }
 
   // Distintos tipos de modificador.

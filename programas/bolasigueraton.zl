@@ -4,19 +4,6 @@ Configuracion
   integrar "bibliotecasZL/canvas.zl"
 Fin
 
-Subrutina Primitiva Operaciones
-Datos
-  centro es Punto de entrada
-  d es Numero de entrada
-  anterior es Punto de entrada
-  resultado es Punto de Salida
-Algoritmo
-	/*
-  $salida.resultado.$miembros.px = $entrada.anterior.$miembros.px + $entrada.d*($entrada.centro.$miembros.px-$entrada.anterior.$miembros.px)*3;
-  $salida.resultado.$miembros.py = $entrada.anterior.$miembros.py + $entrada.d*($entrada.centro.$miembros.py-$entrada.anterior.$miembros.py)*3;
-  */
-Fin
-
 Subrutina Inicio
 Datos
 	anterior es Punto Global
@@ -42,13 +29,7 @@ Algoritmo
   posicionraton [
     posicion -> centro
   ]
-  operaciones [
-    centro <- centro
-    d <- d
-    anterior <- anterior
-    resultado -> anterior
-  ]
-
+	anterior <- anterior + d * (centro - anterior) * 3
   colorrelleno [
     relleno <- "blanco" como color
   ]
