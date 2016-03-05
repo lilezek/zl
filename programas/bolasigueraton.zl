@@ -58,9 +58,7 @@ Algoritmo
     alto <- 50
   ]
   colorBorde [
-    r <- 255
-    g <- 255
-    b <- 255
+    borde <- "blanco" como color
   ]
   grosorBorde [
     grosor <- 3
