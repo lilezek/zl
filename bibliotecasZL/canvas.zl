@@ -1,4 +1,6 @@
 Configuracion
+  importar "bibliotecasZL/punto.zl"
+  importar "bibliotecasZL/color.zl"
   nombreModulo <- "canvas"
 Fin
 
@@ -11,28 +13,25 @@ Fin
 
 Subrutina Primitiva Fondo
 Datos
-  r es Numero de Entrada
-  g es Numero de Entrada
-  b es Numero de Entrada
+  fondo es Color de Entrada
 Algoritmo
   /*
-  $exterior.$ctx2d.fillStyle = "rgba("+~~$entrada.r+","+~~$entrada.g+","+~~$entrada.b+",255)";
+  $exterior.$ctx2d.fillStyle = "rgba("+~~$entrada.fondo.$miembros.r+","+~~$entrada.fondo.$miembros.g+","+~~$entrada.fondo.$miembros.b+ "," + $entrada.fondo.$miembros.a + ")";
   $exterior.$ctx2d.fillRect(0, 0, $exterior.$canvas.width, $exterior.$canvas.height);
   */
 Fin
 
 Subrutina Primitiva Elipse
 Datos
-  centrox es Numero de Entrada
-  centroy es Numero de Entrada
+  centro es Punto de Entrada
   ancho es Numero de Entrada
   alto es Numero de Entrada
 Algoritmo
   /*
   var w = $entrada.ancho >= 0 ? $entrada.ancho : 0;
 	var h = $entrada.alto >= 0 ? $entrada.alto : 0;
-  var x = $entrada.centrox;
-  var y = $entrada.centroy;
+  var x = $entrada.centro.$miembros.px;
+  var y = $entrada.centro.$miembros.py;
 	$exterior.$ctx2d.beginPath();
 	if (w == h) {
 		$exterior.$ctx2d.arc(x,y,w / 2, 0, 6.283185307179586, false);
@@ -69,17 +68,18 @@ Fin
 
 Subrutina Primitiva rectangulo
 Datos
-  posx es Numero de Entrada
-  posy es Numero de Entrada
+  esquina es Punto de Entrada
   ancho es Numero de Entrada
   alto es Numero de Entrada
 Algoritmo
   /*
   var w = $entrada.ancho >= 0 ? $entrada.ancho : 0;
   var h = $entrada.alto >= 0 ? $entrada.alto : 0;
+  var x = $entrada.centro.$miembros.px;
+  var y = $entrada.centro.$miembros.py;
   //if (lineWidth % 2 == 1) $exterior.$ctx2d.translate(0.5,0.5);
   $exterior.$ctx2d.beginPath();
-  $exterior.$ctx2d.rect($entrada.posx,$entrada.posy,w,h);
+  $exterior.$ctx2d.rect(x,y,w,h);
   $exterior.$ctx2d.closePath();
   if ($self.$miembros.$estiloRelleno) {
     //$exterior.$ctx2d.globalAlpha = fillAlpha;
@@ -95,13 +95,10 @@ Fin
 
 Subrutina Primitiva colorRelleno
 Datos
-  r es Numero de Entrada
-  g es Numero de Entrada
-  b es Numero de Entrada
+  relleno es Color de Entrada
 Algoritmo
   /*
-  $exterior.$ctx2d.fillStyle = "rgb("+~~$entrada.r+","+~~$entrada.g+","+~~$entrada.b+")";
-  console.log($self, $self.$miembros);
+  $exterior.$ctx2d.fillStyle = "rgba("+~~$entrada.relleno.$miembros.r+","+~~$entrada.relleno.$miembros.g+","+~~$entrada.relleno.$miembros.b + "," + $entrada.relleno.$miembros.a + ")";
   $self.$miembros.$estiloRelleno = {
     r: $entrada.r,
     g: $entrada.g,
@@ -122,12 +119,10 @@ Fin
 
 Subrutina Primitiva colorBorde
 Datos
-  r es Numero de entrada
-  g es Numero de entrada
-  b es Numero de entrada
+  borde es Color de Entrada
 Algoritmo
   /*
-	$self.$miembros.$estiloBordes = "rgb(" + $entrada.r + "," + $entrada.g + "," + $entrada.b + ")";
+	$self.$miembros.$estiloBordes = "rgba(" + $entrada.borde.$miembros.r + "," + $entrada.borde.$miembros.g + "," + $entrada.borde.$miembros.b + "," + $entrada.borde.$miembros.a + ")";
 	$exterior.$ctx2d.strokeStyle = $self.$miembros.$estiloBordes;
 	//strokeAlpha = parseFloat(a);
   */
@@ -153,29 +148,28 @@ Fin
 
 Subrutina Primitiva PosicionRaton
 Datos
-	posx es Numero de Salida
-  posy es Numero de Salida
+	posicion es Punto de Salida
 Algoritmo
 	/*
-	var p = $exterior.$ratonCanvas();
-  $salida.posx = p[0];
-  $salida.posy = p[1];
+  var p = $exterior.$ratonCanvas();
+  $salida.posicion.$miembros = {
+  	px: p[0],
+    py: p[1]
+  }
   */
 Fin
 
 Subrutina Primitiva Linea
 Datos
-	pos1x es Numero de Entrada
-  pos1y es Numero de Entrada
-  pos2x es Numero de Entrada
-  pos2y es Numero de Entrada
+  principio es Punto de Entrada
+  final es Punto de Entrada
 Algoritmo
 	/*
   var c = document.getElementById("canvas");
   var ctx = c.getContext("2d");
   ctx.beginPath();
-  ctx.moveTo($entrada.pos1x, $entrada.pos1y);
-  ctx.lineTo($entrada.pos2x, $entrada.pos2y);
+  ctx.moveTo($entrada.principio.$miembros.px, $entrada.principio.$miembros.py);
+  ctx.lineTo($entrada.final.$miembros.px, $entrada.final.$miembros.py);
   ctx.closePath();
   if ($self.$miembros.$estiloBordes) {
     //ctx.globalAlpha = strokeAlpha;
@@ -184,16 +178,15 @@ Algoritmo
   */
 Fin
 
-Subrutina Primitiva Punto
+Subrutina Primitiva DibujarPunto
 Datos
-  posx es Numero de Entrada
-  posy es Numero de Entrada
+  punto es Punto de Entrada
 Algoritmo
   /*
   if ($self.$miembros.$estiloBordes){
     $exterior.$ctx2d.beginPath();
     $exterior.$ctx2d.fillStyle = $self.$miembros.$estiloBordes;
-    $exterior.$ctx2d.arc($entrada.posx, $entrada.posy, $self.$miembros.$grosorLinea / 2, 0, 6.283185307179586, false);
+    $exterior.$ctx2d.arc($entrada.punto.$miembros.px, $entrada.punto.$miembros.py, $self.$miembros.$grosorLinea / 2, 0, 6.283185307179586, false);
     $exterior.$ctx2d.fill();
     $exterior.$ctx2d.fillStyle = $self.$miembros.$estiloRelleno;
     $exterior.$ctx2d.closePath();
@@ -203,19 +196,16 @@ Fin
 
 Subrutina Primitiva Triangulo
 Datos
-  pos1x es Numero de Entrada
-  pos1y es Numero de Entrada
-  pos2x es Numero de Entrada
-  pos2y es Numero de Entrada
-  pos3x es Numero de Entrada
-  pos3y es Numero de Entrada
+  punto1 es Punto de Entrada
+  punto2 es Punto de Entrada
+  punto3 es Punto de Entrada
 Algoritmo
   /*
   $exterior.$ctx2d.beginPath();
-  $exterior.$ctx2d.moveTo($entrada.pos1x,$entrada.pos1y);
-  $exterior.$ctx2d.lineTo($entrada.pos2x,$entrada.pos2y);
-  $exterior.$ctx2d.lineTo($entrada.pos3x,$entrada.pos3y);
-  $exterior.$ctx2d.lineTo($entrada.pos1x,$entrada.pos1y);
+  $exterior.$ctx2d.moveTo($entrada.punto1.$miembros.px,$entrada.punto1.$miembros.py);
+  $exterior.$ctx2d.lineTo($entrada.punto2.$miembros.px,$entrada.punto2.$miembros.py);
+  $exterior.$ctx2d.lineTo($entrada.punto3.$miembros.px,$entrada.punto3.$miembros.py);
+  $exterior.$ctx2d.lineTo($entrada.punto1.$miembros.px,$entrada.punto1.$miembros.py);
   $exterior.$ctx2d.closePath();
   if ($self.$miembros.$estiloRelleno !== null) {
     //$exterior.$ctx2d.globalAlpha = fillAlpha;
@@ -231,13 +221,12 @@ Fin
 Subrutina Primitiva DibujarTexto
 Datos
   mensaje es Texto de Entrada
-  posx es Numero de Entrada
-  posy es Numero de Entrada
+  centro es Punto de Entrada
 Algoritmo
   /*
   if ($self.$miembros.$estiloRelleno !== null) {
     //$exterior.$ctx2d.globalAlpha = fillAlpha;
-    $exterior.$ctx2d.fillText($entrada.mensaje,$entrada.posx,$entrada.posy);
+    $exterior.$ctx2d.fillText($entrada.mensaje,$entrada.centro.$miembros.px,$entrada.centro.$miembros.py);
   }
   */
 Fin
@@ -264,8 +253,7 @@ Fin
 Subrutina Primitiva Asincrona Imagen
 Datos
   url es Texto de Entrada
-  posx es Numero de Entrada
-  posy es Numero de Entrada
+  esquina es Punto de Entrada
   ancho es Numero de Entrada
   alto es Numero de Entrada
 Algoritmo
@@ -274,7 +262,7 @@ Algoritmo
   $self.$miembros.$cacheDeImagenes = $self.$miembros.$cacheDeImagenes || {};
   var img = $self.$miembros.$cacheDeImagenes[$entrada.url];
   if (img && img.ready) {
-    $exterior.$ctx2d.drawImage(img, $entrada.posx, $entrada.posy, $entrada.ancho, $entrada.alto);
+    $exterior.$ctx2d.drawImage(img, $entrada.esquina.$miembros.px, $entrada.esquina.$miembros.py, $entrada.ancho, $entrada.alto);
     done(null, {});
   } else {
     img = new Image();

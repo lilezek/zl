@@ -35,9 +35,9 @@ var modulo = function(zl) {
   var a = zl.sintaxis.zlAnalizador = zl.analizador.newAnalizador();
   a.simbolo("<-");
   a.simbolo(".", /^\./);
-  a.simbolo("no",/^no[^a-záéíóúñ0-9]/i);
-  a.simbolo("y",/^y[^a-záéíóúñ0-9]/i);
-  a.simbolo("o",/^o[^a-záéíóúñ0-9]/i);
+  a.simbolo("no", /^no[^a-záéíóúñ0-9]/i);
+  a.simbolo("y", /^y[^a-záéíóúñ0-9]/i);
+  a.simbolo("o", /^o[^a-záéíóúñ0-9]/i);
   a.simbolo("<");
   a.simbolo(">");
   a.simbolo("<=");
@@ -110,23 +110,23 @@ var modulo = function(zl) {
     if (intento == 0) {
       this.registrarResultado({
         tipo: "importar",
-        camino: this.resultado(0,intento,1)
+        camino: this.resultado(0, intento, 1)
       });
     } else if (intento == 1) {
       this.registrarResultado({
         tipo: "integrar",
-        camino: this.resultado(0,intento,1)
+        camino: this.resultado(0, intento, 1)
       });
-    } else if (intento === 3){
+    } else if (intento === 3) {
       this.registrarResultado({
         tipo: "configurar",
         nombre: this.resultado(0, intento, 0),
         valor: this.resultado(0, intento, 2),
         tipoValor: "number"
       });
-    } else if (intento === 2){
+    } else if (intento === 2) {
       var valor = this.resultado(0, intento, 2);
-      valor = valor.substring(1,valor.length-1);
+      valor = valor.substring(1, valor.length - 1);
       this.registrarResultado({
         tipo: "configurar",
         nombre: this.resultado(0, intento, 0),
@@ -239,7 +239,7 @@ var modulo = function(zl) {
     // Buscar primitiva:
     for (var i = 0; i < sub.modificadores.length; i++) {
       if (sub.modificadores[i].toLowerCase() === "primitiva") {
-        sub.segmentoPrimitivo = this.texto.substring(sub.secciones.algoritmo[0]+10, sub.secciones.algoritmo[1]).trim();
+        sub.segmentoPrimitivo = this.texto.substring(sub.secciones.algoritmo[0] + 10, sub.secciones.algoritmo[1]).trim();
       }
     }
     this.registrarResultado(sub);
@@ -439,7 +439,7 @@ var modulo = function(zl) {
       this.retroceder(this.arbol().length - 1);
       try {
         this.intentar([
-            ["no"],
+            //["no"],
             ["y"],
             ["o"],
             ["<="],
@@ -500,40 +500,58 @@ var modulo = function(zl) {
       ["verdadero"],
       ["falso"],
       ["nombre", "(", "listaAcceso", ")"],
-      // TODO: No forzar a que sea un nombre
-      ["nombre", "como", "nombre"],
       ["nombre"],
       ["(", "expresion", ")"],
       ["expresionUnaria"]
     ]);
     var intento = this.resultado(0);
-    if (intento == 8)
-      this.registrarResultado({
+    var evalResultado = null;
+    if (intento == 7)
+      evalResultado = {
         valor: this.resultado(0, intento, 1),
         tipo: this.arbol(0, intento, 1).tipo
-      });
-    else if (intento == 9)
-      this.registrarResultado({
+      };
+    else if (intento == 8)
+      evalResultado = {
         valor: this.resultado(0, intento, 0),
         tipo: "expresion"
-      });
+      };
     else if (intento == 5) {
-      this.registrarResultado({
+      evalResultado = {
         nombre: this.resultado(0, intento, 0),
         acceso: this.resultado(0, intento, 2),
         tipo: "acceso"
-      });
-    } else if (intento == 6) {
-      this.registrarResultado({
-        nombre: this.resultado(0, intento, 0),
-        tipoObjetivo: this.resultado(0, intento, 2),
-        tipo: "conversion"
-      });
+      };
     } else
-      this.registrarResultado({
+      evalResultado = {
         valor: this.resultado(0, intento, 0),
         tipo: this.arbol(0, intento, 0).tipo
-      });
+      };
+    // Ahora que se ha podido hacer una evaluación,
+    // comprobar si le sigue una conversión:
+    try {
+      this.avanzar("como")
+        .nombre();
+      this.registrarResultado({
+        evaluacion: evalResultado,
+        tipoObjetivo: this.resultado(2),
+        tipo: "conversion"
+      })
+    } catch (e) {
+      if (zl.error.esError(e)) {
+        this.retroceder(this.arbol().length - 1);
+        // Si se pudo avanzar el "como" lanzar una excepción:
+        if (this.arbol().length > 1) {
+          throw e;
+        }
+        // Si no, simplemente estamos ante una evaluación sin conversión.
+        else {
+          this.registrarResultado(evalResultado)
+        }
+      } else {
+        throw e;
+      }
+    }
     return this;
   });
 

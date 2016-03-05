@@ -1,0 +1,35 @@
+Configuracion
+  nombreModulo <- "punto"
+Fin
+
+/*
+  biblioteca para la representación de un punto.
+  No tiene dependencias.
+  Un punto representa unas coordenadas bidimensionales.
+*/
+
+Subrutina Primitiva Inicio
+Datos
+  posx es Numero de Entrada
+  px es Numero Global
+  posy es Numero de Entrada
+  py es Numero global
+Algoritmo
+  /*
+  $self.$miembros.px = $entrada.posx;
+  $self.$miembros.py = $entrada.posy;
+  */
+Fin
+
+Subrutina Primitiva LeerComponentes
+Datos
+  posx es Numero de salida
+  px es Numero Global
+  posy es Numero de salida
+  py es Numero global
+Algoritmo
+  /*
+  $salida.posx = $self.$miembros.px;
+  $salida.posy = $self.$miembros.py;
+  */
+Fin

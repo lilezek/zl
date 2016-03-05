@@ -257,12 +257,7 @@ var modulo = function(zl) {
           tipo: arbol.tipoObjetivo
         });
       }
-      var datoTipo = testarExpresion({
-        tipo: "nombre",
-        valor: arbol.nombre,
-        begin: arbol.begin,
-        end: arbol.end
-      }, sub);
+      var datoTipo = testarExpresion(arbol.evaluacion, sub);
       if (!(tipo.nombre in datoTipo.conversiones)) {
         throw zl.error.newError(zl.error.E_CONVERSOR_NO_EXISTE, {
           posicion: [arbol.begin, arbol.end],

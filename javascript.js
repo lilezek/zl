@@ -17,7 +17,23 @@ var modulo = function(zl) {
       var nombre = integraciones[i].configuracion.nombremodulo;
       resultado += "$in."+nombre + ".call(this, $in);"
     }
-    resultado += "this.$miembros={};" +
+    resultado += "this.$miembros={";
+    var coma = "";
+    for (var k in simbolo.globales) {
+      var d = simbolo.globales[k];
+      if (d.tipo.constr) {
+        resultado += coma + d.nombre + ":new $exterior." + d.tipo.constr + "(";
+        // Pasar las dimensiones al constructor si es una lista:
+        if (d.tipo.nombre === "lista") {
+          resultado += JSON.stringify(d.genericidad.dimensiones);
+        } else {
+          resultado += "$exterior";
+        }
+        resultado += ")";
+        coma = ",";
+      }
+    }
+    resultado += "};" +
       "this.$configuracion = " + JSON.stringify(simbolo.configuracion) + ";" +
       "$in.$writeJson(this, $in." + simbolo.nombre + "Prototipo);" +
       "return this;};";
@@ -324,10 +340,7 @@ var modulo = function(zl) {
       var subrutina = compilado.subrutinaConversora;
       var modulo = subrutina.padre;
       return "$exterior." + modulo.nombre + "Prototipo." + subrutina.nombre + "({" +
-        subrutina.conversion.datoEntrada.nombre + ":" + zl.javascript.evaluacion({
-          tipo: "nombre",
-          valor: compilado.nombre,
-        }, simbolo) +
+        subrutina.conversion.datoEntrada.nombre + ":" + zl.javascript.evaluacion(compilado.evaluacion, simbolo) +
         "})." + subrutina.conversion.datoSalida.nombre;
     } else if (compilado.tipo == "acceso") {
       var dato = simbolo.declaraciones[compilado.nombre.toLowerCase()];

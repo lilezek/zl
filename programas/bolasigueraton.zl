@@ -4,45 +4,56 @@ Configuracion
   integrar "bibliotecasZL/canvas.zl"
 Fin
 
+Subrutina Primitiva Operaciones
+Datos
+  centro es Punto de entrada
+  d es Numero de entrada
+  anterior es Punto de entrada
+  resultado es Punto de Salida
+Algoritmo
+	/*
+  $salida.resultado.$miembros.px = $entrada.anterior.$miembros.px + $entrada.d*($entrada.centro.$miembros.px-$entrada.anterior.$miembros.px)*3;
+  $salida.resultado.$miembros.py = $entrada.anterior.$miembros.py + $entrada.d*($entrada.centro.$miembros.py-$entrada.anterior.$miembros.py)*3;
+  */
+Fin
+
 Subrutina Inicio
 Datos
-	anteriorx es Numero Global
-  anteriory es Numero Global
+	anterior es Punto Global
 Algoritmo
-	anteriorx <- 0
-  anteriory <- 0
+	anterior.inicio [
+	  posx <- 0
+	  posy <- 0
+	]
 Fin
 
 Subrutina Fotograma
 Datos
   d es Numero
-  px es Numero
-  py es Numero
-  anteriorx es Numero global
-  anteriory es Numero global
+  centro es Punto
+	anterior es Punto Global
 Algoritmo
   delta [
     delta -> d
   ]
   Fondo [
-    r <- 0
-    g <- 0
-    b <- 0
+    fondo <- "negro" como color
   ]
   posicionraton [
-    posx -> px
-    posy -> py
+    posicion -> centro
   ]
-  anteriorx <- anteriorx + d*(px - anteriorx)*3
-  anteriory <- anteriory + d*(py - anteriory)*3
+  operaciones [
+    centro <- centro
+    d <- d
+    anterior <- anterior
+    resultado -> anterior
+  ]
+
   colorrelleno [
-    r <- 255
-    g <- 255
-    b <- 255
+    relleno <- "blanco" como color
   ]
   elipse [
-    centrox <- anteriorx
-    centroy <- anteriory
+    centro <- anterior
     ancho <- 50
     alto <- 50
   ]
@@ -55,9 +66,7 @@ Algoritmo
     grosor <- 3
   ]
   linea [
-    pos1x <- anteriorx
-    pos1y <- anteriory
-    pos2x <- px
-    pos2y <- py
+    principio <- centro
+    final <- anterior
   ]
 Fin

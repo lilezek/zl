@@ -19,7 +19,7 @@
 
 <configuraciones> ::= "configuracion" <_> (<configuracion> <_>)* "fin"
 
-<configuracion> ::= "importar" <_> <texto> <_> "como" <nombre>
+<configuracion> ::= "importar" <_> <texto>
     | "integrar" <_> <texto>
     | <nombre> <_> "<-" <_> <numero>
     | <nombre> <_> "<-" <_> <texto>
@@ -102,7 +102,7 @@
     | <letra>
     | "verdadero"
     | "falso"
-    | <nombre> <_> "como" <_> <nombre>
+    | <evaluacion> <_> "como" <_> <nombre>
     | <nombre> <_> "(" <_> <listaAcceso> <_> ")"
     | <nombre>
     | "(" <_> <expresion> <_> ")"

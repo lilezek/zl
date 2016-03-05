@@ -84,65 +84,36 @@
   fps <- 60
 	integrar "bibliotecasZL/basico.zl"
   integrar "bibliotecasZL/canvas.zl"
-  importar "bibliotecasZL/color.zl"
-Fin
-
-Subrutina Primitiva FondoColor
-Datos
-  fondo es Color de Entrada
-Algoritmo
-  /*
-  $exterior.canvasPrototipo.fondo($entrada.fondo.$miembros);
-  */
-Fin
-
-Subrutina Primitiva CirculoColor
-Datos
-  circulo es Color de Entrada
-  centrox es Numero de Entrada
-  centroy es Numero de Entrada
-  radio es Numero de Entrada
-Algoritmo
-  /*
-  $exterior.canvasPrototipo.colorrelleno.call($self,$entrada.circulo.$miembros);
-  $exterior.canvasPrototipo.elipse.call($self, {
-  	centrox: $entrada.centrox,
-    centroy: $entrada.centroy,
-    ancho: $entrada.radio,
-    alto: $entrada.radio
-  });
-  */
 Fin
 
 Subrutina Inicio
 Datos
+  fondo es Color Global
+  circulo es Color Global
 Algoritmo
+	fondo <- "blanco" como Color
+  circulo <- "naranja" como color
 Fin
 
 Subrutina Fotograma
 Datos
-	fondo es Color
-  circulo es Color
-  t es Texto
-  px es Numero
-  py es Numero
+  fondo es Color Global
+  circulo es Color Global
+  centro es Punto
 Algoritmo
-  t <- "blanco"
-	fondo <- t como Color
-  t <- "naranja"
-  circulo <- t como color
-  fondocolor [
+  fondo [
     fondo <- fondo
   ]
   posicionraton [
-    posx -> px
-    posy -> py
+    posicion -> centro
   ]
-  circulocolor [
-    circulo <- circulo
-    centrox <- px
-    centroy <- py
-    radio <- 100
+  colorrelleno [
+    relleno <- circulo
+  ]
+  elipse [
+    centro <- centro
+    ancho <- 100
+    alto <- 100
   ]
 Fin</textarea>
     <div class="v divisor"></div>

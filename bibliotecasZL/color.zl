@@ -8,20 +8,20 @@ Datos
   rojo es Numero de Entrada
   verde es Numero de Entrada
   azul es Numero de Entrada
-  opacidad es Numero de Entrada
+  transparencia es Numero de Entrada
   r es Numero Global
   g es Numero Global
   b es Numero Global
   a es Numero Global
 Algoritmo
   /*
-  this.$miembros.r = $entrada.rojo;
-  this.$miembros.g = $entrada.verde;
-  this.$miembros.b = $entrada.azul;
-  if ($entrada.opacidad <= 1) {
-    this.$miembros.a = $entrada.opacidad;
+  $self.$miembros.r = $entrada.rojo;
+  $self.$miembros.g = $entrada.verde;
+  $self.$miembros.b = $entrada.azul;
+  if ($entrada.transparencia <= 1) {
+    $self.$miembros.a = $entrada.transparencia;
   } else {
-    this.$miembros.a = $entrada.opacidad / 0xFF;
+    $self.$miembros.a = $entrada.transparencia / 0xFF;
   }
   */
 Fin
@@ -32,7 +32,6 @@ Datos
   c es EsteModulo de Salida
 Algoritmo
   /*
-  console.log($exterior.$colores);
   $salida.c = new $exterior.color($exterior);
   var x = $entrada.t.toLowerCase();
   if (x in $exterior.$colores) {
@@ -40,7 +39,7 @@ Algoritmo
       rojo: $exterior.$colores[x].r,
       verde: $exterior.$colores[x].g,
       azul: $exterior.$colores[x].b,
-      opacidad: 1
+      transparencia: 1
     });
   } else if ((x + " 1") in $exterior.$colores) {
     x = x + " 1";
@@ -48,7 +47,7 @@ Algoritmo
       rojo: $exterior.$colores[x].r,
       verde: $exterior.$colores[x].g,
       azul: $exterior.$colores[x].b,
-      opacidad: 1
+      transparencia: 1
     });
   }
   */
@@ -65,7 +64,38 @@ Algoritmo
     rojo: ($entrada.n & 0xFF000000) >> 24,
     verde: ($entrada.n & 0xFF0000) >> 16,
     azul: ($entrada.n & 0xFF00) >> 8,
-    opacidad: ($entrada.n & 0xFF) / 0xFF
+    transparencia: ($entrada.n & 0xFF) / 0xFF
   });
+  */
+Fin
+
+Subrutina Primitiva LeerComponentes
+Datos
+  rojo es Numero de Salida
+  verde es Numero de Salida
+  azul es Numero de Salida
+  transparencia es Numero de Salida
+  r es Numero Global
+  g es Numero Global
+  b es Numero Global
+  a es Numero Global
+Algoritmo
+  /*
+  $salida = {
+    rojo: $self.$miembros.r,
+    verde: $self.$miembros.g,
+    azul: $self.$miembros.b,
+    transparencia: $self.$miembros.a
+  };
+  */
+Fin
+
+Subrutina Primitiva CambiarTransparencia
+Datos
+  transparencia es Numero de Entrada
+  a es Numero Global
+Algoritmo
+  /*
+  $self.$miembros.a = $entrada.transparencia;
   */
 Fin
