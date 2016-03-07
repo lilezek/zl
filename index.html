@@ -203,7 +203,9 @@ Fin</textarea>
       });
 
       function autocompletar() {
-        editor.showHint();
+        editor.showHint({
+          mandatory: true
+        });
       }
 
       var evaluando = false;
@@ -278,8 +280,8 @@ Fin</textarea>
         if (!carga) {
           $("#run").html("Abortar");
           carga = zl.Cargar(lastjs);
-          carga.$asincrono.inicio = lastCompilation.inicioAsincrono;
-          carga.$asincrono.fotograma = lastCompilation.fotogramaAsincrono;
+          carga.$asincrono.inicio = lastCompilation.modulo.subrutinas.inicio && lastCompilation.modulo.subrutinas.inicio.modificadores.asincrona;
+          carga.$asincrono.fotograma = lastCompilation.modulo.subrutinas.fotograma && lastCompilation.modulo.subrutinas.fotograma.modificadores.asincrona;
           carga.$alAcabar = function() {
             carga = null;
             $("#run").html("Empezar");
@@ -423,6 +425,7 @@ Fin</textarea>
       }
 
       zl.io.pause = function($local, $global, $entrada, $salida, pos, callback) {
+        console.log("lmao");
         var cursor = editor.posFromIndex(pos);
         $("#continue").prop('disabled', false);
         continuarCallback = callback;

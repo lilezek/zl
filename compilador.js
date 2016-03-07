@@ -154,6 +154,7 @@ var modulo = function(zl, async) {
   // Genera código javascript a partir de código
   // en zl
   zl.Evaluar = function(zlcode, subrutina, carga, entorno) {
+    // TODO: Esto está roto
     zlcode = zlcode.trim();
     if (!zlcode.length)
       return "No hay código seleccionado";

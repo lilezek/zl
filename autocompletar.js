@@ -48,7 +48,7 @@ var modulo = function(zl) {
       .replace(/%([a-z0-9ñáéíóú]+)&texto%/ig, function(match, p1) {
         return emparejarDatoPorTipo(contexto.subrutina, "texto", p1, "\"\"");
       })
-      .replace(/%([a-z0-9ñáéíóú]+)&([a-z0-9ñáéíóú]+)%/ig, function(match, p1, p2){
+      .replace(/%([a-z0-9ñáéíóú]+)&([a-z0-9ñáéíóú]+)%/ig, function(match, p1, p2) {
         return emparejarDatoPorTipo(contexto.subrutina, p2, p1, p2);
       })
       .replace(/%nombre%/g, "Nombre")
@@ -129,30 +129,29 @@ var modulo = function(zl) {
   }
 
   CodeMirror.registerHelper("hint", "zl", function scriptHint(editor, options) {
-    var getToken = function(e, cur) {
-      return e.getTokenAt(cur);
-    }
     var contexto = zl.autocompletar.contexto();
     // Encontrar el token.
     var cur = editor.getCursor(),
       end = editor.indexFromPos(cur),
-      begin = end-1,
+      begin = end - 1,
       t = editor.getValue(),
       token = "";
 
     while (/[a-záéíóúñ0-9\.]/i.test(t[begin])) {
       begin--;
-    } begin++;
-    token = t.substring(begin,end);
+    }
+    begin++;
+    token = t.substring(begin, end);
     // Comprobar que no tenga más de un punto, ni que esté compuesto
     // solo por números:
     var partes = token.split(".");
-    if (partes.length <= 2 && isNaN(partes[0]) && (!partes[1] || isNaN(partes[1]))) {
-      return {
-        list: getCompletions(token, contexto, options),
-        from: editor.posFromIndex(begin + (partes.length == 2 ? partes[0].length+1 : 0)),
-        to: editor.posFromIndex(end)
-      };
+    if (partes.length <= 2 && (!partes[0] || isNaN(partes[0])) && (!partes[1] || isNaN(partes[1]))) {
+      if (token.length >= options.minimumTokenLength || options.mandatory)
+        return {
+          list: getCompletions(token, contexto, options),
+          from: editor.posFromIndex(begin + (partes.length == 2 ? partes[0].length + 1 : 0)),
+          to: editor.posFromIndex(end)
+        };
     }
     return {
       list: [],
@@ -201,41 +200,45 @@ var modulo = function(zl) {
     // TODO: Se puede optimizar esto muchísimo.
     // TODO: Una vez optimizado, hacer Levenshtein con el principio
     // y con la palabra completa, y coger una mezcla de los resultados.
-    var sub = contexto.subrutina;
-    var tipos = [],
+    start = start.toLowerCase();
+    var distintasAlternativas = [],
+      sub = contexto.subrutina,
+      tipos = [],
       datos = Object.keys(sub ? sub.declaraciones : {}),
       subrutinas = ultimaTabla.arrayDeSubrutinas(),
       keywords = contexto.$.$;
     // Nombre compuesto:
     if (sub && start.indexOf(".") > -1) {
       var r = start.split(".");
-      var dato = sub.declaraciones[r[0].toLowerCase()];
+      var dato = sub.declaraciones[r[0]];
       if (dato && dato.tipo.modulo) {
         subrutinas = dato.tipo.modulo.arrayDeSubrutinasPropias();
         start = r[1];
         keywords = [];
         datos = [];
       }
+    } else {
+      distintasAlternativas = distintasAlternativas.concat(keywords);
     }
     if (contexto.tipo === "datos") {
       tipos = ultimaTabla.arrayDeTipos().map(arr => arr.nombre);
+      distintasAlternativas = distintasAlternativas.concat(tipos);
     } else if (contexto.tipo === "algoritmo") {
       subrutinas = subrutinas.map(generarHintSubrutina);
+      distintasAlternativas = distintasAlternativas.concat(subrutinas);
     }
-    // TODO: Escoger qué arrays concatenar según el contexto.
-    var options = subrutinas.concat(datos).concat(tipos).concat(keywords).filter(function(key) {
+    return distintasAlternativas.filter(function(key) {
       // Si start es vacío, no filtrar nada:
       if (!start.length)
         return true;
       var t = (typeof key === "string" ? key : key.text);
-      return t.length >= start.length && new Levenshtein(t.substring(0, start.length), start) < start.length*0.8;
+      return t.length >= start.length && new Levenshtein(t.substring(0, start.length), start) < start.length * 0.8;
     }).sort(function(a, b) {
       var l = start.length;
       var tb = (typeof b === "string" ? b : b.text).substring(0, l);
       var ta = (typeof a === "string" ? a : a.text).substring(0, l);
       return (new Levenshtein(ta, start) - new Levenshtein(tb, start));
     });
-    return options;
   }
 
   zl.autocompletar.alimentarTabla = function(tabla) {

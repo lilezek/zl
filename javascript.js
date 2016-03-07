@@ -143,7 +143,7 @@ var modulo = function(zl) {
       resultado = zl.javascript.sicondicional(compilado, simbolo);
     } else if (compilado.tipo == "pausar") {
       resultado = "done(null,$salida);}, function(arg, done) {done(null, $local, $self.$miembros, $entrada, $salida," +
-        ((compilado.begin + compilado.end) / 2) +
+        ~~((compilado.begin + compilado.end) / 2) +
         ");}, $exterior.$impersonar($exterior.$pausar,$exterior), function(arg,done){";
     }
     return resultado + ";";

@@ -431,6 +431,8 @@
     closeCharacters: /[\s()\[\]{};:>,]/,
     closeOnUnfocus: true,
     completeOnSingleClick: true,
+    mandatory: false,
+    minimumTokenLength: 3,
     container: null,
     customKeys: null,
     extraKeys: null
