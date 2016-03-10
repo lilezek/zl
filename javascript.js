@@ -30,8 +30,10 @@ var modulo = function(zl) {
           resultado += "$exterior";
         }
         resultado += ")";
-        coma = ",";
+      } else {
+        resultado += coma + d.nombre + ":null";
       }
+      coma = ",";
     }
     resultado += "};" +
       "this.$configuracion = " + JSON.stringify(simbolo.configuracion) + ";" +

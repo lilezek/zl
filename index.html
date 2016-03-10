@@ -198,7 +198,7 @@ Fin</textarea>
 
       });
       editor.on("cursorActivity", function(){
-        setTimeout(evaluar,20);
+        //setTimeout(mostrarDatos,20);
         return true;
       });
 
@@ -212,8 +212,8 @@ Fin</textarea>
       editor.addKeyMap({
         "Ctrl-S": download,
         "Cmd-S": download,
-        "Ctrl-F9": function(){evaluando = !evaluando;},
-        "Cmd-F9": function(){evaluando = !evaluando;},
+        "Ctrl-F9": function(){evaluando = !evaluando; mostrarDatos();},
+        "Cmd-F9": function(){evaluando = !evaluando; mostrarDatos();},
         "Ctrl-Space": autocompletar,
         "Cmd-Space": autocompletar,
         "Ctrl-Enter": autocompletar,
@@ -410,7 +410,6 @@ Fin</textarea>
           }
         });
         $("#input").focus();
-        evaluar();
       }
 
       zl.io.abortRead = function() {
@@ -425,7 +424,6 @@ Fin</textarea>
       }
 
       zl.io.pause = function($local, $global, $entrada, $salida, pos, callback) {
-        console.log("lmao");
         var cursor = editor.posFromIndex(pos);
         $("#continue").prop('disabled', false);
         continuarCallback = callback;
@@ -433,7 +431,7 @@ Fin</textarea>
         ultimaLineaPausar = cursor.line;
         editor.addLineClass(ultimaLineaPausar, "background", "CodeMirror-line-pausar");
         saltarAlCodigo(cursor.line, cursor.ch);
-        evaluar();
+        mostrarDatos();
       }
 
       zl.io.abortPause = function() {
@@ -462,16 +460,49 @@ Fin</textarea>
         return true;
       };
 
-      function evaluar() {
+      function mostrarDato(dato) {
+        if (typeof dato === "undefined" || dato === null) {
+          return "sin definir todavía";
+        } else if (typeof dato === "number" || typeof dato === "string") {
+          return ""+dato;
+        } else if (typeof dato === "object") {
+          console.log(dato);
+          var resultado = dato.$configuracion.nombremodulo + "<br>";
+          for (var k in dato.$miembros) {
+            resultado += "||" + k + ": " + mostrarDato(dato.$miembros[k]) + "<br>";
+          }
+          return resultado;
+        }
+        return "desconocido";
+      }
+
+      function mostrarDatos() {
         if (evaluando && carga && lastCompilation && ultimoEntorno) {
           var subrutina = lastCompilation.modulo.subrutinaPorPosicion(editor.indexFromPos(editor.getCursor()));
-          var compilation = $("#helparea").get(0);
-          var valor = zl.Evaluar(editor.getSelection(), subrutina, carga, ultimoEntorno);
+          var compilation = $("#helparea").empty();
+          var local = $("<div class='datosEjecucion local'>Datos locales:<br></div>").appendTo(compilation);
+          var glob = $("<div class='datosEjecucion global'>Datos globales:<br></div>").appendTo(compilation);
+          var entrada = $("<div class='datosEjecucion entrada'>Datos de entrada:<br></div>").appendTo(compilation);
+          var salida = $("<div class='datosEjecucion salida'>Datos de salida:<br></div>").appendTo(compilation);
+          /*var valor = zl.Evaluar(editor.getSelection(), subrutina, carga, ultimoEntorno);
           if (typeof valor === "undefined") {
             valor = "Desconocido/Sin valor";
           }
           compilation.innerHTML = "La expresión \n\t"+editor.getSelection()+"\n"+
-            "Equivale a:\n"+valor;
+            "Equivale a:\n"+valor;*/
+            // ultimoEntorno = [$local, $global, $entrada, $salida]
+          for (var k in ultimoEntorno[0]) {
+            local.append(k + ": " + mostrarDato(ultimoEntorno[0][k]) + "<br>");
+          }
+          for (var k in ultimoEntorno[1]) {
+            glob.append(k + ": " + mostrarDato(ultimoEntorno[1][k]) + "<br>");
+          }
+          for (var k in ultimoEntorno[2]) {
+            entrada.append(k + ": " + mostrarDato(ultimoEntorno[2][k]) + "<br>");
+          }
+          for (var k in ultimoEntorno[3]) {
+            salida.append(k + ": " + mostrarDato(ultimoEntorno[3][k]) + "<br>");
+          }
         }
       }
 
