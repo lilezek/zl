@@ -104,6 +104,10 @@ body, html {
   cursor: auto;
 }
 
+.visual.minimized {
+  border: 2px black dashed;
+}
+
 .hidden {
   display: none;
 }
