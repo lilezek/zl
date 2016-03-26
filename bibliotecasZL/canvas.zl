@@ -1,6 +1,6 @@
 Configuracion
-  importar "bibliotecasZL/punto.zl"
   importar "bibliotecasZL/color.zl"
+  importar "bibliotecasZL/punto.zl"
   nombreModulo <- "canvas"
 Fin
 
@@ -75,8 +75,8 @@ Algoritmo
   /*
   var w = $entrada.ancho >= 0 ? $entrada.ancho : 0;
   var h = $entrada.alto >= 0 ? $entrada.alto : 0;
-  var x = $entrada.centro.$miembros.px;
-  var y = $entrada.centro.$miembros.py;
+  var x = $entrada.esquina.$miembros.px;
+  var y = $entrada.esquina.$miembros.py;
   //if (lineWidth % 2 == 1) $exterior.$ctx2d.translate(0.5,0.5);
   $exterior.$ctx2d.beginPath();
   $exterior.$ctx2d.rect(x,y,w,h);
@@ -267,7 +267,8 @@ Algoritmo
   } else {
     img = new Image();
     img.onload = function() {
-      $exterior.$ctx2d.drawImage(img, $entrada.posx, $entrada.posy, $entrada.ancho, $entrada.alto);
+      console.log(img);
+      $exterior.$ctx2d.drawImage(img, $entrada.esquina.$miembros.px, $entrada.esquina.$miembros.py, $entrada.ancho, $entrada.alto);
       done(null, {});
     }
     img.onerror = function(e) {

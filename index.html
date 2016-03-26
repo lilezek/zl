@@ -90,9 +90,14 @@ Subrutina Inicio
 Datos
   fondo es Color Global
   circulo es Color Global
+  x es Lista(3) de numero
 Algoritmo
 	fondo <- "blanco" como Color
   circulo <- "naranja" como color
+  x <- {10,15*4,20}
+  mostrarNumero [
+    numero <- x(1)
+  ]
 Fin
 
 Subrutina Fotograma
@@ -267,7 +272,7 @@ Fin</textarea>
 
       function saltarAlCodigo(linea, posicion) {
         "use strict";
-        editor.setCursor(linea,posicion);
+        editor.setCursor(linea-1,posicion);
         editor.focus();
         return true;
       }
@@ -289,10 +294,9 @@ Fin</textarea>
           carga.$alError = function(e) {
               this.$continuar = false;
               if (zl.error.esError(e)){
-                var tarjeta = zl.error.obtenerMensajeHtml(e, zlcode);
-                compilation.innerHTML = tarjeta.getHtml();
-                for (var i = 0; i < tarjeta.lineasDeError().length; i++) {
-                  var x = tarjeta.lineasDeError()[i]-1;
+                compilation.innerHTML = ""+e.vincularCodigo(e);
+                for (var i = 0; i < e.lineasDeError().length; i++) {
+                  var x = e.lineasDeError()[i]-1;
                   errorLineas.push(editor.addLineClass(x, "background", "CodeMirror-line-error"));
                 }
               }
@@ -325,10 +329,10 @@ Fin</textarea>
         zl.Compilar(zlcode, {}, function(e, compilado){
           if (e) {
             if (zl.error.esError(e)) {
-              var tarjeta = zl.error.obtenerMensajeHtml(e, zlcode);
-              compilation.innerHTML = tarjeta.getHtml();
-              for (var i = 0; i < tarjeta.lineasDeError().length; i++) {
-                var x = tarjeta.lineasDeError()[i]-1;
+              e.vincularCodigo(zlcode);
+              compilation.innerHTML = ""+e;
+              for (var i = 0; i < e.lineasDeError.length; i++) {
+                var x = e.lineasDeError[i]-1;
                 errorLineas.push(editor.addLineClass(x, "background", "CodeMirror-line-error"));
               }
             } else {

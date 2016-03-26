@@ -132,7 +132,7 @@ var modulo = function(zl) {
       resultado = zl.javascript.datoprefijo(dato, simbolo)
       resultado += zl.javascript.nombre(compilado.variable, simbolo);
       if (compilado.acceso)
-        resultado += ".set(" + zl.javascript.expresion(compilado.valor, simbolo) + zl.javascript.listaAccesoAsignacion(compilado.acceso, simbolo.declaraciones[resultado]) + ")";
+        resultado = "$exterior.$accesoListaSet.call(" + resultado + "," + zl.javascript.expresion(compilado.valor, simbolo) + zl.javascript.listaAcceso(compilado.acceso, dato) + ")";
       else
         resultado += "=" + zl.javascript.expresion(compilado.valor, simbolo);
     } else if (compilado.tipo == "llamada") {
@@ -342,6 +342,20 @@ var modulo = function(zl) {
       return "true";
     } else if (compilado.tipo == "falso") {
       return "false";
+    } else if (compilado.tipo == "lista") {
+      // TODO: revisar esta optimizacion:
+      var lista = {
+        $configuracion: {
+          nombremodulo: "\"lista\""
+        }
+      };
+      lista.v = Array.prototype.slice.call(compilado.valor);
+      lista.v = lista.v.map(function(el) {
+        return zl.javascript.expresion(el, simbolo);
+      })
+      var x = JSON.stringify(lista).replace(/([^\\])\"/g,"$1");
+      x = x.replace(/\\\"/g,"\"")
+      return x;
     } else if (compilado.tipo == "conversion") {
       var subrutina = compilado.subrutinaConversora;
       var modulo = subrutina.padre;
@@ -352,7 +366,7 @@ var modulo = function(zl) {
       var dato = simbolo.declaraciones[compilado.nombre.toLowerCase()];
       var r = zl.javascript.datoprefijo(dato, simbolo);
       r += zl.javascript.nombre(compilado.nombre, simbolo);
-      return r + zl.javascript.listaAcceso(compilado.acceso, simbolo.declaraciones[r]);
+      return "$exterior.$accesoGet.call(" + r + "," + zl.javascript.listaAcceso(compilado.acceso, dato) + ")";
     } else
     if (compilado.tipo == "nombre") {
       var dato = simbolo.declaraciones[compilado.valor.toLowerCase()];
@@ -364,25 +378,14 @@ var modulo = function(zl) {
     }
   }
 
-  zl.javascript.listaAcceso = function(compilado, simbolo) {
-    var resultado = ".get(";
-    for (var i = 0; i < compilado.length; i++) {
-      var expresion = zl.javascript.expresion(compilado[i], simbolo);
-      // Quitar los paréntesis de la expresión:
-      expresion = expresion.substring(1, expresion.length - 1);
-      resultado += expresion;
-    }
-    resultado += ")";
-    return resultado;
-  }
 
-  zl.javascript.listaAccesoAsignacion = function(compilado, simbolo) {
+  zl.javascript.listaAcceso = function(compilado, simbolo) {
     var resultado = "";
+    var coma = "";
     for (var i = 0; i < compilado.length; i++) {
       var expresion = zl.javascript.expresion(compilado[i], simbolo);
-      // Quitar los paréntesis de la expresión:
-      expresion = expresion.substring(1, expresion.length - 1);
-      resultado += "," + expresion;
+      resultado += coma + expresion + ("-" + simbolo.genericidad.offsets[i]);
+      coma = ",";
     }
     return resultado;
   }

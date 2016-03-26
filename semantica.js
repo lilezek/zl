@@ -249,6 +249,11 @@ var modulo = function(zl) {
       return modulo.tipoPorNombre("booleano");
     } else if (arbol.tipo == "falso") {
       return modulo.tipoPorNombre("booleano");
+    } else if (arbol.tipo == "lista") {
+      for (var i = 0; i < arbol.length; i++) {
+        testarExpresion(arbol.valor[i], sub);
+      }
+      return modulo.tipoPorNombre("lista");
     } else if (arbol.tipo == "conversion") {
       var tipo = modulo.tipoPorNombre(arbol.tipoObjetivo);
       if (!tipo) {
@@ -281,8 +286,13 @@ var modulo = function(zl) {
           tipo: tipo
         });
       var dato = sub.declaraciones[arbol.nombre.toLowerCase()];
-      if (tipo.nombre === "lista")
+      var tiposAcceso = arbol.acceso.map(function(v) {
+        return testarExpresion(v, sub);
+      });
+      // TODO: Comprobar que los tipos de acceso son los correctos.
+      if (tipo.nombre === "lista") {
         return dato.genericidad.subtipo;
+      }
       if (tipo.nombre === "relacion")
         return dato.genericidad.valor;
     } else if (arbol.tipo == "nombre") {

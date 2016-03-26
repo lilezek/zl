@@ -21,6 +21,39 @@ Algoritmo
   */
 Fin
 
+Subrutina Conversora Primitiva TextoComoPunto
+Datos
+  t es Texto de Entrada
+  p es EsteModulo de Salida
+Algoritmo
+  /*
+  var x = $entrada.t;
+  var y = [0,0];
+  if (x.indexOf(",") > -1) {
+    y = x.split(",");
+  } else if (x.indexOf(";") > -1) {
+    y = x.split(";");
+  }
+  $salida.p.$miembros = {
+    px: parseFloat(y[0]),
+    py: parseFloat(y[1])
+  }
+  */
+Fin
+
+Subrutina Conversora Primitiva ListaComoPunto
+Datos
+  t es Lista(2) de Numero de Entrada
+  p es EsteModulo de Salida
+Algoritmo
+  /*
+  $salida.p.$miembros = {
+    px: $entrada.t.v[0],
+    py: $entrada.t.v[1]
+  }
+  */
+Fin
+
 Subrutina Primitiva LeerComponentes
 Datos
   posx es Numero de salida

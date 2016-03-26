@@ -29,7 +29,7 @@
 }
 
 \author{Ezequiel Santamaría Navarro}
-\title{Trabajo fin de grado sobre la construcción de un entorno de aprendizaje para la programación.}
+\title{Trabajo fin de grado sobre la construcción de un entorno de aprendizaje pre-universitario para la programación.}
 
 
 %\renewcommand{\abstractname}{Abstracto}
@@ -41,19 +41,97 @@
 \tableofcontents
 	
 \begin{abstract}
-	Abstracto
+	Proceso de creación de un lenguaje sencillo, de un entorno de programación sin instalación y con herramientas para facilitar el desarrollo.
 \end{abstract}
 
 
 \chapter{Introducción}
-Introducción
+
+\section{Declaración de intenciones}
+
+Mi objetivo sería conseguir que el proyecto cumpla los siguientes puntos:
+
+\begin{itemize}
+	\item El lenguaje debe estar en la medida de lo posible en castellano.
+	\item Debe diferenciar correctamente los distintos tipos de datos.
+	\item No debe asumir automáticamente conversiones de datos.
+	\item Que no requiera instalador.
+	\item Que sea flexible para que los docentes puedan añadir funcionalidad.
+\end{itemize} 
+
+Puntos que podrían simplificar el aprendizaje del desarrollo algorítmico y la programación.
+
+\section{Estado del arte}
+
+\subsection{Descubre}
+
+La herramienta Descubre, desarrollada por Juan Antonio Sánchez Laguna, Marcos Menárguez Tortosa, y Juan Antonio Martínez Navarro. 
+
+La herramienta se compone de:
+
+%TODO meter bibliografía y referencias de processing.
+
+\begin{itemize}
+	\item Un editor de texto, derivado de CodeMirror.
+	\item Un lenguaje de programación propio, derivado de Java, con un las funcionalidades de processing.
+	\item Un entorno con un lienzo para dibujar y una salida para escribir texto.
+	\item Un repositorio de usuarios y programas que permite copiar el código de otros para hacer clones. 
+\end{itemize}
+
+Con los siguientes puntos positivos:
+
+\begin{itemize}
+	\item Entorno completo. Desde escribir el código hasta ver su resultado en la misma página.
+	\item Sin instalación y sin necesidad de conocimientos sobre compilaciones.
+	\item El lenguaje comparte sintaxis con C y Java, lo que es útil para avanzar más allá de la enseñanza. 
+	\item La página tiene una lista de tutoriales y documentación sobre la funcionalidad de processing.
+\end{itemize}
+
+Y los siguientes puntos negativos:
+
+\begin{itemize}
+	\item El lienzo es un poco pequeño. Se limita a 320x320.
+	\item La sintaxis de iJava no es amigable para nuevos alumnos.
+	\item La ejecución del código es síncrono. Esto reduce las posibilidades tecnológicas. Como por ejemplo, no se pueden cargar imágenes en tiempo de ejecución.
+	\item No se puede extender el lenguaje con el propio lenguaje. Es decir, no se puede escribir un módulo para que se incluya en otro código. Esta parte no es importante para el alumno, pero sí para el docente que quiera extender el lenguaje.
+\end{itemize}
+
+Acceso: \url{http://descubre.inf.um.es}
+
+\subsection{Codecombat}
+
+CodeCombat es un proyecto de código abierto para aprender a programar en base a un juego multijugador. Actualmente tiene varios problemas sencillos (que van creciendo en dificultad) para ir aprendiendo los mecanismos de los distintos lenguajes que ofrece, a la vez que vas ganando monedas para poder comprar objetos que ofrecen mayor funcionalidad (te permiten usar más métodos para resolver los distintos problemas).
+
+%TODO Añadir imágenes del proyecto y enlaces
+
+Se pueden destacar los siguientes puntos del proyecto:
+
+\begin{itemize}
+	\item Gran conjunto de problemas a resolver que van creciendo en dificultad.
+	\item Permite seleccionar entre Python, JavaScript, Clojure, CoffeScript y Lua.
+	\item Acabado artístico profesional, así como una gran cantidad de objetos.
+	\item Proyecto de código abierto.
+	\item Traducido (parcialmente) a varios idiomas, entre los cuales se encuentra el español.
+\end{itemize}
+
+Sin embargo, el objetivo de esta plataforma es aprender resolviendo problemas concretos como moverse por un laberinto, o eliminando unos enemigos, pero no crear otras aplicaciones. Aún así, es una muy buena herramienta de aprendizaje.
+
+Como punto negativo destacaría que te obligan a programar en un lenguaje real, sin ofrecerte una alternativa amigable para nuevos alumnos. Que por defecto, Python, tiene problemas con la indentación obligatoria.
+
+Se puede probar sin registro. 
+
+Acceso: \url{http://codecombat.com}
+
+\subsection{Scratch}
+
+\subsection{code.org}
 
 \chapter{Lenguaje zl}
 \section{Introducción}
 El lenguaje está enfocado a cumplir las siguientes propiedades:
 
 \begin{itemize}
-	\item Enfocado a parecerse sintáticamente al pseudocódigo en castellano, parecido al enseñado en la asignatura IP.
+	\item Enfocado a parecerse sintácticamente al pseudocódigo en castellano, parecido al enseñado en la asignatura IP.
 	\item Diferenciando los tipos de datos, sin hacer implícitas sus conversiones ni sus operaciones.
 	\item Insensible a mayúsculas y minúsculas, 
 	y aceptando tildes y eñes en los nombres.

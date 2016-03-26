@@ -2,8 +2,9 @@
 ; Notación BNF
 ; <_> significa espacio en blanco (cualquier tipo de espacio en blanco), o un comentario
 ; Algunos de los espacios son opcionales, allá donde no haya ambiguedad:
-; por ejemplo: a.b o a<-b
-
+; por ejemplo: a.b o a<-b no es ambiguo con a . b ni con a <- b
+; la notación está extendida con * y con +, que tienen el mismo significado que
+; en regex, así como paréntesis para agrupar y [] para opcionalidad.
 
 ; Reglas gramaticales
 ; nombreSimple expresión regular ([A-Za-záéíóúÁÉÍÓÚñÑ][A-Za-záéíóúÁÉÍÓÚñÑ0-9]*)
@@ -15,7 +16,7 @@
 ; Nota, para las expresiones del mismo nivel,
 ; el arbol que se construye se reordena para evaluar primero a la izquierda.
 
-<modulo> ::= [<configuraciones> <_>] <subrutina>+
+<modulo> ::= [<configuraciones> <_>] <subrutina>*
 
 <configuraciones> ::= "configuracion" <_> (<configuracion> <_>)* "fin"
 
@@ -26,7 +27,7 @@
 
 <subrutina>  ::= <subrutinaCabecera> <_> <subrutinaCuerpo>
 
-<subrutinaCabecera>  ::= "subrutina" (<_> <modificador>)* [<_> <nombre>]
+<subrutinaCabecera>  ::= "subrutina" (<_> <modificador>)* <_> <nombre>
 
 <subrutinaCuerpo>  ::= <datos> <_> <algoritmo> <_> "fin"
 
@@ -102,6 +103,7 @@
     | <letra>
     | "verdadero"
     | "falso"
+    | <listaConstructor>
     | <evaluacion> <_> "como" <_> <nombre>
     | <nombre> <_> "(" <_> <listaAcceso> <_> ")"
     | <nombre>
@@ -111,6 +113,11 @@
     | <expresion> <_> "," <_> <listaAcceso>
     | <rango>
     | <expresion>
+
+<listaValores> ::= <evaluacion> <_> ("," <_> <listaValores>)*
+
+<listaConstructor> ::= "(" <_> <listaValores> <_> ")"
+
 
 <operadorUnario> ::= "-"
     | "+"

@@ -1,338 +1,553 @@
 var modulo = function(zl) {
   "use strict";
 
+  var espaciosPorTabulacion = "  ";
+
   zl.error = zl.error || {};
 
-  function Error(tipo, traza) {
-    this.tipo = tipo;
-    this.traza = traza;
+  function Error() {
+    this.representacion = "";
+    this.flags = {
+      html: (typeof require !== "function")
+    };
+    this.indentacion = 0;
+    this._lineas = [];
+    this.codigo = "";
+
+    Object.defineProperty(this, "lineasDeError", {
+      get: function() {
+        return this._lineas;
+      },
+      set: function(v) {
+        if( Object.prototype.toString.call( v ) === '[object Array]' ) {
+          this._lineas = v;
+        } else {
+          this._lineas.push(v);
+        }
+      }
+    });
+
     return this;
   }
 
-  Error.prototype.hojas = function(nodo) {
-    var nodo = nodo || this.traza;
-    var res = [];
-    if (nodo.length) {
-      for (var i = 0; i < nodo.length; i++) {
-        var x = Error.prototype.hojas(nodo[i]);
-        res = res.concat(x);
-      }
-      return res;
+  Error.prototype.texto = function(t) {
+    var tab = espaciosPorTabulacion;
+    var self = this;
+    t.replace(/\n/g, function() {
+      return self._nlinea();
+    });
+    if (this.flags.html) {
+      tab = tab.replace(/ /g, "&nbsp;");
+    }
+    t.replace(/\t/g, tab);
+    this.representacion += t;
+    return this;
+  }
+
+  Error.prototype._nlinea = function () {
+    var resultado = "";
+    if (this.flags.html) {
+      resultado += "<br>";
     } else {
-      return [nodo];
-    }
-  }
-
-  zl.error.saltar = function(texto, posicion) {
-    while (/\s/.test(texto.substr(posicion, 1)))
-      posicion++;
-    if (texto.substr(posicion, 2) == "//") {
-      while (texto.substr(posicion, 1) != "\n")
-        posicion++;
-      posicion = zl.error.saltar(texto, posicion);
-    }
-    return posicion;
-  }
-
-  zl.error.posicionCaracter = function(texto, posicion) {
-    posicion = zl.error.saltar(texto, posicion);
-    var resultado = {
-      linea: 1,
-      columna: 1
-    };
-    for (var i = 0; i < posicion; i++) {
-      resultado.columna += 1;
-      if (texto[i] == "\n") {
-        resultado.linea += 1;
-        resultado.columna = 0;
-      }
+      for (var i = 0; i < this.indentacion; i++)
+        resultado += "\t";
+      resultado += "\n";
     }
     return resultado;
   }
 
-  zl.error.linea = function(codigo, numeroLinea) {
-    return codigo.split("\n")[numeroLinea - 1];
+  Error.prototype.nuevaLinea = function() {
+    this.representacion += this._nlinea();
+    return this;
   }
 
-  // Devuelve un string con un apuntador al error.
-  Error.prototype.apuntador = function(codigo) {
-    var hojas = this.hojas();
-    var posicion = hojas[hojas.length - 1].end;
-    var pos = zl.error.posicionCaracter(codigo, posicion);
-    var resultado = zl.error.linea(codigo, pos.linea).replace(/ /g, "&nbsp;").replace(/\n/g, "<br>") + "<br>";
-    for (var i = 0; i < pos.columna; i++)
-      resultado += "&nbsp;";
-    return resultado + "^";
-  }
-
-  zl.error.obtenerMensaje = function(error, zlcodigo) {
-    if (error.tipo == zl.error.E_PALABRA_RESERVADA) {
-      var hojas = error.hojas();
-      var palabra = hojas[hojas.length - 2].resultado;
-      if (palabra === "$error$")
-        console.log(error);
-      return "En la línea " + zl.error.posicionCaracter(zlcodigo, error.traza.end).linea +
-        " se usa como nombre la palabra reservada '" + palabra + "'"
-    } else if (error.tipo == zl.error.E_GLOBALES_INCOMPATIBLES) {
-
-    } else if (error.tipo == zl.error.E_LLAMADA_NOMBRE_NO_ENCONTRADO) {
-
-    } else if (error.tipo == zl.error.E_LLAMADA_DATO_INCOMPATIBLE) {
-      var t = error.traza;
-      return zl.error.posicionCaracter(zlcodigo, t.posicion[0]).linea + ".\tEl dato '" + t.dato.nombre + "' ha sido introducido con un valor de tipo '" + t.obtenido.nombre + "'\n" +
-        "\t\tpero debería ser de tipo '" + t.esperado.nombre + "'.";
-    } else if (error.tipo == zl.error.E_ASIGNACION_INCOMPATIBLE) {
-      var t = error.traza;
-      return zl.error.posicionCaracter(zlcodigo, t.posicion[0]).linea + ".\tEl dato '" + t.arbol.variable + "' ha sido introducido con un valor de tipo '" + t.obtenido.nombre + "'\n" +
-        "\t\tpero debería ser de tipo '" + t.esperado.nombre + "'.";
-    } else if (error.tipo == zl.error.E_NOMBRE_NO_DEFINIDO) {
-      var t = error.traza;
-      var resultado = zl.error.posicionCaracter(zlcodigo, t.posicion[0]).linea + ".\tSe usa el nombre '" + t.nombre + "' pero no está definido.\n\n" +
-        "La lista de datos definidos es la siguiente: \n";
-      for (var k in t.declaraciones) {
-        resultado += zl.error.posicionCaracter(zlcodigo, t.declaraciones[k].posicion[0]).linea + ".\t" + t.declaraciones[k].nombre + " es " + t.declaraciones[k].tipo.nombre + "\n";
-      }
-      return resultado;
-    } else if (error.tipo == zl.error.E_LLAMADA_DATO_INEXISTENTE) {
-
-    } else if (error.tipo == zl.error.E_OPERACION_TIPO_INCOMPATIBLE_BINARIO) {
-      var t = error.traza;
-      return zl.error.posicionCaracter(zlcodigo, t.posicion[0]).linea + ".\tEn la operación \n" +
-        "\t\t" + zlcodigo.substring(t.posicion[0], t.posicion[1]) + "\n" +
-        "\tel operador '" + t.op + "' no está definido para los tipos '" + t.izq.nombre + "' y '" + t.der.nombre + "'\n" +
-        "\ty las dos partes cumplen:\n" +
-        "\t\t" + zlcodigo.substring(t.posizq[0], t.posizq[1]) + " es " + t.izq.nombre + "\n" +
-        "\t\t" + zlcodigo.substring(t.posder[0], t.posder[1]) + " es " + t.der.nombre + "\n";
-    } else if (error.tipo == zl.error.E_CONDICION_NO_BOOLEANA) {
-      var t = error.traza;
-      var linea = zl.error.posicionCaracter(zlcodigo, t.posicion[0]).linea;
-      return linea + ".\tLa condicion\n" +
-        "\t" + zlcodigo.substring(t.posicion[0], t.posicion[1]).trim() + "\n" +
-        "de\n" +
-        "\t" + zl.error.linea(zlcodigo, linea).trim() + "\n" +
-        "es de tipo '" + t.tipo.nombre + "', y las condiciones de este tipo\n" +
-        "no se pueden evaluar como verdadero o falso.\n\n";
-      // TODO: generar ejemplos automáticos con la expresión.
-      //"Ejemplos correctos:\n"
-      //"10 > 15"
-    } else if (error.tipo == zl.error.E_VECES_NO_NUMERICO) {
-      var t = error.traza;
-      var linea = zl.error.posicionCaracter(zlcodigo, t.posicion[0]).linea;
-      return linea + ".\tEn el repetir\n" +
-        "\t" + zl.error.linea(zlcodigo, linea).trim() + "\n" +
-        "dentro:\n" +
-        "\t" + zlcodigo.substring(t.posicion[0], t.posicion[1]).trim() + "\n" +
-        "debería ser un número, o una expresión que genere un número,\n" +
-        "sin embargo es un/a '" + t.tipo.nombre + "'.";
-      // TODO: generar ejemplos automáticos con la expresión.
-      //"Ejemplos correctos:\n"
-      //"10 > 15"
-    }
-    if (error.tipo == zl.error.E_SIMBOLO) {
-      zl.log(error);
-      return "Error genérico:\n\n" +
-        error.apuntador(zlcodigo);
-    }
-    return Object.keys(zl.error).filter(function(key) {
-      zl.log(error);
-      return zl.error[key] === error.tipo
-    })[0];
-  }
-
-  function TarjetaError(error, zlcodigo) {
-    console.log(error);
-    this.lineas = [];
-    if (error.tipo == zl.error.E_SIMBOLO) {
-      var hojas = error.hojas();
-      this.posicion = hojas[hojas.length - 1].end;
-      var tmp = zl.error.posicionCaracter(zlcodigo, this.posicion);
-      this.lineas.push(this.linea = tmp.linea);
-      this.columna = tmp.columna;
-
-      this.mensajeError = "Error genérico.<br>" +
-        this.htmlLinea(this.linea, this.columna) +
-        this.htmlCodigo(error.apuntador(zlcodigo));
-      if (this.linea > 0) {
-        this.mensajeError += "<br>" +
-          "Nota, es posible que el error esté en la línea anterior:<br>" +
-          this.htmlLinea(this.linea - 1, 999) +
-          this.htmlCodigo(zl.error.linea(zlcodigo, this.linea - 1));
-      }
-    } else {
-      // TODO: Unificar la información que se pasa por los errores:
-      this.posicion = zl.error.saltar(zlcodigo, (error.traza.arbol ? error.traza.arbol.begin : null) ||
-        (error.traza.posicion ? error.traza.posicion[0] : null) ||
-        (error.traza[0] && error.traza[0].posicion ? error.traza[0].posicion[0] : null)
-      );
-      var tmp = zl.error.posicionCaracter(zlcodigo, this.posicion);
-      this.lineas.push(this.linea = tmp.linea);
-      this.columna = tmp.columna;
-      this.mensajeError = "Error: en la línea <br>" +
-        this.htmlLinea(this.linea, this.columna) + this.htmlCodigo(zl.error.linea(zlcodigo, this.linea)) + "<br>";
-      if (error.tipo === zl.error.E_PALABRA_RESERVADA) {
-
-      } else if (error.tipo === zl.error.E_NOMBRE_SUBRUTINA_YA_USADO) {
-
-      } else if (error.tipo === zl.error.E_NOMBRE_DATO_YA_USADO) {
-
-      } else if (error.tipo === zl.error.E_MODIFICADOR_REPETIDO) {
-
-      } else if (error.tipo === zl.error.E_USO_INDEBIDO_MODIFICADOR_GLOBAL) {
-
-      } else if (error.tipo === zl.error.E_GLOBALES_INCOMPATIBLES) {
-        var tmp2 = zl.error.posicionCaracter(zlcodigo, error.traza[1].posicion[0]);
-        this.lineas = this.lineas.concat([tmp.linea, tmp2.linea]);
-        console.log(this.lineas);
-        this.mensajeError += "y en la línea <br>" +
-          this.htmlLinea(tmp2.linea, tmp2.columna) + this.htmlCodigo(zl.error.linea(zlcodigo, tmp2.linea)) + "<br>" +
-          "Las dos líneas definen el dato con tipos que no son compatibles:<br>" +
-          "el tipo " + this.htmlTipo(error.traza[0].tipo) + " es incompatible con el tipo " + this.htmlTipo(error.traza[1].tipo);
-      } else if (error.tipo === zl.error.E_LLAMADA_NOMBRE_NO_ENCONTRADO) {
-        this.mensajeError += "Subrutina con nombre '" + this.htmlSubrutina(error.traza["arbol"].nombre) +
-          "' no encontrada.<br>" +
-          // TODO: Encontrar similitudes por algún algoritmo como la distancia de
-          // Levensthein
-          "La lista de subrutinas definidas es:<br>";
-        for (var i = 0; i < error.traza.tabla.length; i++) {
-          this.mensajeError += this.htmlSubrutina(error.traza.tabla[i]) + "<br>";
-        }
-      } else if (error.tipo === zl.error.E_LLAMADA_DATO_INEXISTENTE) {
-        var t = error.traza;
-        this.mensajeError += "Se usa el nombre " + this.htmlDato(t.dato.izq) + " pero no está definido en la subrutina " + this.htmlSubrutina(t.subrutina.nombre) + "<br>" +
-          "La lista de entradas y salidas de " + this.htmlSubrutina(t.subrutina.nombre) + " es:<br>";
-        for (var k in t.subrutina.declaraciones) {
-          this.mensajeError += this.htmlDato(t.subrutina.declaraciones[k].nombre) + " es " + this.htmlTipo(t.subrutina.declaraciones[k].tipo);
-          if (t.subrutina.declaraciones[k].modificadores & t.subrutina.declaraciones[k].M_ENTRADA)
-            this.mensajeError += " de Entrada";
-          if (t.subrutina.declaraciones[k].modificadores & t.subrutina.declaraciones[k].M_SALIDA)
-            this.mensajeError += " de Salida";
-          this.mensajeError += "<br>";
-        }
-      } else if (error.tipo === zl.error.E_LLAMADA_DATO_INCOMPATIBLE) {
-        var t = error.traza;
-        console.log(t);
-        this.mensajeError += "El dato "+this.htmlDato(t.dato.nombre) + " ha sido introducido con un valor de tipo "+
-          this.htmlTipo(t.obtenido) + "<br>" +
-          "pero debería ser de tipo "+ this.htmlTipo(t.esperado);
-      } else if (error.tipo === zl.error.E_LLAMADA_DATOS_INCOMPLETOS) {
-
-      } else if (error.tipo === zl.error.E_NOMBRE_NO_DEFINIDO) {
-
-      } else if (error.tipo === zl.error.E_OPERACION_TIPO_INCOMPATIBLE_BINARIO) {
-        var t = error.traza;
-        this.mensajeError += "En la operación<br>" + this.htmlCodigo(zlcodigo.substring(t.posicion[0], t.posicion[1]))+"<br>"+
-          "el operador " + this.htmlCodigo(t.op) + " no está definido para los tipos " +
-          this.htmlTipo(t.izq) + " y " + this.htmlTipo(t.der) + "<br>" +
-          "y las dos partes cumplen:<br>" +
-          this.htmlCodigo(zlcodigo.substring(t.posizq[0], t.posizq[1])) + " es " + this.htmlTipo(t.izq)+ "<br>" +
-          this.htmlCodigo(zlcodigo.substring(t.posder[0], t.posder[1])) + " es " + this.htmlTipo(t.der)+ "<br>";
-      } else if (error.tipo === zl.error.E_OPERACION_NO_DEFINIDA) {
-
-      } else if (error.tipo === zl.error.E_CONDICION_NO_BOOLEANA) {
-
-      } else if (error.tipo === zl.error.E_VECES_NO_NUMERICO) {
-
-      } else if (error.tipo === zl.error.E_ASIGNACION_INCOMPATIBLE) {
-        // TODO: Que esta división no sea necesaria
-        // TODO: Incluir la declaración del dato
-        var partes = zlcodigo.substring(this.posicion, error.traza.posicion[1]).split("<-");
-        this.mensajeError += "La expresión "+this.htmlCodigo(partes[1])+"<br>"+
-          "genera un valor de tipo <span class='tipo'>" + error.traza.obtenido.nombre + "</span><br>" +
-          "pero el dato <span class='dato'>" + error.traza.arbol.variable +
-          "</span> es de tipo <span class='tipo'>" + error.traza.esperado.nombre + "</span>";
-      } else if (error.tipo === zl.error.E_TIPO_NO_EXISTE) {
-
-      } else if (error.tipo === zl.error.E_FLECHA_INCORRECTA) {
-        this.mensajeError += "La flecha "+this.htmlCodigo(error.traza.obtenido)+
-          " debería ser la flecha "+this.htmlCodigo(error.traza.esperado);
-      } else if (error.tipo === zl.error.E_ACCESO_A_DATO_LOCAL) {
-
-      } else if (error.tipo === zl.error.E_LECTURA_ILEGAL) {
-
-      } else if (error.tipo === zl.error.E_ESCRITURA_ILEGAL) {
-
-      } else if (error.tipo === zl.error.E_INDICE_NO_LISTA_NO_RELACION) {
-
-      } else if (error.tipo === zl.error.E_EJECUCION_INDICE_DESCONTROLADO) {
-
-      }
+  Error.prototype.subrutina = function(sub) {
+    var html = this.flags.html;
+    if (typeof sub === "string") {
+      this.representacion +=  (html ? "<span class='subrutina'>" : "") +
+                               sub +
+                              (html ? "</span>" : "");
+    } else if (typeof sub === "object") {
+      this.representacion +=  (html ? "<span class='subrutina'>" : "")+
+                              sub.nombre +
+                              (html ? "</span>" : "");
     }
     return this;
   }
 
-  TarjetaError.prototype.getHtml = function() {
-    var html = "<div class='error'>";
-    html += this.mensajeError;
-    html += "</div>"
-    return html;
+  Error.prototype.dato = function(dato) {
+    var html = this.flags.html;
+    if (typeof dato === "string") {
+      this.representacion +=  (html ? "<span class='dato'>" : "") +
+                               dato +
+                              (html ? "</span>" : "");
+    } else if (typeof dato === "object") {
+      this.representacion +=  (html ? "<span class='dato'>" : "")+
+                              dato.nombre +
+                              (html ? "</span>" : "");
+    }
+    return this;
   }
 
-  TarjetaError.prototype.htmlCodigo = function(codigo) {
-    return "<span class='codigo'>" + codigo.trim() + "</span>";
+  Error.prototype.tipo = function(tipo) {
+    var html = this.flags.html;
+    if (typeof tipo === "string") {
+      this.representacion +=  (html ? "<span class='tipo'>" : "") +
+      tipo +
+      (html ? "</span>" : "");
+    } else if (typeof tipo === "object") {
+      this.representacion +=  (html ? "<span class='tipo'>" : "")+
+      tipo.nombre +
+      (html ? "</span>" : "");
+    }
+    return this;
   }
 
-  TarjetaError.prototype.htmlTipo = function(tipo) {
-    return "<span class='tipo'>" + tipo.nombre + "</span>";
+  Error.prototype.resaltarLinea = function(posicion) {
+    // TODO: resaltar la línea correctamente en la opción no html
+    if (this.flags.html)
+      this.representacion += "<span class='linea' onclick='saltarAlCodigo($linea{"+(posicion+1)+"},0);'>$linea{"+(posicion+1)+"}</span>";
+    else
+      this.representacion += "Posicion: ${"+(posicion+1)+"}\n";
+    return this;
   }
 
-  // TODO: Recibir el dato y no el nombre
-  TarjetaError.prototype.htmlDato = function(nombre) {
-    return "<span class='dato'>" + nombre + "</span>";
+  Error.prototype.indentar = function() {
+    this.indentacion += 1;
+    if (this.flags.html) {
+      this.representacion += "<span class='indentacion error'>";
+    }
+    return this;
   }
 
-  // TODO: Recibir la subrutina y no el nombre
-  TarjetaError.prototype.htmlSubrutina = function(nombre) {
-    return "<span class='subrutina'>" + nombre + "</span>";
+  Error.prototype.desindentar = function() {
+    this.indentacion -= 1;
+    if (this.flags.html) {
+      this.representacion += "</span>";
+    }
+    return this;
   }
 
-  TarjetaError.prototype.htmlLinea = function(linea, columna) {
-    return "<span class='linea' onclick='return saltarAlCodigo(" + (linea - 1) + "," + (columna) + ");'>" + linea + "</span>";
+  Error.prototype.vincularCodigo = function(codigo) {
+    this.codigo = codigo;
+    this.lineasDeError = [];
   }
 
-  TarjetaError.prototype.lineasDeError = function() {
-    return this.lineas;
+  Error.prototype.toString = function() {
+    var self = this;
+    if (this.indentacion != 0) {
+      throw "La indentacion no es correcta. Se ha terminado de construir el error con "+this.indentacion+" indentaciones.";
+    }
+    if (this.flags.html) {
+      var r = this.representacion.replace(/\$linea\{(\d*)\}/ig,function(match, p1) {
+        // Contar lineas hasta la posición:
+        var linea = (self.codigo.substring(0,parseInt(p1)).split("\n").length);
+        self.lineasDeError = linea;
+        return ""+linea;
+      });
+      console.log(r);
+      return "<div class='error'>"+r+"</div>";
+    } else {
+      return this.representacion;
+    }
   }
 
-  zl.error.obtenerMensajeHtml = function(error, zlcodigo) {
-    return new TarjetaError(error, zlcodigo);
-  }
-
-
-  // distintos errores:
-  zl.error.E_SIMBOLO = 1;
-  zl.error.E_PALABRA_RESERVADA = 2;
-  zl.error.E_NOMBRE_SUBRUTINA_YA_USADO = 3;
-  zl.error.E_NOMBRE_DATO_YA_USADO = 4;
-  zl.error.E_MODIFICADOR_REPETIDO = 5;
-  zl.error.E_USO_INDEBIDO_MODIFICADOR_GLOBAL = 6;
-  zl.error.E_GLOBALES_INCOMPATIBLES = 7;
-  zl.error.E_LLAMADA_NOMBRE_NO_ENCONTRADO = 8;
-  zl.error.E_LLAMADA_DATO_INEXISTENTE = 9;
-  zl.error.E_LLAMADA_DATO_INCOMPATIBLE = 10;
-  zl.error.E_LLAMADA_DATOS_INCOMPLETOS = 11;
-  zl.error.E_NOMBRE_NO_DEFINIDO = 12;
-  zl.error.E_OPERACION_TIPO_INCOMPATIBLE_BINARIO = 13;
-  zl.error.E_OPERACION_NO_DEFINIDA = 14;
-  zl.error.E_CONDICION_NO_BOOLEANA = 15;
-  zl.error.E_VECES_NO_NUMERICO = 16;
-  zl.error.E_ASIGNACION_INCOMPATIBLE = 17;
-  zl.error.E_TIPO_NO_EXISTE = 18;
-  zl.error.E_FLECHA_INCORRECTA = 19;
-  zl.error.E_ACCESO_A_DATO_LOCAL = 20;
-  zl.error.E_LECTURA_ILEGAL = 21;
-  zl.error.E_ESCRITURA_ILEGAL = 22;
-  zl.error.E_INDICE_NO_LISTA_NO_RELACION = 23;
-  zl.error.E_CONVERSOR_NO_EXISTE = 24;
-  zl.error.E_EJECUCION_INDICE_DESCONTROLADO = 500;
-  zl.error.E_EJECUCION_CONVERSION_INVALIDA = 501;
-
-  zl.error.newError = function(a, b) {
-    return new Error(a, b);
+  zl.error.newError = function(constructor, informacion) {
+    var err = new Error();
+    constructor.call(err, informacion);
+    return err;
   }
 
   zl.error.esError = function(err) {
     return err && err.constructor && err.constructor.name === "Error";
   }
+
+  // distintos errores:
+  zl.error.E_SIMBOLO = function(informacion) {
+    this.enumeracion = 1;
+    this.identificador = "E_SIMBOLO";
+    this
+      .resaltarLinea(informacion.begin)
+      .texto("Error: " + this.identificador)
+      .indentar()
+      .texto("identacion")
+      .indentar()
+      .texto("identacion")
+      .desindentar()
+      .texto("desindentar")
+      .desindentar();
+  }
+  zl.error.E_PALABRA_RESERVADA = function(informacion) {
+    this.enumeracion = 2;
+    this.identificador = "E_PALABRA_RESERVADA";
+    this
+      .resaltarLinea(1,1)
+      .texto("Error: " + this.identificador)
+      .indentar()
+      .texto("identacion")
+      .indentar()
+      .texto("identacion")
+      .desindentar()
+      .texto("desindentar")
+      .desindentar();
+  }
+  zl.error.E_NOMBRE_SUBRUTINA_YA_USADO = function(informacion) {
+    this.enumeracion = 3;
+    this.identificador = "E_NOMBRE_SUBRUTINA_YA_USADO";
+    this
+      .resaltarLinea(1,1)
+      .texto("Error: " + this.identificador)
+      .indentar()
+      .texto("identacion")
+      .indentar()
+      .texto("identacion")
+      .desindentar()
+      .texto("desindentar")
+      .desindentar();
+  }
+  zl.error.E_NOMBRE_DATO_YA_USADO = function(informacion) {
+    this.enumeracion = 4;
+    this.identificador = "E_NOMBRE_DATO_YA_USADO";
+    this
+      .resaltarLinea(1,1)
+      .texto("Error: " + this.identificador)
+      .indentar()
+      .texto("identacion")
+      .indentar()
+      .texto("identacion")
+      .desindentar()
+      .texto("desindentar")
+      .desindentar();
+  }
+  zl.error.E_MODIFICADOR_REPETIDO = function(informacion) {
+    this.enumeracion = 5;
+    this.identificador = "E_MODIFICADOR_REPETIDO";
+    this
+      .resaltarLinea(1,1)
+      .texto("Error: " + this.identificador)
+      .indentar()
+      .texto("identacion")
+      .indentar()
+      .texto("identacion")
+      .desindentar()
+      .texto("desindentar")
+      .desindentar();
+  }
+  zl.error.E_USO_INDEBIDO_MODIFICADOR_GLOBAL = function(informacion) {
+    this.enumeracion = 6;
+    this.identificador = "E_USO_INDEBIDO_MODIFICADOR_GLOBAL";
+    this
+      .resaltarLinea(1,1)
+      .texto("Error: " + this.identificador)
+      .indentar()
+      .texto("identacion")
+      .indentar()
+      .texto("identacion")
+      .desindentar()
+      .texto("desindentar")
+      .desindentar();
+  }
+  zl.error.E_GLOBALES_INCOMPATIBLES = function(informacion) {
+    this.enumeracion = 7;
+    this.identificador = "E_GLOBALES_INCOMPATIBLES";
+    this
+      .resaltarLinea(1,1)
+      .texto("Error: " + this.identificador)
+      .indentar()
+      .texto("identacion")
+      .indentar()
+      .texto("identacion")
+      .desindentar()
+      .texto("desindentar")
+      .desindentar();
+  }
+  zl.error.E_LLAMADA_NOMBRE_NO_ENCONTRADO = function(informacion) {
+    this.enumeracion = 8;
+    this.identificador = "E_LLAMADA_NOMBRE_NO_ENCONTRADO";
+    this
+      .resaltarLinea(1,1)
+      .texto("Error: " + this.identificador)
+      .indentar()
+      .texto("identacion")
+      .indentar()
+      .texto("identacion")
+      .desindentar()
+      .texto("desindentar")
+      .desindentar();
+  }
+  zl.error.E_LLAMADA_DATO_INEXISTENTE = function(informacion) {
+    this.enumeracion = 9;
+    this.identificador = "E_LLAMADA_DATO_INEXISTENTE";
+    console.log(informacion);
+    this
+      .resaltarLinea(informacion.posicion[0])
+      .texto("Error: la subrutina ")
+      .subrutina(informacion.subrutina)
+      .texto(" no tiene ningún dato de entrada ")
+      .dato(informacion.dato.izq)
+      .nuevaLinea()
+      .texto("Los datos de la subrutina son: ")
+      .nuevaLinea()
+      .indentar();
+      for (var k in informacion.subrutina.declaraciones) {
+        this
+          .dato(informacion.subrutina.declaraciones[k])
+          .texto(" es ")
+          .tipo(informacion.subrutina.declaraciones[k].tipo)
+          .nuevaLinea()
+          ;
+      }
+      this.desindentar();
+  }
+  zl.error.E_LLAMADA_DATO_INCOMPATIBLE = function(informacion) {
+    this.enumeracion = 10;
+    this.identificador = "E_LLAMADA_DATO_INCOMPATIBLE";
+    this
+      .resaltarLinea(1,1)
+      .texto("Error: " + this.identificador)
+      .indentar()
+      .texto("identacion")
+      .indentar()
+      .texto("identacion")
+      .desindentar()
+      .texto("desindentar")
+      .desindentar();
+  }
+  zl.error.E_LLAMADA_DATOS_INCOMPLETOS = function(informacion) {
+    this.enumeracion = 11;
+    this.identificador = "E_LLAMADA_DATOS_INCOMPLETOS";
+    this
+      .resaltarLinea(1,1)
+      .texto("Error: " + this.identificador)
+      .indentar()
+      .texto("identacion")
+      .indentar()
+      .texto("identacion")
+      .desindentar()
+      .texto("desindentar")
+      .desindentar();
+  }
+  zl.error.E_NOMBRE_NO_DEFINIDO = function(informacion) {
+    this.enumeracion = 12;
+    this.identificador = "E_NOMBRE_NO_DEFINIDO";
+    console.log(informacion);
+    this
+      .resaltarLinea(informacion.posicion[0])
+      .texto("Error: el dato con nombre ")
+      .dato(informacion.nombre)
+      .texto(" no existe")
+      .nuevaLinea()
+      .texto("La lista de los datos actualmente declarados son: ")
+      .nuevaLinea()
+      .indentar()
+      ;
+      for (var k in informacion.declaraciones) {
+        this
+          .dato(informacion.declaraciones[k])
+          .texto(" es ")
+          .tipo(informacion.declaraciones[k].tipo)
+          .nuevaLinea()
+          ;
+      }
+      this.desindentar();
+
+  }
+  zl.error.E_OPERACION_TIPO_INCOMPATIBLE_BINARIO = function(informacion) {
+    this.enumeracion = 13;
+    this.identificador = "E_OPERACION_TIPO_INCOMPATIBLE_BINARIO";
+    console.log(informacion);
+    this
+      .resaltarLinea(informacion.posicion[0])
+      .texto("Error: " + this.identificador)
+      .indentar()
+      .texto("identacion")
+      .indentar()
+      .texto("identacion")
+      .desindentar()
+      .texto("desindentar")
+      .desindentar();
+  }
+  zl.error.E_OPERACION_NO_DEFINIDA = function(informacion) {
+    this.enumeracion = 14;
+    this.identificador = "E_OPERACION_NO_DEFINIDA";
+    this
+      .resaltarLinea(1,1)
+      .texto("Error: " + this.identificador)
+      .indentar()
+      .texto("identacion")
+      .indentar()
+      .texto("identacion")
+      .desindentar()
+      .texto("desindentar")
+      .desindentar();
+  }
+  zl.error.E_CONDICION_NO_BOOLEANA = function(informacion) {
+    this.enumeracion = 15;
+    this.identificador = "E_CONDICION_NO_BOOLEANA";
+    this
+      .resaltarLinea(1,1)
+      .texto("Error: " + this.identificador)
+      .indentar()
+      .texto("identacion")
+      .indentar()
+      .texto("identacion")
+      .desindentar()
+      .texto("desindentar")
+      .desindentar();
+  }
+  zl.error.E_VECES_NO_NUMERICO = function(informacion) {
+    this.enumeracion = 16;
+    this.identificador = "E_VECES_NO_NUMERICO";
+    this
+      .resaltarLinea(1,1)
+      .texto("Error: " + this.identificador)
+      .indentar()
+      .texto("identacion")
+      .indentar()
+      .texto("identacion")
+      .desindentar()
+      .texto("desindentar")
+      .desindentar();
+  }
+  zl.error.E_ASIGNACION_INCOMPATIBLE = function(informacion) {
+    this.enumeracion = 17;
+    this.identificador = "E_ASIGNACION_INCOMPATIBLE";
+    this
+      .resaltarLinea(informacion.posicion[0])
+      .texto("Error: a la izquierda de la flecha está el dato ")
+      .nuevaLinea()
+      .dato(informacion.arbol.variable)
+      .texto(" que es de tipo ")
+      .tipo(informacion.esperado)
+      .nuevaLinea()
+      .texto(" pero la parte derecha de la flecha es una expresión de tipo ")
+      .nuevaLinea()
+      .tipo(informacion.obtenido)
+      ;
+  }
+  zl.error.E_TIPO_NO_EXISTE = function(informacion) {
+    this.enumeracion = 18;
+    this.identificador = "E_TIPO_NO_EXISTE";
+    this
+      .resaltarLinea(informacion.posicion[0])
+      .texto("El tipo ")
+      .tipo(informacion.tipo)
+      .texto(" no existe")
+      ;
+  }
+  zl.error.E_FLECHA_INCORRECTA = function(informacion) {
+    this.enumeracion = 19;
+    this.identificador = "E_FLECHA_INCORRECTA";
+    this
+      .resaltarLinea(1,1)
+      .texto("Error: " + this.identificador)
+      .indentar()
+      .texto("identacion")
+      .indentar()
+      .texto("identacion")
+      .desindentar()
+      .texto("desindentar")
+      .desindentar();
+  }
+  zl.error.E_ACCESO_A_DATO_LOCAL = function(informacion) {
+    this.enumeracion = 20;
+    this.identificador = "E_ACCESO_A_DATO_LOCAL";
+    this
+      .resaltarLinea(1,1)
+      .texto("Error: " + this.identificador)
+      .indentar()
+      .texto("identacion")
+      .indentar()
+      .texto("identacion")
+      .desindentar()
+      .texto("desindentar")
+      .desindentar();
+  }
+  zl.error.E_LECTURA_ILEGAL = function(informacion) {
+    this.enumeracion = 21;
+    this.identificador = "E_LECTURA_ILEGAL";
+    this
+      .resaltarLinea(1,1)
+      .texto("Error: " + this.identificador)
+      .indentar()
+      .texto("identacion")
+      .indentar()
+      .texto("identacion")
+      .desindentar()
+      .texto("desindentar")
+      .desindentar();
+  }
+  zl.error.E_ESCRITURA_ILEGAL = function(informacion) {
+    this.enumeracion = 22;
+    this.identificador = "E_ESCRITURA_ILEGAL";
+    this
+      .resaltarLinea(1,1)
+      .texto("Error: " + this.identificador)
+      .indentar()
+      .texto("identacion")
+      .indentar()
+      .texto("identacion")
+      .desindentar()
+      .texto("desindentar")
+      .desindentar();
+  }
+  zl.error.E_INDICE_NO_LISTA_NO_RELACION = function(informacion) {
+    this.enumeracion = 23;
+    this.identificador = "E_INDICE_NO_LISTA_NO_RELACION";
+    this
+      .resaltarLinea(1,1)
+      .texto("Error: " + this.identificador)
+      .indentar()
+      .texto("identacion")
+      .indentar()
+      .texto("identacion")
+      .desindentar()
+      .texto("desindentar")
+      .desindentar();
+  }
+  zl.error.E_CONVERSOR_NO_EXISTE = function(informacion) {
+    this.enumeracion = 24;
+    this.identificador = "E_CONVERSOR_NO_EXISTE";
+    this
+      .resaltarLinea(1,1)
+      .texto("Error: " + this.identificador)
+      .indentar()
+      .texto("identacion")
+      .indentar()
+      .texto("identacion")
+      .desindentar()
+      .texto("desindentar")
+      .desindentar();
+  }
+  zl.error.E_EJECUCION_INDICE_DESCONTROLADO = function(informacion) {
+    this.enumeracion = 500;
+    this.identificador = "E_EJECUCION_INDICE_DESCONTROLADO";
+    this
+      .resaltarLinea(1,1)
+      .texto("Error: " + this.identificador)
+      .indentar()
+      .texto("identacion")
+      .indentar()
+      .texto("identacion")
+      .desindentar()
+      .texto("desindentar")
+      .desindentar();
+  }
+  zl.error.E_EJECUCION_CONVERSION_INVALIDA = function(informacion) {
+    this.enumeracion = 501;
+    this.identificador = "E_EJECUCION_CONVERSION_INVALIDA";
+    this
+      .resaltarLinea(1,1)
+      .texto("Error: " + this.identificador)
+      .indentar()
+      .texto("identacion")
+      .indentar()
+      .texto("identacion")
+      .desindentar()
+      .texto("desindentar")
+      .desindentar();
+  }
+
   return zl;
 }
 

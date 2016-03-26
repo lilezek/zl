@@ -451,11 +451,16 @@ var modulo = function(zl) {
     if (this.tipo.nombre === "lista") {
       this.genericidad.subtipo = this.padre.padre.tipoPorNombre(arbol.subtipo);
       this.genericidad.dimensiones = [];
+      this.genericidad.offsets = [];
       for (var i = 0; i < arbol.dimensiones.length; i++) {
         if (arbol.dimensiones[i].tipo === 'expresion') {
-          this.genericidad.dimensiones.push([1, parseInt(arbol.dimensiones[i].valor.valor)]);
-        } else
-          this.genericidad.dimensiones.push([parseInt(arbol.dimensiones[i].valor.minimo), parseInt(arbol.dimensiones[i].valor.maximo)]);
+          this.genericidad.dimensiones.push(parseInt(arbol.dimensiones[i].valor.valor));
+          this.genericidad.offsets.push(1);
+        } else {
+          this.genericidad.dimensiones.push(parseInt(arbol.dimensiones[i].valor.maximo) - parseInt(arbol.dimensiones[i].valor.minimo) + 1);
+          this.genericidad.offsets.push(parseInt(arbol.dimensiones[i].valor.minimo));
+
+        }
       }
     }
     if (this.tipo.nombre === "relacion") {
@@ -712,7 +717,7 @@ var modulo = function(zl) {
 
         zl.writeJson(lista, {
           nombre: "lista",
-          constr: "construirLista"
+          constr: "construirListaVacia"
         });
 
         zl.writeJson(relacion, {

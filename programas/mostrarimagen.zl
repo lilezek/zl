@@ -9,9 +9,7 @@ Datos
 	url es Texto
 Algoritmo
 	fondo [
-	  r <- 255
-	  g <- 255
-	  b <- 255
+	  fondo <- "blanco" como Color
 	]
   mostrar [
     mensaje <- "Escribe el url de una imagen:"
@@ -21,8 +19,7 @@ Algoritmo
   ]
   imagen [
 	  url <- url
-	  posx <- 0
-	  posy <- 0
+	  esquina <- "0,0" como Punto
 	  ancho <- 320
 	  alto <- 320
 	]

@@ -1,9 +1,9 @@
-.error {
+div.error {
   position: relative;
   margin-left: 50px;
 }
 
-.error::before {
+div.error::before {
   content: "";
   border-left: 1px solid;
   border-color: #333333;
@@ -43,4 +43,8 @@
   text-transform: capitalize;
   background-color: #eeeeee;
   color: #d28f9b;
+}
+
+.error.indentacion {
+  margin-left: 10px;
 }

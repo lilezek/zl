@@ -337,6 +337,7 @@ var modulo = function(zl, async) {
   Analisis.prototype.intentar = function(intentos) {
     var longitud = 0;
     var mayorerror = 0;
+    var iderror = "E_SIMBOLO";
     this.nuevoNodo({
       begin: this.posicion,
       end: this.posicion,
@@ -353,10 +354,14 @@ var modulo = function(zl, async) {
       } catch (e) {
         if (!zl.error.esError(e))
           throw e;
-        if (longitud == e.traza.end)
-          mayorerror = Math.max(e.tipo, mayorerror);
-        else if (longitud < e.traza.end)
+        if (longitud == e.traza.end && e.tipo > mayorerror) {
+          iderror = e.identificador;
           mayorerror = e.tipo;
+        }
+        else if (longitud < e.traza.end) {
+          iderror = e.identificador;
+          mayorerror = e.tipo;
+        }
         longitud = Math.max(e.traza.end, longitud);
       }
     }
@@ -365,7 +370,7 @@ var modulo = function(zl, async) {
       if (this.nodoActual[i].end < longitud)
         this.nodoActual.remove(i--);
     }
-    throw this.propagarError(zl.error.newError(mayorerror, this.arbol()));
+    throw this.propagarError(zl.error.newError(zl.error[iderror], this.arbol()));
   }
 
   function Nodo(a) {

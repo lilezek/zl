@@ -52,6 +52,8 @@ var modulo = function(zl) {
   a.simbolo("(", /^\(/);
   a.simbolo("[", /^\[/);
   a.simbolo("]", /^\]/);
+  a.simbolo("{", /^\{/);
+  a.simbolo("}", /^\}/);
   a.simbolo("->");
   a.simbolo("%");
 
@@ -499,6 +501,7 @@ var modulo = function(zl) {
       ["letra"],
       ["verdadero"],
       ["falso"],
+      ["listaConstructor"],
       ["nombre", "(", "listaAcceso", ")"],
       ["nombre"],
       ["(", "expresion", ")"],
@@ -506,21 +509,27 @@ var modulo = function(zl) {
     ]);
     var intento = this.resultado(0);
     var evalResultado = null;
-    if (intento == 7)
+    if (intento == 8)
       evalResultado = {
         valor: this.resultado(0, intento, 1),
         tipo: this.arbol(0, intento, 1).tipo
       };
-    else if (intento == 8)
+    else if (intento == 9)
       evalResultado = {
         valor: this.resultado(0, intento, 0),
         tipo: "expresion"
       };
-    else if (intento == 5) {
+    else if (intento == 6) {
       evalResultado = {
         nombre: this.resultado(0, intento, 0),
         acceso: this.resultado(0, intento, 2),
         tipo: "acceso"
+      };
+    } else if (intento == 5) {
+      evalResultado = {
+        valor: this.resultado(0, intento, 0),
+        length: this.resultado(0, intento, 0).length,
+        tipo: "lista"
       };
     } else
       evalResultado = {
@@ -552,6 +561,25 @@ var modulo = function(zl) {
         throw e;
       }
     }
+    return this;
+  });
+
+  a.regla("listaValores", function() {
+    this.expresion()
+      .acumular(",").acumular("expresion").avanzarVarios();
+    var res = [this.resultado(0)];
+    for (var i = 0; i < this.resultado(1).length; i++) {
+      res.push(this.resultado(1)[i][1]);
+    }
+    this.registrarResultado(res);
+    return this;
+  });
+
+  a.regla("listaConstructor", function() {
+    this.avanzar("{")
+      .listaValores()
+      .avanzar("}");
+    this.registrarResultado(this.resultado(1));
     return this;
   });
 

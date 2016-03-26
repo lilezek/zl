@@ -14,7 +14,7 @@ var modulo = function(zl, async) {
 
   zl.ejecucion = zl.ejecucion || {};
 
-  var rte = {};
+  var rte = zl.ejecucion.rte = {};
   // Dependencias Web
   if (typeof window !== "undefined") {
     window.$zl_rte = rte;
@@ -26,57 +26,79 @@ var modulo = function(zl, async) {
       arg);
   }
 
-  rte.construirLista = function(dimensiones) {
-    // TODO: Construir la lista usando el constructor del tipo, no ceros para rellenar.
-    var r = {
-      v: [],
-      offsets: [],
-      get: function construirLista$get() {
-        var resultado = this.v;
-        for (var i = 0; i < arguments.length; i++) {
-          resultado = resultado[arguments[i] - this.offsets[i]];
-          if (typeof resultado === "undefined" || resultado === null)
-            throw zl.error.newError(zl.error.E_EJECUCION_INDICE_DESCONTROLADO, {
-              array: this.v,
-              indices: Array.prototype.slice(arguments)
-            })
-        }
-        return resultado;
-      },
-      set: function construirLista$set(valor) {
-        var resultado = this.v;
-        var i;
-        for (i = 1; i < arguments.length - 1; i++) {
-          resultado = resultado[arguments[i] - this.offsets[i - 1]];
-          if (typeof resultado === "undefined" || resultado === null)
-            throw zl.error.newError(zl.error.E_EJECUCION_INDICE_DESCONTROLADO, {
-              array: this.v,
-              indices: Array.prototype.slice(arguments)
-            })
-        }
-        if (typeof resultado[arguments[i] - this.offsets[i - 1]] === "undefined" || resultado[arguments[i] - this.offsets[i - 1]] === null)
-          throw zl.error.newError(zl.error.E_EJECUCION_INDICE_DESCONTROLADO, {
-            array: this.v,
-            indices: Array.prototype.slice(arguments)
-          });
-        resultado[arguments[i] - this.offsets[i - 1]] = valor;
-      }
-    };
-
-    r.v = (function _generarArray(dim, i) {
-      if (i == dim.length) {
-        return 0;
-      } else {
-        var resultado = [];
-        r.offsets[i] = dim[i][0];
-        for (var j = dim[i][0]; j <= dim[i][1]; j++) {
-          resultado.push(_generarArray(dim, i + 1));
-        }
-        return resultado;
-      }
-    })(dimensiones, 0);
-    return r;
+  rte.$accesoGet = function() {
+    var resultado = this.v;
+    for (var i = 0; i < arguments.length; i++) {
+      resultado = resultado[arguments[i]];
+      if (typeof resultado === "undefined" || resultado === null)
+        throw zl.error.newError(zl.error.E_EJECUCION_INDICE_DESCONTROLADO, {
+          array: this.v,
+          indices: Array.prototype.slice(arguments)
+        })
+    }
+    return resultado;
   }
+
+  rte.$accesoSet = function() {
+    var resultado = this.v;
+    var i;
+    for (i = 1; i < arguments.length - 1; i++) {
+      resultado = resultado[arguments[i]];
+      if (typeof resultado === "undefined" || resultado === null)
+        throw zl.error.newError(zl.error.E_EJECUCION_INDICE_DESCONTROLADO, {
+          array: this.v,
+          indices: Array.prototype.slice(arguments)
+        })
+    }
+    if (typeof resultado[arguments[i]] === "undefined" || resultado[arguments[i]] === null)
+      throw zl.error.newError(zl.error.E_EJECUCION_INDICE_DESCONTROLADO, {
+        array: this.v,
+        indices: Array.prototype.slice(arguments)
+      });
+    resultado[arguments[i]] = valor;
+  }
+
+  rte.$generarArray = function(dim, i, defaultConstructor) {
+    if (i == dim.length) {
+      return defaultConstructor();
+    } else {
+      var resultado = [];
+      for (var j = 0; j <= dim[i]; j++) {
+        resultado.push(rte.$generarArray(dim, i + 1, defaultConstructor));
+      }
+      return resultado;
+    }
+  }
+
+  rte.$listaCompatible = function(otraLista) {
+    var a = this.v;
+    var b = otra.v;
+
+    function arraySameSizeRecursive(a,b) {
+      var result = a.length === b.length;
+      for (var i = 0; i < a.length && result; i++) {
+        result = arraySameSizeRecursive(a[i], b[i]);
+      }
+      return result;
+    }
+  }
+
+  rte.construirListaVacia = function(dimensiones) {
+    var lista = {v : []}; // TODO: Cambiar el constructor por defecto
+    lista.v = rte.$generarArray(dimensiones, 0, function() {return 0;});
+    return lista;
+  }
+
+  rte.construirLista = function(valores) {
+    var lista = {v : []}; lista.v = valores;
+    for (var i = 0; i < lista.v.length; i++) {
+      if (lista.v[i].constructor && lista.v[i].constructor.name === "zlLista") {
+        lista.v[i] = lista.v[i].v;
+      }
+    }
+    return lista;
+  }
+
 
   rte.$ratonCanvas = function() {
     return zl.io.posicionRatonCanvas();

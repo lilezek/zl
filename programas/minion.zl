@@ -6,196 +6,153 @@ Fin
 
 Subrutina Inicio
 Datos
-  px es Numero
-  py es Numero
+  centro es Punto
   alto es Numero
   ancho es Numero
 Algoritmo
   Fondo [
-    r <- 255
-    g <- 255
-    b <- 255
+    fondo <- "blanco" como color
   ]
-  px <- 900
-  py <- 200
+  centro <- {900,200} como punto
   alto <- 200
   ancho <- 300
   // Cuerpo
   colorrelleno [
-    r <- 255
-    g <- 215
-    b <- 101
+    relleno <- "amarillo" como color
   ]
   rectangulo [
-    posx <- px-150
-    posy <- py
+    esquina <- centro - {150,0} como punto
     ancho <- ancho
     alto <- alto
   ]
   elipse [
-    centrox <- px
-    centroy <- py
+    centro <- centro
     ancho <- ancho
     alto <- alto
   ]
   pausar
   // Mono
-    colorrelleno [
-    r <- 59
-    g <- 103
-    b <- 133
+  colorrelleno [
+    relleno <- {59,103,133} como color
   ]
   elipse [
-    centrox <- px
-    centroy <- py+alto
+    centro <- {0, 0+alto} como punto + centro
     ancho <- ancho
     alto <- alto
   ]
   rectangulo [
-    posx <- px+(ancho*0.1)
-    posy <- py+(alto*1.4)
+    esquina <- {0+(ancho*0.1),0+(alto*1.4)} como punto + centro
     ancho <- 30
     alto <- 30
   ]
   rectangulo [
-    posx <- px-(ancho*0.1)-30
-    posy <- py+(alto*1.4)
+    esquina <- {0-(ancho*0.1)-30,0+(alto*1.4)} como punto + centro
     ancho <- 30
     alto <- 30
   ]
   pausar
   // Brazos y pies
   colorrelleno [
-    r <- 255
-    g <- 215
-    b <- 101
+    relleno <- "amarillo" como color
   ]
   rectangulo [
-    posx <- px
-    posy <- py+alto*0.5
+    esquina <- {0,0+alto*0.5} como punto + centro
     ancho <- ancho
     alto <- 30
   ]
   rectangulo [
-    posx <- px-ancho
-    posy <- py+alto*0.5
+    esquina <- {0-ancho,0+alto*0.5} como punto + centro
     ancho <- ancho
     alto <- 30
   ]
   pausar
   // Ojos
   colorrelleno [
-    r <- 255
-    g <- 255
-    b <- 255
+    relleno <- {255,255,255} como color
   ]
   elipse [
-    centrox <- px-ancho*0.15-1
-    centroy <- py
+    centro <- {0-ancho*0.15-1, 0} como punto + centro
     ancho <- ancho*0.3
     alto <- ancho*0.3
   ]
   elipse [
-    centrox <- px+ancho*0.15+1
-    centroy <- py
+    centro <- {0+ancho*0.15+1, 0} como punto + centro
     ancho <- ancho*0.3
     alto <- ancho*0.3
   ]
   colorrelleno [
-    r <- 113
-    g <- 76
-    b <- 56
+    relleno <- {113,76,56} como color
   ]
   elipse [
-    centrox <- px+ancho*0.15+1
-    centroy <- py
+    centro <- {0+ancho*0.15+1, 0} como punto + centro
     ancho <- ancho*0.15
     alto <- ancho*0.15
   ]
   colorrelleno [
-    r <- 129
-    g <- 118
-    b <- 73
+    relleno <- {129,118,73} como color
   ]
   elipse [
-    centrox <- px-ancho*0.15+1
-    centroy <- py
+    centro <- {0-ancho*0.15+1, 0} como punto + centro
     ancho <- ancho*0.15
     alto <- ancho*0.15
   ]
   colorrelleno [
-    r <- 0
-    g <- 0
-    b <- 0
+    relleno <- {0,0,0} como color
   ]
   elipse [
-    centrox <- px+ancho*0.15+1
-    centroy <- py
+    centro <- {0+ancho*0.15+1, 0} como punto + centro
     ancho <- ancho*0.07
     alto <- ancho*0.07
   ]
   elipse [
-    centrox <- px-ancho*0.15+1
-    centroy <- py
+    centro <- {0-ancho*0.15+1, 0} como punto + centro
     ancho <- ancho*0.07
     alto <- ancho*0.07
   ]
   pausar
   // Boca
   elipse [
-    centrox <- px
-    centroy <- py+alto/2
+    centro <- {0, 0+alto/2} como punto + centro
     ancho <- ancho*0.6
     alto <- ancho*0.15
   ]
   colorrelleno [
-    r <- 255
-    g <- 215
-    b <- 101
+    relleno <- "amarillo" como color
   ]
   rectangulo [
-    posx <- px-ancho/2
-    posy <- py+alto/2-ancho*0.075
+    esquina <- {0-ancho/2,0+alto/2-ancho*0.075} como punto + centro
     ancho <- ancho
     alto <- ancho*0.075
   ]
   pausar
   // Gafas
   colorrelleno [
-    r <- 0
-    g <- 0
-    b <- 0
+    relleno <- {0,0,0} como color
   ]
   rectangulo [
-    posx <- px+ancho*0.3+1
-    posy <- py-ancho*0.0375
+    esquina <- {0+ancho*0.3+1,0-ancho*0.0375} como punto + centro
     ancho <- ancho*0.2
     alto <- ancho*0.075
   ]
   rectangulo [
-    posx <- px-ancho*0.5+1
-    posy <- py-ancho*0.0375
+    esquina <- {0-ancho*0.5+1,0-ancho*0.0375} como punto + centro
     ancho <- ancho*0.2
     alto <- ancho*0.075
   ]
   sinrelleno []
   colorborde [
-    r <- 140
-    g <- 140
-    b <- 140
+    borde <- {140,140,140} como color
   ]
   grosorborde [
     grosor <- 10
   ]
   elipse [
-    centrox <- px-ancho*0.15-1
-    centroy <- py
+    centro <- {0-ancho*0.15-1, 0} como punto + centro
     ancho <- ancho*0.3
     alto <- ancho*0.3
   ]
   elipse [
-    centrox <- px+ancho*0.15+1
-    centroy <- py
+    centro <- {0+ancho*0.15+1, 0} como punto + centro
     ancho <- ancho*0.3
     alto <- ancho*0.3
   ]
@@ -203,55 +160,43 @@ Algoritmo
   // Resto del mono
   sinborde []
   colorrelleno [
-    r <- 255
-    g <- 215
-    b <- 101
+    relleno <- "amarillo" como color
   ]
   rectangulo [
-    posx <- px-ancho/2
-    posy <- py+alto*0.65
+    esquina <- {0-ancho/2,0+alto*0.65} como punto + centro
     ancho <- ancho
     alto <- alto*0.35
   ]
   colorrelleno [
-    r <- 59
-    g <- 103
-    b <- 133
+    relleno <- {59,103,133} como color
   ]
   rectangulo [
-    posx <- px-ancho*0.35
-    posy <- py+alto*0.80
+    esquina <- {0-ancho*0.35,0+alto*0.80} como punto + centro
     ancho <- ancho*0.7
     alto <- alto*0.20
   ]
   pausar
   // Zapatos
   colorrelleno [
-    r <- 0
-    g <- 0
-    b <- 0
+    relleno <- {0,0,0} como color
   ]
   rectangulo [
-    posx <- px+(ancho*0.1)
-    posy <- py+(alto*1.4)+30
+    esquina <- {0+(ancho*0.1),0+(alto*1.4)+30} como punto + centro
     ancho <- 60
     alto <- 30
   ]
   rectangulo [
-    posx <- px-(ancho*0.1)-60
-    posy <- py+(alto*1.4)+30
+    esquina <- {0-(ancho*0.1)-60,0+(alto*1.4)+30} como punto + centro
     ancho <- 60
     alto <- 30
   ]
   elipse [
-    centrox <- px-(ancho*0.1)-60
-    centroy <- py+(alto*1.4)+45
+    centro <- {0-(ancho*0.1)-60, 0+(alto*1.4)+45} como punto + centro
     ancho <- 30
     alto <- 30
   ]
   elipse [
-    centrox <- px+(ancho*0.1)+60
-    centroy <- py+(alto*1.4)+45
+    centro <- {0+(ancho*0.1)+60, 0+(alto*1.4)+45} como punto + centro
     ancho <- 30
     alto <- 30
   ]
