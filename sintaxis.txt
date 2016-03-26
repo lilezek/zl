@@ -116,7 +116,7 @@
 
 <listaValores> ::= <evaluacion> <_> ("," <_> <listaValores>)*
 
-<listaConstructor> ::= "(" <_> <listaValores> <_> ")"
+<listaConstructor> ::= "{" <_> <listaValores> <_> "}"
 
 
 <operadorUnario> ::= "-"
