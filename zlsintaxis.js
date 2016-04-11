@@ -35,9 +35,9 @@ var modulo = function(zl) {
   var a = zl.sintaxis.zlAnalizador = zl.analizador.newAnalizador();
   a.simbolo("<-");
   a.simbolo(".", /^\./);
-  a.simbolo("no", /^no[^a-záéíóúñ0-9]/i);
-  a.simbolo("y", /^y[^a-záéíóúñ0-9]/i);
-  a.simbolo("o", /^o[^a-záéíóúñ0-9]/i);
+  a.simbolo("no", /^no(?![a-záéíóúñ0-9])/i);
+  a.simbolo("y", /^y(?![a-záéíóúñ0-9])/i);
+  a.simbolo("o", /^o(?![a-záéíóúñ0-9])/i);
   a.simbolo("<");
   a.simbolo(">");
   a.simbolo("<=");

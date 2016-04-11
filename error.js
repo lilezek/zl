@@ -368,6 +368,7 @@ var modulo = function(zl) {
       .desindentar();
   }
   zl.error.E_OPERACION_NO_DEFINIDA = function(informacion) {
+    console.log(informacion);
     this.enumeracion = 14;
     this.identificador = "E_OPERACION_NO_DEFINIDA";
     this
