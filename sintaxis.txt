@@ -8,13 +8,17 @@
 
 ; Reglas gramaticales
 ; nombreSimple expresión regular ([A-Za-záéíóúÁÉÍÓÚñÑ][A-Za-záéíóúÁÉÍÓÚñÑ0-9]*)
-; numero expresión regular ((?:[0-1]+(?:\|2))|(?:[0-9A-Fa-f]+(?:\|16))|(?:[0-9]+(?:\|10)?))
+; entero expresión regular ((?:[0-1]+(?:\|2))|(?:[0-9A-Fa-f]+(?:\|16))|(?:[0-9]+(?:\|10)?))
+; decimal expresión regular (\d+\.\d+)
 ; texto expresión regular \"([^"\\]|\\.|\\\n)*\"
 ; letra expresión regular \'([^"\\]|\\.|\\\n)*\'
 ; comentario expresión regular \/\/.*
 
 ; Nota, para las expresiones del mismo nivel,
 ; el arbol que se construye se reordena para evaluar primero a la izquierda.
+
+<numero> ::= <decimal>
+    | <entero>
 
 <modulo> ::= [<configuraciones> <_>] <subrutina>*
 
@@ -35,20 +39,20 @@
     | "primitiva"
     | "conversora"
 
-<nombre> ::= <nombreSimple> (<_> "." <_> <nombre>)*
+<nombre> ::= <nombreSimple>
 
 <datos> ::= "datos" <_> (<declaracion> <_>)+
 
 <algoritmo> ::= "algoritmo" <_> (<sentencia> <_>)+
 
-<declaracion> ::= <nombre> <_> "es" <_> <nombre> (<_> <declaracionModificador>)*
-    | <nombre> <_> "es" <_> "lista" "(" <_> <listaDecl> <_> ")" <_> "de" <_> <nombre> (<_> <declaracionModificador>)*
-    | <nombre> <_> "es" <_> "relacion" <_> "de" <_> <nombre> <_> "a" <_>  (<_> <declaracionModificador>)*
+<declaracion> ::= <nombre> <_> "es" <_> <tipo> (<_> <declaracionModificador>)*
 
-<listaDecl> ::= <rango> <_> "," <_> <listaDecl>
-    | <rango>
+<tipo> ::= <nombre> ("(" <genericidad> ")")?
 
-<rango> ::= <numero> <_> ".." <_> <numero>
+<genericidad> ::= <genericidad> "," <tipo>
+    | <genericidad> "," <numero>
+    | <tipo>
+    | <numero>
 
 <sentencia> ::= <asignacion>
     | <llamada>
@@ -62,11 +66,9 @@
     | "global"
 
 <asignacion> ::= <nombre> <_> "<-" <_> <expresion>
-    | <nombre> <_> "(" <_> <listaAcceso> <_> ")" <_> "<-" <_> <expresion>
+    | <lvalor> <_> "<-" <_> <expresion>
 
-<llamada> ::= <nombre> <_> "->" <_> <nombre> <_> "->" <_> <nombre>
-    | <nombre> <_> "->" <_> <nombre>
-    | <nombre> <_> "[" <_> (<llamadaAsignacion> <_>)+ "]"
+<llamada> ::= (<lvalor> <_> "." <_>) ? <nombre> <_> "[" <_> (<llamadaAsignacion> <_>)+ "]"
 
 <repetir> ::= "repetir" <_> <expresion> <_> "veces" <_> (<sentencia> <_>)+ "fin"
 
@@ -98,26 +100,25 @@
     | <evaluacion> <_> <operadorBinarioPrimero> <_> <expresionPrimera>
     | <evaluacion>
 
-<evaluacion> ::= <numero>
-    | <texto>
-    | <letra>
+<evaluacion> ::=
+    | <evaluacion> <_> "como" <_> <tipo>
+    | <evaluacion> <_> "(" <_> <listaAcceso> <_> ")"
     | "verdadero"
     | "falso"
-    | <listaConstructor>
-    | <evaluacion> <_> "como" <_> <nombre>
-    | <nombre> <_> "(" <_> <listaAcceso> <_> ")"
+    | <numero>
+    | <texto>
+    | <letra>
     | <nombre>
+    | <listaConstructor>
     | "(" <_> <expresion> <_> ")"
 
-<listaAcceso> ::= <rango> <_> "," <_> <listaAcceso>
-    | <expresion> <_> "," <_> <listaAcceso>
-    | <rango>
-    | <expresion>
+<lvalor> ::= <nombre> ( <_> "(" <_> <listaAcceso> <_> ")" )+
+
+<listaAcceso> ::= <expresion> <_> ("," <_> <expresion>)*
 
 <listaValores> ::= <evaluacion> <_> ("," <_> <listaValores>)*
 
 <listaConstructor> ::= "{" <_> <listaValores> <_> "}"
-
 
 <operadorUnario> ::= "-"
     | "+"

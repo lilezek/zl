@@ -1,0 +1,46 @@
+Configuracion
+  nombremodulo <- "relacion"
+  genericos <- "cualquiera;cualquiera"
+  importar "bibliotecasZL/lista.zl"
+Fin
+
+Subrutina Primitiva Inicio
+Datos
+  v es Interno Global
+Algoritmo
+  /*
+  $self.$miembros.v = {};
+  */
+Fin
+
+Subrutina Primitiva OperadorAccesoLectura LeerRelacion
+Datos
+  derecha es Generico(1) de Entrada
+  izquierda es EsteModulo(Generico(1),Generico(2)) de Entrada
+  resultado es Generico(2) de Salida
+Algoritmo
+  /*
+  $salida.resultado = $entrada.izquierda.$miembros.v[$entrada.derecha];
+  */
+Fin
+
+Subrutina Primitiva OperadorAccesoEscritura EscribirRelacion
+Datos
+  derecha es Generico(1) de Entrada
+  resultado es Generico(2) de Entrada
+  izquierda es EsteModulo(Generico(1),Generico(2)) de Entrada de Salida
+Algoritmo
+  /*
+  $salida.izquierda.$miembros.v[$entrada.derecha] = $entrada.resultado;
+  */
+Fin
+
+Subrutina Primitiva Claves
+Datos
+  v es Interno Global
+  valores es Lista(Generico(2)) de salida
+Algoritmo
+  /*
+  $salida.valores.$miembros.v = Object.keys($self.$miembros.v);
+  */
+Fin

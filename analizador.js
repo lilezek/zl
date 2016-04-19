@@ -183,6 +183,9 @@ var modulo = function(zl, async) {
       throw "No se puede avanzar uno porque hay 0 acumulados";
     }
     var id = this.acumulado.shift();
+    if ( Object.prototype.toString.call( id ) === '[object Array]') {
+      return this.intentar(id);
+    }
     var regex = this.analizador.simbolos[id] || this.analizador.tokens[id];
     if (!regex) {
       if (typeof this[id] === "undefined") {
@@ -269,6 +272,8 @@ var modulo = function(zl, async) {
         // Generar el resultado array
         this.arbol().resultadoArray();
         this.nodoPadre();
+        // Liberar las acumulaciones restantes:
+        this.acumulado = [];
         return this;
       }
     }
@@ -301,7 +306,7 @@ var modulo = function(zl, async) {
         }
         // No propagar error alguno.
         delete this.arbol().error;
-        // Elimiar el último nodo añadido porque siempre es un intento fallido
+        // Eliminar el último nodo añadido porque siempre es un intento fallido
         this.arbol().pop();
         // Generar el resultado array
         this.arbol().resultadoArray();
@@ -346,7 +351,7 @@ var modulo = function(zl, async) {
     });
     for (var i = 0; i < intentos.length; i++) {
       try {
-        this.acumulado = intentos[i];
+        this.acumulado = intentos[i].slice();
         this.avanzarTodos();
         this.registrarResultado(i);
         this.nodoPadre();
@@ -371,6 +376,10 @@ var modulo = function(zl, async) {
         this.nodoActual.remove(i--);
     }
     throw this.propagarError(zl.error.newError(zl.error[iderror], this.arbol()));
+  }
+
+  Analisis.prototype.intento = function(intentos) {
+    return this.acumular(intentos);
   }
 
   function Nodo(a) {

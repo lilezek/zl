@@ -50,7 +50,8 @@ describe('Forzando errores', function() {
         err.should.exist;
         done();
       } else {
-        expect(err.tipo).to.equal(zl.error.E_NOMBRE_NO_DEFINIDO);
+
+        expect(err.enumeracion).to.equal(12);
         done();
       }
     });

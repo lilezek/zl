@@ -1,12 +1,16 @@
 Configuracion
+  importar "bibliotecasZL/lista.zl"
   integrar "bibliotecasZL/basico.zl"
 Fin
 
 Subrutina Inicio
 Datos
-  sopa es Lista(4) de Texto
+  sopa es Lista(Texto)
 Algoritmo
-  sopa(1) <- "hjas"
+  sopa.inicio [
+    tamaño <- 4
+  ]
+  /*sopa(1) <- "hjas"
   sopa(2) <- "kojf"
   sopa(3) <- "zplq"
   sopa(4) <- "ñria"
@@ -15,5 +19,5 @@ Algoritmo
   mostrar [ mensaje <- sopa(1) ]
   mostrar [ mensaje <- sopa(2) ]
   mostrar [ mensaje <- sopa(3) ]
-  mostrar [ mensaje <- sopa(4) ]
+  mostrar [ mensaje <- sopa(4) ]*/
 Fin

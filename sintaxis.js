@@ -29,9 +29,16 @@ var modulo = function(zl) {
     return analisis.resultado(0);
   }
 
+  var arbolTipo = function(zlcode) {
+    var analisis = zl.sintaxis.zlAnalizador.empezar(zlcode);
+    analisis.tipo();
+    return analisis.resultado(0);
+  }
+
   zl.sintaxis.arbolConfiguracion = arbolConfiguracion;
   zl.sintaxis.arbolCodigo = arbolCodigo;
   zl.sintaxis.arbolExpresion = arbolExpresion;
+  zl.sintaxis.arbolTipo = arbolTipo;
 
   return zl;
 }

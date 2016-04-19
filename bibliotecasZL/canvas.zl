@@ -267,7 +267,6 @@ Algoritmo
   } else {
     img = new Image();
     img.onload = function() {
-      console.log(img);
       $exterior.$ctx2d.drawImage(img, $entrada.esquina.$miembros.px, $entrada.esquina.$miembros.py, $entrada.ancho, $entrada.alto);
       done(null, {});
     }

@@ -19,7 +19,7 @@ var modulo = function(zl) {
         return this._lineas;
       },
       set: function(v) {
-        if( Object.prototype.toString.call( v ) === '[object Array]' ) {
+        if (Object.prototype.toString.call(v) === '[object Array]') {
           this._lineas = v;
         } else {
           this._lineas.push(v);
@@ -44,7 +44,7 @@ var modulo = function(zl) {
     return this;
   }
 
-  Error.prototype._nlinea = function () {
+  Error.prototype._nlinea = function() {
     var resultado = "";
     if (this.flags.html) {
       resultado += "<br>";
@@ -64,13 +64,13 @@ var modulo = function(zl) {
   Error.prototype.subrutina = function(sub) {
     var html = this.flags.html;
     if (typeof sub === "string") {
-      this.representacion +=  (html ? "<span class='subrutina'>" : "") +
-                               sub +
-                              (html ? "</span>" : "");
+      this.representacion += (html ? "<span class='subrutina'>" : "") +
+        sub +
+        (html ? "</span>" : "");
     } else if (typeof sub === "object") {
-      this.representacion +=  (html ? "<span class='subrutina'>" : "")+
-                              sub.nombre +
-                              (html ? "</span>" : "");
+      this.representacion += (html ? "<span class='subrutina'>" : "") +
+        sub.nombre +
+        (html ? "</span>" : "");
     }
     return this;
   }
@@ -78,27 +78,46 @@ var modulo = function(zl) {
   Error.prototype.dato = function(dato) {
     var html = this.flags.html;
     if (typeof dato === "string") {
-      this.representacion +=  (html ? "<span class='dato'>" : "") +
-                               dato +
-                              (html ? "</span>" : "");
+      this.representacion += (html ? "<span class='dato'>" : "") +
+        dato +
+        (html ? "</span>" : "");
     } else if (typeof dato === "object") {
-      this.representacion +=  (html ? "<span class='dato'>" : "")+
-                              dato.nombre +
-                              (html ? "</span>" : "");
+      this.representacion += (html ? "<span class='dato'>" : "") +
+        dato.nombre +
+        (html ? "</span>" : "");
     }
     return this;
+  }
+
+  function recursivoTipoInstancia(dato) {
+    var resultado;
+    if (dato.tipo) {
+      resultado = dato.tipo.nombre;
+      if (dato.genericos.length)
+      resultado += "(";
+      var coma = "";
+      for (var i = 0; i < dato.genericos.length; i++) {
+        resultado += coma +  recursivoTipoInstancia(dato.genericos[i]);
+        coma = ",";
+      }
+      if (dato.genericos.length)
+      resultado += ")";
+    }
+    else
+      resultado = ""+dato;
+    return resultado;
   }
 
   Error.prototype.tipo = function(tipo) {
     var html = this.flags.html;
     if (typeof tipo === "string") {
-      this.representacion +=  (html ? "<span class='tipo'>" : "") +
-      tipo +
-      (html ? "</span>" : "");
+      this.representacion += (html ? "<span class='tipo'>" : "") +
+        tipo +
+        (html ? "</span>" : "");
     } else if (typeof tipo === "object") {
-      this.representacion +=  (html ? "<span class='tipo'>" : "")+
-      tipo.nombre +
-      (html ? "</span>" : "");
+      this.representacion += (html ? "<span class='tipo'>" : "") +
+        recursivoTipoInstancia(tipo) +
+        (html ? "</span>" : "");
     }
     return this;
   }
@@ -106,9 +125,9 @@ var modulo = function(zl) {
   Error.prototype.resaltarLinea = function(posicion) {
     // TODO: resaltar la línea correctamente en la opción no html
     if (this.flags.html)
-      this.representacion += "<span class='linea' onclick='saltarAlCodigo($linea{"+(posicion+1)+"},0);'>$linea{"+(posicion+1)+"}</span>";
+      this.representacion += "<span class='linea' onclick='saltarAlCodigo($linea{" + (posicion + 1) + "},0);'>$linea{" + (posicion + 1) + "}</span>";
     else
-      this.representacion += "Posicion: ${"+(posicion+1)+"}\n";
+      this.representacion += "Posicion: $linea{" + (posicion + 1) + "}\n";
     return this;
   }
 
@@ -136,19 +155,24 @@ var modulo = function(zl) {
   Error.prototype.toString = function() {
     var self = this;
     if (this.indentacion != 0) {
-      throw "La indentacion no es correcta. Se ha terminado de construir el error con "+this.indentacion+" indentaciones.";
+      throw "La indentacion no es correcta. Se ha terminado de construir el error con " + this.indentacion + " indentaciones.";
     }
     if (this.flags.html) {
-      var r = this.representacion.replace(/\$linea\{(\d*)\}/ig,function(match, p1) {
+      var r = this.representacion.replace(/\$linea\{(\d*)\}/ig, function(match, p1) {
         // Contar lineas hasta la posición:
-        var linea = (self.codigo.substring(0,parseInt(p1)).split("\n").length);
+        var linea = (self.codigo.substring(0, parseInt(p1)).split("\n").length);
         self.lineasDeError = linea;
-        return ""+linea;
+        return "" + linea;
       });
-      console.log(r);
-      return "<div class='error'>"+r+"</div>";
+      return "<div class='error'>" + r + "</div>";
     } else {
-      return this.representacion;
+      var r = this.representacion.replace(/\$linea\{(\d*)\}/ig, function(match, p1) {
+        // Contar lineas hasta la posición:
+        var linea = (self.codigo.substring(0, parseInt(p1)).split("\n").length);
+        self.lineasDeError = linea;
+        return "" + linea;
+      });
+      return r;
     }
   }
 
@@ -181,7 +205,7 @@ var modulo = function(zl) {
     this.enumeracion = 2;
     this.identificador = "E_PALABRA_RESERVADA";
     this
-      .resaltarLinea(1,1)
+      .resaltarLinea(1, 1)
       .texto("Error: " + this.identificador)
       .indentar()
       .texto("identacion")
@@ -195,7 +219,7 @@ var modulo = function(zl) {
     this.enumeracion = 3;
     this.identificador = "E_NOMBRE_SUBRUTINA_YA_USADO";
     this
-      .resaltarLinea(1,1)
+      .resaltarLinea(1, 1)
       .texto("Error: " + this.identificador)
       .indentar()
       .texto("identacion")
@@ -209,7 +233,7 @@ var modulo = function(zl) {
     this.enumeracion = 4;
     this.identificador = "E_NOMBRE_DATO_YA_USADO";
     this
-      .resaltarLinea(1,1)
+      .resaltarLinea(1, 1)
       .texto("Error: " + this.identificador)
       .indentar()
       .texto("identacion")
@@ -223,7 +247,7 @@ var modulo = function(zl) {
     this.enumeracion = 5;
     this.identificador = "E_MODIFICADOR_REPETIDO";
     this
-      .resaltarLinea(1,1)
+      .resaltarLinea(1, 1)
       .texto("Error: " + this.identificador)
       .indentar()
       .texto("identacion")
@@ -237,7 +261,7 @@ var modulo = function(zl) {
     this.enumeracion = 6;
     this.identificador = "E_USO_INDEBIDO_MODIFICADOR_GLOBAL";
     this
-      .resaltarLinea(1,1)
+      .resaltarLinea(1, 1)
       .texto("Error: " + this.identificador)
       .indentar()
       .texto("identacion")
@@ -251,7 +275,7 @@ var modulo = function(zl) {
     this.enumeracion = 7;
     this.identificador = "E_GLOBALES_INCOMPATIBLES";
     this
-      .resaltarLinea(1,1)
+      .resaltarLinea(1, 1)
       .texto("Error: " + this.identificador)
       .indentar()
       .texto("identacion")
@@ -265,7 +289,7 @@ var modulo = function(zl) {
     this.enumeracion = 8;
     this.identificador = "E_LLAMADA_NOMBRE_NO_ENCONTRADO";
     this
-      .resaltarLinea(1,1)
+      .resaltarLinea(1, 1)
       .texto("Error: " + this.identificador)
       .indentar()
       .texto("identacion")
@@ -278,7 +302,6 @@ var modulo = function(zl) {
   zl.error.E_LLAMADA_DATO_INEXISTENTE = function(informacion) {
     this.enumeracion = 9;
     this.identificador = "E_LLAMADA_DATO_INEXISTENTE";
-    console.log(informacion);
     this
       .resaltarLinea(informacion.posicion[0])
       .texto("Error: la subrutina ")
@@ -289,35 +312,36 @@ var modulo = function(zl) {
       .texto("Los datos de la subrutina son: ")
       .nuevaLinea()
       .indentar();
-      for (var k in informacion.subrutina.declaraciones) {
-        this
-          .dato(informacion.subrutina.declaraciones[k])
-          .texto(" es ")
-          .tipo(informacion.subrutina.declaraciones[k].tipo)
-          .nuevaLinea()
-          ;
-      }
-      this.desindentar();
+    for (var k in informacion.subrutina.declaraciones) {
+      this
+        .dato(informacion.subrutina.declaraciones[k])
+        .texto(" es ")
+        .tipo(informacion.subrutina.declaraciones[k].tipoInstancia)
+        .nuevaLinea();
+    }
+    this.desindentar();
   }
   zl.error.E_LLAMADA_DATO_INCOMPATIBLE = function(informacion) {
     this.enumeracion = 10;
     this.identificador = "E_LLAMADA_DATO_INCOMPATIBLE";
     this
-      .resaltarLinea(1,1)
-      .texto("Error: " + this.identificador)
-      .indentar()
-      .texto("identacion")
-      .indentar()
-      .texto("identacion")
-      .desindentar()
-      .texto("desindentar")
-      .desindentar();
+      .resaltarLinea(informacion.posicion[0])
+      .texto("En la llamada a ")
+      .subrutina(informacion.dato.padre)
+      .texto(" el dato ")
+      .dato(informacion.dato)
+      .nuevaLinea()
+      .texto(" debería ser de tipo ")
+      .tipo(informacion.esperado)
+      .nuevaLinea()
+      .texto(" pero el valor dado es de tipo ")
+      .tipo(informacion.obtenido)
   }
   zl.error.E_LLAMADA_DATOS_INCOMPLETOS = function(informacion) {
     this.enumeracion = 11;
     this.identificador = "E_LLAMADA_DATOS_INCOMPLETOS";
     this
-      .resaltarLinea(1,1)
+      .resaltarLinea(1, 1)
       .texto("Error: " + this.identificador)
       .indentar()
       .texto("identacion")
@@ -339,17 +363,15 @@ var modulo = function(zl) {
       .nuevaLinea()
       .texto("La lista de los datos actualmente declarados son: ")
       .nuevaLinea()
-      .indentar()
-      ;
-      for (var k in informacion.declaraciones) {
-        this
-          .dato(informacion.declaraciones[k])
-          .texto(" es ")
-          .tipo(informacion.declaraciones[k].tipo)
-          .nuevaLinea()
-          ;
-      }
-      this.desindentar();
+      .indentar();
+    for (var k in informacion.declaraciones) {
+      this
+        .dato(informacion.declaraciones[k])
+        .texto(" es ")
+        .tipo(informacion.declaraciones[k].tipo)
+        .nuevaLinea();
+    }
+    this.desindentar();
 
   }
   zl.error.E_OPERACION_TIPO_INCOMPATIBLE_BINARIO = function(informacion) {
@@ -372,7 +394,7 @@ var modulo = function(zl) {
     this.enumeracion = 14;
     this.identificador = "E_OPERACION_NO_DEFINIDA";
     this
-      .resaltarLinea(1,1)
+      .resaltarLinea(1, 1)
       .texto("Error: " + this.identificador)
       .indentar()
       .texto("identacion")
@@ -386,7 +408,7 @@ var modulo = function(zl) {
     this.enumeracion = 15;
     this.identificador = "E_CONDICION_NO_BOOLEANA";
     this
-      .resaltarLinea(1,1)
+      .resaltarLinea(1, 1)
       .texto("Error: " + this.identificador)
       .indentar()
       .texto("identacion")
@@ -400,7 +422,7 @@ var modulo = function(zl) {
     this.enumeracion = 16;
     this.identificador = "E_VECES_NO_NUMERICO";
     this
-      .resaltarLinea(1,1)
+      .resaltarLinea(1, 1)
       .texto("Error: " + this.identificador)
       .indentar()
       .texto("identacion")
@@ -423,8 +445,7 @@ var modulo = function(zl) {
       .nuevaLinea()
       .texto(" pero la parte derecha de la flecha es una expresión de tipo ")
       .nuevaLinea()
-      .tipo(informacion.obtenido)
-      ;
+      .tipo(informacion.obtenido);
   }
   zl.error.E_TIPO_NO_EXISTE = function(informacion) {
     this.enumeracion = 18;
@@ -433,14 +454,13 @@ var modulo = function(zl) {
       .resaltarLinea(informacion.posicion[0])
       .texto("El tipo ")
       .tipo(informacion.tipo)
-      .texto(" no existe")
-      ;
+      .texto(" no existe");
   }
   zl.error.E_FLECHA_INCORRECTA = function(informacion) {
     this.enumeracion = 19;
     this.identificador = "E_FLECHA_INCORRECTA";
     this
-      .resaltarLinea(1,1)
+      .resaltarLinea(1, 1)
       .texto("Error: " + this.identificador)
       .indentar()
       .texto("identacion")
@@ -454,7 +474,7 @@ var modulo = function(zl) {
     this.enumeracion = 20;
     this.identificador = "E_ACCESO_A_DATO_LOCAL";
     this
-      .resaltarLinea(1,1)
+      .resaltarLinea(1, 1)
       .texto("Error: " + this.identificador)
       .indentar()
       .texto("identacion")
@@ -468,7 +488,7 @@ var modulo = function(zl) {
     this.enumeracion = 21;
     this.identificador = "E_LECTURA_ILEGAL";
     this
-      .resaltarLinea(1,1)
+      .resaltarLinea(1, 1)
       .texto("Error: " + this.identificador)
       .indentar()
       .texto("identacion")
@@ -482,7 +502,7 @@ var modulo = function(zl) {
     this.enumeracion = 22;
     this.identificador = "E_ESCRITURA_ILEGAL";
     this
-      .resaltarLinea(1,1)
+      .resaltarLinea(1, 1)
       .texto("Error: " + this.identificador)
       .indentar()
       .texto("identacion")
@@ -496,7 +516,7 @@ var modulo = function(zl) {
     this.enumeracion = 23;
     this.identificador = "E_INDICE_NO_LISTA_NO_RELACION";
     this
-      .resaltarLinea(1,1)
+      .resaltarLinea(1, 1)
       .texto("Error: " + this.identificador)
       .indentar()
       .texto("identacion")
@@ -510,7 +530,7 @@ var modulo = function(zl) {
     this.enumeracion = 24;
     this.identificador = "E_CONVERSOR_NO_EXISTE";
     this
-      .resaltarLinea(1,1)
+      .resaltarLinea(1, 1)
       .texto("Error: " + this.identificador)
       .indentar()
       .texto("identacion")
@@ -524,7 +544,7 @@ var modulo = function(zl) {
     this.enumeracion = 500;
     this.identificador = "E_EJECUCION_INDICE_DESCONTROLADO";
     this
-      .resaltarLinea(1,1)
+      .resaltarLinea(1, 1)
       .texto("Error: " + this.identificador)
       .indentar()
       .texto("identacion")
@@ -538,7 +558,7 @@ var modulo = function(zl) {
     this.enumeracion = 501;
     this.identificador = "E_EJECUCION_CONVERSION_INVALIDA";
     this
-      .resaltarLinea(1,1)
+      .resaltarLinea(1, 1)
       .texto("Error: " + this.identificador)
       .indentar()
       .texto("identacion")

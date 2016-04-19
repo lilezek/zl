@@ -1,5 +1,6 @@
 Configuracion
   nombreModulo <- "punto"
+  importar "bibliotecasZL/lista.zl"
 Fin
 
 /*
@@ -43,13 +44,13 @@ Fin
 
 Subrutina Conversora Primitiva ListaComoPunto
 Datos
-  t es Lista(2) de Numero de Entrada
+  t es Lista(Numero) de Entrada
   p es EsteModulo de Salida
 Algoritmo
   /*
   $salida.p.$miembros = {
-    px: $entrada.t.v[0],
-    py: $entrada.t.v[1]
+    px: $entrada.t.$miembros.v[0],
+    py: $entrada.t.$miembros.v[1]
   }
   */
 Fin
@@ -64,6 +65,22 @@ Algoritmo
   /*
   $salida.posx = $self.$miembros.px;
   $salida.posy = $self.$miembros.py;
+  */
+Fin
+
+Subrutina Primitiva OperadorAccesoLectura PuntoLeerCoordenada
+Datos
+  izquierda es EsteModulo de Entrada
+  derecha es Texto de entrada
+  resultado es Numero de salida
+Algoritmo
+  /*
+  if ($entrada.derecha === "x" || $entrada.derecha === "X") {
+    $salida.resultado = $entrada.izquierda.$miembros.px;
+  } else if ($entrada.derecha === "y" || $entrada.derecha === "Y") {
+    $salida.resultado = $entrada.izquierda.$miembros.py;
+  }
+  //TODO: lanzar excepción
   */
 Fin
 

@@ -1,5 +1,6 @@
 Configuracion
   nombreModulo <- "basico"
+  importar "bibliotecasZL/lista.zl"
 Fin
 
 /*
@@ -20,6 +21,15 @@ Datos
 Algoritmo
   /*
   $exterior.$io.outWrite($entrada.mensaje+"\n");
+  */
+Fin
+
+Subrutina Primitiva MostrarLetra
+Datos
+  letra es Letra de Entrada
+Algoritmo
+  /*
+  $exterior.$io.outWrite($entrada.letra+"\n");
   */
 Fin
 
@@ -415,5 +425,32 @@ Datos
 Algoritmo
   /*
   $salida.resultado = Math.pow($entrada.base,$entrada.exponente);
+  */
+Fin
+
+/*
+  ****************************************
+  ************* Operaciones **************
+  ****************************************
+*/
+
+Subrutina Primitiva OperadorAccesoLectura TextoAccesoLetra
+Datos
+  izquierda es Texto de Entrada
+  derecha es Numero de Entrada
+  resultado es Letra de Salida
+Algoritmo
+  /*
+  $salida.resultado = $entrada.izquierda[$entrada.derecha-1];
+  */
+Fin
+
+Subrutina Primitiva Conversora TextoAListaDeLetra
+Datos
+  t es Texto de Entrada
+  l es Lista(Letra) de Salida
+Algoritmo
+  /*
+  $salida.l.$miembros.v = $entrada.t.split('');
   */
 Fin

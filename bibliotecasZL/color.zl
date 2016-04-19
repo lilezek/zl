@@ -55,7 +55,7 @@ Fin
 
 Subrutina Conversora Primitiva ListaComoColor
 Datos
-  l es Lista(3) de Numero de Entrada
+  l es Lista(Numero) de Entrada
   c es EsteModulo de Salida
 Algoritmo
   /*

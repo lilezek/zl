@@ -1,7 +1,16 @@
 Subrutina Inicio
 Datos
-  cuadrado es Lista(1..2,1..2) de Letra
+  cuadrado es Lista(Lista(Letra))
 Algoritmo
+  cuadrado.inicio [
+    tamaño <- 2
+  ]
+  /*cuadrado(1).inicio [
+    tamaño <- 2
+  ]
+  cuadrado(2).inicio [
+    tamaño <- 2
+  ]*/
   cuadrado(1,1) <- '#'
   cuadrado(1,2) <- '#'
   cuadrado(2,1) <- '#'

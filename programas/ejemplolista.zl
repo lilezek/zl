@@ -1,0 +1,26 @@
+Configuracion
+  fps <- 60
+  importar "bibliotecasZL/lista.zl"
+  integrar "bibliotecasZL/basico.zl"
+Fin
+
+Subrutina Inicio
+Datos
+  l es Lista(Numero)
+  x es Numero
+Algoritmo
+  l.inicio [
+    tamaño <- 2
+  ]
+  l.escribir [
+    indice <- 1
+    valor <- 1
+  ]
+  l.leer [
+    indice <- 1
+    valor -> x
+  ]
+  mostrarNumero [
+    numero <- x
+  ]
+Fin

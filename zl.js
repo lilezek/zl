@@ -3,9 +3,10 @@ function debug() {
   //console.log.apply(console, arguments);
 }
 
+var async = require("async");
 var zl = require('./compilador')({
   log: debug
-});
+}, async);
 
 var UglifyJS = require('uglify-js');
 var js_beautify = require('js-beautify').js_beautify;
@@ -44,7 +45,11 @@ process.stdin.on('data', function(buf) {
   content += buf.toString();
 });
 process.stdin.on('end', function() {
-  zl.Compilar(content, {}, function(err, compilado){
-    console.log(beautify(uglify(compilado.javascript)));
+  zl.Compilar(content, {}, function(err, compilado) {
+    if (err) {
+      if (zl.error.esError(err)) err.vincularCodigo(content);
+      throw err;
+    } else
+      console.log(beautify(uglify(compilado.javascript)));
   });
 });

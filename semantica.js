@@ -18,6 +18,97 @@ var modulo = function(zl) {
       sub.modificadores.asincrona = true;
   }
 
+  function testarLValor(arbol, sub) {
+    var varizq = sub.declaraciones[arbol.dato];
+    if (!varizq) {
+      throw zl.error.newError(zl.error.E_NOMBRE_NO_DEFINIDO, {
+        posicion: [arbol.begin, arbol.end],
+        nombre: arbol.dato,
+        declaraciones: sub.declaraciones
+      });
+    }
+    if (varizq.modificadores === varizq.M_ENTRADA) {
+      throw zl.error.newError(zl.error.E_ESCRITURA_ILEGAL, {
+        declaracion: varizq,
+        posicion: [arbol.begin, arbol.end]
+      });
+    }
+    var tipoActual = varizq.tipoInstancia;
+    var modulo = sub.padre;
+    for (var i = 0; i < arbol.accesos.length; i++) {
+      var acceso = arbol.accesos[i];
+      var tipoacc = testarExpresion(acceso, sub);
+      var operacion = modulo.operadorBinario("()", tipoActual, tipoacc);
+      if (!operacion)
+        throw zl.error.newError(zl.error.E_OPERACION_NO_DEFINIDA, {
+          posicion: [arbol.begin, arbol.end],
+          op: "()",
+          izq: tipoActual,
+          der: tipoacc,
+          posizq: [arbol.dato.begin, acceso.begin - 1],
+          posder: [acceso.begin, acceso.end]
+        });
+      acceso.alias = operacion.alias;
+      acceso.localizacion = operacion.localizacion;
+      tipoActual = operacion.tipoResultado;
+    }
+    return tipoActual;
+  }
+
+  function testarLValorAsignacion(arbol, sub) {
+    var varizq = sub.declaraciones[arbol.dato];
+    if (!varizq) {
+      throw zl.error.newError(zl.error.E_NOMBRE_NO_DEFINIDO, {
+        posicion: [arbol.begin, arbol.end],
+        nombre: arbol.dato,
+        declaraciones: sub.declaraciones
+      });
+    }
+    if (varizq.modificadores === varizq.M_ENTRADA) {
+      throw zl.error.newError(zl.error.E_ESCRITURA_ILEGAL, {
+        declaracion: varizq,
+        posicion: [arbol.begin, arbol.end]
+      });
+    }
+    var tipoActual = varizq.tipoInstancia;
+    var modulo = sub.padre;
+    for (var i = 0; i < arbol.accesos.length - 1; i++) {
+      var acceso = arbol.accesos[i];
+      var tipoacc = testarExpresion(acceso, sub);
+      var operacion = modulo.operadorBinario("()", tipoActual, tipoacc);
+      if (!operacion)
+        throw zl.error.newError(zl.error.E_OPERACION_NO_DEFINIDA, {
+          posicion: [arbol.begin, arbol.end],
+          op: "()",
+          izq: tipoActual,
+          der: tipoacc,
+          posizq: [arbol.dato.begin, acceso.begin - 1],
+          posder: [acceso.begin, acceso.end]
+        });
+      acceso.alias = operacion.alias;
+      acceso.localizacion = operacion.localizacion;
+      tipoActual = operacion.tipoResultado;
+    }
+    if (arbol.accesos.length) {
+      var acceso = arbol.accesos[arbol.accesos.length - 1];
+      var tipoacc = testarExpresion(acceso, sub);
+      var operacion = modulo.operadorBinario("(&)", tipoActual, tipoacc);
+      if (!operacion)
+        throw zl.error.newError(zl.error.E_OPERACION_NO_DEFINIDA, {
+          posicion: [arbol.begin, arbol.end],
+          op: "(&)",
+          izq: tipoActual,
+          der: tipoacc,
+          posizq: [arbol.dato.begin, acceso.begin - 1],
+          posder: [acceso.begin, acceso.end]
+        });
+      acceso.alias = operacion.alias;
+      acceso.localizacion = operacion.localizacion;
+      tipoActual = operacion.tipoResultado;
+    }
+    return tipoActual;
+  }
+
   function testarSentencias(arbol, sub) {
     // Comprobar si el árbol debe ser asíncrono.
     // Útil si se va a compilar a lenguajes como javascript.
@@ -25,34 +116,8 @@ var modulo = function(zl) {
     for (var k in arbol) {
       var s = arbol[k];
       if (s.tipo == "asignacion") {
-        var varizq = sub.declaraciones[s.variable];
+        var tipoizq = testarLValorAsignacion(s.variable, sub);
         var tipoder = testarExpresion(s.valor, sub);
-        if (!varizq) {
-          throw zl.error.newError(zl.error.E_NOMBRE_NO_DEFINIDO, {
-            posicion: [s.begin, s.end],
-            nombre: s.variable,
-            declaraciones: sub.declaraciones
-          });
-        }
-        if (varizq.modificadores === varizq.M_ENTRADA) {
-          throw zl.error.newError(zl.error.E_ESCRITURA_ILEGAL, {
-            declaracion: varizq,
-            posicion: [s.begin, s.end]
-          });
-        }
-        var tipoizq = varizq.tipo;
-        if (s.acceso && tipoizq.nombre != "lista" && tipoizq.nombre != "relacion") {
-          throw zl.error.newError(zl.error.E_INDICE_NO_LISTA_NO_RELACION, {
-            posicion: [s.begin, s.end],
-            nombre: s.variable,
-            tipo: tipoizq
-          });
-        }
-        // TODO: Comprobar el tipo de la clave
-        if (s.acceso && tipoizq.nombre === "lista")
-          tipoizq = varizq.genericidad.subtipo;
-        else if (s.acceso && tipoizq.nombre === "relacion")
-          tipoizq = varizq.genericidad.valor;
         if (!tipoizq.esCompatible(tipoder)) {
           throw zl.error.newError(zl.error.E_ASIGNACION_INCOMPATIBLE, {
             esperado: tipoizq,
@@ -66,7 +131,7 @@ var modulo = function(zl) {
         asincrono = asincrono || s.asincrono;
       } else if (s.tipo == "repetir") {
         var tipo = testarExpresion(s.veces, sub);
-        if (tipo.nombre != "numero") {
+        if (tipo.tipo.nombre != "numero") {
           throw zl.error.newError(zl.error.E_VECES_NO_NUMERICO, {
             arbol: s,
             posicion: [s.veces.begin, s.veces.end],
@@ -77,7 +142,7 @@ var modulo = function(zl) {
         asincrono = asincrono || s.asincrono;
       } else if (s.tipo == "mientras") {
         var tipo = testarExpresion(s.condicion, sub);
-        if (tipo.nombre != "booleano") {
+        if (tipo.tipo.nombre != "booleano") {
           throw zl.error.newError(zl.error.E_CONDICION_NO_BOOLEANA, {
             arbol: s,
             posicion: [s.condicion.begin, s.condicion.end],
@@ -90,7 +155,8 @@ var modulo = function(zl) {
         while (s) {
           if (s.condicion) {
             var tipo = testarExpresion(s.condicion, sub);
-            if (tipo.nombre != "booleano") {
+            console.log(tipo.tipo.nombre);
+            if (tipo.tipo.nombre != "booleano") {
               throw zl.error.newError(zl.error.E_CONDICION_NO_BOOLEANA, {
                 arbol: s,
                 posicion: [s.condicion.begin, s.condicion.end],
@@ -112,22 +178,19 @@ var modulo = function(zl) {
 
   function testarLlamada(arbol, sub) {
     var modulo = sub.padre;
-    var n = arbol.nombre;
-    // El módulo no siempre es sub.padre,
-    // sino que puede ser otro módulo:
-    if (n.indexOf('.') > -1) {
-      // TODO: comprobar si el tipo es primitivo.
-      // TODO: comprobar si el nombre no existe.
-      // TODO: comprobar si la subrutina es interna.
-      var r = n.split('.');
-      n = r[1];
-      modulo = sub.declaraciones[r[0].toLowerCase()].tipo.modulo;
+    var nombre = arbol.nombre;
+    var contexto = arbol.contexto;
+    var llamada = null;
+    if (contexto) {
+      var tipoContexto = testarLValor(contexto, sub);
+      llamada = tipoContexto.subrutinaPorNombreInstanciada(nombre);
+    } else {
+      llamada = modulo.subrutinaPorNombre(nombre);
     }
-    var llamada = modulo.subrutinaPorNombre(n);
     if (!llamada)
       throw zl.error.newError(zl.error.E_LLAMADA_NOMBRE_NO_ENCONTRADO, {
         arbol: arbol,
-        tabla: modulo.arrayDeSubrutinas()
+        tabla: (modulo ? modulo.arrayDeSubrutinas() : [])
       });
     for (var k in arbol.entrada) {
       var decl = arbol.entrada[k];
@@ -149,9 +212,9 @@ var modulo = function(zl) {
             posicion: [decl.begin, decl.end]
           });
         }
-        if (!decl2.tipo.esCompatible(tipo))
+        if (!decl2.tipoInstancia.esCompatible(tipo))
           throw zl.error.newError(zl.error.E_LLAMADA_DATO_INCOMPATIBLE, {
-            esperado: decl2.tipo,
+            esperado: decl2.tipoInstancia,
             obtenido: tipo,
             dato: decl2,
             posicion: [decl.begin, decl.end]
@@ -192,10 +255,10 @@ var modulo = function(zl) {
             posicion: [decl.begin, decl.end]
           });
         }
-        if (!decl2.tipo.esCompatible(der.tipo))
+        if (!decl2.tipoInstancia.esCompatible(der.tipoInstancia))
           throw zl.error.newError(zl.error.E_LLAMADA_DATO_INCOMPATIBLE, {
-            esperado: decl2.tipo,
-            obtenido: der.tipo,
+            esperado: decl2.tipoInstancia,
+            obtenido: der.tipoInstancia,
             dato: decl2,
             posicion: [decl.begin, decl.end]
           });
@@ -238,63 +301,50 @@ var modulo = function(zl) {
   function _testarExpresion(arbol, sub) {
     var modulo = sub.padre;
     if (arbol.tipo == "numero") {
-      return modulo.tipoPorNombre("numero");
+      return modulo.tipoPorNombre("numero").instanciar([], modulo);
     } else if (arbol.tipo == "texto") {
-      return modulo.tipoPorNombre("texto");
+      return modulo.tipoPorNombre("texto").instanciar([], modulo);
     } else if (arbol.tipo == "letra") {
-      return modulo.tipoPorNombre("letra");
+      return modulo.tipoPorNombre("letra").instanciar([], modulo);
     } else if (arbol.tipo == "expresion") {
       return testarExpresion(arbol.valor, sub);
     } else if (arbol.tipo == "verdadero") {
-      return modulo.tipoPorNombre("booleano");
+      return modulo.tipoPorNombre("booleano").instanciar([], modulo);
     } else if (arbol.tipo == "falso") {
-      return modulo.tipoPorNombre("booleano");
+      return modulo.tipoPorNombre("booleano").instanciar([], modulo);
     } else if (arbol.tipo == "lista") {
+      var subtipoInstancia;
       for (var i = 0; i < arbol.length; i++) {
-        testarExpresion(arbol.valor[i], sub);
+        var subtipo2 = testarExpresion(arbol.valor[i], sub);
+        if (subtipoInstancia && !subtipoInstancia.esIgual(subtipo2)) {
+          throw zl.error.newError(zl.error.E_LISTA_TIPOS_DISTINTOS, {
+            indices: [i, i - 1],
+            tipos: [subtipoInstancia, subtipo2],
+            posicion: [arbol.begin, arbol.end]
+          });
+        }
+        subtipoInstancia = subtipo2;
       }
-      return modulo.tipoPorNombre("lista");
-    } else if (arbol.tipo == "conversion") {
-      var tipo = modulo.tipoPorNombre(arbol.tipoObjetivo);
-      if (!tipo) {
-        throw zl.error.newError(zl.error.E_TIPO_NO_EXISTE, {
-          posicion: [arbol.begin, arbol.end],
-          tipo: arbol.tipoObjetivo
+      var tlista = modulo.tipoPorNombre("lista");
+      if (!tlista) {
+        throw zl.error.newError(zl.error.E_LISTA_NO_ESTA_IMPORTADA, {
+          posicion: [arbol.begin, arbol.end]
         });
       }
+      return tlista.instanciar([subtipoInstancia], modulo);
+    } else if (arbol.tipo == "conversion") {
+      var tipo = zl.entorno.newTipoInstancia(modulo);
+      tipo.rellenarDesdeArbol(arbol.tipoObjetivo, modulo);
       var datoTipo = testarExpresion(arbol.evaluacion, sub);
-      if (!(tipo.nombre in datoTipo.conversiones)) {
+      arbol.subrutinaConversora = modulo.conversor(tipo, datoTipo);
+      if (!arbol.subrutinaConversora) {
         throw zl.error.newError(zl.error.E_CONVERSOR_NO_EXISTE, {
           posicion: [arbol.begin, arbol.end],
-          tipoObjetivo: arbol.tipoObjetivo,
-          tipoBase: datoTipo.nombre
+          tipoObjetivo: tipo,
+          tipoBase: datoTipo
         });
       }
-      arbol.subrutinaConversora = datoTipo.conversiones[tipo.nombre];
       return tipo;
-    } else if (arbol.tipo == "acceso") {
-      var tipo = testarExpresion({
-        tipo: "nombre",
-        valor: arbol.nombre,
-        begin: arbol.begin,
-        end: arbol.end
-      }, sub);
-      if (tipo.nombre != "lista" && tipo.nombre != "relacion")
-        throw zl.error.newError(zl.error.E_INDICE_NO_LISTA_NO_RELACION, {
-          posicion: [arbol.begin, arbol.end],
-          nombre: arbol.nombre,
-          tipo: tipo
-        });
-      var dato = sub.declaraciones[arbol.nombre.toLowerCase()];
-      var tiposAcceso = arbol.acceso.map(function(v) {
-        return testarExpresion(v, sub);
-      });
-      // TODO: Comprobar que los tipos de acceso son los correctos.
-      if (tipo.nombre === "lista") {
-        return dato.genericidad.subtipo;
-      }
-      if (tipo.nombre === "relacion")
-        return dato.genericidad.valor;
     } else if (arbol.tipo == "nombre") {
       var dato = sub.declaraciones[arbol.valor.toLowerCase()];
       // TODO: Añadir más información al error
@@ -309,8 +359,7 @@ var modulo = function(zl) {
           declaracion: dato,
           posicion: [arbol.begin, arbol.end]
         });
-      if (dato.tipo)
-        return dato.tipo;
+      return dato.tipoInstancia;
     }
     // Expresiones complejas
     else if (!arbol.tipo && arbol.op && arbol.der) {
@@ -320,7 +369,8 @@ var modulo = function(zl) {
       if (arbol.izq) {
         var tipoizq = testarExpresion(arbol.izq, sub);
         // Comprobaciones de tipos y operaciones:
-        var operacion = tipoizq.opbinario[op];
+        var operacion = modulo.operadorBinario(op, tipoizq, tipoder);
+        // TODO: mover esto a operadorBinario
         if (!operacion)
           throw zl.error.newError(zl.error.E_OPERACION_NO_DEFINIDA, {
             posicion: [arbol.begin, arbol.end],
@@ -330,19 +380,10 @@ var modulo = function(zl) {
             posizq: [arbol.izq.begin, arbol.izq.end],
             posder: [arbol.der.begin, arbol.der.end]
           });
-        var tipores = operacion[tipoder.nombre];
-        if (!tipores)
-          throw zl.error.newError(zl.error.E_OPERACION_TIPO_INCOMPATIBLE_BINARIO, {
-            posicion: [arbol.begin, arbol.end],
-            op: op,
-            izq: tipoizq,
-            der: tipoder,
-            posizq: [arbol.izq.begin, arbol.izq.end],
-            posder: [arbol.der.begin, arbol.der.end]
-          });
-        return modulo.tipoPorNombre(tipores.resultado);
+        var tipores = operacion.tipoResultado;
+        return tipores;
       } else /* Operaciones unarias */ {
-        var operacion = tipoder.opunario[op];
+        var operacion = modulo.operadorUnario(op, tipoder);
         if (!operacion)
           throw zl.error.newError(zl.error.E_OPERACION_NO_DEFINIDA, {
             posicion: [arbol.begin, arbol.end],
@@ -350,7 +391,7 @@ var modulo = function(zl) {
             der: tipoder,
             posder: [arbol.der.begin, arbol.der.end]
           });
-        return modulo.tipoPorNombre(operacion.resultado);
+        return operacion.tipoResultado;
       }
     }
   }

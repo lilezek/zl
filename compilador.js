@@ -74,6 +74,7 @@ var modulo = function(zl, async) {
           importes.push(camino);
         }
       }
+
     } catch (e) {
       if (!zl.error.esError(e) || e.traza.end > 0) {
         done(e);
@@ -121,6 +122,19 @@ var modulo = function(zl, async) {
           // Fase 5, generar la tabla de símbolos
           // Construir este módulo
           var mod = zl.entorno.newModulo();
+
+          // Esta fase debería ser de configuración, pero se ha de hacer después de importar módulos
+          if (configuraciones.genericos) {
+            var arr = configuraciones.genericos.split(";");
+            mod.genericos = new Array(arr.length);
+            for (var i = 0; i < arr.length; i++) {
+              // TODO: Errores
+              // TODO: Comprobar que no se use el Generico aquí
+              var tipo = zl.sintaxis.arbolTipo(arr[i]);
+              mod.genericos[i] = zl.entorno.newTipoInstancia([]);
+              mod.genericos[i].rellenarDesdeArbol(tipo,mod);
+            }
+          }
 
           // Fase 6, introducir las integraciones en el módulo
           for (var i = 0; i < integraciones.length; i++)

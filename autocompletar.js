@@ -10,7 +10,7 @@ var modulo = function(zl) {
     var mejorPosibilidad = "";
     var distancia = Infinity;
     for (var k in subrutina.declaraciones) {
-      if (subrutina.declaraciones[k].tipo.nombre === tipo) {
+      if (subrutina.declaraciones[k].tipoInstancia.tipo.nombre === tipo) {
         var d;
         if ((d = (new Levenshtein(similitud, subrutina.declaraciones[k].nombre)).distance) < distancia) {
           distancia = d;
@@ -174,19 +174,19 @@ var modulo = function(zl) {
         if (decl.modificadores & decl.M_ENTRADA && decl.modificadores & decl.M_SALIDA) {
           hint.repl += " <- ";
           hint.repl += "%" + decl.nombre + "&";
-          hint.repl += decl.tipo.nombre + "%\n%indent%";
+          hint.repl += decl.tipoInstancia.tipo.nombre + "%\n%indent%";
           hint.repl += " -> ";
           hint.repl += "%dato&";
-          hint.repl += decl.tipo.nombre + "%";
+          hint.repl += decl.tipoInstancia.tipo.nombre + "%";
         } else if (decl.modificadores & decl.M_ENTRADA) {
           hint.repl += " <- ";
           hint.repl += "%" + decl.nombre + "&";
-          hint.repl += decl.tipo.nombre + "%";
+          hint.repl += decl.tipoInstancia.tipo.nombre + "%";
         } else if (decl.modificadores & decl.M_SALIDA) {
           hint.repl += " -> ";
           hint.repl += "%dato&";
           hint.repl += decl.nombre + "&";
-          hint.repl += decl.tipo.nombre + "%";
+          hint.repl += decl.tipoInstancia.tipo.nombre + "%";
         }
       }
     }
@@ -211,8 +211,8 @@ var modulo = function(zl) {
     if (sub && start.indexOf(".") > -1) {
       var r = start.split(".");
       var dato = sub.declaraciones[r[0]];
-      if (dato && dato.tipo.modulo) {
-        subrutinas = dato.tipo.modulo.arrayDeSubrutinasPropias();
+      if (dato && dato.tipoInstancia.tipo.modulo) {
+        subrutinas = dato.tipoInstancia.tipo.modulo.arrayDeSubrutinasPropias();
         start = r[1];
         keywords = [];
         datos = [];

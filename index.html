@@ -7,7 +7,11 @@
 
   <script>
     // Activar debug:
-    this.zl = {log : function() { console.log.apply(console, arguments); }};
+    this.zl = {
+      log: function() {
+        console.log.apply(console, arguments);
+      }
+    };
   </script>
 
   <script src="terceros/jquery-2.1.4.min.js"></script>
@@ -44,81 +48,113 @@
   <script src="terceros/uglifyjs/output.js"></script>
   <script src="terceros/uglifyjs/compress.js"></script>
   <script>
-  var default_options = {};
+    var default_options = {};
 
-  function uglify(code) {
-    var options = {};
-    // Create copies of the options
-    var parse_options = defaults({}, options.parse);
-    var compress_options = defaults({}, options.compress);
-    var output_options = defaults({}, options.output);
+    function uglify(code) {
+      var options = {};
+      // Create copies of the options
+      var parse_options = defaults({}, options.parse);
+      var compress_options = defaults({}, options.compress);
+      var output_options = defaults({}, options.output);
 
-    parse_options = defaults(parse_options, default_options.parse, true);
-    compress_options = defaults(compress_options, default_options.compress, true);
-    output_options = defaults(output_options, default_options.output, true);
+      parse_options = defaults(parse_options, default_options.parse, true);
+      compress_options = defaults(compress_options, default_options.compress, true);
+      output_options = defaults(output_options, default_options.output, true);
 
-    // 1. Parse
-    var toplevel_ast = parse(code, parse_options);
-    toplevel_ast.figure_out_scope();
+      // 1. Parse
+      var toplevel_ast = parse(code, parse_options);
+      toplevel_ast.figure_out_scope();
 
-    // 2. Compress
-    var compressor = new Compressor(compress_options);
-    var compressed_ast = toplevel_ast.transform(compressor);
+      // 2. Compress
+      var compressor = new Compressor(compress_options);
+      var compressed_ast = toplevel_ast.transform(compressor);
 
-    // 3. Mangle
-    compressed_ast.figure_out_scope();
-    compressed_ast.compute_char_frequency();
-    compressed_ast.mangle_names();
+      // 3. Mangle
+      compressed_ast.figure_out_scope();
+      compressed_ast.compute_char_frequency();
+      compressed_ast.mangle_names();
 
-    // 4. Generate output
-    code = compressed_ast.print_to_string(output_options);
+      // 4. Generate output
+      code = compressed_ast.print_to_string(output_options);
 
-    return code;
-  }
-</script>
+      return code;
+    }
+  </script>
 </head>
 
 <body onresize="return canvasEscala();">
   <div class="main">
-<textarea class="editor" id="editor">Configuracion
+    <textarea class="editor" id="editor">Configuracion
   fps <- 60
-	integrar "bibliotecasZL/basico.zl"
+  importar "bibliotecasZL/punto.zl"
+  importar "bibliotecasZL/lista.zl"
   integrar "bibliotecasZL/canvas.zl"
+  integrar "bibliotecasZL/basico.zl"
+Fin
+
+Subrutina NuevoCodigoDeBarras
+Datos
+  codigobarras es Lista(booleano) de salida de entrada
+  i es numero
+  aleatorio es numero
+Algoritmo
+  i <- 0
+  Repetir 100 veces
+    i <- i + 1
+    aleatorio [
+      minimo <- 0
+      maximo <- 1
+      resultado -> aleatorio
+    ]
+    Si aleatorio = 1 hacer
+    	codigobarras(i) <- verdadero
+  	si no hacer
+      codigobarras(i) <- falso
+    Fin
+	Fin
 Fin
 
 Subrutina Inicio
 Datos
-  fondo es Color Global
-  circulo es Color Global
-  x es Lista(3) de numero
+  codigobarras es Lista(booleano) global
+  i es numero
+  aleatorio es numero
 Algoritmo
-	fondo <- "blanco" como Color
-  circulo <- "naranja" como color
-  x <- {10,15*4,20}
-  mostrarNumero [
-    numero <- x(1)
+  codigobarras.inicio [
+    tamaño <- 100
   ]
+	nuevocodigodebarras [
+	  codigobarras <- codigobarras
+	]
 Fin
+
+
 
 Subrutina Fotograma
 Datos
-  fondo es Color Global
-  circulo es Color Global
-  centro es Punto
+  codigobarras es Lista(booleano) global
+  i es numero
 Algoritmo
   fondo [
-    fondo <- fondo
-  ]
-  posicionraton [
-    posicion -> centro
+    fondo <- "blanco" como color
   ]
   colorrelleno [
-    relleno <- circulo
+    relleno <- "negro" como color
   ]
-  elipse [
-    centro <- centro
-    ancho <- 100
-    alto <- 100
+  i <- 0
+	Repetir 100 veces
+    i <- i + 1
+    Si codigobarras(i) hacer
+      rectangulo [
+        esquina <- {i*10,50} como punto
+        ancho <- 10
+        alto <- 500
+      ]
+    Fin
+	Fin
+	pausar
+  nuevocodigodebarras [
+    codigobarras <- codigobarras
   ]
 Fin</textarea>
     <div class="v divisor"></div>
@@ -190,7 +226,7 @@ Fin</textarea>
         }
 
         if (lastCompilation)
-          lastCompilation.modulo.desplazarPosiciones(editor.indexFromPos(ev.from),movido);
+          lastCompilation.modulo.desplazarPosiciones(editor.indexFromPos(ev.from), movido);
         if (lasttimeout) {
           clearTimeout(lasttimeout);
         }
@@ -202,7 +238,7 @@ Fin</textarea>
         }
 
       });
-      editor.on("cursorActivity", function(){
+      editor.on("cursorActivity", function() {
         //setTimeout(mostrarDatos,20);
         return true;
       });
@@ -217,8 +253,14 @@ Fin</textarea>
       editor.addKeyMap({
         "Ctrl-S": download,
         "Cmd-S": download,
-        "Ctrl-F9": function(){evaluando = !evaluando; mostrarDatos();},
-        "Cmd-F9": function(){evaluando = !evaluando; mostrarDatos();},
+        "Ctrl-F9": function() {
+          evaluando = !evaluando;
+          mostrarDatos();
+        },
+        "Cmd-F9": function() {
+          evaluando = !evaluando;
+          mostrarDatos();
+        },
         "Ctrl-Space": autocompletar,
         "Cmd-Space": autocompletar,
         "Ctrl-Enter": autocompletar,
@@ -226,7 +268,7 @@ Fin</textarea>
       });
 
       if (parametros["programa"] && parametros["programa"].indexOf("..") === -1) {
-        $.ajax("programas/"+parametros["programa"],{
+        $.ajax("programas/" + parametros["programa"], {
           dataType: "text",
           type: "get",
           success: function(data) {
@@ -272,7 +314,7 @@ Fin</textarea>
 
       function saltarAlCodigo(linea, posicion) {
         "use strict";
-        editor.setCursor(linea-1,posicion);
+        editor.setCursor(linea - 1, posicion);
         editor.focus();
         return true;
       }
@@ -292,16 +334,15 @@ Fin</textarea>
             $("#run").html("Empezar");
           }
           carga.$alError = function(e) {
-              this.$continuar = false;
-              if (zl.error.esError(e)){
-                compilation.innerHTML = ""+e.vincularCodigo(e);
-                for (var i = 0; i < e.lineasDeError().length; i++) {
-                  var x = e.lineasDeError()[i]-1;
-                  errorLineas.push(editor.addLineClass(x, "background", "CodeMirror-line-error"));
-                }
+            this.$continuar = false;
+            if (zl.error.esError(e)) {
+              compilation.innerHTML = "" + e.vincularCodigo(e);
+              for (var i = 0; i < e.lineasDeError().length; i++) {
+                var x = e.lineasDeError()[i] - 1;
+                errorLineas.push(editor.addLineClass(x, "background", "CodeMirror-line-error"));
               }
-              else
-                throw e;
+            } else
+              throw e;
           }
           zl.Ejecutar(carga);
         } else {
@@ -326,13 +367,13 @@ Fin</textarea>
         lasttimeout = null;
         var compilation = $("#helparea").get(0);
         eliminarLineasError();
-        zl.Compilar(zlcode, {}, function(e, compilado){
+        zl.Compilar(zlcode, {}, function(e, compilado) {
           if (e) {
             if (zl.error.esError(e)) {
               e.vincularCodigo(zlcode);
-              compilation.innerHTML = ""+e;
+              compilation.innerHTML = "" + e;
               for (var i = 0; i < e.lineasDeError.length; i++) {
-                var x = e.lineasDeError[i]-1;
+                var x = e.lineasDeError[i] - 1;
                 errorLineas.push(editor.addLineClass(x, "background", "CodeMirror-line-error"));
               }
             } else {
@@ -361,7 +402,7 @@ Fin</textarea>
 
       function download() {
         var zip = new JSZip();
-        zip.file("codigo.zl",editor.getValue());
+        zip.file("codigo.zl", editor.getValue());
         zip.file("zl.comp.json", JSON.stringify({
           javascript: lastCompilation.javascript,
           inicioAsincrono: lastCompilation.inicioAsincrono,
@@ -374,7 +415,9 @@ Fin</textarea>
         zip.file("utils.js", ziputils);
         zip.file("arrastrame a google chrome o firefox.html", zipindex);
 
-        var content = zip.generate({type: "blob"});
+        var content = zip.generate({
+          type: "blob"
+        });
         saveAs(content, "programa.zip");
       }
 
@@ -382,7 +425,7 @@ Fin</textarea>
       $("#output").get(0).onscroll = function(ev) {
         $this = $("#output");
         var t = $this.get(0);
-        isBottom = (t.scrollTop+$this.innerHeight() >= t.scrollHeight);
+        isBottom = (t.scrollTop + $this.innerHeight() >= t.scrollHeight);
       };
 
       zl.io = zl.io || {};
@@ -403,8 +446,8 @@ Fin</textarea>
       }
 
       zl.io.inRead = function(callback) {
-        $("#input").prop("disabled",false);
-        $("#input").keypress(function (e) {
+        $("#input").prop("disabled", false);
+        $("#input").keypress(function(e) {
           if (e.which == 13) {
             $(this).off("keypress");
             var v = $("#input").val();
@@ -468,12 +511,27 @@ Fin</textarea>
         if (typeof dato === "undefined" || dato === null) {
           return "sin definir todavía";
         } else if (typeof dato === "number" || typeof dato === "string") {
-          return ""+dato;
+          return "" + dato;
         } else if (typeof dato === "object") {
-          console.log(dato);
-          var resultado = dato.$configuracion.nombremodulo + "<br>";
-          for (var k in dato.$miembros) {
-            resultado += "||" + k + ": " + mostrarDato(dato.$miembros[k]) + "<br>";
+          if (dato.$configuracion) {
+            var resultado = dato.$configuracion.nombremodulo + "<br>";
+            for (var k in dato.$miembros) {
+              resultado += "||" + k + ": " + mostrarDato(dato.$miembros[k]) + "<br>";
+            }
+          } else if (dato.constructor.toString().indexOf("Array") > -1) {
+            resultado = "[";
+            var coma = "";
+            for (var i = 0; i < dato.length; i++) {
+              resultado += coma + mostrarDato(dato[i]);
+              coma = ",";
+            }
+            resultado += "]";
+          } else {
+            try {
+              resultado = JSON.stringify(dato);
+            } catch (e) {
+              resultado = Object.prototype.toString.call(dato);
+            }
           }
           return resultado;
         }
@@ -494,7 +552,7 @@ Fin</textarea>
           }
           compilation.innerHTML = "La expresión \n\t"+editor.getSelection()+"\n"+
             "Equivale a:\n"+valor;*/
-            // ultimoEntorno = [$local, $global, $entrada, $salida]
+          // ultimoEntorno = [$local, $global, $entrada, $salida]
           for (var k in ultimoEntorno[0]) {
             local.append(k + ": " + mostrarDato(ultimoEntorno[0][k]) + "<br>");
           }
@@ -515,7 +573,7 @@ Fin</textarea>
       var zipasync;
       var zipjquery;
       var ziputils;
-      $.ajax("entornoEjecucion/estilo.css",{
+      $.ajax("entornoEjecucion/estilo.css", {
         dataType: "text",
         type: "get",
         success: function(data) {
@@ -523,7 +581,7 @@ Fin</textarea>
         }
       });
 
-      $.ajax("entornoEjecucion/index.html",{
+      $.ajax("entornoEjecucion/index.html", {
         dataType: "text",
         type: "get",
         success: function(data) {
@@ -531,7 +589,7 @@ Fin</textarea>
         }
       });
 
-      $.ajax("ejecucion.js",{
+      $.ajax("ejecucion.js", {
         dataType: "text",
         type: "get",
         success: function(data) {
@@ -539,7 +597,7 @@ Fin</textarea>
         }
       });
 
-      $.ajax("terceros/jquery-2.1.4.min.js",{
+      $.ajax("terceros/jquery-2.1.4.min.js", {
         dataType: "text",
         type: "get",
         success: function(data) {
@@ -547,7 +605,7 @@ Fin</textarea>
         }
       });
 
-      $.ajax("terceros/async.min.js",{
+      $.ajax("terceros/async.min.js", {
         dataType: "text",
         type: "get",
         success: function(data) {
@@ -555,7 +613,7 @@ Fin</textarea>
         }
       });
 
-      $.ajax("utils.js",{
+      $.ajax("utils.js", {
         dataType: "text",
         type: "get",
         success: function(data) {

@@ -83,7 +83,7 @@ var modulo = function(zl) {
 
   a.token("verdadero", /^verdadero/i, 0);
   a.token("falso", /^falso/i, 1);
-  a.token("subModificador", /^(interna|primitiva|conversora|asincrona|operadorsuma|operadorresta|operadorproducto)/i, 2);
+  a.token("subModificador", /^(interna|primitiva|conversora|asincrona|operadorsuma|operadorresta|operadorproducto|operadoraccesolectura|operadoraccesoescritura)/i, 2);
   a.token("decModificador", /^((?:de\s+entrada)|(?:de\s+salida)|global)/i, 3);
   a.token("entero", /^((?:[0-1]+(?:\|2))|(?:[0-9A-Fa-f]+(?:\|16))|(?:[0-9]+(?:\|10)?))/i, 4);
   a.token("decimal", /^(\d+\.\d+)/i, 5);
@@ -158,20 +158,13 @@ var modulo = function(zl) {
   });
 
   a.regla("nombre", function() {
-    this.avanzar("nombreSimple")
-      .acumular(".")
-      .acumular("nombreSimple")
-      .avanzarVarios();
-    var resultado = this.arbol(0).resultado;
-    for (var i = 0; i < this.arbol(1).length; i++) {
-      resultado += this.resultado(1, i, 0); // "."
-      resultado += this.resultado(1, i, 1); // "nombreSimple"
-    }
-    this.registrarResultado(resultado);
+    this.avanzar("nombreSimple");
+    var resultado;
+    this.registrarResultado(resultado = this.resultado(0));
     // Comprobar que el resultado no es una palabra reservada
     if (resultado.toLowerCase() in palabrasReservadas) {
       // Retroceder el nombre si está reservado
-      this.retroceder(2);
+      this.retroceder(1);
       throw zl.error.newError(zl.error.E_PALABRA_RESERVADA, this.arbol());
     }
     return this;
@@ -180,37 +173,50 @@ var modulo = function(zl) {
   a.regla("declaracion", function() {
     this.nombre()
       .avanzar("es")
-      .intentar([
-        ["relacion", "de", "nombre", "a", "nombre"],
-        ["lista", "(", "listaAcceso", ")", "de", "nombre"],
-        ["nombre"]
-      ])
-      .acumular("decModificador")
-      .avanzarVarios();
-    var intento = this.resultado(2);
-    if (intento == 2) {
-      this.registrarResultado({
-        nombre: this.resultado(0),
-        tipo: this.resultado(2, intento, 0),
-        modificadores: this.resultado(3)
-      });
-    } else if (intento == 1) {
-      this.registrarResultado({
-        nombre: this.resultado(0),
-        tipo: "lista",
-        dimensiones: this.resultado(2, intento, 2),
-        subtipo: this.resultado(2, intento, 5),
-        modificadores: this.resultado(3)
-      });
-    } else if (intento == 0) {
-      this.registrarResultado({
-        nombre: this.resultado(0),
-        tipo: "relacion",
-        clave: this.resultado(2, intento, 2),
-        valor: this.resultado(2, intento, 4),
-        modificadores: this.resultado(3)
-      });
+      .tipo()
+      .acumular("decModificador").avanzarVarios()
+
+
+    this.registrarResultado({
+      nombre: this.resultado(0),
+      tipoInstancia: this.resultado(2),
+      modificadores: this.resultado(3)
+    });
+    return this;
+  });
+
+  a.regla("tipo", function() {
+    this.nombre()
+      .acumular("(").acumular("genericidad").acumular(")").avanzarVarios()
+    var genericos = new Array();
+    for (var i = 0; i < this.resultado(1).length; i++) {
+      genericos = genericos.concat(this.resultado(1, i, 1));
     }
+    this.registrarResultado({
+      tipo: this.resultado(0),
+      genericos: genericos
+    })
+    return this;
+  });
+
+  a.regla("genericidad", function() {
+    var resultado = [];
+    this.intentar([
+      ["tipo"],
+      ["numero"]
+    ]);
+    var intento = this.resultado(0);
+    resultado.push(this.resultado(0, intento, 0));
+    this.acumular(",")
+      .intento([
+        ["tipo"],
+        ["numero"]
+      ]).avanzarVarios();
+    for (var i = 0; i < this.resultado(1).length; i++) {
+      var intento = this.resultado(1, i, 1);
+      resultado.push(this.resultado(1, i, 1, intento, 0));
+    }
+    this.registrarResultado(resultado);
     return this;
   });
 
@@ -271,7 +277,7 @@ var modulo = function(zl) {
 
   a.regla("asignacion", function() {
     this.intentar([
-        ["nombre", "(", "listaAcceso", ")"],
+        ["lvalor"],
         ["nombre"]
       ])
       .avanzar("<-")
@@ -279,28 +285,40 @@ var modulo = function(zl) {
     var intento = this.resultado(0);
     this.registrarResultado({
       variable: this.resultado(0, intento, 0),
-      acceso: (intento ? null : this.resultado(0, intento, 2)),
       valor: this.resultado(2)
     });
     return this;
   });
 
   a.regla("llamada", function() {
-    this.nombre()
+    var contexto = null;
+    try {
+      this.lvalor().avanzar(".");
+      contexto = this.resultado(0);
+    } catch (e) {
+      if (!zl.error.esError(e))
+        throw e;
+      this.retroceder(this.arbol().length);
+    }
+    var indice = this.arbol().length;
+    this
+      .nombre()
       .avanzar("[")
       .acumular("llamadaAsignacion").avanzarVarios()
       .avanzar("]")
+
     var entrada = [];
     var salida = [];
-    for (var i = 0; i < this.resultado(2).length; i++) {
-      if (this.resultado(2)[i].tipo == "entrada") {
-        entrada.push(this.resultado(2)[i]);
+    for (var i = 0; i < this.resultado(indice+2).length; i++) {
+      if (this.resultado(indice+2)[i].tipo == "entrada") {
+        entrada.push(this.resultado(indice+2)[i]);
       } else {
-        salida.push(this.resultado(2)[i]);
+        salida.push(this.resultado(indice+2)[i]);
       }
     }
     this.registrarResultado({
-      nombre: this.resultado(0),
+      contexto: contexto,
+      nombre: this.resultado(indice),
       entrada: entrada,
       salida: salida,
     });
@@ -502,10 +520,9 @@ var modulo = function(zl) {
       ["verdadero"],
       ["falso"],
       ["listaConstructor"],
-      ["nombre", "(", "listaAcceso", ")"],
       ["nombre"],
-      ["(", "expresion", ")"],
-      ["expresionUnaria"]
+      ["expresionUnaria"],
+      ["(", "expresion", ")"]
     ]);
     var intento = this.resultado(0);
     var evalResultado = null;
@@ -514,18 +531,12 @@ var modulo = function(zl) {
         valor: this.resultado(0, intento, 1),
         tipo: this.arbol(0, intento, 1).tipo
       };
-    else if (intento == 9)
+    else if (intento == 7)
       evalResultado = {
         valor: this.resultado(0, intento, 0),
         tipo: "expresion"
       };
-    else if (intento == 6) {
-      evalResultado = {
-        nombre: this.resultado(0, intento, 0),
-        acceso: this.resultado(0, intento, 2),
-        tipo: "acceso"
-      };
-    } else if (intento == 5) {
+    else if (intento == 5) {
       evalResultado = {
         valor: this.resultado(0, intento, 0),
         length: this.resultado(0, intento, 0).length,
@@ -536,31 +547,47 @@ var modulo = function(zl) {
         valor: this.resultado(0, intento, 0),
         tipo: this.arbol(0, intento, 0).tipo
       };
-    // Ahora que se ha podido hacer una evaluación,
-    // comprobar si le sigue una conversión:
-    try {
-      this.avanzar("como")
-        .nombre();
-      this.registrarResultado({
-        evaluacion: evalResultado,
-        tipoObjetivo: this.resultado(2),
-        tipo: "conversion"
-      })
-    } catch (e) {
-      if (zl.error.esError(e)) {
-        this.retroceder(this.arbol().length - 1);
-        // Si se pudo avanzar el "como" lanzar una excepción:
-        if (this.arbol().length > 1) {
-          throw e;
+    this.intento([
+      ["como", "tipo"],
+      ["(", "listaAcceso", ")"]
+    ]).avanzarVarios();
+    for (var i = 0; i < this.resultado(1).length; i++) {
+      var intento = this.resultado(1, i);
+      if (intento === 0) {
+        evalResultado = {
+          evaluacion: evalResultado,
+          tipoObjetivo: this.resultado(1, i, intento, 1),
+          tipo: "conversion"
         }
-        // Si no, simplemente estamos ante una evaluación sin conversión.
-        else {
-          this.registrarResultado(evalResultado)
+      } else if (intento === 1) {
+        var arr = this.resultado(1,i,intento,1);
+        for (var j = 0; j < arr.length; j++) {
+          evalResultado = {
+            izq: evalResultado,
+            der: arr[j],
+            op: "()"
+          }
         }
-      } else {
-        throw e;
       }
     }
+
+    this.registrarResultado(evalResultado);
+    return this;
+  });
+
+  a.regla("lvalor", function() {
+    this.nombre()
+      .acumular("(")
+      .acumular("listaAcceso")
+      .acumular(")").avanzarVarios();
+    var accesos = [];
+    for (var i = 0; i < this.resultado(1).length; i++) {
+      accesos = accesos.concat(this.resultado(1,i,1));
+    }
+    this.registrarResultado({
+      dato: this.resultado(0),
+      accesos: accesos
+    });
     return this;
   });
 
@@ -584,40 +611,16 @@ var modulo = function(zl) {
   });
 
   a.regla("listaAcceso", function() {
-    this.acceso()
-      .acumular(",")
-      .acumular("acceso").avanzarVarios();
+    this.expresion()
+      .acumular(",").acumular("expresion").avanzarVarios();
     var resultado = [this.resultado(0)];
     for (var i = 0; i < this.resultado(1).length; i++) {
-      resultado.push(this.resultado(1)[i][1]);
+      resultado.push(this.resultado(1, i, 1));
     }
     this.registrarResultado(resultado);
     return this;
   });
 
-  a.regla("acceso", function() {
-    this.intentar([
-      ["rango"],
-      ["expresion"]
-    ]);
-    var intento = this.resultado(0);
-    this.registrarResultado({
-      valor: this.resultado(0, intento, 0),
-      tipo: (intento ? "expresion" : "rango")
-    });
-    return this;
-  });
-
-  a.regla("rango", function() {
-    this.avanzar("entero")
-      .avanzar("..")
-      .avanzar("entero");
-    this.registrarResultado({
-      minimo: this.resultado(0),
-      maximo: this.resultado(2)
-    })
-    return this;
-  });
   return zl;
 }
 

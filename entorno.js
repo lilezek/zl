@@ -5,6 +5,7 @@ var modulo = function(zl) {
   var modInterno;
 
   function Modulo() {
+    var that = this;
     this.padre = null;
     this.subrutinas = {};
     this.tipos = {};
@@ -13,20 +14,23 @@ var modulo = function(zl) {
     this.configuracion = {
       fps: 10,
       precision: 0,
-      nombremodulo: "$principal"
+      nombremodulo: "$principal",
+      genericos: []
     };
 
-    Object.defineProperty(this,"nombre", {
-      get : function() {
+    this.genericos = [];
+
+    Object.defineProperty(this, "nombre", {
+      get: function() {
         return this.configuracion.nombremodulo;
       },
-      set : function(value) {
+      set: function(value) {
         this.configuracion.nombremodulo = value;
       }
     });
 
     Object.defineProperty(this, "interno", {
-      get : function() {
+      get: function() {
         return this.nombre === "$internal";
       }
     });
@@ -38,6 +42,11 @@ var modulo = function(zl) {
     this.integraciones = {};
     if (modInterno)
       this.integraciones.$internal = modInterno;
+
+    // Las operaciones:
+    this.operacionesBinarias = {};
+    this.operacionesUnarias = {};
+    this.conversiones = [];
 
     // Por defecto: representa el código escrito en el propio editor.
     this.fuente = "/";
@@ -66,6 +75,8 @@ var modulo = function(zl) {
   }
 
   Modulo.prototype.registrarTipo = function(tipo) {
+    if (tipo.modulo)
+      this.importes[tipo.nombre] = tipo.modulo;
     this.tipos[tipo.nombre] = tipo;
   }
 
@@ -94,6 +105,49 @@ var modulo = function(zl) {
         return r;
     }
     return null;
+  }
+
+  Modulo.prototype.conversor = function(tipoObjetivo, tipoFuente) {
+    var ops = this.conversiones;
+    var opcn = null;
+    for (var i = 0; !opcn && i < ops.length; i++) {
+      // TODO: Sustituir genéricos
+      var der = ops[i].tipoDerecho.especificar(tipoFuente.genericos);
+      var res = ops[i].tipoResultado.especificar(tipoObjetivo.genericos);
+      if (der.esCompatible(tipoFuente) && res.esCompatible(tipoObjetivo))
+        opcn = ops[i];
+    }
+    if (!opcn) {
+      for (var k in this.integraciones) {
+        opcn = this.integraciones[k].conversor(tipoObjetivo, tipoFuente);
+        if (opcn)
+          break;
+      }
+    }
+    if (!opcn) {
+      for (var k in this.importes) {
+        opcn = this.importes[k].conversor(tipoObjetivo, tipoFuente);
+        if (opcn)
+          break;
+      }
+    }
+
+    // Ahora comprobar si la operación tiene genéricos.
+    // Si tiene genéricos, especificar usando el tipo izquierdo:
+    return opcn;
+  }
+
+  Modulo.prototype.registrarConversor = function(tipoObjetivo, tipoFuente, subrutina) {
+    var opcn = new Operacion();
+    delete opcn.operador;
+    delete opcn.tipoIzquierdo;
+    opcn.tipoDerecho = tipoFuente;
+    opcn.tipoResultado = tipoObjetivo;
+    delete opcn.localizacion;
+    delete opcn.alias;
+    opcn.subrutina = subrutina;
+    this.conversiones.push(opcn);
+    return opcn;
   }
 
   Modulo.prototype.subrutinaPorPosicion = function(pos) {
@@ -180,7 +234,7 @@ var modulo = function(zl) {
     this.integraciones[otroModulo.configuracion.nombremodulo] = otroModulo;
   }
 
-  var ovalues = Object.values || function(o,f) {
+  var ovalues = Object.values || function(o, f) {
     var r = [];
     for (var k in o)
       if (f(k, o[k]))
@@ -189,7 +243,7 @@ var modulo = function(zl) {
   }
 
   Modulo.prototype.arrayDeIntegraciones = function() {
-    return ovalues(this.integraciones, function(k,v) {
+    return ovalues(this.integraciones, function(k, v) {
       return !v.interno;
     });
   }
@@ -228,6 +282,104 @@ var modulo = function(zl) {
     return r;
   }
 
+  Modulo.prototype.registrarOperadorBinario = function(op, tipoInstanciaIzq, tipoInstanciaDer, tipoInstanciaRes, subrutina) {
+    var opcn = new Operacion();
+    opcn.operador = op;
+    opcn.tipoDerecho = tipoInstanciaDer;
+    opcn.tipoIzquierdo = tipoInstanciaIzq;
+    opcn.tipoResultado = tipoInstanciaRes;
+    if (subrutina) {
+      opcn.localizacion = subrutina.padre;
+      opcn.alias = subrutina.nombre;
+    }
+    this.operacionesBinarias[op] = this.operacionesBinarias[op] || [];
+    this.operacionesBinarias[op].push(opcn);
+    return opcn;
+  }
+
+  Modulo.prototype.operadorBinario = function(op, tipoInstanciaIzq, tipoInstanciaDer) {
+    var ops = this.operacionesBinarias[op] || [];
+    var opcn = null;
+    for (var i = 0; !opcn && i < ops.length; i++) {
+      // TODO: Sustituir genéricos
+      var izq = ops[i].tipoIzquierdo.especificar(tipoInstanciaIzq.genericos);
+      var der = ops[i].tipoDerecho.especificar(tipoInstanciaIzq.genericos);
+      if (izq.esCompatible(tipoInstanciaIzq) && der.esCompatible(tipoInstanciaDer))
+        opcn = ops[i];
+    }
+    if (!opcn) {
+      for (var k in this.integraciones) {
+        opcn = this.integraciones[k].operadorBinario(op, tipoInstanciaIzq, tipoInstanciaDer);
+        if (opcn)
+          break;
+      }
+    }
+    if (!opcn) {
+      for (var k in this.importes) {
+        opcn = this.importes[k].operadorBinario(op, tipoInstanciaIzq, tipoInstanciaDer);
+        if (opcn)
+          break;
+      }
+    }
+    // Ahora comprobar si la operación tiene genéricos.
+    // Si tiene genéricos, especificar usando el tipo izquierdo:
+    if (opcn && opcn.localizacion && opcn.localizacion.genericos.length) {
+      // TODO: comprobar si esto es suficiente
+      opcn = zl.writeJson(new Operacion(), opcn);
+      opcn.tipoResultado = opcn.tipoResultado.especificar(tipoInstanciaIzq.genericos);
+    }
+    return opcn;
+  }
+
+  Modulo.prototype.registrarOperadorUnario = function(op, tipo, tipoResultado, subrutina) {
+    var opcn = new Operacion();
+    opcn.operador = op;
+    opcn.tipoDerecho = tipo;
+    delete opcn.tipoIzquierdo;
+    opcn.tipoResultado = tipoResultado;
+    if (subrutina) {
+      opcn.localizacion = subrutina.padre;
+      opcn.alias = subrutina.nombre;
+    }
+    this.operacionesUnarias[op] = this.operacionesUnarias[op] || [];
+    this.operacionesUnarias[op].push(opcn);
+    return opcn;
+  }
+
+  Modulo.prototype.operadorUnario = function(op, tipo) {
+    var ops = this.operacionesUnarias[op] || [];
+    var opcn = null;
+    for (var i = 0; !opcn && i < ops.length; i++) {
+      // TODO: Sustituir genéricos
+      var der = ops[i].tipoDerecho.especificar(tipo.genericos);
+      if (der.esCompatible(tipo))
+        opcn = ops[i];
+    }
+    if (!opcn) {
+      for (var k in this.integraciones) {
+        opcn = this.integraciones[k].operadorUnario(op, tipo);
+        if (opcn)
+          break;
+      }
+    }
+    if (!opcn) {
+      for (var k in this.importes) {
+        opcn = this.importes[k].operadorUnario(op, tipo);
+        if (opcn)
+          break;
+      }
+    }
+
+    // Ahora comprobar si la operación tiene genéricos.
+    // Si tiene genéricos, especificar usando el tipo izquierdo:
+    if (opcn && opcn.localizacion && opcn.localizacion.genericos.length) {
+      // TODO: comprobar si esto es suficiente
+      opcn = zl.writeJson(new Operacion(), opcn);
+      opcn.tipoResultado = opcn.tipoResultado.especificar(tipo.genericos);
+    }
+    return opcn;
+  }
+
   function Subrutina(modulo) {
     // Módulo padre
     this.padre = modulo || null;
@@ -239,6 +391,25 @@ var modulo = function(zl) {
     this.posicionSubrutina = [0, 0];
     this.posicionDatos = [0, 0];
     this.posicionAlgoritmo = [0, 0];
+
+    // El contexto es útil cuando se necesita una instancia concreta de subrutina.
+    this.$contexto = null;
+
+    Object.defineProperty(this, "contexto", {
+      get: function() {
+        return this.$contexto;
+      },
+      set: function(value) {
+        this.$contexto = value;
+        var declgenericas = this.declaraciones;
+        this.declaraciones = {};
+        for (var k in declgenericas) {
+          this.declaraciones[k] = zl.writeJson(new Declaracion(), declgenericas[k]);
+          this.declaraciones[k].tipoInstancia = declgenericas[k].tipoInstancia.especificar(value);
+        }
+      }
+    })
+
 
     // La serialización para distinguirlo de otra subrutina
     this.serial = "";
@@ -305,7 +476,7 @@ var modulo = function(zl) {
     // Registrar datos
     for (var i = 0; i < arbol.datos.length; i++) {
       var decl = new Declaracion(this);
-      decl.rellenarDesdeArbol(arbol.datos[i]);
+      decl.rellenarDesdeArbol(arbol.datos[i], this.padre);
 
       if (decl.nombre in this.declaraciones)
         throw zl.error.newError(zl.error.E_NOMBRE_DATO_YA_USADO, arbol.datos[i]);
@@ -336,32 +507,51 @@ var modulo = function(zl) {
           this.conversion.datoSalida = this.declaraciones[k];
       }
       if (this.conversion.datoEntrada && this.conversion.datoSalida) {
-        this.conversion.datoEntrada.tipo.registrarConversor(this, this.conversion.datoSalida.tipo);
+        this.padre.registrarConversor(this.conversion.datoSalida.tipoInstancia, this.conversion.datoEntrada.tipoInstancia, this);
       }
     }
     // Operaciones
     for (var k in this.modificadores) {
       // Operaciones binarias
-      if (k.indexOf("operador") > -1 && k.indexOf("operadorunario") == -1) {
+      if (k.indexOf("operadoracceso") > -1) {
+        // TODO: añadir las comprobaciones oportunas
+        // Un dato índice de entrada
+        // Un dato de salida o de entrada, depdendiendo de la lectura o la escritura.
+        // Posibles datos globales.
+        // ¿No asíncrona?
+        var operador = ({
+            "lectura": "()",
+            "escritura": "(&)"
+          })[k.substr(14)]
+          // TODO: Cambiar los nombres
+        var contenedor = this.declaraciones.izquierda.tipoInstancia;
+        var indice = this.declaraciones.derecha.tipoInstancia;
+        var valor = this.declaraciones.resultado.tipoInstancia;
+        var modulo = this.padre;
+        var alias = this.nombre;
+        modulo.registrarOperadorBinario(operador, contenedor, indice, valor, this);
+      } else if (k.indexOf("operador") > -1 && k.indexOf("operadorunario") == -1) {
         // TODO: añadir las comprobaciones oportunas
         // Dos datos de entrada izquierda y derecha
         // Un dato de salida resultado
-        // Sin datos globales
+        // Sin poder escribir datos globales
         // ¿No asíncrona?
         var operador = ({
           "suma": "+",
           "resta": "-",
-          "producto": "*"
+          "producto": "*",
+          "modulo": "%",
+          "division": "/",
+          "y": "y",
+          "o": "o"
         })[k.substr(8)]
-        var izquierda = this.declaraciones.izquierda.tipo;
-        var derecha = this.declaraciones.derecha.tipo;
-        var resultado = this.declaraciones.resultado.tipo;
+        var izquierda = this.declaraciones.izquierda.tipoInstancia;
+        var derecha = this.declaraciones.derecha.tipoInstancia;
+        var resultado = this.declaraciones.resultado.tipoInstancia;
         var modulo = this.padre;
-        var alias = this.nombre;
-        izquierda.registrarOperadorBinario(operador, derecha, resultado, modulo, alias);
+        modulo.registrarOperadorBinario(operador, izquierda, derecha, resultado, this);
       }
     }
-
     this.serializar();
   }
 
@@ -390,20 +580,12 @@ var modulo = function(zl) {
     this.padre = padre || null;
 
     this.nombre = "";
-    this.tipo = null;
-    // Información de genericidad
-    // Ahora mismo es útil para listas y relaciones.
-    this.genericidad = {
-      subtipo: null, // Subtipo si es lista
-      clave: null, // Clave si es relación
-      valor: null // Valor si es relación
-    };
+    this.tipoInstancia = null;
     this.modificadores = 0x00;
     this.posicion = [0, 0];
 
     // La serialización para poder serializar las subrutinas.
     this.serial = "";
-
     return this;
   }
 
@@ -414,20 +596,12 @@ var modulo = function(zl) {
 
   Declaracion.prototype.serializar = function() {
     //TODO: serializar correctamente el tipo
-    this.serial = (this.nombre + "@" + this.tipo.serial + "@" + this.modificadores).toLowerCase();
+    this.serial = (this.nombre + /*"@" + this.tipo.serial +*/ "@" + this.modificadores).toLowerCase();
   }
 
   Declaracion.prototype.rellenarDesdeArbol = function(arbol) {
     this.nombre = arbol.nombre.toLowerCase();
     this.posicion = [arbol.begin, arbol.end];
-    this.tipo = this.padre.padre.tipoPorNombre(arbol.tipo);
-    if (!this.tipo) {
-      // TODO: Añadir una lista de tipos que sí existen.
-      throw zl.error.newError(zl.error.E_TIPO_NO_EXISTE, {
-        posicion: [arbol.begin, arbol.end],
-        tipo: arbol.tipo
-      });
-    }
     for (var j = 0; j < arbol.modificadores.length; j++) {
       var mod = arbol.modificadores[j].toLowerCase();
       if (mod.indexOf("salida") > -1) {
@@ -446,27 +620,8 @@ var modulo = function(zl) {
         this.modificadores |= this.M_GLOBAL;
       }
     }
-    // Genericidad:
-    // TODO: Comprobar que los subtipos existen y emitir el error indicado si no.
-    if (this.tipo.nombre === "lista") {
-      this.genericidad.subtipo = this.padre.padre.tipoPorNombre(arbol.subtipo);
-      this.genericidad.dimensiones = [];
-      this.genericidad.offsets = [];
-      for (var i = 0; i < arbol.dimensiones.length; i++) {
-        if (arbol.dimensiones[i].tipo === 'expresion') {
-          this.genericidad.dimensiones.push(parseInt(arbol.dimensiones[i].valor.valor));
-          this.genericidad.offsets.push(1);
-        } else {
-          this.genericidad.dimensiones.push(parseInt(arbol.dimensiones[i].valor.maximo) - parseInt(arbol.dimensiones[i].valor.minimo) + 1);
-          this.genericidad.offsets.push(parseInt(arbol.dimensiones[i].valor.minimo));
-
-        }
-      }
-    }
-    if (this.tipo.nombre === "relacion") {
-      this.genericidad.clave = this.padre.padre.tipoPorNombre(arbol.clave);
-      this.genericidad.valor = this.padre.padre.tipoPorNombre(arbol.valor);
-    }
+    this.tipoInstancia = new TipoInstancia(this.padre.padre.genericos);
+    this.tipoInstancia.rellenarDesdeArbol(arbol.tipoInstancia, this.padre.padre);
     this.serializar();
   }
 
@@ -481,14 +636,8 @@ var modulo = function(zl) {
     // Constructor:
     this.constr = "";
 
-    // Operaciones con el tipo:
-    // Unarias
-    this.opunario = {};
-    // Binarias
-    this.opbinario = {};
-
-    // Conversiones:
-    this.conversiones = {};
+    // Genericos:
+    this.genericos = [];
 
     // Serialización:
     this.serial = "";
@@ -512,6 +661,13 @@ var modulo = function(zl) {
         },
       })
 
+      delete this.genericos;
+      Object.defineProperty(this, "genericos", {
+        get: function() {
+          return this.modulo.genericos;
+        }
+      })
+
       this.metodos = this.modulo.subrutinas;
       this.serializar();
     }
@@ -521,7 +677,13 @@ var modulo = function(zl) {
 
   Tipo.prototype.esCompatible = function(tipo) {
     // TODO: no limitarse a usar el nombre
-    return (tipo instanceof Tipo) && (tipo.nombre === this.nombre);
+    return (tipo instanceof Tipo) && ((tipo.nombre === this.nombre) ||
+      ("cualquiera" === tipo.nombre) ||
+      ("cualquiera" === this.nombre));
+  }
+
+  Tipo.prototype.esIgual = function(tipo) {
+    return ((tipo instanceof Tipo) && (tipo.nombre === this.nombre));
   }
 
   Tipo.prototype.serializar = function() {
@@ -529,20 +691,173 @@ var modulo = function(zl) {
     this.serial = this.nombre;
   }
 
-  Tipo.prototype.registrarConversor = function(subrutina, tipoObjetivo) {
-    // TODO: Comprobar si el conversor está en otro módulo
-    // para preparar lo que sea necesario.
-    this.conversiones[tipoObjetivo.nombre] = subrutina;
+  Tipo.prototype.instanciar = function(genericos, contexto) {
+    var ti = new TipoInstancia(contexto);
+    ti.genericos = genericos.slice();
+    ti.tipo = this;
+    return ti;
   }
 
-  Tipo.prototype.registrarOperadorBinario = function(operador, otroTipo, resultado, modulo, alias) {
-    // TODO: Comprobar que no esté ya registrado
-    this.opbinario[operador] = this.opbinario[operador] || {};
-    this.opbinario[operador][otroTipo.nombre] = {
-      resultado: resultado.nombre,
-      alias: alias,
-      modulo: modulo.nombre
+  function TipoInstancia(contexto) {
+    this.contexto = contexto;
+    this.tipo = null;
+    this.genericos = [];
+    this.subsCache = {};
+    // TODO: ¿Serializar?
+  }
+
+  TipoInstancia.prototype.subrutinaPorNombreInstanciada = function(nombre) {
+    //if (nombre in this.subsCache)
+    //return this.subsCache[nombre.toLowerCase()];
+    var subrutinaGenerica;
+    if (this.tipo.modulo)
+      subrutinaGenerica = this.tipo.modulo.subrutinaPorNombre(nombre);
+    if (!subrutinaGenerica)
+      return null;
+    if (!this.genericos.length)
+      return subrutinaGenerica;
+
+    var subrutinaNueva = new Subrutina();
+    zl.writeJson(subrutinaNueva, subrutinaGenerica);
+    subrutinaNueva.contexto = this.genericos;
+    return this.subsCache[nombre.toLowerCase()] = subrutinaNueva;
+  }
+
+  TipoInstancia.prototype.esCompatible = function(otroTi) {
+    // Tipo generico
+    // sustituir por el subtipo
+    var subIzquierda;
+    var subDerecha;
+
+    if (this.tipo.nombre === "generico") {
+      subIzquierda = this.contexto[this.genericos[0] - 1];
+    } else {
+      subIzquierda = this;
     }
+
+    if (otroTi.tipo.nombre === "generico") {
+      subDerecha = otroTi.contexto[otroTi.genericos[0] - 1];
+    } else {
+      subDerecha = otroTi;
+    }
+
+    var compatible = subIzquierda.tipo.esCompatible(subDerecha.tipo);
+
+    if (subDerecha.genericos.length != subIzquierda.genericos.length)
+      return false;
+
+    for (var i = 0; compatible && i < subDerecha.genericos.length; i++) {
+      compatible = compatible && subIzquierda.genericos[i].esCompatible(subDerecha.genericos[i]);
+    }
+    return compatible;
+  }
+
+  TipoInstancia.prototype.rellenarDesdeArbol = function(arbol, modulo) {
+    var tipo = modulo.tipoPorNombre(arbol.tipo);
+    if (!tipo) {
+      // TODO: Añadir una lista de tipos que sí existen.
+      throw zl.error.newError(zl.error.E_TIPO_NO_EXISTE, {
+        posicion: [arbol.begin, arbol.end],
+        tipo: arbol.tipo
+      });
+    }
+
+    if (tipo.genericos.length != arbol.genericos.length) {
+      throw zl.error.newError(zl.error.E_GENERICOS_NO_COINCIDEN_TAM, {
+        posicion: [arbol.begin, arbol.end],
+        tipo: tipo
+      });
+    }
+
+    this.tipo = tipo;
+    this.genericos = new Array(arbol.genericos.length);
+
+    for (var i = 0; i < arbol.genericos.length; i++) {
+      // Si es el tipo genérico evitar consumir sus genericos como tipos
+      if (tipo.nombre !== "generico") {
+        this.genericos[i] = new TipoInstancia(this.contexto);
+        this.genericos[i].rellenarDesdeArbol(arbol.genericos[i], modulo);
+      } else {
+        this.genericos[i] = arbol.genericos[i];
+      }
+    }
+  }
+
+  TipoInstancia.prototype.esIgual = function(otroTi) {
+    // Tipo generico
+    // sustituir por el subtipo
+    var compatible = this.tipo.esIgual(otroTi.tipo);
+    var subIzquierda;
+    var subDerecha;
+
+    if (this.tipo.nombre === "generico") {
+      subIzquierda = this.contexto[this.genericos[0] - 1];
+    } else {
+      subIzquierda = this;
+    }
+
+    if (otroTi.tipo.nombre === "generico") {
+      subDerecha = otroTi.contexto[otroTi.genericos[0] - 1];
+    } else {
+      subDerecha = otroTi;
+    }
+
+    if (subDerecha.genericos.length != subIzquierda.genericos.length)
+      return false;
+
+    for (var i = 0; compatible && i < subDerecha.genericos.length; i++) {
+      compatible = compatible && subIzquierda.genericos[i].esIgual(subDerecha.genericos[i]);
+    }
+    return compatible;
+  }
+
+  TipoInstancia.prototype.especificar = function(contexto) {
+    if (this.genericos.length) {
+      if (this.tipo.nombre === "generico") {
+        var indice = this.genericos[0];
+        return contexto[indice - 1];
+      } else {
+        var ti = new TipoInstancia();
+        ti.tipo = this.tipo;
+        ti.contexto = this.contexto;
+        ti.genericos = this.genericos.slice().map(function(v) {
+          return v.especificar(contexto);
+        });
+        return ti;
+      }
+    } else {
+      return this;
+    }
+  }
+
+  TipoInstancia.prototype.toString = function() {
+    if (this.tipo.nombre === "generico") {
+      var indice = this.genericos[0];
+      return "Generico(" + indice + ") = " + this.contexto[this.genericos[0] - 1]
+    } else {
+      var r = this.tipo.nombre.charAt(0).toUpperCase() + this.tipo.nombre.slice(1);
+      if (this.genericos.length) {
+        r += "(";
+      }
+      var coma = "";
+      for (var i = 0; i < this.genericos.length; i++) {
+        r += coma + this.genericos[i];
+        coma = ",";
+      }
+      if (this.genericos.length) {
+        r += ")";
+      }
+      return r;
+    }
+  }
+
+  function Operacion() {
+    this.operador = "";
+    this.tipoDerecho = null;
+    this.tipoIzquierdo = null;
+    this.tipoResultado = null;
+    this.localizacion = null;
+    this.alias = "";
   }
 
   // Distintos tipos de modificador.
@@ -567,6 +882,10 @@ var modulo = function(zl) {
     return new Tipo(a);
   }
 
+  zl.entorno.newTipoInstancia = function(a) {
+    return new TipoInstancia(a);
+  }
+
   // El módulo interno contiene las funciones básicas del lenguaje.
   // Recibe un módulo y devuelve el mismo módulo con las transformaciones oportunas.
   var moduloInterno = function(mod) {
@@ -575,168 +894,79 @@ var modulo = function(zl) {
       var booleano = zl.entorno.newTipo(null);
       var texto = zl.entorno.newTipo(null);
       var letra = zl.entorno.newTipo(null);
-      var relacion = zl.entorno.newTipo(null);
-      var lista = zl.entorno.newTipo(null); {
+      var interno = zl.entorno.newTipo(null);
+      var cualquiera = zl.entorno.newTipo(null);
+      var generico = zl.entorno.newTipo(null); {
         zl.writeJson(numero, {
-          nombre: "numero",
-          opunario: {
-            '+': {
-              resultado: 'numero'
-            },
-            '-': {
-              resultado: 'numero'
-            }
-          },
-          opbinario: {
-            '>': {
-              'numero': {
-                resultado: 'booleano',
-                alias: ''
-              }
-            },
-            '=': {
-              'numero': {
-                resultado: 'booleano',
-                alias: ''
-              }
-            },
-            '<': {
-              'numero': {
-                resultado: 'booleano',
-                alias: ''
-              }
-            },
-            '<=': {
-              'numero': {
-                resultado: 'booleano',
-                alias: ''
-              }
-            },
-            '>=': {
-              'numero': {
-                resultado: 'booleano',
-                alias: ''
-              }
-            },
-            '+': {
-              'numero': {
-                resultado: 'numero',
-                alias: ''
-              }
-            },
-            '-': {
-              'numero': {
-                resultado: 'numero',
-                alias: ''
-              }
-            },
-            '*': {
-              'numero': {
-                resultado: 'numero',
-                alias: ''
-              },
-              'texto': {
-                resultado: 'texto',
-                alias: 'productoTexto'
-              }
-            },
-            '/': {
-              'numero': {
-                resultado: 'numero',
-                alias: ''
-              }
-            },
-            '%': {
-              'numero': {
-                resultado: 'numero',
-                alias: ''
-              }
-            }
-          }
+          nombre: "numero"
         });
 
         zl.writeJson(booleano, {
-          nombre: "booleano",
-          opunario: {
-            'no': {
-              resultado: 'booleano',
-              alias: ''
-            }
-          },
-          opbinario: {
-            'o': {
-              'booleano': {
-                resultado: 'booleano',
-                alias: ''
-              }
-            },
-            'y': {
-              'booleano': {
-                resultado: 'booleano',
-                alias: ''
-              }
-            }
-          }
+          nombre: "booleano"
         });
 
         zl.writeJson(texto, {
-          nombre: "texto",
-          opbinario: {
-            '=': {
-              'texto': {
-                resultado: 'booleano',
-                alias: ''
-              }
-            },
-            '+': {
-              'texto': {
-                resultado: 'texto',
-                alias: ''
-              }
-            },
-            '*': {
-              'numero': {
-                resultado: 'texto',
-                alias: 'productoTexto'
-              }
-            }
-          }
+          nombre: "texto"
         });
 
         zl.writeJson(letra, {
-          nombre: "letra",
-          opbinario: {
-            '=': {
-              'letra': {
-                resultado: 'booleano',
-                alias: ''
-              }
-            },
-          }
+          nombre: "letra"
         });
 
-        zl.writeJson(lista, {
-          nombre: "lista",
-          constr: "construirListaVacia"
+        zl.writeJson(interno, {
+          nombre: "interno"
         });
 
-        zl.writeJson(relacion, {
-          nombre: "relacion"
+        zl.writeJson(cualquiera, {
+          nombre: "cualquiera"
+        })
+
+        zl.writeJson(generico, {
+          nombre: "generico",
+          genericos: Array(1)
         });
 
         numero.serializar();
         booleano.serializar();
         texto.serializar();
+        interno.serializar();
+        cualquiera.serializar();
+        generico.serializar();
+
+        mod.registrar(interno);
+        mod.registrar(cualquiera);
+        mod.registrar(generico);
 
         mod.registrar(numero);
         mod.registrar(booleano);
         mod.registrar(texto);
         mod.registrar(letra);
-        mod.registrar(relacion);
-        mod.registrar(lista);
       }
 
-      // TODO: acabar el módulo
+      // Aritmética
+      mod.registrarOperadorBinario("*", numero.instanciar([], modulo), numero.instanciar([], modulo), numero.instanciar([], modulo), null);
+      mod.registrarOperadorBinario("+", numero.instanciar([], modulo), numero.instanciar([], modulo), numero.instanciar([], modulo), null);
+      mod.registrarOperadorBinario("-", numero.instanciar([], modulo), numero.instanciar([], modulo), numero.instanciar([], modulo), null);
+      mod.registrarOperadorBinario("/", numero.instanciar([], modulo), numero.instanciar([], modulo), numero.instanciar([], modulo), null);
+      mod.registrarOperadorBinario("%", numero.instanciar([], modulo), numero.instanciar([], modulo), numero.instanciar([], modulo), null);
+      mod.registrarOperadorBinario("=", numero.instanciar([], modulo), numero.instanciar([], modulo), booleano.instanciar([], modulo), null);
+      mod.registrarOperadorBinario("<>", numero.instanciar([], modulo), numero.instanciar([], modulo), booleano.instanciar([], modulo), null);
+      mod.registrarOperadorBinario("<", numero.instanciar([], modulo), numero.instanciar([], modulo), booleano.instanciar([], modulo), null);
+      mod.registrarOperadorBinario(">", numero.instanciar([], modulo), numero.instanciar([], modulo), booleano.instanciar([], modulo), null);
+      mod.registrarOperadorBinario("<=", numero.instanciar([], modulo), numero.instanciar([], modulo), booleano.instanciar([], modulo), null);
+      mod.registrarOperadorBinario(">=", numero.instanciar([], modulo), numero.instanciar([], modulo), booleano.instanciar([], modulo), null);
+
+      mod.registrarOperadorUnario("+", numero.instanciar([], modulo), numero.instanciar([], modulo), null);
+      mod.registrarOperadorUnario("-", numero.instanciar([], modulo), numero.instanciar([], modulo), null);
+
+      // Lógica
+      mod.registrarOperadorBinario("y", booleano.instanciar([], modulo), booleano.instanciar([], modulo), booleano.instanciar([], modulo), null);
+      mod.registrarOperadorBinario("o", booleano.instanciar([], modulo), booleano.instanciar([], modulo), booleano.instanciar([], modulo), null);
+      mod.registrarOperadorUnario("no", booleano.instanciar([], modulo), booleano.instanciar([], modulo), null);
+
+      // Texto
+      mod.registrarOperadorBinario("+", texto.instanciar([], modulo), texto.instanciar([], modulo), texto.instanciar([], modulo), null);
+
       mod.serializar();
       return mod;
     }

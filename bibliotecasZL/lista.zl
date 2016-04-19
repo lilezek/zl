@@ -1,0 +1,36 @@
+Configuracion
+  nombremodulo <- "lista"
+  genericos <- "cualquiera"
+Fin
+
+Subrutina Primitiva Inicio
+Datos
+  Tamaño es Numero de Entrada
+  v es Interno Global
+Algoritmo
+  /*
+  $self.$miembros.v = Array($entrada.tamaño);
+  */
+Fin
+
+Subrutina Primitiva OperadorAccesoLectura LeerLista
+Datos
+  derecha es Numero de Entrada
+  izquierda es EsteModulo(Generico(1)) de Entrada
+  resultado es Generico(1) de Salida
+Algoritmo
+  /*
+  $salida.resultado = $entrada.izquierda.$miembros.v[$entrada.derecha-1];
+  */
+Fin
+
+Subrutina Primitiva OperadorAccesoEscritura EscribirLista
+Datos
+  derecha es Numero de Entrada
+  resultado es Generico(1) de Entrada
+  izquierda es EsteModulo(Generico(1)) de Entrada de Salida
+Algoritmo
+  /*
+  $salida.izquierda.$miembros.v[$entrada.derecha-1] = $entrada.resultado;
+  */
+Fin
