@@ -383,7 +383,7 @@ var modulo = function(zl) {
       this.avanzar("si")
         .expresion()
         .avanzar("hacer")
-        .acumular("sentencia").avanzarObligatorioVarios();
+        .acumular("sentencia").avanzarVarios();
       this.intentar([
         ["fin"],
         ["sinocondicional"],

@@ -1,0 +1,73 @@
+Configuracion
+  fps <- 60
+  importar "bibliotecasZL/punto.zl"
+  importar "bibliotecasZL/lista.zl"
+  integrar "bibliotecasZL/canvas.zl"
+  integrar "bibliotecasZL/basico.zl"
+Fin
+
+Subrutina NuevoCodigoDeBarras
+Datos
+  codigobarras es Lista(booleano) de salida de entrada
+  i es numero
+  aleatorio es numero
+Algoritmo
+  i <- 0
+  Repetir 100 veces
+    i <- i + 1
+    aleatorio [
+      minimo <- 0
+      maximo <- 1
+      resultado -> aleatorio
+    ]
+    Si aleatorio = 1 hacer
+    	codigobarras(i) <- verdadero
+  	si no hacer
+      codigobarras(i) <- falso
+    Fin
+	Fin
+Fin
+
+Subrutina Inicio
+Datos
+  codigobarras es Lista(booleano) global
+  i es numero
+  aleatorio es numero
+Algoritmo
+  codigobarras.inicio [
+    tamaño <- 100
+  ]
+	nuevocodigodebarras [
+	  codigobarras <- codigobarras
+	]
+Fin
+
+
+
+Subrutina Fotograma
+Datos
+  codigobarras es Lista(booleano) global
+  i es numero
+Algoritmo
+  fondo [
+    fondo <- "blanco" como color
+  ]
+  colorrelleno [
+    relleno <- "negro" como color
+  ]
+  i <- 0
+	Repetir 100 veces
+    i <- i + 1
+    Si codigobarras(i) hacer
+      rectangulo [
+        esquina <- {i*10,50} como punto
+        ancho <- 10
+        alto <- 500
+      ]
+    Fin
+	Fin
+	pausar
+  nuevocodigodebarras [
+    codigobarras <- codigobarras
+  ]
+Fin

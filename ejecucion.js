@@ -6,7 +6,6 @@ var modulo = function(zl, async) {
     require("./njsio")(zl);
   }
 
-
   if (!async) {
     console.error("Se requiere async para la ejecución.");
     return zl;
@@ -18,6 +17,95 @@ var modulo = function(zl, async) {
   // Dependencias Web
   if (typeof window !== "undefined") {
     window.$zl_rte = rte;
+
+    // TODO: Completar esta tabla
+    var table = {
+      "8": "BORRAR",
+      "31": "",
+      "32": "ESPACIO",
+      "33": "!",
+      "34": "\"",
+      "35": "#",
+      "36": "$",
+      "37": "IZQUIERDA",
+      "38": "ARRIBA",
+      "39": "DERECHA",
+      "40": "ABAJO",
+      "41": ")",
+      "42": "*",
+      "43": "+",
+      "45": "-",
+      "47": "/",
+      "48": "0",
+      "49": "1",
+      "50": "2",
+      "51": "3",
+      "52": "4",
+      "53": "5",
+      "54": "6",
+      "55": "7",
+      "56": "8",
+      "57": "9",
+      "58": ":",
+      "59": ";",
+      "60": "<",
+      "61": "=",
+      "62": ">",
+      "63": "?",
+      "64": "@",
+      "65": "A",
+      "66": "B",
+      "67": "C",
+      "68": "D",
+      "69": "E",
+      "70": "F",
+      "71": "G",
+      "72": "H",
+      "73": "I",
+      "74": "J",
+      "75": "K",
+      "76": "L",
+      "77": "M",
+      "78": "N",
+      "79": "O",
+      "80": "P",
+      "81": "Q",
+      "82": "R",
+      "83": "S",
+      "84": "T",
+      "85": "U",
+      "86": "V",
+      "87": "W",
+      "88": "X",
+      "89": "Y",
+      "90": "Z",
+      "91": "[",
+      "92": "\\",
+      "93": "]",
+      "94": "^",
+      "95": "_",
+      "96": "`",
+      "123": "{",
+      "124": "|",
+      "125": "}",
+      "126": "~",
+      "127": "",
+      "188": ",",
+      "190": "."
+    }
+
+    var pulsadas = {};
+
+    $(document).on("keydown", function(e) {
+      pulsadas[table[e.which] || e.which] = true;
+    }).on("keyup", function(e) {
+      pulsadas[table[e.which] || e.which] = false;
+    });
+
+
+    rte.$teclas = function() {
+      return pulsadas;
+    }
   }
 
   rte.$precision = function(arg) {
@@ -74,7 +162,7 @@ var modulo = function(zl, async) {
     var a = this.v;
     var b = otra.v;
 
-    function arraySameSizeRecursive(a,b) {
+    function arraySameSizeRecursive(a, b) {
       var result = a.length === b.length;
       for (var i = 0; i < a.length && result; i++) {
         result = arraySameSizeRecursive(a[i], b[i]);
@@ -84,13 +172,20 @@ var modulo = function(zl, async) {
   }
 
   rte.construirListaVacia = function(dimensiones) {
-    var lista = {v : []}; // TODO: Cambiar el constructor por defecto
-    lista.v = rte.$generarArray(dimensiones, 0, function() {return 0;});
+    var lista = {
+      v: []
+    }; // TODO: Cambiar el constructor por defecto
+    lista.v = rte.$generarArray(dimensiones, 0, function() {
+      return 0;
+    });
     return lista;
   }
 
   rte.construirLista = function(valores) {
-    var lista = {v : []}; lista.v = valores;
+    var lista = {
+      v: []
+    };
+    lista.v = valores;
     for (var i = 0; i < lista.v.length; i++) {
       if (lista.v[i].constructor && lista.v[i].constructor.name === "zlLista") {
         lista.v[i] = lista.v[i].v;
@@ -123,6 +218,8 @@ var modulo = function(zl, async) {
       zl.io.pause($local, $global, $entrada, $salida, pos, function() {
         self.$abortar = oldabortar;
         callback.apply(self, arguments);
+        // Con esto evitamos que se den saltos en el tiempo con el pausar
+        self.$animStart = null;
       });
     }
   }

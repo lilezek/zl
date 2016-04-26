@@ -21,7 +21,6 @@ var modulo = function(zl) {
     var coma = "";
     for (var k in simbolo.globales) {
       var d = simbolo.globales[k];
-      console.log(d);
       if (d.tipoInstancia.tipo.constr) {
         resultado += coma + d.nombre + ":new $exterior." + d.tipoInstancia.tipo.constr + "(";
         resultado += "$exterior";
@@ -124,7 +123,7 @@ var modulo = function(zl) {
   zl.javascript.sentencia = function(compilado, simbolo) {
     var resultado = "";
     if (compilado.tipo == "asignacion") {
-      var dato = simbolo.declaraciones[compilado.variable.dato];
+      var dato = simbolo.declaraciones[compilado.variable.dato.toLowerCase()];
       var lvalor = zl.javascript.lvalorAsignacion(compilado.variable, simbolo).replace("$prefijo$",zl.javascript.datoprefijo(dato, simbolo));
       if (lvalor.indexOf("(&)") > -1) {
         resultado = lvalor.replace("(&)", zl.javascript.expresion(compilado.valor, simbolo));
@@ -148,8 +147,8 @@ var modulo = function(zl) {
   }
 
   zl.javascript.lvalorAsignacion = function(compilado, simbolo) {
-    var resultado = "$prefijo$" + compilado.dato;
-    var tipoActual = simbolo.declaraciones[compilado.dato].tipoInstancia;
+    var resultado = "$prefijo$" + compilado.dato.toLowerCase();
+    var tipoActual = simbolo.declaraciones[compilado.dato.toLowerCase()].tipoInstancia;
     var modulo = simbolo.padre;
     for (var i = 0; i < compilado.accesos.length - 1; i++) {
       var acceso = compilado.accesos[i];
@@ -165,14 +164,13 @@ var modulo = function(zl) {
   }
 
   zl.javascript.lvalor = function(compilado, simbolo) {
-    var resultado = "$prefijo$" + compilado.dato;
+    var resultado = "$prefijo$" + compilado.dato.toLowerCase();
     var tipoActual = simbolo.declaraciones[compilado.dato].tipoInstancia;
     var modulo = simbolo.padre;
     for (var i = 0; i < compilado.accesos.length ; i++) {
       var acceso = compilado.accesos[i];
       var der = zl.javascript.expresion(acceso, simbolo);
       resultado = (acceso.localizacion ? "$exterior." + acceso.localizacion.nombre + "Prototipo." : "") + acceso.alias + "({izquierda:" + resultado + ",derecha:" + der + "}).resultado"
-      console.log(acceso);
     }
     return resultado;
   }
@@ -306,7 +304,7 @@ var modulo = function(zl) {
   zl.javascript.llamadaSalida = function(compilado, simbolo) {
     var resultado = "";
     for (var i = 0; i < compilado.length; i++) {
-      var dato = simbolo.declaraciones[compilado[i].der];
+      var dato = simbolo.declaraciones[compilado[i].der.toLowerCase()];
       resultado += zl.javascript.datoprefijo(dato, simbolo);
       resultado += zl.javascript.nombre(dato.nombre, simbolo) + "=$res." + compilado[i].izq + ";";
     }

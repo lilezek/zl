@@ -85,77 +85,146 @@
 <body onresize="return canvasEscala();">
   <div class="main">
     <textarea class="editor" id="editor">Configuracion
-  fps <- 60
-  importar "bibliotecasZL/punto.zl"
+  importar "bibliotecasZL/relacion.zl"
   importar "bibliotecasZL/lista.zl"
+  importar "bibliotecasZL/punto.zl"
+  integrar "bibliotecasZL/teclado.zl"
   integrar "bibliotecasZL/canvas.zl"
   integrar "bibliotecasZL/basico.zl"
 Fin
 
-Subrutina NuevoCodigoDeBarras
+Subrutina GenerarObstaculo
 Datos
-  codigobarras es Lista(booleano) de salida de entrada
+	obstaculos es Lista(Punto) global
+  obstaculoLibre es numero
+  coordX es Numero
+  coordXmax es Numero
   i es numero
-  aleatorio es numero
+  altura es Numero
 Algoritmo
-  i <- 0
-  Repetir 100 veces
-    i <- i + 1
-    aleatorio [
-      minimo <- 0
-      maximo <- 1
-      resultado -> aleatorio
+  coordXmax <- 2000
+  i <- 1
+	obstaculoLibre <- 0
+  Repetir 6 veces
+	  obstaculos(i).leercomponentes [
+      posx -> coordX
     ]
-    Si aleatorio = 1 hacer
-    	codigobarras(i) <- verdadero
-  	si no hacer
-      codigobarras(i) <- falso
+    Si coordX <= -100 hacer
+      obstaculoLibre <- i
     Fin
+    i <- i + 1
+  	Si coordXMax < coordX + 320 hacer
+  	  coordXmax <- coordX + 320
+  	Fin
+	Fin
+	Si obstaculoLibre > 0 hacer
+    aleatorio [
+      minimo <- 200
+      maximo <- 700
+      resultado -> altura
+    ]
+		obstaculos(obstaculoLibre) <- {coordXMax,altura} como punto
+
 	Fin
 Fin
 
 Subrutina Inicio
 Datos
-  codigobarras es Lista(booleano) global
-  i es numero
-  aleatorio es numero
+  pajaro es Punto Global
+  velocidad es Punto Global
+  gravedad es Numero Global
+  obstaculos es Lista(Punto) global
 Algoritmo
-  codigobarras.inicio [
-    tamaño <- 100
-  ]
-	nuevocodigodebarras [
-	  codigobarras <- codigobarras
-	]
+  gravedad <- 2000
+  pajaro <- {500, 500} como punto
+  velocidad <- {0,0} como punto
+  obstaculos <- {
+  	{2000,50} como punto,
+  	{3000,500} como punto,
+  	{4000,700} como punto,
+    {5000,500} como punto,
+  	{6000,700} como punto,
+    {7000,500} como punto
+  }
 Fin
-
-
 
 Subrutina Fotograma
 Datos
-  codigobarras es Lista(booleano) global
+  pajaro es Punto Global
+  velocidad es Punto Global
+	d es numero
+  gravedad es Numero Global
+  arriba es booleano
+  obstaculos es Lista(Punto) global
   i es numero
 Algoritmo
+  delta [
+    delta -> d
+  ]
   fondo [
     fondo <- "blanco" como color
   ]
-  colorrelleno [
-    relleno <- "negro" como color
+  colorborde [
+    borde <- "negro" como color
   ]
-  i <- 0
-	Repetir 100 veces
+  grosorborde [
+    grosor <- 100
+  ]
+
+  teclapulsada [
+    tecla <- "ARRIBA"
+    estapulsada -> arriba
+  ]
+
+  Si arriba hacer
+    velocidad <- {0, -500} como punto
+  si no hacer
+		velocidad <- velocidad + {0,gravedad} como punto * d
+  Fin
+
+  pajaro <- pajaro + velocidad * d
+
+	dibujarpunto [
+	  punto <- pajaro
+	]
+
+	grosorborde [
+    grosor <- 1
+  ]
+	i <- 1
+	Repetir 6 veces
+    obstaculos(i) <- obstaculos(i) - {500,0} como punto * d
+    colorrelleno [
+      relleno <- "negro" como color
+    ]
+    rectangulo [
+      esquina <- obstaculos(i) + {0,200} como punto
+      ancho <- 50
+      alto <- 1920
+    ]
+    rectangulo [
+      esquina <- obstaculos(i) + {0,-200-1920} como punto
+      ancho <- 50
+      alto <- 1920
+    ]
     i <- i + 1
-    Si codigobarras(i) hacer
-      rectangulo [
-        esquina <- {i*10,50} como punto
-        ancho <- 10
-        alto <- 500
-      ]
-    Fin
 	Fin
-	pausar
-  nuevocodigodebarras [
-    codigobarras <- codigobarras
-  ]
+	generarobstaculo []
+	// Se sale por arriba o por abajo:
+  Si (pajaro("y") < 0) o (pajaro("y") > 1000) hacer
+    //pausar
+    inicio []
+  Fin
+	// Choca con algún obstaculo
+  i <- 1
+	Repetir 6 veces
+    Si (((pajaro("x") - obstaculos(i)("x"))*(pajaro("x") - obstaculos(i)("x"))) < 900)
+			y (((pajaro("y") - obstaculos(i)("y"))*(pajaro("y") - obstaculos(i)("y"))) > 12000) hacer
+      //pausar
+      inicio []
+    Fin
+		i <- i + 1
+	Fin
 Fin</textarea>
     <div class="v divisor"></div>
     <div class="compilation">

@@ -1,0 +1,30 @@
+Configuracion
+  nombreModulo <- "teclado"
+  importar "bibliotecasZL/relacion.zl"
+Fin
+
+/*
+  biblioteca de entrada de teclado de ZL.
+  Para funcionar, hace falta que $exterior.$teclas sea un JSO donde
+  los indices son strings que corresponden a teclas,
+  y el valor es verdadero si está pulsada, o falso si no.
+*/
+
+Subrutina Primitiva teclaPulsada
+Datos
+  tecla es Texto de Entrada
+  estaPulsada es booleano de Salida
+Algoritmo
+  /*
+  $salida.estapulsada = Boolean($exterior.$teclas()[$entrada.tecla]);
+  */
+Fin
+
+Subrutina Primitiva relacionDeTeclas
+Datos
+  teclas es Relacion(Texto, Booleano) de Salida
+Algoritmo
+  /*
+  $salida.teclas.$miembros.v = $exterior.$writeJson({}, $exterior.$teclas());
+  */
+Fin

@@ -962,6 +962,7 @@ var modulo = function(zl) {
       // Lógica
       mod.registrarOperadorBinario("y", booleano.instanciar([], modulo), booleano.instanciar([], modulo), booleano.instanciar([], modulo), null);
       mod.registrarOperadorBinario("o", booleano.instanciar([], modulo), booleano.instanciar([], modulo), booleano.instanciar([], modulo), null);
+      mod.registrarOperadorBinario("=", booleano.instanciar([], modulo), booleano.instanciar([], modulo), booleano.instanciar([], modulo), null);
       mod.registrarOperadorUnario("no", booleano.instanciar([], modulo), booleano.instanciar([], modulo), null);
 
       // Texto

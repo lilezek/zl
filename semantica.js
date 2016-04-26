@@ -19,7 +19,7 @@ var modulo = function(zl) {
   }
 
   function testarLValor(arbol, sub) {
-    var varizq = sub.declaraciones[arbol.dato];
+    var varizq = sub.declaraciones[arbol.dato.toLowerCase()];
     if (!varizq) {
       throw zl.error.newError(zl.error.E_NOMBRE_NO_DEFINIDO, {
         posicion: [arbol.begin, arbol.end],
@@ -56,7 +56,7 @@ var modulo = function(zl) {
   }
 
   function testarLValorAsignacion(arbol, sub) {
-    var varizq = sub.declaraciones[arbol.dato];
+    var varizq = sub.declaraciones[arbol.dato.toLowerCase()];
     if (!varizq) {
       throw zl.error.newError(zl.error.E_NOMBRE_NO_DEFINIDO, {
         posicion: [arbol.begin, arbol.end],
@@ -155,7 +155,6 @@ var modulo = function(zl) {
         while (s) {
           if (s.condicion) {
             var tipo = testarExpresion(s.condicion, sub);
-            console.log(tipo.tipo.nombre);
             if (tipo.tipo.nombre != "booleano") {
               throw zl.error.newError(zl.error.E_CONDICION_NO_BOOLEANA, {
                 arbol: s,
@@ -230,7 +229,7 @@ var modulo = function(zl) {
 
     for (var k in arbol.salida) {
       var decl = arbol.salida[k];
-      var der = sub.declaraciones[decl.der];
+      var der = sub.declaraciones[decl.der.toLowerCase()];
       var nombre = decl.izq;
       if (!der) {
         throw zl.error.newError(zl.error.E_NOMBRE_NO_DEFINIDO, {
@@ -267,13 +266,6 @@ var modulo = function(zl) {
           dato: decl,
           subrutina: llamada,
           posicion: [decl.begin, decl.end]
-        });
-      }
-      if (!der) {
-        throw zl.error.newError(zl.error.E_NOMBRE_NO_DEFINIDO, {
-          nombre: decl.der,
-          posicion: [decl.begin, decl.end],
-          declaraciones: sub.declaraciones
         });
       }
       if (der.modificadores === der.M_ENTRADA) {
