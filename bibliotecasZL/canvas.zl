@@ -291,3 +291,14 @@ Algoritmo
   }
   */
 Fin
+
+Subrutina Primitiva Dimensiones
+Datos
+  ancho es Numero de Salida
+  alto es Numero de Salida
+Algoritmo
+  /*
+  $salida.ancho = window.innerWidth;
+  $salida.alto = window.innerHeight;
+  */
+Fin

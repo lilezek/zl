@@ -91,6 +91,8 @@
   integrar "bibliotecasZL/teclado.zl"
   integrar "bibliotecasZL/canvas.zl"
   integrar "bibliotecasZL/basico.zl"
+  ancho <- 1920
+  alto <- 1080
 Fin
 
 Subrutina GenerarObstaculo
@@ -148,9 +150,6 @@ Algoritmo
   	{6000,700} como punto,
     {7000,500} como punto
   }
-  tamañofuentetexto [
-    tamaño <- 50
-  ]
   esconderRaton []
 Fin
 
@@ -222,10 +221,6 @@ Algoritmo
     i <- i + 1
 	Fin
 	generarobstaculo []
-	// Se sale por arriba o por abajo:
-  Si (pajaro("y") < 0) o (pajaro("y") > 1000) hacer
-    inicio []
-  Fin
 	// Choca con algún obstaculo
   i <- 1
 	Repetir 6 veces
@@ -235,6 +230,9 @@ Algoritmo
     Fin
 		i <- i + 1
 	Fin
+	tamañofuentetexto [
+    tamaño <- 50
+  ]
 	dibujartexto [
 	  mensaje <- puntuacion como texto
 	  centro <- {50,100} como punto
@@ -360,9 +358,10 @@ Fin</textarea>
         });
       }
 
+      zl.lienzo = {};
       function canvasEscala() {
-        $("canvas").attr("width", window.innerWidth);
-        $("canvas").attr("height", window.innerHeight);
+        $("canvas").attr("width", zl.lienzo.ancho || window.innerWidth);
+        $("canvas").attr("height", zl.lienzo.alto || window.innerHeight);
         return true;
       }
       canvasEscala();
