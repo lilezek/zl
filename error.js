@@ -205,7 +205,7 @@ var modulo = function(zl) {
     this.enumeracion = 2;
     this.identificador = "E_PALABRA_RESERVADA";
     this
-      .resaltarLinea(1, 1)
+      .resaltarLinea(1,1)
       .texto("Error: " + this.identificador)
       .indentar()
       .texto("identacion")
@@ -219,7 +219,7 @@ var modulo = function(zl) {
     this.enumeracion = 3;
     this.identificador = "E_NOMBRE_SUBRUTINA_YA_USADO";
     this
-      .resaltarLinea(1, 1)
+      .resaltarLinea(informacion.posicion[0])
       .texto("Error: " + this.identificador)
       .indentar()
       .texto("identacion")
@@ -233,7 +233,7 @@ var modulo = function(zl) {
     this.enumeracion = 4;
     this.identificador = "E_NOMBRE_DATO_YA_USADO";
     this
-      .resaltarLinea(1, 1)
+      .resaltarLinea(informacion.posicion[0])
       .texto("Error: " + this.identificador)
       .indentar()
       .texto("identacion")
@@ -247,7 +247,7 @@ var modulo = function(zl) {
     this.enumeracion = 5;
     this.identificador = "E_MODIFICADOR_REPETIDO";
     this
-      .resaltarLinea(1, 1)
+      .resaltarLinea(informacion.posicion[0])
       .texto("Error: " + this.identificador)
       .indentar()
       .texto("identacion")
@@ -261,7 +261,7 @@ var modulo = function(zl) {
     this.enumeracion = 6;
     this.identificador = "E_USO_INDEBIDO_MODIFICADOR_GLOBAL";
     this
-      .resaltarLinea(1, 1)
+      .resaltarLinea(informacion.posicion[0])
       .texto("Error: " + this.identificador)
       .indentar()
       .texto("identacion")
@@ -275,7 +275,7 @@ var modulo = function(zl) {
     this.enumeracion = 7;
     this.identificador = "E_GLOBALES_INCOMPATIBLES";
     this
-      .resaltarLinea(1, 1)
+      .resaltarLinea(informacion.posicion[0])
       .texto("Error: " + this.identificador)
       .indentar()
       .texto("identacion")
@@ -289,7 +289,7 @@ var modulo = function(zl) {
     this.enumeracion = 8;
     this.identificador = "E_LLAMADA_NOMBRE_NO_ENCONTRADO";
     this
-      .resaltarLinea(1, 1)
+      .resaltarLinea(informacion.posicion[0])
       .texto("Error: " + this.identificador)
       .indentar()
       .texto("identacion")
@@ -341,7 +341,7 @@ var modulo = function(zl) {
     this.enumeracion = 11;
     this.identificador = "E_LLAMADA_DATOS_INCOMPLETOS";
     this
-      .resaltarLinea(1, 1)
+      .resaltarLinea(informacion.posicion[0])
       .texto("Error: " + this.identificador)
       .indentar()
       .texto("identacion")
@@ -394,21 +394,22 @@ var modulo = function(zl) {
     this.enumeracion = 14;
     this.identificador = "E_OPERACION_NO_DEFINIDA";
     this
-      .resaltarLinea(1, 1)
-      .texto("Error: " + this.identificador)
+      .resaltarLinea(informacion.posicion[0])
+      .texto("Error: la operación " + informacion.op + " no está definidia para: ")
+      .nuevaLinea()
       .indentar()
-      .texto("identacion")
-      .indentar()
-      .texto("identacion")
-      .desindentar()
-      .texto("desindentar")
+      .tipo(informacion.izq)
+      .nuevaLinea()
+      .texto("y")
+      .nuevaLinea()
+      .tipo(informacion.der)
       .desindentar();
   }
   zl.error.E_CONDICION_NO_BOOLEANA = function(informacion) {
     this.enumeracion = 15;
     this.identificador = "E_CONDICION_NO_BOOLEANA";
     this
-      .resaltarLinea(1, 1)
+      .resaltarLinea(informacion.posicion[0])
       .texto("Error: " + this.identificador)
       .indentar()
       .texto("identacion")
@@ -422,7 +423,7 @@ var modulo = function(zl) {
     this.enumeracion = 16;
     this.identificador = "E_VECES_NO_NUMERICO";
     this
-      .resaltarLinea(1, 1)
+      .resaltarLinea(informacion.posicion[0])
       .texto("Error: " + this.identificador)
       .indentar()
       .texto("identacion")
@@ -460,7 +461,7 @@ var modulo = function(zl) {
     this.enumeracion = 19;
     this.identificador = "E_FLECHA_INCORRECTA";
     this
-      .resaltarLinea(1, 1)
+      .resaltarLinea(informacion.posicion[0])
       .texto("Error: " + this.identificador)
       .indentar()
       .texto("identacion")
@@ -474,7 +475,7 @@ var modulo = function(zl) {
     this.enumeracion = 20;
     this.identificador = "E_ACCESO_A_DATO_LOCAL";
     this
-      .resaltarLinea(1, 1)
+      .resaltarLinea(informacion.posicion[0])
       .texto("Error: " + this.identificador)
       .indentar()
       .texto("identacion")
@@ -488,7 +489,7 @@ var modulo = function(zl) {
     this.enumeracion = 21;
     this.identificador = "E_LECTURA_ILEGAL";
     this
-      .resaltarLinea(1, 1)
+      .resaltarLinea(informacion.posicion[0])
       .texto("Error: " + this.identificador)
       .indentar()
       .texto("identacion")
@@ -502,7 +503,7 @@ var modulo = function(zl) {
     this.enumeracion = 22;
     this.identificador = "E_ESCRITURA_ILEGAL";
     this
-      .resaltarLinea(1, 1)
+      .resaltarLinea(informacion.posicion[0])
       .texto("Error: " + this.identificador)
       .indentar()
       .texto("identacion")
@@ -516,7 +517,7 @@ var modulo = function(zl) {
     this.enumeracion = 23;
     this.identificador = "E_INDICE_NO_LISTA_NO_RELACION";
     this
-      .resaltarLinea(1, 1)
+      .resaltarLinea(informacion.posicion[0])
       .texto("Error: " + this.identificador)
       .indentar()
       .texto("identacion")
@@ -530,7 +531,7 @@ var modulo = function(zl) {
     this.enumeracion = 24;
     this.identificador = "E_CONVERSOR_NO_EXISTE";
     this
-      .resaltarLinea(1, 1)
+      .resaltarLinea(informacion.posicion[0])
       .texto("Error: " + this.identificador)
       .indentar()
       .texto("identacion")
@@ -544,7 +545,7 @@ var modulo = function(zl) {
     this.enumeracion = 500;
     this.identificador = "E_EJECUCION_INDICE_DESCONTROLADO";
     this
-      .resaltarLinea(1, 1)
+      .resaltarLinea(informacion.posicion[0])
       .texto("Error: " + this.identificador)
       .indentar()
       .texto("identacion")
@@ -558,7 +559,7 @@ var modulo = function(zl) {
     this.enumeracion = 501;
     this.identificador = "E_EJECUCION_CONVERSION_INVALIDA";
     this
-      .resaltarLinea(1, 1)
+      .resaltarLinea(informacion.posicion[0])
       .texto("Error: " + this.identificador)
       .indentar()
       .texto("identacion")

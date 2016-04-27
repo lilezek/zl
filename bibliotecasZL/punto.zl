@@ -84,6 +84,22 @@ Algoritmo
   */
 Fin
 
+Subrutina Primitiva OperadorAccesoEscritura PuntoEscribirCoordenada
+Datos
+  izquierda es EsteModulo de Entrada de Salida
+  derecha es Texto de entrada
+  resultado es Numero de entrada
+Algoritmo
+  /*
+  if ($entrada.derecha === "x" || $entrada.derecha === "X") {
+    $salida.izquierda.$miembros.px = $entrada.resultado;
+  } else if ($entrada.derecha === "y" || $entrada.derecha === "Y") {
+    $salida.izquierda.$miembros.py = $entrada.resultado;
+  }
+  //TODO: lanzar excepción
+  */
+Fin
+
 Subrutina Primitiva OperadorSuma PuntoSumaPunto
 Datos
   izquierda es EsteModulo de Entrada

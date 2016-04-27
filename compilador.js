@@ -148,6 +148,8 @@ var modulo = function(zl, async) {
           zl.writeJson(mod.configuracion, configuraciones);
           mod.rellenarDesdeArbol(compilado);
 
+          console.log(mod.operacionesBinarias);
+
           // Fase 9, comprobaciones semánticas (tipos compatibles, uso de nombres que
           // están registrados, etc...).
           zl.semantica.testarModulo(compilado, mod);

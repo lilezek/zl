@@ -1,0 +1,161 @@
+Configuracion
+  importar "bibliotecasZL/relacion.zl"
+  importar "bibliotecasZL/lista.zl"
+  importar "bibliotecasZL/punto.zl"
+  integrar "bibliotecasZL/teclado.zl"
+  integrar "bibliotecasZL/canvas.zl"
+  integrar "bibliotecasZL/basico.zl"
+Fin
+
+Subrutina GenerarObstaculo
+Datos
+	obstaculos es Lista(Punto) global
+  obstaculoLibre es numero
+  coordX es Numero
+  coordXmax es Numero
+  i es numero
+  altura es Numero
+  puntuacion es Numero Global
+Algoritmo
+  coordXmax <- 2000
+  i <- 1
+	obstaculoLibre <- 0
+  Repetir 6 veces
+	  obstaculos(i).leercomponentes [
+      posx -> coordX
+    ]
+    Si coordX <= -100 hacer
+      obstaculoLibre <- i
+    Fin
+    i <- i + 1
+  	Si coordXMax < coordX + 320 hacer
+  	  coordXmax <- coordX + 320
+  	Fin
+	Fin
+	Si obstaculoLibre > 0 hacer
+
+    aleatorio [
+      minimo <- 200
+      maximo <- 700
+      resultado -> altura
+    ]
+		obstaculos(obstaculoLibre) <- {coordXMax,altura} como punto
+		puntuacion <- puntuacion + 1
+	Fin
+Fin
+
+Subrutina Inicio
+Datos
+  pajaro es Punto Global
+  velocidad es Punto Global
+  gravedad es Numero Global
+  obstaculos es Lista(Punto) global
+  puntuacion es Numero global
+Algoritmo
+  puntuacion <- 0
+  gravedad <- 2000
+  pajaro <- {500, 500} como punto
+  velocidad <- {0,0} como punto
+  obstaculos <- {
+  	{2000,50} como punto,
+  	{3000,500} como punto,
+  	{4000,700} como punto,
+    {5000,500} como punto,
+  	{6000,700} como punto,
+    {7000,500} como punto
+  }
+  tamañofuentetexto [
+    tamaño <- 50
+  ]
+Fin
+
+Subrutina Fotograma
+Datos
+  pajaro es Punto Global
+  velocidad es Punto Global
+	d es numero
+  gravedad es Numero Global
+  arriba es booleano
+  abajo es booleano
+  obstaculos es Lista(Punto) global
+  i es numero
+  puntuacion es Numero global
+Algoritmo
+  delta [
+    delta -> d
+  ]
+  fondo [
+    fondo <- "blanco" como color
+  ]
+  colorborde [
+    borde <- "negro" como color
+  ]
+  grosorborde [
+    grosor <- 100
+  ]
+
+  teclapulsada [
+    tecla <- "ARRIBA"
+    estapulsada -> arriba
+  ]
+
+  teclapulsada [
+    tecla <- "ABAJO"
+    estapulsada -> abajo
+  ]
+
+  Si arriba hacer
+    velocidad("y") <- -500
+  o si abajo hacer
+    velocidad("y") <- velocidad("y") + 400
+  si no hacer
+		velocidad <- velocidad + {0,gravedad} como punto * d
+  Fin
+	velocidad <- velocidad + {25,0} como punto * d
+
+  pajaro("y") <- pajaro("y") + velocidad("y") * d
+
+	dibujarpunto [
+	  punto <- pajaro
+	]
+
+	grosorborde [
+    grosor <- 1
+  ]
+	i <- 1
+	Repetir 6 veces
+    obstaculos(i) <- obstaculos(i) - {velocidad("x"),0} como punto * d
+    colorrelleno [
+      relleno <- "negro" como color
+    ]
+    rectangulo [
+      esquina <- obstaculos(i) + {0,200} como punto
+      ancho <- 50
+      alto <- 1920
+    ]
+    rectangulo [
+      esquina <- obstaculos(i) + {0,-200-1920} como punto
+      ancho <- 50
+      alto <- 1920
+    ]
+    i <- i + 1
+	Fin
+	generarobstaculo []
+	// Se sale por arriba o por abajo:
+  Si (pajaro("y") < 0) o (pajaro("y") > 1000) hacer
+    inicio []
+  Fin
+	// Choca con algún obstaculo
+  i <- 1
+	Repetir 6 veces
+    Si (((pajaro("x") - obstaculos(i)("x"))*(pajaro("x") - obstaculos(i)("x"))) < 900)
+			y (((pajaro("y") - obstaculos(i)("y"))*(pajaro("y") - obstaculos(i)("y"))) > 16000) hacer
+      inicio []
+    Fin
+		i <- i + 1
+	Fin
+	dibujartexto [
+	  mensaje <- puntuacion como texto
+	  centro <- {50,100} como punto
+	]
+Fin

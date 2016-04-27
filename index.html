@@ -101,6 +101,7 @@ Datos
   coordXmax es Numero
   i es numero
   altura es Numero
+  puntuacion es Numero Global
 Algoritmo
   coordXmax <- 2000
   i <- 1
@@ -118,26 +119,27 @@ Algoritmo
   	Fin
 	Fin
 	Si obstaculoLibre > 0 hacer
+
     aleatorio [
       minimo <- 200
       maximo <- 700
       resultado -> altura
     ]
 		obstaculos(obstaculoLibre) <- {coordXMax,altura} como punto
-
+		puntuacion <- puntuacion + 1
 	Fin
 Fin
 
 Subrutina Inicio
 Datos
   pajaro es Punto Global
-  velocidad es Punto Global
-  gravedad es Numero Global
+  velocidad es Numero Global
   obstaculos es Lista(Punto) global
+  puntuacion es Numero global
 Algoritmo
-  gravedad <- 2000
+  puntuacion <- 0
   pajaro <- {500, 500} como punto
-  velocidad <- {0,0} como punto
+  velocidad <- 0
   obstaculos <- {
   	{2000,50} como punto,
   	{3000,500} como punto,
@@ -146,17 +148,22 @@ Algoritmo
   	{6000,700} como punto,
     {7000,500} como punto
   }
+  tamañofuentetexto [
+    tamaño <- 50
+  ]
+  esconderRaton []
 Fin
 
 Subrutina Fotograma
 Datos
   pajaro es Punto Global
-  velocidad es Punto Global
+  velocidad es Numero Global
 	d es numero
-  gravedad es Numero Global
   arriba es booleano
+  abajo es booleano
   obstaculos es Lista(Punto) global
   i es numero
+  puntuacion es Numero global
 Algoritmo
   delta [
     delta -> d
@@ -176,13 +183,18 @@ Algoritmo
     estapulsada -> arriba
   ]
 
-  Si arriba hacer
-    velocidad <- {0, -500} como punto
-  si no hacer
-		velocidad <- velocidad + {0,gravedad} como punto * d
-  Fin
+  teclapulsada [
+    tecla <- "ABAJO"
+    estapulsada -> abajo
+  ]
 
-  pajaro <- pajaro + velocidad * d
+  posicionraton [
+    posicion -> pajaro
+  ]
+  pajaro("x") <- 500
+
+	velocidad <- velocidad + 25 * d
+  pajaro("y") <- pajaro("y")
 
 	dibujarpunto [
 	  punto <- pajaro
@@ -193,7 +205,7 @@ Algoritmo
   ]
 	i <- 1
 	Repetir 6 veces
-    obstaculos(i) <- obstaculos(i) - {500,0} como punto * d
+    obstaculos(i) <- obstaculos(i) - {velocidad,0} como punto * d
     colorrelleno [
       relleno <- "negro" como color
     ]
@@ -212,19 +224,21 @@ Algoritmo
 	generarobstaculo []
 	// Se sale por arriba o por abajo:
   Si (pajaro("y") < 0) o (pajaro("y") > 1000) hacer
-    //pausar
     inicio []
   Fin
 	// Choca con algún obstaculo
   i <- 1
 	Repetir 6 veces
     Si (((pajaro("x") - obstaculos(i)("x"))*(pajaro("x") - obstaculos(i)("x"))) < 900)
-			y (((pajaro("y") - obstaculos(i)("y"))*(pajaro("y") - obstaculos(i)("y"))) > 12000) hacer
-      //pausar
+			y (((pajaro("y") - obstaculos(i)("y"))*(pajaro("y") - obstaculos(i)("y"))) > 16000) hacer
       inicio []
     Fin
 		i <- i + 1
 	Fin
+	dibujartexto [
+	  mensaje <- puntuacion como texto
+	  centro <- {50,100} como punto
+	]
 Fin</textarea>
     <div class="v divisor"></div>
     <div class="compilation">

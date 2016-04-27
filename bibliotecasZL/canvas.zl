@@ -159,6 +159,16 @@ Algoritmo
   */
 Fin
 
+Subrutina Primitiva EsconderRaton
+Datos
+
+Algoritmo
+	/*
+  var c = document.getElementById("canvas");
+  c.style.cursor = "none";
+  */
+Fin
+
 Subrutina Primitiva Linea
 Datos
   principio es Punto de Entrada
