@@ -33,7 +33,6 @@ Algoritmo
   	Fin
 	Fin
 	Si obstaculoLibre > 0 hacer
-
     aleatorio [
       minimo <- 200
       maximo <- 700
@@ -42,6 +41,40 @@ Algoritmo
 		obstaculos(obstaculoLibre) <- {coordXMax,altura} como punto
 		puntuacion <- puntuacion + 1
 	Fin
+Fin
+
+Subrutina DibujarPajaro
+Datos
+	centro es Punto de Entrada
+  velocidad es punto Global
+Algoritmo
+  grosorborde [
+    grosor <- 100
+  ]
+	dibujarpunto [
+	  punto <- centro
+	]
+  grosorborde [
+    grosor <- 1
+  ]
+  triangulo [
+    punto1 <- centro + {0, 25} como punto
+    punto2 <- centro + {75, 0} como punto
+    punto3 <- centro + {0, -25} como punto
+  ]
+  Si velocidad("y") > 0 hacer
+    triangulo [
+      punto1 <- centro
+      punto2 <- centro + {-75, -10} como punto
+      punto3 <- centro + {-100, -50} como punto
+    ]
+  si no hacer
+		triangulo [
+      punto1 <- centro
+      punto2 <- centro + {-75, 10} como punto
+      punto3 <- centro + {-100, 50} como punto
+    ]
+  Fin
 Fin
 
 Subrutina Inicio
@@ -90,10 +123,6 @@ Algoritmo
   colorborde [
     borde <- "negro" como color
   ]
-  grosorborde [
-    grosor <- 100
-  ]
-
   teclapulsada [
     tecla <- "ARRIBA"
     estapulsada -> arriba
@@ -115,13 +144,11 @@ Algoritmo
 
   pajaro("y") <- pajaro("y") + velocidad("y") * d
 
-	dibujarpunto [
-	  punto <- pajaro
+	dibujarpajaro [
+	  centro <- pajaro
 	]
 
-	grosorborde [
-    grosor <- 1
-  ]
+
 	i <- 1
 	Repetir 6 veces
     obstaculos(i) <- obstaculos(i) - {velocidad("x"),0} como punto * d
