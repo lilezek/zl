@@ -188,6 +188,7 @@ var modulo = function(zl) {
     }
     if (!llamada)
       throw zl.error.newError(zl.error.E_LLAMADA_NOMBRE_NO_ENCONTRADO, {
+        posicion: [arbol.begin, arbol.end],
         arbol: arbol,
         tabla: (modulo ? modulo.arrayDeSubrutinas() : [])
       });

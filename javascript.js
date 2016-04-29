@@ -293,9 +293,9 @@ var modulo = function(zl) {
   zl.javascript.llamadaEntrada = function(compilado, simbolo) {
     var resultado = "{";
     if (compilado.length > 0) {
-      resultado += compilado[0].izq + ":" + zl.javascript.expresion(compilado[0].der, simbolo);
+      resultado += compilado[0].izq.toLowerCase() + ":" + zl.javascript.expresion(compilado[0].der, simbolo);
       for (var i = 1; i < compilado.length; i++) {
-        resultado += "," + compilado[i].izq + ":" + zl.javascript.expresion(compilado[i].der, simbolo);
+        resultado += "," + compilado[i].izq.toLowerCase() + ":" + zl.javascript.expresion(compilado[i].der, simbolo);
       }
     }
     return resultado + "}";

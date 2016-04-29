@@ -288,6 +288,7 @@ var modulo = function(zl) {
   zl.error.E_LLAMADA_NOMBRE_NO_ENCONTRADO = function(informacion) {
     this.enumeracion = 8;
     this.identificador = "E_LLAMADA_NOMBRE_NO_ENCONTRADO";
+    console.log(informacion);
     this
       .resaltarLinea(informacion.posicion[0])
       .texto("Error: " + this.identificador)

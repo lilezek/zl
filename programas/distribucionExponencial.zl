@@ -1,0 +1,57 @@
+Configuracion
+  ancho <- 1920
+  alto <- 1080
+  fps <- 60
+  integrar "bibliotecasZL/basico.zl"
+  integrar "bibliotecasZL/canvas.zl"
+Fin
+
+Subrutina Inicio
+Datos
+  dist es Lista(Numero) Global
+  i es Numero
+Algoritmo
+  dist.inicio [
+    tamaño <- 1920
+  ]
+  i <- 1
+  Repetir 1920 veces
+    dist(i) <- 0
+    i <- i + 1
+  Fin
+  fondo [
+    fondo <- "blanco" como color
+  ]
+  colorrelleno [
+    relleno <- "negro" como color
+  ]
+  colorborde [
+    borde <- "negro" como color
+  ]
+Fin
+
+Subrutina Fotograma
+Datos
+  aleatorio es Numero
+  dist es Lista(Numero) Global
+Algoritmo
+  grosorborde [
+    grosor <- 2
+  ]
+  Repetir 100 veces
+    AleatorioExponencial [
+      lambda <- 5
+      resultado -> aleatorio
+    ]
+    redondear [
+      numero <- aleatorio*1000
+      resultado -> aleatorio
+    ]
+    Si (aleatorio >= 1) y (aleatorio <= 1920) Hacer
+      dist(aleatorio) <- dist(aleatorio) + 1
+      dibujarpunto [
+      punto <- {aleatorio,800-dist(aleatorio)} como punto
+      ]
+    Fin
+  Fin
+Fin
