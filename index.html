@@ -296,7 +296,7 @@ Fin</textarea>
         styleActiveLine: true,
         matchBrackets: true
       });
-      editor.on("change", function(cm, ev) {
+      editor.on("change", function TriggerChangeEditor(cm, ev) {
         var movido = 0;
         movido += ev.text.length - 1;
         for (var i = 0; i < ev.text.length; i++) {
@@ -354,6 +354,10 @@ Fin</textarea>
           type: "get",
           success: function(data) {
             editor.setValue(data);
+            if (lasttimeout) {
+              clearTimeout(lasttimeout);
+            }
+            lasttimeout = setTimeout(Compile, 250, editor.getValue());
           }
         });
       }
