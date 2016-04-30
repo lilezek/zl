@@ -311,6 +311,7 @@ Fin</textarea>
         if (lasttimeout) {
           clearTimeout(lasttimeout);
         }
+        $("#run").prop("disabled", true).html("Compilando");
         lasttimeout = setTimeout(Compile, 250, editor.getValue());
         if (ev.origin === "+input" && /[a-zA-Z\.]/.test(ev.text)) {
           editor.showHint({
@@ -347,20 +348,6 @@ Fin</textarea>
         "Ctrl-Enter": autocompletar,
         "Cmd-Enter": autocompletar
       });
-
-      if (parametros["programa"] && parametros["programa"].indexOf("..") === -1) {
-        $.ajax("programas/" + parametros["programa"], {
-          dataType: "text",
-          type: "get",
-          success: function(data) {
-            editor.setValue(data);
-            if (lasttimeout) {
-              clearTimeout(lasttimeout);
-            }
-            lasttimeout = setTimeout(Compile, 250, editor.getValue());
-          }
-        });
-      }
 
       zl.lienzo = {};
       function canvasEscala() {
@@ -473,6 +460,7 @@ Fin</textarea>
             else
               lastjs = js_beautify(lastCompilation.javascript);
             compilation.innerHTML = zl.escapeHtml(lastjs);
+            $("#run").prop("disabled", false).html("Empezar");
           }
         });
       }
@@ -484,7 +472,23 @@ Fin</textarea>
         errorLineas = [];
       }
 
-      Compile(editor.getValue());
+      if (parametros["programa"] && parametros["programa"].indexOf("..") === -1) {
+        $("#run").html("Cargando").prop("disabled", true);
+        $.ajax("programas/" + parametros["programa"], {
+          dataType: "text",
+          type: "get",
+          success: function(data) {
+            editor.setValue(data);
+            if (lasttimeout) {
+              clearTimeout(lasttimeout);
+            }
+            lasttimeout = setTimeout(Compile, 250, editor.getValue());
+            $("#run").prop("disabled", true).html("Compilando");
+          }
+        });
+      } else {
+        Compile(editor.getValue());
+      }
 
       function download() {
         var zip = new JSZip();
