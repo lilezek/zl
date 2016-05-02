@@ -260,7 +260,30 @@ Algoritmo
   */
 Fin
 
-Subrutina Primitiva Asincrona Imagen
+Subrutina Primitiva Asincrona CargarImagen
+Datos
+  url es Texto de Entrada
+Algoritmo
+  /*
+  // TODO: crear la caché fuera de esta subrutina
+  $self.$miembros.$cacheDeImagenes = $self.$miembros.$cacheDeImagenes || {};
+  var img = new Image();
+  img.onload = function() {
+    $self.$miembros.$cacheDeImagenes[$entrada.url] = img;
+    done(null, {});
+  }
+  img.onerror = function(e) {
+    done($exterior.$error.newError($exterior.$error.E_EJECUCION_IMAGEN_NO_CARGA, {
+    		url: $entrada.url,
+        motivo: e,
+        adicional: "No se pudo cargar la imagen."
+  		}));
+  }
+  img.src = $entrada.url;
+  */
+Fin
+
+Subrutina Primitiva DibujarImagen
 Datos
   url es Texto de Entrada
   esquina es Punto de Entrada
@@ -268,27 +291,8 @@ Datos
   alto es Numero de Entrada
 Algoritmo
   /*
-  // TODO: crear la caché fuera de esta subrutina
-  $self.$miembros.$cacheDeImagenes = $self.$miembros.$cacheDeImagenes || {};
   var img = $self.$miembros.$cacheDeImagenes[$entrada.url];
-  if (img && img.ready) {
-    $exterior.$ctx2d.drawImage(img, $entrada.esquina.$miembros.px, $entrada.esquina.$miembros.py, $entrada.ancho, $entrada.alto);
-    done(null, {});
-  } else {
-    img = new Image();
-    img.onload = function() {
-      $exterior.$ctx2d.drawImage(img, $entrada.esquina.$miembros.px, $entrada.esquina.$miembros.py, $entrada.ancho, $entrada.alto);
-      done(null, {});
-    }
-    img.onerror = function(e) {
-      done($exterior.$error.newError($exterior.$error.E_EJECUCION_IMAGEN_NO_CARGA, {
-      		url: $entrada.url,
-          motivo: e,
-          adicional: "No se pudo cargar la imagen."
-    		}));
-    }
-    img.src = $entrada.url;
-  }
+  $exterior.$ctx2d.drawImage(img, $entrada.esquina.$miembros.px, $entrada.esquina.$miembros.py, $entrada.ancho, $entrada.alto);
   */
 Fin
 

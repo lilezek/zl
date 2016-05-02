@@ -16,7 +16,7 @@ Datos
   estaPulsada es booleano de Salida
 Algoritmo
   /*
-  $salida.estapulsada = Boolean($exterior.$teclas()[$entrada.tecla]);
+  $salida.estapulsada = Boolean($exterior.$teclas()[$entrada.tecla.toUpperCase()]);
   */
 Fin
 
