@@ -402,7 +402,6 @@ Fin</textarea>
         $("canvas").attr("height", zl.lienzo.alto || window.innerHeight);
         return true;
       }
-      canvasEscala();
 
       function visualRestore(event, visual) {
         if ($(visual).hasClass("minimized")) {
@@ -508,6 +507,7 @@ Fin</textarea>
               lastjs = js_beautify(lastCompilation.javascript);
             compilation.innerHTML = zl.escapeHtml(lastjs);
             $("#run").prop("disabled", false).html("Empezar");
+            canvasEscala();
           }
         });
       }

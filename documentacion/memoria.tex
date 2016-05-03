@@ -37,122 +37,325 @@
 \renewcommand{\chaptername}{Parte}
 
 \begin{document}
-\maketitle
-\tableofcontents
+	\maketitle
+	\tableofcontents
 	
-\begin{abstract}
-	Proceso de creación de un lenguaje sencillo, de un entorno de programación sin instalación y con herramientas para facilitar el desarrollo.
-\end{abstract}
-
-
-\chapter{Introducción}
-
-\section{Declaración de intenciones}
-
-Mi objetivo sería conseguir que el proyecto cumpla los siguientes puntos:
-
-\begin{itemize}
-	\item El lenguaje debe estar en la medida de lo posible en castellano.
-	\item Debe diferenciar correctamente los distintos tipos de datos.
-	\item No debe asumir automáticamente conversiones de datos.
-	\item Que no requiera instalador.
-	\item Que sea flexible para que los docentes puedan añadir funcionalidad.
-\end{itemize} 
-
-Puntos que podrían simplificar el aprendizaje del desarrollo algorítmico y la programación.
-
-\section{Estado del arte}
-
-\subsection{Descubre}
-
-La herramienta Descubre, desarrollada por Juan Antonio Sánchez Laguna, Marcos Menárguez Tortosa, y Juan Antonio Martínez Navarro. 
-
-La herramienta se compone de:
-
-%TODO meter bibliografía y referencias de processing.
-
-\begin{itemize}
-	\item Un editor de texto, derivado de CodeMirror.
-	\item Un lenguaje de programación propio, derivado de Java, con un las funcionalidades de processing.
-	\item Un entorno con un lienzo para dibujar y una salida para escribir texto.
-	\item Un repositorio de usuarios y programas que permite copiar el código de otros para hacer clones. 
-\end{itemize}
-
-Con los siguientes puntos positivos:
-
-\begin{itemize}
-	\item Entorno completo. Desde escribir el código hasta ver su resultado en la misma página.
-	\item Sin instalación y sin necesidad de conocimientos sobre compilaciones.
-	\item El lenguaje comparte sintaxis con C y Java, lo que es útil para avanzar más allá de la enseñanza. 
-	\item La página tiene una lista de tutoriales y documentación sobre la funcionalidad de processing.
-\end{itemize}
-
-Y los siguientes puntos negativos:
-
-\begin{itemize}
-	\item El lienzo es un poco pequeño. Se limita a 320x320.
-	\item La sintaxis de iJava no es amigable para nuevos alumnos.
-	\item La ejecución del código es síncrono. Esto reduce las posibilidades tecnológicas. Como por ejemplo, no se pueden cargar imágenes en tiempo de ejecución.
-	\item No se puede extender el lenguaje con el propio lenguaje. Es decir, no se puede escribir un módulo para que se incluya en otro código. Esta parte no es importante para el alumno, pero sí para el docente que quiera extender el lenguaje.
-\end{itemize}
-
-Acceso: \url{http://descubre.inf.um.es}
-
-\subsection{Codecombat}
-
-CodeCombat es un proyecto de código abierto para aprender a programar en base a un juego multijugador. Actualmente tiene varios problemas sencillos (que van creciendo en dificultad) para ir aprendiendo los mecanismos de los distintos lenguajes que ofrece, a la vez que vas ganando monedas para poder comprar objetos que ofrecen mayor funcionalidad (te permiten usar más métodos para resolver los distintos problemas).
-
-%TODO Añadir imágenes del proyecto y enlaces
-
-Se pueden destacar los siguientes puntos del proyecto:
-
-\begin{itemize}
-	\item Gran conjunto de problemas a resolver que van creciendo en dificultad.
-	\item Permite seleccionar entre Python, JavaScript, Clojure, CoffeScript y Lua.
-	\item Acabado artístico profesional, así como una gran cantidad de objetos.
-	\item Proyecto de código abierto.
-	\item Traducido (parcialmente) a varios idiomas, entre los cuales se encuentra el español.
-\end{itemize}
-
-Sin embargo, el objetivo de esta plataforma es aprender resolviendo problemas concretos como moverse por un laberinto, o eliminando unos enemigos, pero no crear otras aplicaciones. Aún así, es una muy buena herramienta de aprendizaje.
-
-Como punto negativo destacaría que te obligan a programar en un lenguaje real, sin ofrecerte una alternativa amigable para nuevos alumnos. Que por defecto, Python, tiene problemas con la indentación obligatoria.
-
-Se puede probar sin registro. 
-
-Acceso: \url{http://codecombat.com}
-
-\subsection{Scratch}
-
-\subsection{code.org}
-
-\chapter{Lenguaje zl}
-\section{Introducción}
-El lenguaje está enfocado a cumplir las siguientes propiedades:
-
-\begin{itemize}
-	\item Enfocado a parecerse sintácticamente al pseudocódigo en castellano, parecido al enseñado en la asignatura IP.
-	\item Diferenciando los tipos de datos, sin hacer implícitas sus conversiones ni sus operaciones.
-	\item Insensible a mayúsculas y minúsculas, 
-	y aceptando tildes y eñes en los nombres.
-	\item Con un único tipo de datos para representar números enteros y decimales (similar a Javascript).
-\end{itemize}
-
-\section{Definición formal del lenguaje}
-La gramática del lenguaje en formato BNF es:
-
-\VerbatimInput{../sintaxis.txt}
-
-Cabe destacar de la gramática las 4 expresiones y los cuatro grupos de operadores, para poder definir correctamente el orden en el cuál los operadores se reducen.
-
-Por otro lado, los número en el lenguaje permiten indicar base 2, 10 o 16 de la siguiente manera:
-
-\begin{itemize}
-	\item $51966$ como número en base 10
-	\item $51966|10$ como el mismo número
-	\item $CAFE|16$ o $cafe|16$ como el mismo número en base hexadecimal.
-	\item $1100101011111110|2$ como el número en base binaria.
-\end{itemize}
-
+	\begin{abstract}
+		Proceso de creación de un lenguaje sencillo, de un entorno de programación sin instalación y con herramientas para facilitar el desarrollo.
+	\end{abstract}
+	
+	
+	\chapter{Introducción}
+	
+	\section{Objetivo e intenciones de este trabajo}
+	
+	La enseñanza preuniversitaria de la programación consiste en enseñar a adolescentes y niños a poder pensar de forma lógica y abstracta. Esto conlleva un conjunto de problemas distintos al de la enseñanza a nivel universitario. Antes de la universidad no se puede asumir si los alumnos conocen o no ciertas partes de las matemáticas, si saben o no dibujo técnico, o incluso si entienden como funciona un espacio de coordenadas cartesianas.
+	
+	En mi caso concreto, la primera vez que empecé con un lenguaje de programación (uno que se use de forma profesional) fue Pascal con Delphi (en 2007). Fue mi hermano mayor quien me ayudó a instalar tanto el IDE como quien me explicó algunas directrices para empezar a hacer aplicaciones muy básicas.
+	
+	Durante dos años intenté hacer dos cosas muy concretas con Delphi que no conseguí y que me causaron frustración: dibujar (como en un lienzo, algunos gráficos) y conectar la aplicación a internet con otra copia de la aplicación.
+	
+	La sensación que he tenido desde entonces hasta hoy es que los lenguajes de programación están orientados a ser útiles desde la perspectiva de un ingeniero, pero no de facilitar el aprendizaje. 
+	
+	Por ello, mi objetivo sería conseguir que el proyecto cumpla los siguientes puntos:
+	
+	\begin{itemize}
+		\item El lenguaje debe estar en la medida de lo posible en castellano, para no asumir que el alumno entiende inglés.
+		\item El lenguaje tendrá tipos de datos, con nombres comunes. Por ejemplo, se evitará el uso de Mapa y Vector, y se usarán nombres como Relación y Lista respectivamente.
+		\item No debe asumir automáticamente conversiones de datos. Bajo mi perspectiva, el alumno debe ser consciente de que los datos tienen un representación que se puede convertir, pero que el ordenador no es inteligente y hay que dar órdenes explícitas.
+		\item Que no requiera instalador, importantísimo para evitar frustraciones con el software. 
+		\item Si fuera posible, integrable con la herramienta Descubre, para aprovechar el sistema de usuarios y de compartir los ejemplos que ya tiene.
+		\item Que sea flexible para que los docentes puedan añadir funcionalidad, ampliando el conjunto de problemas, ejemplos, soluciones y aplicaciones.
+	\end{itemize} 
+	
+	Estos son los puntos fundamentales que podrían simplificar el aprendizaje del desarrollo algorítmico y la programación.
+	
+	\section{Estado del arte}
+	
+	Investigando proyectos con puntos comunes a lo que busco, estos son los proyectos que he podido ver y me han sorprendido en algún o varios aspectos. Existen muchos más, pero estos ofrecen en conjunto lo mismo (o lo más destacable) que el resto.
+	
+	\subsection{Descubre}
+	
+	La herramienta Descubre, desarrollada por Juan Antonio Sánchez Laguna, Marcos Menárguez Tortosa, y Juan Antonio Martínez Navarro. 
+	
+	La herramienta se compone de:
+	
+	%TODO meter bibliografía y referencias de processing.
+	
+	\begin{itemize}
+		\item Un editor de texto, derivado de CodeMirror.
+		\item Un lenguaje de programación propio, derivado de Java, con un las funcionalidades de processing.
+		\item Un entorno con un lienzo para dibujar y una salida para escribir texto.
+		\item Un repositorio de usuarios y programas que permite copiar el código de otros para hacer clones. 
+	\end{itemize}
+	
+	Con los siguientes puntos positivos:
+	
+	\begin{itemize}
+		\item Entorno completo. Desde escribir el código hasta ver su resultado en la misma página.
+		\item Sin instalación y sin necesidad de conocimientos sobre compilaciones.
+		\item El lenguaje comparte sintaxis con C y Java, lo que es útil para avanzar más allá de la enseñanza. 
+		\item La página tiene una lista de tutoriales y documentación sobre la funcionalidad de processing.
+		\item Se puede clonar con facilidad el código de otros alumnos o docentes.
+	\end{itemize}
+	
+	Y los siguientes puntos negativos:
+	
+	\begin{itemize}
+		\item El lienzo es un poco pequeño. Se limita a 320x320.
+		\item La sintaxis de iJava no es amigable para nuevos alumnos.
+		\item La ejecución del código es síncrono. Esto reduce las posibilidades tecnológicas. Como por ejemplo, no se pueden cargar imágenes en tiempo de ejecución.
+		\item No se puede rotar el lienzo, así que todos los dibujos deben estar alineados a los ejes de coordenadas.
+		\item No se puede extender el lenguaje con el propio lenguaje. Es decir, no se puede escribir un módulo para que se incluya en otro código. Esta parte no es importante para el alumno, pero sí para el docente que quiera extender el lenguaje.
+	\end{itemize}
+	
+	\hfill
+	
+	Acceso: \url{http://descubre.inf.um.es}
+	
+	\subsection{Codecombat}
+	
+	CodeCombat es un proyecto de código abierto para aprender a programar en base a un juego multijugador. Actualmente tiene varios problemas sencillos (que van creciendo en dificultad) para ir aprendiendo los mecanismos de los distintos lenguajes que ofrece, a la vez que vas ganando monedas para poder comprar objetos que ofrecen mayor funcionalidad (te permiten usar más métodos para resolver los distintos problemas).
+	
+	%TODO Añadir imágenes del proyecto y enlaces
+	
+	Se pueden destacar los siguientes puntos del proyecto:
+	
+	\begin{itemize}
+		\item Gran conjunto de problemas a resolver que van creciendo en dificultad.
+		\item Permite seleccionar entre Python, JavaScript, Clojure, CoffeScript y Lua.
+		\item Acabado artístico profesional, así como una gran cantidad de objetos.
+		\item Proyecto de código abierto.
+		\item Traducido (parcialmente) a varios idiomas, entre los cuales se encuentra el español.
+	\end{itemize}
+	
+	Sin embargo, el objetivo de esta plataforma es aprender resolviendo problemas concretos como moverse por un laberinto, o eliminando unos enemigos, pero no crear otras aplicaciones. Aún así, es una muy buena herramienta de aprendizaje.
+	
+	Como punto negativo destacaría que te obligan a programar en un lenguaje real, sin ofrecerte una alternativa amigable para nuevos alumnos. Que por defecto, Python, tiene problemas con la indentación obligatoria, que podría ser una barrera.
+	
+	Se puede probar sin registro. 
+	
+	\hfill
+	
+	Acceso: \url{http://codecombat.com}
+	
+	\subsection{Scratch}
+	
+	Scracth es un proyecto impulsado por el MIT para el desarrollo de pequeños proyectos con dibujos, animaciones y sonidos. 
+	
+	Se basa en programar unos módulos encajando unas piezas que equivalen a sentencias, instrucciones o elementos de control en un lenguaje
+	por bloques, como si fuera un juego de Lego en dos dimensiones.
+	
+	El lenguaje y el editor tienen versión web y versión local, que se encuentra en paquetes como la Raspberry Pi. En la versión web, se pueden alojar proyectos para que 
+	sean de dominio público y cualquier persona puede clonarlo para alterarlo a su gusto.
+	
+	De este proyecto cabe destacar la gran cantidad de usuarios, así como la interfaz y la posibilidad de no necesitar la web para hacer un proyecto. Además, los bloques que conforman el código están traducidos a varios idiomas, reduciendo la barrera de los alumnos que aprenden en castellano.
+	
+	La única pega que le veo al proyecto es que la programación es por bloques, y que la interfaz, en mi opinión, está enfocado a alumnos muy jóvenes (de edades entre 6 y 12 años). 
+	
+	\hfill
+	
+	Acceso: \url{https://scratch.mit.edu}
+	
+	\subsection{code.org}
+	
+	Code.org es una web con varios tipos niveles de problemas, donde hay un lienzo representando un problema. Los alumnos (recomendado de 4 a 18 años) resuelven unos problemas que crecen progresivamente en dificultad. A diferencia de codecombat, code.org utiliza un lenguaje basado en bloques como el de Scratch. 
+	
+	Los problemas son visualmente muy entretenidos (como los de codecombat), aunque más enfocados a alumnos más jóvenes (desde 4 años).
+	
+	Al igual que Scratch, esta web ofrece los bloques de código en castellano, y unos vídeos introductorios interesantes con subtítulos al español.
+	
+	La pega que le veo es la misma que a Scratch y Codecombat: solo ofrecen un mecanismo para resolver problemas, con una interfaz basada en bloques y con una temática enfocada a niños pequeños.
+	
+	\hfill
+	
+	Acceso: \url{http://code.org}
+	
+	\subsection{Khan Academy - Aprendiendo a dibujar con Javascript}
+	
+	En Khan Academy hay un conjunto de tutoriales para aprender JavaScript con el objetivo de dibujar en un lienzo como el de Descubre. Tiene muchos tutoriales y son todos interactivos y subtitulados al castellano.
+	
+	\hfill
+	
+	De aquí cabe destacar que el editor es muy interactivo. Permite la edición de casi cualquier valor con una especie de elemento visual. Además, el código se compila automáticamente (en el caso de javascript se podría evaluar directamente) y se pinta en el lienzo cada vez que el código cambia. 
+	
+	\hfill
+	
+	Acceso: 
+	\href{https://es.khanacademy.org/computing/hour-of-code/hour-of-code-tutorial/p/intro-to-drawing}{Intro to Drawing}
+	
+	\section{Ideas extraídas de los distintos proyectos}
+	
+	Las ideas que más me han gustado y que desarrollo en el siguiente capítulo son:
+	
+	\begin{itemize}
+		\item Editor y ejecución (compilación transparente) en una misma web como Descubre o CodeCombat.
+		\item Un lenguaje propio simplificado como iJava. 
+		\item Mezcla de imperativo y con objetos (aunque mayoritariamente imperativo) con una lista de subrutinas para dibujar como Processing.
+		\item Intentar advertir de los errores de compilación con lenguaje sencillo evitando tecnicismos si es posible, como con el editor de Khan Academy
+		\item Ofrecer un editor que ayude al alumno a escribir el código, sugiriendo nombres, autocompletando según el contexto...
+	\end{itemize}
+	
+	%TODO: en vez de una sección por cada sistema de aprendizaje, hacer una sección con los sistemas
+	% otro con los compiladores, y otro con los IDEs.
+	
+	\chapter{Metas y objetivos}
+	
+	Esta es la lista de metas y objetivos desarrollados en el proyecto. Hay otra lista en la sección posibles ampliaciones futuras sobre otras ideas que podrían implementarse en un futuro.
+	
+	\hfill
+	
+	Muchas de estas metas salen del conjunto de ideas después de haber visto el estado del arte, y también del escrito de Bret Victor\cite{bretvictor}
+	
+	\section{Lenguaje de programación}
+	
+	\subsection{Sintaxis básica}
+	
+	\subsection{Listas y relaciones (vectores y mapas)}
+	
+	\subsection{Uso de código nativo}
+	
+	\subsection{Configuración del código}
+	
+	\subsection{Definición de nuevos tipos}
+	
+	\subsection{Sobrecarga de operadores}
+	
+	\subsection{Definición de funciones y procedimientos}
+	
+	\subsection{Contratos (precondiciones y postcondiciones)}
+	
+	\section{Editor de código}
+	
+	\subsection{Coloreado}
+	
+	\subsection{Autocompletado simple}
+	
+	\subsection{Autocompletado con contexto}
+	
+	\subsection{Guardar y cargar el código}
+	
+	\subsection{Ayuda a la edición de valores}
+	
+	\subsection{Autoindentado}
+	
+	\subsection{Autocomentado de código que se rompe}
+	
+	\section{Entorno de ejecución}
+	
+	\subsection{Entrada y salida de texto}
+	
+	\subsection{Dibujo y lienzo}
+	
+	\subsection{Entorno de ejecución sin editor}
+	
+	\subsection{WebRTC}
+	
+	\subsection{Gráficas}
+	
+	\subsection{Descarga y subida de ficheros}
+	
+	\subsection{Multi lienzo}
+	
+	\section{Depuración de código}
+	
+	\subsection{Errores en tiempo de compilación}
+	
+	a
+	
+	\subsection{Errores en tiempo de ejecución}
+	
+	a
+	
+	\subsection{Pausas (puntos de ruptura)}
+	
+	\subsection{Lectura del estado de los datos al pausar}
+	
+	\subsection{Guardado del estado entre fotogramas}
+	
+	\subsection{Edición del estado de los datos al pausar}
+	
+	\subsection{Optimización del código generado}
+	
+	\chapter{Lenguaje zl}
+	\section{Introducción}
+	El lenguaje está enfocado a cumplir las siguientes propiedades:
+	
+	\begin{itemize}
+		\item Enfocado a parecerse sintácticamente al pseudocódigo en castellano, parecido al enseñado en la asignatura IP.
+		\item Diferenciando los tipos de datos, sin hacer implícitas sus conversiones ni sus operaciones.
+		\item Insensible a mayúsculas y minúsculas, 
+		y aceptando tildes y eñes en los nombres.
+		\item Con un único tipo de datos para representar números enteros y decimales (similar a Javascript).
+	\end{itemize}
+	
+	\section{Definición formal del lenguaje}
+	La gramática del lenguaje en formato BNF se puede ver en el \hyperref[app:a]{Apéndice A}. De ella, cabe destacar de la gramática las 4 expresiones y los cuatro grupos de operadores, para poder definir correctamente el orden en el cuál los operadores se reducen. En la implementación no uso esa técnica para definir el orden de las operaciones, sino que una vez construido el árbol de la expresión, cambio sus ramas para que respeten el orden de los operadores. 
+	
+	\hfill
+	
+	Por otro lado, los número en el lenguaje permiten indicar base 2, 10 o 16 de la siguiente manera:
+	
+	\begin{itemize}
+		\item $51966$ como número en base 10
+		\item $51966|10$ como el mismo número
+		\item $CAFE|16$ o $cafe|16$ como el mismo número en base hexadecimal.
+		\item $1100101011111110|2$ como el número en base binaria.
+	\end{itemize}
+	
+	\section{Subrutinas y datos}
+	
+	\section{Modulos y tipos}
+	
+	\section{Compilación}
+	
+	\subsection{Primera parte - Configuración}
+	
+	\subsection{Segunda parte - Sintaxis}
+	
+	\subsection{Tercera parte - Generación de tablas y entorno}
+	
+	\subsection{Cuarta parte - Comprobaciones semánticas}
+	
+	\subsection{Quinta parte - Generación de código JavaScript}
+	
+	\section{Ejecución}
+	
+	\subsection{Paso de objetos JavaScript al entorno}
+	
+	\chapter{Editor y entorno web}
+	
+	\section{Partes visuales del editor}
+	
+	\section{Descripción de funcionalidades}
+	
+	\chapter{Compilador sin entorno - NodeJS}
+	
+	\section{Compilación de código ZL a JavaScript sin dependencias web}
+	
+	\section{Pruebas unitarias}
+	
+	\chapter{Extendiendo el lenguaje}
+	
+	\section{Subrutinas primitivas - Código nativo}
+	
+	\section{Tipos de datos y sobrecarga de operadores} 
+	
+	\chapter{Ideas y ampliaciones futuras} 
+	
+	\appendix
+	\chapter{Notación BNF (extendida) del lenguaje} \label{app:a}
+	
+	\VerbatimInput{../sintaxis.txt}
+	
+	\begin{thebibliography}{9}
+		
+		\bibitem{bretvictor}
+		Bret Victor,
+		\emph{Learnable Programming},
+		\href{http://worrydream.com/#!/LearnableProgramming}{worrydream.com},
+		2012.
+		
+	\end{thebibliography}
+	
 \end{document}
-
