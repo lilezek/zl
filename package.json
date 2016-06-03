@@ -2,8 +2,9 @@
   "name": "zl",
   "version": "0.9.0",
   "description": "Conjunto de herramientas para el lenguaje ZL.",
-  "main": "zl.js",
+  "main": "main.js",
   "scripts": {
+    "start": "node_modules/.bin/electron .",
     "test": "./node_modules/mocha/bin/mocha"
   },
   "repository": {
@@ -23,6 +24,7 @@
   "dependencies": {
     "async": "1.5.1",
     "chai": "3.4.1",
+    "electron-prebuilt": "^1.2.1",
     "http-server": "^0.9.0",
     "js-beautify": "1.5.10",
     "mocha": "2.3.4",

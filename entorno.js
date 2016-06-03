@@ -200,8 +200,14 @@ var modulo = function(zl) {
       sub.rellenarDesdeArbol(arbol.subrutinas[i]);
 
       // Comprobar que no se repite el nombre
-      if (this.subrutinaPorNombre(sub.nombre)) {
-        throw zl.error.newError(zl.error.E_NOMBRE_SUBRUTINA_YA_USADO, arbol.subrutinas[i]);
+      var otra;
+      if (otra = this.subrutinaPorNombre(sub.nombre)) {
+        throw zl.error.newError(zl.error.E_NOMBRE_SUBRUTINA_YA_USADO, {
+          posicion: [arbol.subrutinas[i].begin, arbol.subrutinas[i].end],
+          modulo: this,
+          arbolSubrutina: arbol.subrutinas[i],
+          otraSubrutina: otra
+        });
       }
       // Sino, añadirla
       else {
@@ -479,7 +485,11 @@ var modulo = function(zl) {
       decl.rellenarDesdeArbol(arbol.datos[i], this.padre);
 
       if (decl.nombre in this.declaraciones)
-        throw zl.error.newError(zl.error.E_NOMBRE_DATO_YA_USADO, arbol.datos[i]);
+        throw zl.error.newError(zl.error.E_NOMBRE_DATO_YA_USADO, {
+          posicion: [arbol.datos[i].begin, arbol.datos[i].end],
+          arbolDato: arbol.datos[i],
+          otroDato: this.declaraciones[decl.nombre]
+        });
       else
         this.declaraciones[decl.nombre] = decl;
 
@@ -606,17 +616,29 @@ var modulo = function(zl) {
       var mod = arbol.modificadores[j].toLowerCase();
       if (mod.indexOf("salida") > -1) {
         if (this.modificadores & this.M_SALIDA)
-          throw zl.error.newError(zl.error.E_MODIFICADOR_REPETIDO, arbol);
+          throw zl.error.newError(zl.error.E_MODIFICADOR_REPETIDO, {
+            posicion: [arbol.begin, arbol.end],
+            arbolDato: arbol,
+            modificadorRepetido: this.M_SALIDA
+          });
         this.modificadores |= this.M_SALIDA;
       }
       if (mod.indexOf("entrada") > -1) {
         if (this.modificadores & this.M_ENTRADA)
-          throw zl.error.newError(zl.error.E_MODIFICADOR_REPETIDO, arbol);
+          throw zl.error.newError(zl.error.E_MODIFICADOR_REPETIDO, {
+            posicion: [arbol.begin, arbol.end],
+            arbolDato: arbol,
+            modificadorRepetido: this.M_ENTRADA
+          });
         this.modificadores |= this.M_ENTRADA;
       }
       if (mod == "global") {
         if (this.modificadores != this.M_LOCAL)
-          throw zl.error.newError(zl.error.E_USO_INDEBIDO_MODIFICADOR_GLOBAL, arbol);
+          throw zl.error.newError(zl.error.E_USO_INDEBIDO_MODIFICADOR_GLOBAL, {
+            posicion: [arbol.begin, arbol.end],
+            arbolDato: arbol,
+            modificadores: this.modificadores
+          });
         this.modificadores |= this.M_GLOBAL;
       }
     }

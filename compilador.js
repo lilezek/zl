@@ -82,13 +82,6 @@ var modulo = function(zl, async) {
       }
     }
 
-    if ("ancho" in configuraciones) {
-      zl.lienzo.ancho = configuraciones["ancho"];
-    }
-    if ("alto" in configuraciones) {
-      zl.lienzo.alto = configuraciones["alto"];
-    }
-
     // Fase 3, ensamblar cada dependencia
     async.eachSeries(integraciones.concat(importes), function(camino, callback) {
       // ¿Está en caché?

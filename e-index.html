@@ -27,11 +27,9 @@
   <script src="terceros/show-hint.js"></script>
   <link rel="stylesheet" href="terceros/codemirror.css">
   <link rel="stylesheet" href="terceros/addon/hint/show-hint.css">
-  <script src="utils.js"></script>
   <script src="analizador.js"></script>
   <script src="zlsintaxis.js"></script>
-  <script src="error.js"></script>
-  <script src="ejecucion.js"></script>
+  <script src="utils.js"></script>
   <script src="sintaxis.js"></script>
   <script src="entorno.js"></script>
   <script src="semantica.js"></script>
@@ -39,6 +37,7 @@
   <script src="javascript.js"></script>
   <script src="terceros/levenshtein.js"></script>
   <script src="editor.js"></script>
+  <script src="error.js"></script>
   <script src="autocompletar.js"></script>
   <script src="terceros/uglifyjs/utils.js"></script>
   <script src="terceros/uglifyjs/ast.js"></script>
@@ -82,9 +81,11 @@
   </script>
 </head>
 
-<body onresize="return canvasEscala();">
+<body>
   <div class="main">
-    <textarea class="editor" id="editor">
+<textarea class="editor" id="editor">
+// Desarrollado con ayuda de Ginés García Mateos
+
 Configuracion
   importar "bibliotecasZL/relacion.zl"
   importar "bibliotecasZL/lista.zl"
@@ -96,18 +97,197 @@ Configuracion
   alto <- 1080
 Fin
 
-Subrutina mostrar
+Subrutina GenerarObstaculo
 Datos
+  obstaculos es Lista(Punto) global
+  obstaculoLibre es numero
+  coordX es Numero
+  coordXmax es Numero
+  i es numero
+  altura es Numero
+  puntuacion es Numero Global
 Algoritmo
+  coordXmax <- 2000
+  i <- 1
+  obstaculoLibre <- 0
+  Repetir 6 veces
+    obstaculos(i).leercomponentes [
+      posx -> coordX
+    ]
+    Si coordX <= -100 hacer
+      obstaculoLibre <- i
+    Fin
+    i <- i + 1
+    Si coordXMax < coordX + 320 hacer
+      coordXmax <- coordX + 320
+    Fin
+  Fin
+  Si obstaculoLibre > 0 hacer
+    aleatorio [
+      minimo <- 200
+      maximo <- 700
+      resultado -> altura
+    ]
+    obstaculos(obstaculoLibre) <- {coordXMax,altura} como punto
+    puntuacion <- puntuacion + 1
+  Fin
+Fin
+
+Subrutina Inicio
+Datos
+  pajaro es Punto Global
+  velocidad es Numero Global
+  obstaculos es Lista(Punto) global
+  puntuacion es Numero global
+  t es Numero Global
+Algoritmo
+  puntuacion <- 0
+  pajaro <- {500, 500} como punto
+  velocidad <- 0
+  t <- 0
+  obstaculos <- {
+    {2000,50} como punto,
+    {3000,500} como punto,
+    {4000,700} como punto,
+    {5000,500} como punto,
+    {6000,700} como punto,
+    {7000,500} como punto
+  }
+  cargarImagen [
+    url <- "http://dis.um.es/~ginesgm/images/fondo2.png"
+  ]
+  cargarImagen [
+    url <- "http://dis.um.es/~ginesgm/images/fondo3.png"
+  ]
+  cargarImagen [
+    url <- "http://dis.um.es/~ginesgm/images/fondo3.png"
+  ]
+  cargarImagen [
+    url <- "http://dis.um.es/~ginesgm/images/bird1.png"
+  ]
+  cargarImagen [
+    url <- "http://dis.um.es/~ginesgm/images/bird2.png"
+  ]
+  cargarImagen [
+    url <- "http://dis.um.es/~ginesgm/images/palo1.png"
+  ]
+  cargarImagen [
+    url <- "http://dis.um.es/~ginesgm/images/palo2.png"
+  ]
+  esconderRaton []
+Fin
+
+Subrutina Fotograma
+Datos
+  pajaro es Punto Global
+  velocidad es Numero Global
+  d es numero
+  arriba es booleano
+  abajo es booleano
+  obstaculos es Lista(Punto) global
+  i es numero
+  t es Numero Global
+  puntuacion es Numero global
+  reiniciar es booleano
+Algoritmo
+  t <- t + 1
+  delta [
+    delta -> d
+  ]
+  teclapulsada [
+    tecla <- "ARRIBA"
+    estapulsada -> arriba
+  ]
+
+  teclapulsada [
+    tecla <- "ABAJO"
+    estapulsada -> abajo
+  ]
+
+  posicionraton [
+    posicion -> pajaro
+  ]
+  pajaro("x") <- 500
+
+  velocidad <- velocidad + 25 * d
+
+  dibujarImagen [
+    url <- "http://dis.um.es/~ginesgm/images/fondo2.png"
+    esquina <- {0,0} como punto
+    ancho <- 1920
+    alto <- 1080
+  ]
+  dibujarImagen [
+    url <- "http://dis.um.es/~ginesgm/images/fondo3.png"
+    esquina <- {-2*t%1920,860} como punto
+    ancho <- 1920
+    alto <- 220
+  ]
+  dibujarImagen [
+    url <- "http://dis.um.es/~ginesgm/images/fondo3.png"
+    esquina <- {1920-2*t%1920,860} como punto
+    ancho <- 1920
+    alto <- 220
+  ]
+  Si (pajaro("y")%80) > 40 hacer
+    dibujarImagen [
+      url <- "http://dis.um.es/~ginesgm/images/bird1.png"
+      esquina <- {pajaro("x")-50,pajaro("y")-50} como punto
+      ancho <- 120
+      alto <- 100
+    ]
+  si no hacer
+    dibujarImagen [
+      url <- "http://dis.um.es/~ginesgm/images/bird2.png"
+      esquina <- {pajaro("x")-50,pajaro("y")-50} como punto
+      ancho <- 120
+      alto <- 100
+    ]
+  Fin
+  i <- 1
+  Repetir 6 veces
+    obstaculos(i) <- obstaculos(i) - {velocidad,0} como punto * d
+        colorrelleno [
+      relleno <- "negro" como color
+    ]
+    dibujarImagen [
+      url <- "http://dis.um.es/~ginesgm/images/palo1.png"
+      esquina <- obstaculos(i) + {0,200} como punto
+      ancho <- 80
+      alto <- 1080-obstaculos(i)("y")-200
+    ]
+    dibujarImagen [
+      url <- "http://dis.um.es/~ginesgm/images/palo2.png"
+      esquina <- obstaculos(i) + {0,-200-obstaculos(i)("y")} como punto
+      ancho <- 80
+      alto <- obstaculos(i)("y")
+    ]
+    i <- i + 1
+  Fin
+  generarobstaculo []
+  // Choca con algún obstaculo
+  i <- 1
+  Repetir 6 veces
+    Si (((pajaro("x") - obstaculos(i)("x"))*(pajaro("x") - obstaculos(i)("x"))) < 900)
+     y (((pajaro("y") - obstaculos(i)("y"))*(pajaro("y") - obstaculos(i)("y"))) > 16000) hacer
+      reiniciar <- verdadero
+    Fin
+    i <- i + 1
+  Fin
+  tamañofuentetexto [
+    tamaño <- 50
+  ]
+  dibujartexto [
+    mensaje <- puntuacion como texto
+    centro <- {50,100} como punto
+  ]
+  si reiniciar hacer
+    inicio []
+  fin
 Fin
 </textarea>
     <div class="v divisor"></div>
     <div class="compilation">
-      <div class="visual minimized" onclick="return visualRestore(event,this);">
-        <canvas id="canvas" width="100" height="100" onmousemove="return handleMouseMove(event);" onmouseover="return handleMouseOver(event);">Tu explorador no es compatible con canvas</canvas>
-        <div class="minimize hidden" onclick="return visualMinimize(event,this);">[-]</div>
-        <div class="maximize hidden" onclick="return visualMaximize(event,this);">[+]</div>
-      </div>
       <div class="helparea" id="helparea">
       </div>
       <div class="h divisor"></div>
@@ -124,6 +304,8 @@ Fin
     </div>
 
     <script>
+      // CODIGO SOLO DEL EDITOR
+      // TAMBIEN LA PARTE DE COMPILACION
       var parametrosArray = location.search.split("?");
       var parametros = {};
 
@@ -135,22 +317,11 @@ Fin
 
       var carga = null;
 
-
       window.onbeforeunload = function(e) {
-         if (confirm('¿Seguro que quiere abandonar el editor?'))
+        if (confirm('¿Seguro que quiere abandonar el editor?'))
           return;
-        return false;         
+        return false;
       };
-
-
-      if (parametrosArray.length > 1) {
-        parametrosArray = parametrosArray[1].split("&");
-        for (var i = 0; i < parametrosArray.length; i++) {
-          var x = parametrosArray[i].split("=");
-          parametros[x[0]] = x[1];
-        }
-      }
-      delete parametrosArray;
 
       var editor = CodeMirror.fromTextArea($("#editor").get(0), {
         lineNumbers: true,
@@ -162,6 +333,34 @@ Fin
         styleActiveLine: true,
         matchBrackets: true
       });
+
+      if (parametrosArray.length > 1) {
+        parametrosArray = parametrosArray[1].split("&");
+        for (var i = 0; i < parametrosArray.length; i++) {
+          var x = parametrosArray[i].split("=");
+          parametros[x[0]] = x[1];
+        }
+      }
+      delete parametrosArray;
+
+      if (parametros["programa"] && parametros["programa"].indexOf("..") === -1) {
+        $("#run").html("Cargando").prop("disabled", true);
+        $.ajax("programas/" + parametros["programa"], {
+          dataType: "text",
+          type: "get",
+          success: function(data) {
+            editor.setValue(data);
+            if (lasttimeout) {
+              clearTimeout(lasttimeout);
+            }
+            lasttimeout = setTimeout(Compile, 250, editor.getValue());
+            $("#run").prop("disabled", true).html("Compilando");
+          }
+        });
+      } else {
+        Compile(editor.getValue());
+      }
+
       editor.on("change", function TriggerChangeEditor(cm, ev) {
         var movido = 0;
         movido += ev.text.length - 1;
@@ -215,91 +414,26 @@ Fin
         "Cmd-Enter": autocompletar
       });
 
-      zl.lienzo = {};
-      function canvasEscala() {
-        $("canvas").attr("width", zl.lienzo.ancho || window.innerWidth);
-        $("canvas").attr("height", zl.lienzo.alto || window.innerHeight);
-        return true;
+      function download() {
+        var zip = new JSZip();
+        zip.file("codigo.zl", editor.getValue());
+        zip.file("zl.comp.json", JSON.stringify({
+          javascript: lastCompilation.javascript,
+          inicioAsincrono: lastCompilation.inicioAsincrono,
+          fotogramaAsincrono: lastCompilation.fotogramaAsincrono
+        }));
+        zip.file("estilo.css", zipestilo);
+        zip.file("ejecucion.js", zipejecucion);
+        zip.file("async.min.js", zipasync);
+        zip.file("jquery-2.1.4.min.js", zipjquery);
+        zip.file("utils.js", ziputils);
+        zip.file("arrastrame a google chrome o firefox.html", zipindex);
+
+        var content = zip.generate({
+          type: "blob"
+        });
+        saveAs(content, "programa.zip");
       }
-
-      function visualRestore(event, visual) {
-        if ($(visual).hasClass("minimized")) {
-          $(visual).removeClass("minimized");
-          $(visual).children(".minimize, .maximize").removeClass("hidden");
-          $("#helparea").addClass("hidden");
-        }
-        event.stopPropagation();
-        return true;
-      }
-
-      function visualMinimize(event, minimize) {
-        var $visual = $(minimize).parent();
-        $visual.removeClass("maximized");
-        $visual.addClass("minimized");
-        $(minimize).addClass("hidden");
-        $(".maximize").addClass("hidden");
-        $("#helparea").removeClass("hidden");
-        event.stopPropagation();
-        return true;
-      }
-
-      function visualMaximize(event, maximize) {
-        var $visual = $(maximize).parent();
-        $visual.toggleClass("maximized");
-        event.stopPropagation();
-        return true;
-      }
-
-      function saltarAlCodigo(linea, posicion) {
-        "use strict";
-        editor.setCursor(linea - 1, posicion);
-        editor.focus();
-        return true;
-      }
-
-      $("#run").click(function() {
-        if (!lastCompilation)
-          return false;
-        var compilation = $("#helparea").get(0);
-        var zlcode = editor.getValue();
-        if (!carga) {
-          $("#run").html("Abortar");
-          carga = zl.Cargar(lastjs);
-          carga.$asincrono.inicio = lastCompilation.modulo.subrutinas.inicio && lastCompilation.modulo.subrutinas.inicio.modificadores.asincrona;
-          carga.$asincrono.fotograma = lastCompilation.modulo.subrutinas.fotograma && lastCompilation.modulo.subrutinas.fotograma.modificadores.asincrona;
-          carga.$alAcabar = function() {
-            carga = null;
-            $("#run").html("Empezar");
-          }
-          carga.$alError = function(e) {
-            this.$continuar = false;
-            if (zl.error.esError(e)) {
-              compilation.innerHTML = "" + e.vincularCodigo(e);
-              for (var i = 0; i < e.lineasDeError().length; i++) {
-                var x = e.lineasDeError()[i] - 1;
-                errorLineas.push(editor.addLineClass(x, "background", "CodeMirror-line-error"));
-              }
-            } else
-              throw e;
-          }
-          zl.Ejecutar(carga);
-        } else {
-          zl.Abortar(carga);
-          carga = null;
-
-          $("#run").html("Empezar");
-          compilation.innerHTML = "";
-        }
-      });
-
-      var continuarCallback;
-      var ultimoEntorno;
-      $("#continue").click(function() {
-        $("#continue").prop('disabled', true);
-        editor.removeLineClass(ultimaLineaPausar, "background", "CodeMirror-line-pausar");
-        ultimoEntorno = null;
-        continuarCallback(null, null);
-      });
 
       function Compile(zlcode) {
         lasttimeout = null;
@@ -326,7 +460,6 @@ Fin
               lastjs = js_beautify(lastCompilation.javascript);
             compilation.innerHTML = zl.escapeHtml(lastjs);
             $("#run").prop("disabled", false).html("Empezar");
-            canvasEscala();
           }
         });
       }
@@ -338,130 +471,32 @@ Fin
         errorLineas = [];
       }
 
-      if (parametros["programa"] && parametros["programa"].indexOf("..") === -1) {
-        $("#run").html("Cargando").prop("disabled", true);
-        $.ajax("programas/" + parametros["programa"], {
-          dataType: "text",
-          type: "get",
-          success: function(data) {
-            editor.setValue(data);
-            if (lasttimeout) {
-              clearTimeout(lasttimeout);
-            }
-            lasttimeout = setTimeout(Compile, 250, editor.getValue());
-            $("#run").prop("disabled", true).html("Compilando");
-          }
+      function saltarAlCodigo(linea, posicion) {
+        "use strict";
+        editor.setCursor(linea - 1, posicion);
+        editor.focus();
+        return true;
+      }
+
+      $("#run").click(function() {
+        if (!lastCompilation)
+          return false;
+        ipc.send("ejecutar", {
+          lastCompilation: lastCompilation,
+          lastjs: lastjs,
+          zlcode: editor.getValue()
         });
-      } else {
-        Compile(editor.getValue());
-      }
+      });
 
-      function download() {
-        var zip = new JSZip();
-        zip.file("codigo.zl", editor.getValue());
-        zip.file("zl.comp.json", JSON.stringify({
-          javascript: lastCompilation.javascript,
-          inicioAsincrono: lastCompilation.inicioAsincrono,
-          fotogramaAsincrono: lastCompilation.fotogramaAsincrono
-        }));
-        zip.file("estilo.css", zipestilo);
-        zip.file("ejecucion.js", zipejecucion);
-        zip.file("async.min.js", zipasync);
-        zip.file("jquery-2.1.4.min.js", zipjquery);
-        zip.file("utils.js", ziputils);
-        zip.file("arrastrame a google chrome o firefox.html", zipindex);
-
-        var content = zip.generate({
-          type: "blob"
-        });
-        saveAs(content, "programa.zip");
-      }
-
-      var isBottom = true;
-      $("#output").get(0).onscroll = function(ev) {
-        $this = $("#output");
-        var t = $this.get(0);
-        isBottom = (t.scrollTop + $this.innerHeight() >= t.scrollHeight);
-      };
-
-      zl.io = zl.io || {};
-      zl.io.lineas = [];
-
-      zl.io.outWrite = function(html) {
-        var t = $("#output").get(0);
-        if (zl.io.lineas.length > 50) {
-          zl.io.lineas = zl.io.lineas.slice(20);
-          zl.io.lineas.push(zl.escapeHtml(html));
-        } else {
-          zl.io.lineas.push(zl.escapeHtml(html));
-        }
-        t.innerHTML = zl.io.lineas.join('');
-        if (isBottom) {
-          t.scrollTop = t.scrollHeight;
-        }
-      }
-
-      zl.io.inRead = function(callback) {
-        $("#input").prop("disabled", false);
-        $("#input").keypress(function(e) {
-          if (e.which == 13) {
-            $(this).off("keypress");
-            var v = $("#input").val();
-            $("#input").val("");
-            $("#input").prop('disabled', true);
-            callback(null, v);
-          }
-        });
-        $("#input").focus();
-      }
-
-      zl.io.abortRead = function() {
-        $("#input").off("keypress");
-        $("#input").val("");
-        $("#input").prop('disabled', true);
-      }
-
-      zl.io.clear = function() {
-        $("#output").get(0).innerHTML = "";
-        zl.io.lineas = [];
-      }
-
-      zl.io.pause = function($local, $global, $entrada, $salida, pos, callback) {
-        var cursor = editor.posFromIndex(pos);
-        $("#continue").prop('disabled', false);
-        continuarCallback = callback;
-        ultimoEntorno = [$local, $global, $entrada, $salida];
-        ultimaLineaPausar = cursor.line;
-        editor.addLineClass(ultimaLineaPausar, "background", "CodeMirror-line-pausar");
-        saltarAlCodigo(cursor.line, cursor.ch);
-        mostrarDatos();
-      }
-
-      zl.io.abortPause = function() {
+      var continuarCallback;
+      var ultimoEntorno;
+      $("#continue").click(function() {
         $("#continue").prop('disabled', true);
         editor.removeLineClass(ultimaLineaPausar, "background", "CodeMirror-line-pausar");
-      }
+        ultimoEntorno = null;
+        continuarCallback(null, null);
+      });
 
-      var mouseX = 0;
-      var mouseY = 0;
-      var canvas = document.getElementById("canvas");
-      zl.io.posicionRatonCanvas = function() {
-        return [mouseX, mouseY];
-      }
-
-      var handleMouseMove = function(e) {
-        var rect = canvas.getBoundingClientRect();
-        mouseX = (e.clientX - rect.left) / (rect.right - rect.left) * canvas.width;
-        mouseY = (e.clientY - rect.top) / (rect.bottom - rect.top) * canvas.height;
-        return true;
-      };
-
-      var handleMouseOver = function(e) {
-        var rect = canvas.getBoundingClientRect();
-        mouseX = (e.clientX - rect.left) / (rect.right - rect.left) * canvas.width;
-        mouseY = (e.clientY - rect.top) / (rect.bottom - rect.top) * canvas.height;
-        return true;
-      };
 
       function mostrarDato(dato) {
         if (typeof dato === "undefined" || dato === null) {
@@ -577,6 +612,75 @@ Fin
         }
       });
     </script>
+
+    <script>
+      // Entrada/Salida de texto:
+      var isBottom = true;
+      $("#output").get(0).onscroll = function(ev) {
+        $this = $("#output");
+        var t = $this.get(0);
+        isBottom = (t.scrollTop + $this.innerHeight() >= t.scrollHeight);
+      };
+
+      zl.io = zl.io || {};
+      zl.io.lineas = [];
+
+      zl.io.outWrite = function(html) {
+        var t = $("#output").get(0);
+        if (zl.io.lineas.length > 50) {
+          zl.io.lineas = zl.io.lineas.slice(20);
+          zl.io.lineas.push(zl.escapeHtml(html));
+        } else {
+          zl.io.lineas.push(zl.escapeHtml(html));
+        }
+        t.innerHTML = zl.io.lineas.join('');
+        if (isBottom) {
+          t.scrollTop = t.scrollHeight;
+        }
+      }
+
+      zl.io.inRead = function(callback) {
+        $("#input").prop("disabled", false);
+        $("#input").keypress(function(e) {
+          if (e.which == 13) {
+            $(this).off("keypress");
+            var v = $("#input").val();
+            $("#input").val("");
+            $("#input").prop('disabled', true);
+            callback(null, v);
+          }
+        });
+        $("#input").focus();
+      }
+
+      zl.io.abortRead = function() {
+        $("#input").off("keypress");
+        $("#input").val("");
+        $("#input").prop('disabled', true);
+      }
+
+      zl.io.clear = function() {
+        $("#output").get(0).innerHTML = "";
+        zl.io.lineas = [];
+      }
+
+      zl.io.pause = function($local, $global, $entrada, $salida, pos, callback) {
+        var cursor = editor.posFromIndex(pos);
+        $("#continue").prop('disabled', false);
+        continuarCallback = callback;
+        ultimoEntorno = [$local, $global, $entrada, $salida];
+        ultimaLineaPausar = cursor.line;
+        editor.addLineClass(ultimaLineaPausar, "background", "CodeMirror-line-pausar");
+        saltarAlCodigo(cursor.line, cursor.ch);
+        mostrarDatos();
+      }
+
+      zl.io.abortPause = function() {
+        $("#continue").prop('disabled', true);
+        editor.removeLineClass(ultimaLineaPausar, "background", "CodeMirror-line-pausar");
+      }
+    </script>
+
 </body>
 
 </html>

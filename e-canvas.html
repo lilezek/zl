@@ -1,0 +1,153 @@
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <script src="terceros/jquery-2.1.4.min.js"></script>
+  <script src="terceros/async.min.js"></script>
+
+  <script src="utils.js"></script>
+  <script src="error.js"></script>
+  <script src="ejecucion.js"></script>
+  <script src="entorno.js"></script>
+</head>
+
+<body onresize="return canvasEscala();">
+  <canvas id="canvas" width="100" height="100" onmousemove="return handleMouseMove(event);" onmouseover="return handleMouseOver(event);"></canvas>
+</body>
+
+<style>
+  html, body, canvas {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+  }
+</style>
+
+<script>
+  // SCRIPT sobre el canvas
+  // SOLO CODIGO RELACIONADO CON CANVAS
+
+  var mouseX = 0;
+  var mouseY = 0;
+  var canvas = document.getElementById("canvas");
+
+  zl.io = zl.io || {};
+  zl.io.posicionRatonCanvas = function() {
+    return [mouseX, mouseY];
+  }
+
+  zl.lienzo = {};
+  function canvasEscala() {
+    $("canvas").attr("width", zl.lienzo.ancho || window.innerWidth);
+    $("canvas").attr("height", zl.lienzo.alto || window.innerHeight);
+    return true;
+  }
+
+  var handleMouseMove = function(e) {
+    var rect = canvas.getBoundingClientRect();
+    mouseX = (e.clientX - rect.left) / (rect.right - rect.left) * canvas.width;
+    mouseY = (e.clientY - rect.top) / (rect.bottom - rect.top) * canvas.height;
+    return true;
+  };
+
+  var handleMouseOver = function(e) {
+    var rect = canvas.getBoundingClientRect();
+    mouseX = (e.clientX - rect.left) / (rect.right - rect.left) * canvas.width;
+    mouseY = (e.clientY - rect.top) / (rect.bottom - rect.top) * canvas.height;
+    return true;
+  };
+</script>
+
+<script>
+  // SCRIPT SOLO EJECUCION Y ENTORNO
+  var carga = null;
+  ipc.on("ejecutar", function(event, arg) {
+    var compilation = $("#helparea").get(0);
+    var {zlcode} = arg;
+    var {lastCompilation} = arg;
+    var {lastjs} = arg;
+    if (!carga) {
+      var configuraciones = lastCompilation.modulo.configuracion;
+      if ("ancho" in configuraciones) {
+        zl.lienzo.ancho = configuraciones["ancho"];
+      }
+      if ("alto" in configuraciones) {
+        zl.lienzo.alto = configuraciones["alto"];
+      }
+      $("#run").html("Abortar");
+      carga = zl.Cargar(lastjs);
+      carga.$asincrono.inicio = lastCompilation.modulo.subrutinas.inicio && lastCompilation.modulo.subrutinas.inicio.modificadores.asincrona;
+      carga.$asincrono.fotograma = lastCompilation.modulo.subrutinas.fotograma && lastCompilation.modulo.subrutinas.fotograma.modificadores.asincrona;
+      carga.$alAcabar = function() {
+        carga = null;
+        $("#run").html("Empezar");
+      }
+      carga.$alError = function(e) {
+        this.$continuar = false;
+        if (zl.error.esError(e)) {
+          compilation.innerHTML = "" + e.vincularCodigo(e);
+          for (var i = 0; i < e.lineasDeError().length; i++) {
+            var x = e.lineasDeError()[i] - 1;
+            errorLineas.push(editor.addLineClass(x, "background", "CodeMirror-line-error"));
+          }
+        } else
+        throw e;
+      }
+      zl.Ejecutar(carga);
+    } else {
+      zl.Abortar(carga);
+      carga = null;
+
+      // $("#run").html("Empezar");
+      // compilation.innerHTML = "";
+    }
+  })
+
+  //TODO: Conectar
+  zl.io.clear = function() {}
+
+  zl.io.outWrite = function(html) {
+    var t = $("#output").get(0);
+    if (zl.io.lineas.length > 50) {
+      zl.io.lineas = zl.io.lineas.slice(20);
+      zl.io.lineas.push(zl.escapeHtml(html));
+    } else {
+      zl.io.lineas.push(zl.escapeHtml(html));
+    }
+    t.innerHTML = zl.io.lineas.join('');
+    if (isBottom) {
+      t.scrollTop = t.scrollHeight;
+    }
+  }
+
+  zl.io.inRead = function(callback) {
+    $("#input").prop("disabled", false);
+    $("#input").keypress(function(e) {
+      if (e.which == 13) {
+        $(this).off("keypress");
+        var v = $("#input").val();
+        $("#input").val("");
+        $("#input").prop('disabled', true);
+        callback(null, v);
+      }
+    });
+    $("#input").focus();
+  }
+
+  zl.io.abortRead = function() {
+  }
+
+  zl.io.clear = function() {
+
+  }
+
+  zl.io.pause = function($local, $global, $entrada, $salida, pos, callback) {
+    callback(null);
+  }
+
+  zl.io.abortPause = function() {  }
+
+</script>
+
+</html>

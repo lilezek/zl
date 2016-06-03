@@ -295,9 +295,7 @@ var modulo = function(zl) {
 }
 
 if (typeof module !== "undefined") {
-  // TODO: ¿Añadir soporte para NodeJS?
-  console.error("Sin soporte para NodeJS");
-  module.exports = null;
+  module.exports = modulo;
 } else {
   this.zl = modulo(this.zl || {});
 }

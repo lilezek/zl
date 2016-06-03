@@ -85,6 +85,15 @@ Algoritmo
   */
 Fin
 
+Subrutina Primitiva Limpiar
+Datos
+
+Algoritmo
+  /*
+  $exterior.$io.clear();
+  */
+Fin
+
 Subrutina Primitiva Aleatorio
 Datos
   minimo es Numero de Entrada

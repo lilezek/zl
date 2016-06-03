@@ -89,22 +89,35 @@ var modulo = function(zl) {
     return this;
   }
 
+  Error.prototype.modulo = function(modulo) {
+    var html = this.flags.html;
+    if (typeof modulo === "string") {
+      this.representacion += (html ? "<span class='modulo'>" : "") +
+        modulo +
+        (html ? "</span>" : "");
+    } else if (typeof modulo === "object") {
+      this.representacion += (html ? "<span class='modulo'>" : "") +
+        modulo.nombre +
+        (html ? "</span>" : "");
+    }
+    return this;
+  }
+
   function recursivoTipoInstancia(dato) {
     var resultado;
     if (dato.tipo) {
       resultado = dato.tipo.nombre;
       if (dato.genericos.length)
-      resultado += "(";
+        resultado += "(";
       var coma = "";
       for (var i = 0; i < dato.genericos.length; i++) {
-        resultado += coma +  recursivoTipoInstancia(dato.genericos[i]);
+        resultado += coma + recursivoTipoInstancia(dato.genericos[i]);
         coma = ",";
       }
       if (dato.genericos.length)
-      resultado += ")";
-    }
-    else
-      resultado = ""+dato;
+        resultado += ")";
+    } else
+      resultado = "" + dato;
     return resultado;
   }
 
@@ -205,7 +218,7 @@ var modulo = function(zl) {
     this.enumeracion = 2;
     this.identificador = "E_PALABRA_RESERVADA";
     this
-      .resaltarLinea(1,1)
+      .resaltarLinea(1, 1)
       .texto("Error: " + this.identificador)
       .indentar()
       .texto("identacion")
@@ -218,58 +231,60 @@ var modulo = function(zl) {
   zl.error.E_NOMBRE_SUBRUTINA_YA_USADO = function(informacion) {
     this.enumeracion = 3;
     this.identificador = "E_NOMBRE_SUBRUTINA_YA_USADO";
+    var moduloNueva = informacion.modulo;
+    var moduloAnterior = informacion.otraSubrutina.padre;
     this
       .resaltarLinea(informacion.posicion[0])
-      .texto("Error: " + this.identificador)
-      .indentar()
-      .texto("identacion")
-      .indentar()
-      .texto("identacion")
-      .desindentar()
-      .texto("desindentar")
-      .desindentar();
+      .texto("Error: la subrutina ")
+      .subrutina(informacion.arbolSubrutina.nombre)
+      .texto(" ya está definida ")
+      .nuevaLinea()
+    if (moduloNueva === moduloAnterior) {
+      this
+        .resaltarLinea(informacion.otraSubrutina.posicionCabecera[0])
+        .texto("en la línea remarcada")
+    } else {
+      this
+        .texto("en el módulo ")
+        .modulo(moduloAnterior)
+    }
   }
   zl.error.E_NOMBRE_DATO_YA_USADO = function(informacion) {
     this.enumeracion = 4;
     this.identificador = "E_NOMBRE_DATO_YA_USADO";
     this
       .resaltarLinea(informacion.posicion[0])
-      .texto("Error: " + this.identificador)
-      .indentar()
-      .texto("identacion")
-      .indentar()
-      .texto("identacion")
-      .desindentar()
-      .texto("desindentar")
-      .desindentar();
+      .texto("Error: el nombre ")
+      .dato(informacion.arbolDato.nombre)
+      .nuevaLinea()
+      .resaltarLinea(informacion.otroDato.posicion[0])
+      .texto("ya tiene otro dato en la línea resaltada")
   }
   zl.error.E_MODIFICADOR_REPETIDO = function(informacion) {
     this.enumeracion = 5;
     this.identificador = "E_MODIFICADOR_REPETIDO";
     this
       .resaltarLinea(informacion.posicion[0])
-      .texto("Error: " + this.identificador)
-      .indentar()
-      .texto("identacion")
-      .indentar()
-      .texto("identacion")
-      .desindentar()
-      .texto("desindentar")
-      .desindentar();
+      .texto("Error: el dato ")
+      .dato(informacion.arbolDato.nombre)
+      .texto(" tiene el modificador de ")
+      .texto(["entrada", "salida"][informacion.modificadorRepetido-1])
+      .texto(" repetido al menos una vez")
   }
   zl.error.E_USO_INDEBIDO_MODIFICADOR_GLOBAL = function(informacion) {
     this.enumeracion = 6;
     this.identificador = "E_USO_INDEBIDO_MODIFICADOR_GLOBAL";
     this
       .resaltarLinea(informacion.posicion[0])
-      .texto("Error: " + this.identificador)
-      .indentar()
-      .texto("identacion")
-      .indentar()
-      .texto("identacion")
-      .desindentar()
-      .texto("desindentar")
-      .desindentar();
+      .texto("Error: en el dato ")
+      .dato(informacion.arbolDato.nombre)
+      .texto(" se está usando el modificador de ")
+      .texto(
+        (informacion.modificadores & 1 ? "entrada" : "salida")
+      )
+      .texto(" junto al modificador global.")
+      .nuevaLinea()
+      .texto("Ambos modificadores a la vez son incompatibles.")
   }
   zl.error.E_GLOBALES_INCOMPATIBLES = function(informacion) {
     this.enumeracion = 7;

@@ -291,7 +291,7 @@ var modulo = function(zl, async) {
       carga.$ctx2d.font = "normal 14pt arial";
     }
     // Cargar el código:
-    zl.io.limpiar();
+    zl.io.clear();
     zl.eval.call(carga, javascript);
     return carga;
   }

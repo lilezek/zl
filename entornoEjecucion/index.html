@@ -15,8 +15,6 @@
   <script src="async.min.js"></script>
   <script src="utils.js"></script>
   <script src="ejecucion.js"></script>
-  <script src="configuracion.js"></script>
-  <script src="entorno.js"></script>
 </head>
 
 <body onresize="return canvasEscala();">
@@ -48,22 +46,35 @@
     $("#run").click(function() {
       if (!lastCompilation)
         return false;
+      var compilation = $("#helparea").get(0);
+      var zlcode = editor.getValue();
       if (!carga) {
         $("#run").html("Abortar");
-        carga = zl.Cargar(lastCompilation.javascript);
-        carga.$asincrono.inicio = lastCompilation.inicioAsincrono;
-        carga.$asincrono.fotograma = lastCompilation.fotogramaAsincrono;
+        carga = zl.Cargar(lastjs);
+        carga.$asincrono.inicio = lastCompilation.modulo.subrutinas.inicio && lastCompilation.modulo.subrutinas.inicio.modificadores.asincrona;
+        carga.$asincrono.fotograma = lastCompilation.modulo.subrutinas.fotograma && lastCompilation.modulo.subrutinas.fotograma.modificadores.asincrona;
         carga.$alAcabar = function() {
-            carga = null;
-            $("#run").html("Empezar");
-          }
-          // TODO: Mostrar errores de ejecución.
+          carga = null;
+          $("#run").html("Empezar");
+        }
+        carga.$alError = function(e) {
+          this.$continuar = false;
+          if (zl.error.esError(e)) {
+            compilation.innerHTML = "" + e.vincularCodigo(e);
+            for (var i = 0; i < e.lineasDeError().length; i++) {
+              var x = e.lineasDeError()[i] - 1;
+              errorLineas.push(editor.addLineClass(x, "background", "CodeMirror-line-error"));
+            }
+          } else
+            throw e;
+        }
         zl.Ejecutar(carga);
       } else {
         zl.Abortar(carga);
         carga = null;
 
         $("#run").html("Empezar");
+        compilation.innerHTML = "";
       }
     });
 
@@ -77,8 +88,8 @@
 
 
     function canvasEscala() {
-      $("canvas").attr("width", window.innerWidth);
-      $("canvas").attr("height", window.innerHeight);
+      $("canvas").attr("width", zl.lienzo.ancho || window.innerWidth);
+      $("canvas").attr("height", zl.lienzo.alto || window.innerHeight);
       return true;
     }
     canvasEscala();
@@ -139,7 +150,6 @@
         }
       });
       $("#input").focus();
-      evaluar();
     }
 
     zl.io.abortRead = function() {
@@ -148,24 +158,47 @@
       $("#input").prop('disabled', true);
     }
 
-    zl.io.limpiar = function() {
+    zl.io.clear = function() {
       $("#output").get(0).innerHTML = "";
       zl.io.lineas = [];
     }
 
     zl.io.pause = function($local, $global, $entrada, $salida, pos, callback) {
+      var cursor = editor.posFromIndex(pos);
       $("#continue").prop('disabled', false);
       continuarCallback = callback;
       ultimoEntorno = [$local, $global, $entrada, $salida];
-      //ultimaLineaPausar = editor.posFromIndex(pos).line;
-      //editor.addLineClass(ultimaLineaPausar, "background", "CodeMirror-line-pausar");
-      //evaluar();
+      ultimaLineaPausar = cursor.line;
+      editor.addLineClass(ultimaLineaPausar, "background", "CodeMirror-line-pausar");
+      saltarAlCodigo(cursor.line, cursor.ch);
+      mostrarDatos();
     }
 
     zl.io.abortPause = function() {
       $("#continue").prop('disabled', true);
-      //editor.removeLineClass(ultimaLineaPausar, "background", "CodeMirror-line-pausar");
+      editor.removeLineClass(ultimaLineaPausar, "background", "CodeMirror-line-pausar");
     }
+
+    var mouseX = 0;
+    var mouseY = 0;
+    var canvas = document.getElementById("canvas");
+    zl.io.posicionRatonCanvas = function() {
+      return [mouseX, mouseY];
+    }
+
+    var handleMouseMove = function(e) {
+      var rect = canvas.getBoundingClientRect();
+      mouseX = (e.clientX - rect.left) / (rect.right - rect.left) * canvas.width;
+      mouseY = (e.clientY - rect.top) / (rect.bottom - rect.top) * canvas.height;
+      return true;
+    };
+
+    var handleMouseOver = function(e) {
+      var rect = canvas.getBoundingClientRect();
+      mouseX = (e.clientX - rect.left) / (rect.right - rect.left) * canvas.width;
+      mouseY = (e.clientY - rect.top) / (rect.bottom - rect.top) * canvas.height;
+      return true;
+    };
 
     $.ajax("zl.comp.json", {
       dataType: "json",
