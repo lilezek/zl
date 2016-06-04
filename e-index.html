@@ -374,10 +374,8 @@ Fin
         }
 
         if (lastCompilation) {
-          // TODO: Hack
-          lastCompilation.modulo = zl.writeJson(zl.entorno.newModulo(),lastCompilation.modulo);
-          lastCompilation.modulo.desplazarPosiciones(editor.indexFromPos(ev.from), movido);
         }
+        lastCompilation.modulo.desplazarPosiciones(editor.indexFromPos(ev.from), movido);
 
         if (lasttimeout) {
           clearTimeout(lasttimeout);
@@ -441,8 +439,7 @@ Fin
         saveAs(content, "programa.zip");
       }
 
-      ipc.on("compilado", function(event, cjsonArgs) {
-        var args = cJSON.parse(cjsonArgs);
+      ipc.on("compilado", function(event, args) {
         var [e, compilado] = args;
         var compilation = $("#helparea").get(0);
         if (e) {
@@ -458,6 +455,8 @@ Fin
           }
         } else {
           lastCompilation = compilado;
+          lastCompilation.modulo = zl.entorno.unserializeModulo(lastCompilation.modulo);
+          console.log(lastCompilation.modulo);
           zl.autocompletar.alimentarTabla(lastCompilation.modulo);
           if (minify)
             lastjs = js_beautify(uglify(js_beautify(lastCompilation.javascript)));

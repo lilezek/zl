@@ -908,6 +908,22 @@ var modulo = function(zl) {
     return new TipoInstancia(a);
   }
 
+  zl.entorno.unserializeModulo = function(s) {
+    var r = zl.writeJson(zl.entorno.newModulo(),s);
+    for (var k in r.integraciones) {
+      r.integraciones[k] = zl.writeJson(zl.entorno.newModulo(),r.integraciones[k]);
+    }
+    for (var k in r.importes) {
+      r.importes[k] = zl.writeJson(zl.entorno.newModulo(),r.importes[k]);
+    }
+    for (var k in r.subrutinas) {
+      r.subrutinas[k] = zl.writeJson(zl.entorno.newSubrutina(),r.subrutinas[k]);
+    }
+
+    // TODO: Sin acabar.
+    return r;
+  }
+
   // El módulo interno contiene las funciones básicas del lenguaje.
   // Recibe un módulo y devuelve el mismo módulo con las transformaciones oportunas.
   var moduloInterno = function(mod) {

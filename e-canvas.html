@@ -85,6 +85,7 @@
     } = arg;
     if (!carga) {
       var configuraciones = lastCompilation.modulo.configuracion;
+      console.log(lastCompilation);
       if ("ancho" in configuraciones) {
         zl.lienzo.ancho = configuraciones["ancho"];
       }

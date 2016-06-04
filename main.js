@@ -29,14 +29,24 @@ var beautify = function(code) {
     return code;
   }
   //////////////////////////////////////////////////////////////////
-
 if (cluster.isMaster) {
   cluster.fork().on('message', (arg) => {
-    var {
-      msgid
-    } = arg;
-    if (msgid == 'compilado') {
-      editor.webContents.send('compilado', arg.ccontenido);
+    // Ignorar si hay nuevo código para compilar
+    if (acumZLcode !== '') {
+      acumZLcode = '';
+      worker.send({
+        msgid: "compilar",
+        zlcode: acumZLcode
+      });
+    } else {
+      working = false;
+      acumZLcode = '';
+      var {
+        msgid
+      } = arg;
+      if (msgid == 'compilado') {
+        editor.webContents.send('compilado', cJSON.parse(arg.ccontenido));
+      }
     }
   });
 } else {
@@ -182,12 +192,18 @@ ipcMain.on("continuar", function(event) {
 
 // Worker: hilo donde se compila en paralelo
 var worker = cluster.workers[1];
+var working = false;
 // acumZLcode: último código zl que se acumula si el worker no terminó de compilar
 // pero el usuario ya está escribiendo nuevo código
-var acumZlcode;
+var acumZLcode = '';
 ipcMain.on("compilar", function(event, zlcode) {
-  worker.send({
-    msgid: "compilar",
-    zlcode: zlcode
-  })
+  if (!working) {
+    working = true;
+    worker.send({
+      msgid: "compilar",
+      zlcode: zlcode
+    })
+  } else {
+    acumZLcode = zlcode;
+  }
 })
