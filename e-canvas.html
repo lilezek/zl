@@ -16,13 +16,22 @@
 </body>
 
 <style>
-  html, body, canvas {
+  html,
+  body,
+  canvas {
     width: 100%;
     height: 100%;
     padding: 0;
     margin: 0;
   }
 </style>
+
+<script>
+  // Evitar el cierre del lienzo:
+  window.onbeforeunload = function(e) {
+    return false;
+  };
+</script>
 
 <script>
   // SCRIPT sobre el canvas
@@ -38,6 +47,7 @@
   }
 
   zl.lienzo = {};
+
   function canvasEscala() {
     $("canvas").attr("width", zl.lienzo.ancho || window.innerWidth);
     $("canvas").attr("height", zl.lienzo.alto || window.innerHeight);
@@ -64,9 +74,15 @@
   var carga = null;
   ipc.on("ejecutar", function(event, arg) {
     var compilation = $("#helparea").get(0);
-    var {zlcode} = arg;
-    var {lastCompilation} = arg;
-    var {lastjs} = arg;
+    var {
+      zlcode
+    } = arg;
+    var {
+      lastCompilation
+    } = arg;
+    var {
+      lastjs
+    } = arg;
     if (!carga) {
       var configuraciones = lastCompilation.modulo.configuracion;
       if ("ancho" in configuraciones) {
@@ -92,7 +108,7 @@
             errorLineas.push(editor.addLineClass(x, "background", "CodeMirror-line-error"));
           }
         } else
-        throw e;
+          throw e;
       }
       canvasEscala();
       zl.Ejecutar(carga);
@@ -136,8 +152,7 @@
     $("#input").focus();
   }
 
-  zl.io.abortRead = function() {
-  }
+  zl.io.abortRead = function() {}
 
   zl.io.clear = function() {
 
@@ -147,8 +162,7 @@
     callback(null);
   }
 
-  zl.io.abortPause = function() {  }
-
+  zl.io.abortPause = function() {}
 </script>
 
 </html>

@@ -38,6 +38,7 @@ function createWindows() {
 
   // Emitted when the window is closed.
   editor.on('closed', () => {
+    editor = null;
     app.quit();
   });
 
@@ -61,10 +62,16 @@ function createWindows() {
 
   // Emitted when the window is closed.
   canvas.on('closed', () => {
+    canvas = null;
     app.quit();
   });
 
+  canvas.on('close', () => {
+    canvas.hide();
+  })
+
   ipcMain.on("ejecutar", function(event, javascript) {
+    canvas.show();
     canvas.webContents.send("ejecutar", javascript);
   })
 }
