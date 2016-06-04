@@ -1,3 +1,64 @@
+const cluster = require('cluster');
+const cJSON = require('circular-json');
+
+//////////////////////////////////////////////////////////////
+const async = require("async");
+var zl = require('./compilador')({
+  log: () => undefined
+}, async);
+
+var UglifyJS = require('uglify-js');
+var js_beautify = require('js-beautify').js_beautify;
+
+var options = {
+  uglify: false,
+  beautify: false
+};
+
+var uglify = function(code) {
+  if (options.uglify)
+    return UglifyJS.minify(code, {
+      fromString: true
+    }).code;
+  return code;
+}
+
+var beautify = function(code) {
+    if (options.beautify)
+      return js_beautify(code);
+    return code;
+  }
+  //////////////////////////////////////////////////////////////////
+
+if (cluster.isMaster) {
+  cluster.fork().on('message', (arg) => {
+    var {
+      msgid
+    } = arg;
+    if (msgid == 'compilado') {
+      editor.webContents.send('compilado', arg.ccontenido);
+    }
+  });
+} else {
+  process.on('message', (arg) => {
+    var {
+      msgid
+    } = arg;
+    if (msgid == "compilar") {
+      var {
+        zlcode
+      } = arg;
+      zl.Compilar(zlcode, {}, function(e, compilado) {
+        process.send({
+          msgid: 'compilado',
+          ccontenido: cJSON.stringify([e, compilado])
+        });
+      });
+    }
+  });
+  return;
+}
+
 const electron = require('electron');
 const path = require('path');
 
@@ -17,8 +78,11 @@ const {
 
 const appDir = __dirname;
 
+let editor;
+let canvas;
+
 function createWindows() {
-  let editor = new BrowserWindow({
+  editor = new BrowserWindow({
     width: 800,
     height: 1000,
     x: 0,
@@ -39,10 +103,10 @@ function createWindows() {
   // Emitted when the window is closed.
   editor.on('closed', () => {
     editor = null;
-    app.quit();
+    app.exit(0);
   });
 
-  let canvas = new BrowserWindow({
+  canvas = new BrowserWindow({
     width: 800,
     height: 1000,
     x: 900,
@@ -63,16 +127,12 @@ function createWindows() {
   // Emitted when the window is closed.
   canvas.on('closed', () => {
     canvas = null;
-    app.quit();
+    app.exit(0);
   });
 
   canvas.on('close', () => {
+    canvas.webContents.send("abortar");
     canvas.hide();
-  })
-
-  ipcMain.on("ejecutar", function(event, javascript) {
-    canvas.show();
-    canvas.webContents.send("ejecutar", javascript);
   })
 }
 
@@ -97,3 +157,37 @@ app.on('activate', () => {
     createWindows();
   }
 });
+
+// Eventos de IPC:
+
+ipcMain.on("ejecutar", function(event, javascript) {
+  canvas.show();
+  canvas.webContents.send("ejecutar", javascript);
+})
+
+ipcMain.on("abortar", function(event) {
+  canvas.hide();
+  canvas.webContents.send("abortar");
+})
+
+ipcMain.on("pausar", function(event, info) {
+  editor.webContents.send("pausar", info);
+})
+
+ipcMain.on("continuar", function(event) {
+  canvas.webContents.send("continuar");
+  canvas.focus();
+})
+
+
+// Worker: hilo donde se compila en paralelo
+var worker = cluster.workers[1];
+// acumZLcode: último código zl que se acumula si el worker no terminó de compilar
+// pero el usuario ya está escribiendo nuevo código
+var acumZlcode;
+ipcMain.on("compilar", function(event, zlcode) {
+  worker.send({
+    msgid: "compilar",
+    zlcode: zlcode
+  })
+})

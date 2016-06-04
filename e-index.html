@@ -25,6 +25,7 @@
   <script src="terceros/addon/selection/active-line.js"></script>
   <script src="terceros/matchbrackets.js"></script>
   <script src="terceros/show-hint.js"></script>
+  <script src="terceros/cjson.min.js"></script>
   <link rel="stylesheet" href="terceros/codemirror.css">
   <link rel="stylesheet" href="terceros/addon/hint/show-hint.css">
   <script src="analizador.js"></script>
@@ -47,6 +48,7 @@
   <script src="terceros/uglifyjs/output.js"></script>
   <script src="terceros/uglifyjs/compress.js"></script>
   <script>
+    var cJSON = window.CircularJSON;
     var default_options = {};
 
     function uglify(code) {
@@ -371,8 +373,12 @@ Fin
           movido -= ev.removed[i].length;
         }
 
-        if (lastCompilation)
+        if (lastCompilation) {
+          // TODO: Hack
+          lastCompilation.modulo = zl.writeJson(zl.entorno.newModulo(),lastCompilation.modulo);
           lastCompilation.modulo.desplazarPosiciones(editor.indexFromPos(ev.from), movido);
+        }
+
         if (lasttimeout) {
           clearTimeout(lasttimeout);
         }
@@ -435,33 +441,38 @@ Fin
         saveAs(content, "programa.zip");
       }
 
-      function Compile(zlcode) {
-        lasttimeout = null;
+      ipc.on("compilado", function(event, cjsonArgs) {
+        var args = cJSON.parse(cjsonArgs);
+        var [e, compilado] = args;
         var compilation = $("#helparea").get(0);
-        eliminarLineasError();
-        zl.Compilar(zlcode, {}, function(e, compilado) {
-          if (e) {
-            if (zl.error.esError(e)) {
-              e.vincularCodigo(zlcode);
-              compilation.innerHTML = "" + e;
-              for (var i = 0; i < e.lineasDeError.length; i++) {
-                var x = e.lineasDeError[i] - 1;
-                errorLineas.push(editor.addLineClass(x, "background", "CodeMirror-line-error"));
-              }
-            } else {
-              throw e;
+        if (e) {
+          if (zl.error.esError(e)) {
+            e.vincularCodigo(zlcode);
+            compilation.innerHTML = "" + e;
+            for (var i = 0; i < e.lineasDeError.length; i++) {
+              var x = e.lineasDeError[i] - 1;
+              errorLineas.push(editor.addLineClass(x, "background", "CodeMirror-line-error"));
             }
           } else {
-            lastCompilation = compilado;
-            zl.autocompletar.alimentarTabla(lastCompilation.modulo);
-            if (minify)
-              lastjs = js_beautify(uglify(js_beautify(lastCompilation.javascript)));
-            else
-              lastjs = js_beautify(lastCompilation.javascript);
-            compilation.innerHTML = zl.escapeHtml(lastjs);
-            $("#run").prop("disabled", false).html("Empezar");
+            throw e;
           }
-        });
+        } else {
+          lastCompilation = compilado;
+          zl.autocompletar.alimentarTabla(lastCompilation.modulo);
+          if (minify)
+            lastjs = js_beautify(uglify(js_beautify(lastCompilation.javascript)));
+          else
+            lastjs = js_beautify(lastCompilation.javascript);
+          compilation.innerHTML = zl.escapeHtml(lastjs);
+          $("#run").prop("disabled", false).html("Empezar");
+        }
+      })
+
+      function Compile(zlcode) {
+        lasttimeout = null;
+        eliminarLineasError();
+        ipc.send("compilar", zlcode);
+
       }
 
       function eliminarLineasError() {
@@ -488,15 +499,13 @@ Fin
         });
       });
 
-      var continuarCallback;
       var ultimoEntorno;
       $("#continue").click(function() {
         $("#continue").prop('disabled', true);
         editor.removeLineClass(ultimaLineaPausar, "background", "CodeMirror-line-pausar");
         ultimoEntorno = null;
-        continuarCallback(null, null);
+        ipc.send("continuar", null);
       });
-
 
       function mostrarDato(dato) {
         if (typeof dato === "undefined" || dato === null) {
@@ -664,16 +673,16 @@ Fin
         zl.io.lineas = [];
       }
 
-      zl.io.pause = function($local, $global, $entrada, $salida, pos, callback) {
+      ipc.on("pausar", function(event, valores) {
+        var [$local, $global, $entrada, $salida, pos] = valores;
         var cursor = editor.posFromIndex(pos);
         $("#continue").prop('disabled', false);
-        continuarCallback = callback;
         ultimoEntorno = [$local, $global, $entrada, $salida];
         ultimaLineaPausar = cursor.line;
         editor.addLineClass(ultimaLineaPausar, "background", "CodeMirror-line-pausar");
         saltarAlCodigo(cursor.line, cursor.ch);
         mostrarDatos();
-      }
+      })
 
       zl.io.abortPause = function() {
         $("#continue").prop('disabled', true);

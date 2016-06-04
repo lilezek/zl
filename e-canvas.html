@@ -159,7 +159,10 @@
   }
 
   zl.io.pause = function($local, $global, $entrada, $salida, pos, callback) {
-    callback(null);
+    ipc.send("pausar", [$local, $global, $entrada, $salida, pos])
+    ipc.once("continuar", function() {
+      callback(null, null);
+    })
   }
 
   zl.io.abortPause = function() {}
