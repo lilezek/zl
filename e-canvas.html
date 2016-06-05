@@ -85,42 +85,39 @@
     } = arg;
     if (!carga) {
       var configuraciones = lastCompilation.modulo.configuracion;
-      console.log(lastCompilation);
       if ("ancho" in configuraciones) {
         zl.lienzo.ancho = configuraciones["ancho"];
       }
       if ("alto" in configuraciones) {
         zl.lienzo.alto = configuraciones["alto"];
       }
-      $("#run").html("Abortar");
       carga = zl.Cargar(lastjs);
       carga.$asincrono.inicio = lastCompilation.modulo.subrutinas.inicio && lastCompilation.modulo.subrutinas.inicio.modificadores.asincrona;
       carga.$asincrono.fotograma = lastCompilation.modulo.subrutinas.fotograma && lastCompilation.modulo.subrutinas.fotograma.modificadores.asincrona;
       carga.$alAcabar = function() {
-        carga = null;
-        $("#run").html("Empezar");
+        abortarIPC();
       }
       carga.$alError = function(e) {
         this.$continuar = false;
         if (zl.error.esError(e)) {
-          compilation.innerHTML = "" + e.vincularCodigo(e);
-          for (var i = 0; i < e.lineasDeError().length; i++) {
-            var x = e.lineasDeError()[i] - 1;
-            errorLineas.push(editor.addLineClass(x, "background", "CodeMirror-line-error"));
-          }
+          ipc.send('errorejecucion', e);
         } else
           throw e;
       }
       canvasEscala();
+      ipc.send('ejecutando');
       zl.Ejecutar(carga);
-    } else {
-      zl.Abortar(carga);
-      carga = null;
-
-      // $("#run").html("Empezar");
-      // compilation.innerHTML = "";
     }
   })
+
+  ipc.on('abortar', function abortarIPC() {
+    if (carga) {
+      zl.Abortar(carga);
+      carga = null;
+      ipc.removeAllListeners('continuar');
+      ipc.send('ejecutado');
+    }
+  });
 
   //TODO: Conectar
   zl.io.clear = function() {}

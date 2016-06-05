@@ -380,7 +380,8 @@ Fin
         if (lasttimeout) {
           clearTimeout(lasttimeout);
         }
-        $("#run").prop("disabled", true).html("Compilando");
+        if (!corriendo)
+          $("#run").prop("disabled", true).html("Compilando");
         lasttimeout = setTimeout(Compile, 250, editor.getValue());
         if (ev.origin === "+input" && /[a-zA-Z\.]/.test(ev.text)) {
           editor.showHint({
@@ -463,7 +464,8 @@ Fin
           else
             lastjs = js_beautify(lastCompilation.javascript);
           compilation.innerHTML = zl.escapeHtml(lastjs);
-          $("#run").prop("disabled", false).html("Empezar");
+          if (!corriendo)
+            $("#run").prop("disabled", false).html("Empezar");
         }
       })
 
@@ -488,14 +490,43 @@ Fin
         return true;
       }
 
+      var corriendo = false;
+
+      ipc.on('ejecutando', function() {
+        corriendo = true;
+        $("#run").prop("disabled", false).html("Abortar");
+      })
+
+      ipc.on('ejecutado', function ejecutadoIPC() {
+        corriendo = false;
+        $("#run").prop("disabled", false).html("Empezar");
+        $("#continue").prop('disabled', true);
+        editor.removeLineClass(ultimaLineaPausar, "background", "CodeMirror-line-pausar");
+        ultimoEntorno = null;
+      })
+
+      ipc.on('errorejecucion', function(e) {
+        ejecutadoIPC();
+        var compilation = $("#helparea").empty();
+        compilation.innerHTML = "" + e.vincularCodigo(e);
+        for (var i = 0; i < e.lineasDeError().length; i++) {
+          var x = e.lineasDeError()[i] - 1;
+          errorLineas.push(editor.addLineClass(x, "background", "CodeMirror-line-error"));
+        }
+      })
+
       $("#run").click(function() {
         if (!lastCompilation)
           return false;
-        ipc.send("ejecutar", {
-          lastCompilation: lastCompilation,
-          lastjs: lastjs,
-          zlcode: editor.getValue()
-        });
+        if (!corriendo)
+          ipc.send("ejecutar", {
+            lastCompilation: lastCompilation,
+            lastjs: lastjs,
+            zlcode: editor.getValue()
+          });
+        else
+          ipc.send('abortar', {});
+        $("#run").prop('disabled', true);
       });
 
       var ultimoEntorno;

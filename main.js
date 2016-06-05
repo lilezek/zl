@@ -97,6 +97,7 @@ function createWindows() {
     height: 1000,
     x: 0,
     y: 0,
+    fullscreen: true,
     title: "Editor ZL",
     webPreferences: {
       nodeIntegration: false,
@@ -108,19 +109,21 @@ function createWindows() {
   editor.loadURL(`file://${appDir}/e-index.html`);
 
   // Open the DevTools.
-  editor.webContents.openDevTools();
+  // editor.webContents.openDevTools();
 
   // Emitted when the window is closed.
   editor.on('closed', () => {
     editor = null;
+    worker.kill();
     app.exit(0);
   });
 
   canvas = new BrowserWindow({
-    width: 800,
-    height: 1000,
+    width: 400,
+    height: 400,
     x: 900,
     y: 0,
+    show: false,
     title: "Resultado",
     webPreferences: {
       nodeIntegration: false,
@@ -132,11 +135,12 @@ function createWindows() {
   canvas.loadURL(`file://${appDir}/e-canvas.html`);
 
   // Open the DevTools.
-  canvas.webContents.openDevTools();
+  // canvas.webContents.openDevTools();
 
   // Emitted when the window is closed.
   canvas.on('closed', () => {
     canvas = null;
+    worker.kill();
     app.exit(0);
   });
 
@@ -144,6 +148,8 @@ function createWindows() {
     canvas.webContents.send("abortar");
     canvas.hide();
   })
+
+  enrutamientosIPC();
 }
 
 // This method will be called when Electron has finished
@@ -156,7 +162,7 @@ app.on('window-all-closed', () => {
   // On OS X it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
   if (process.platform !== 'darwin') {
-    app.quit();
+    process.exit(0);
   }
 });
 
@@ -169,25 +175,29 @@ app.on('activate', () => {
 });
 
 // Eventos de IPC:
+function enrutar(name, to, preroute, postroute) {
+  ipcMain.on(name, function(event, arg) {
+    if (preroute)
+      preroute(arg);
+    to.webContents.send(name, arg);
+    if (postroute)
+      postroute(arg);
+  })
+}
 
-ipcMain.on("ejecutar", function(event, javascript) {
-  canvas.show();
-  canvas.webContents.send("ejecutar", javascript);
-})
+function enrutamientosIPC() {
+  // Eventos para el canvas
+  enrutar('ejecutar', canvas, () => canvas.show());
+  enrutar('abortar', canvas, () => canvas.hide());
+  enrutar('continuar', canvas, () => canvas.focus());
 
-ipcMain.on("abortar", function(event) {
-  canvas.hide();
-  canvas.webContents.send("abortar");
-})
 
-ipcMain.on("pausar", function(event, info) {
-  editor.webContents.send("pausar", info);
-})
-
-ipcMain.on("continuar", function(event) {
-  canvas.webContents.send("continuar");
-  canvas.focus();
-})
+  // Eventos para el editor
+  enrutar('ejecutando', editor);
+  enrutar('ejecutado', editor);
+  enrutar('errorejecucion', editor);
+  enrutar('pausar', editor);
+}
 
 
 // Worker: hilo donde se compila en paralelo
