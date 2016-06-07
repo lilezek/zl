@@ -98,7 +98,6 @@ var modulo = function(zl, async) {
       } else {
         cargarModulo(camino, ensamblados, function(error, compilado) {
           if (error) {
-            console.log(error);
             callback(error);
           } else {
             var modulo = compilado.modulo;

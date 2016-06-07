@@ -444,14 +444,18 @@ Fin
         var [e, compilado] = args;
         var compilation = $("#helparea").get(0);
         if (e) {
+          if (e._tipo === "zl.Error") {
+            e = zl.error.unserializeError(e);
+          }
           if (zl.error.esError(e)) {
-            e.vincularCodigo(zlcode);
+            e.vincularCodigo(editor.getValue());
             compilation.innerHTML = "" + e;
             for (var i = 0; i < e.lineasDeError.length; i++) {
               var x = e.lineasDeError[i] - 1;
               errorLineas.push(editor.addLineClass(x, "background", "CodeMirror-line-error"));
             }
           } else {
+            console.log(e);
             throw e;
           }
         } else {

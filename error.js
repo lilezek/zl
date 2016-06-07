@@ -6,7 +6,9 @@ var modulo = function(zl) {
   zl.error = zl.error || {};
 
   function Error() {
+    this._tipo = "zl.Error";
     this.representacion = "";
+    this.info = {};
     this.flags = {
       html: (typeof require !== "function")
     };
@@ -201,6 +203,7 @@ var modulo = function(zl) {
 
   // distintos errores:
   zl.error.E_SIMBOLO = function(informacion) {
+    this.info = informacion;
     this.enumeracion = 1;
     this.identificador = "E_SIMBOLO";
     this
@@ -215,6 +218,7 @@ var modulo = function(zl) {
       .desindentar();
   }
   zl.error.E_PALABRA_RESERVADA = function(informacion) {
+    this.info = informacion;
     this.enumeracion = 2;
     this.identificador = "E_PALABRA_RESERVADA";
     this
@@ -229,6 +233,7 @@ var modulo = function(zl) {
       .desindentar();
   }
   zl.error.E_NOMBRE_SUBRUTINA_YA_USADO = function(informacion) {
+    this.info = informacion;
     this.enumeracion = 3;
     this.identificador = "E_NOMBRE_SUBRUTINA_YA_USADO";
     var moduloNueva = informacion.modulo;
@@ -250,6 +255,7 @@ var modulo = function(zl) {
     }
   }
   zl.error.E_NOMBRE_DATO_YA_USADO = function(informacion) {
+    this.info = informacion;
     this.enumeracion = 4;
     this.identificador = "E_NOMBRE_DATO_YA_USADO";
     this
@@ -261,6 +267,7 @@ var modulo = function(zl) {
       .texto("ya tiene otro dato en la línea resaltada")
   }
   zl.error.E_MODIFICADOR_REPETIDO = function(informacion) {
+    this.info = informacion;
     this.enumeracion = 5;
     this.identificador = "E_MODIFICADOR_REPETIDO";
     this
@@ -272,6 +279,7 @@ var modulo = function(zl) {
       .texto(" repetido al menos una vez")
   }
   zl.error.E_USO_INDEBIDO_MODIFICADOR_GLOBAL = function(informacion) {
+    this.info = informacion;
     this.enumeracion = 6;
     this.identificador = "E_USO_INDEBIDO_MODIFICADOR_GLOBAL";
     this
@@ -287,6 +295,7 @@ var modulo = function(zl) {
       .texto("Ambos modificadores a la vez son incompatibles.")
   }
   zl.error.E_GLOBALES_INCOMPATIBLES = function(informacion) {
+    this.info = informacion;
     this.enumeracion = 7;
     this.identificador = "E_GLOBALES_INCOMPATIBLES";
     this
@@ -301,9 +310,9 @@ var modulo = function(zl) {
       .desindentar();
   }
   zl.error.E_LLAMADA_NOMBRE_NO_ENCONTRADO = function(informacion) {
+    this.info = informacion;
     this.enumeracion = 8;
     this.identificador = "E_LLAMADA_NOMBRE_NO_ENCONTRADO";
-    console.log(informacion);
     this
       .resaltarLinea(informacion.posicion[0])
       .texto("Error: " + this.identificador)
@@ -316,6 +325,7 @@ var modulo = function(zl) {
       .desindentar();
   }
   zl.error.E_LLAMADA_DATO_INEXISTENTE = function(informacion) {
+    this.info = informacion;
     this.enumeracion = 9;
     this.identificador = "E_LLAMADA_DATO_INEXISTENTE";
     this
@@ -338,6 +348,7 @@ var modulo = function(zl) {
     this.desindentar();
   }
   zl.error.E_LLAMADA_DATO_INCOMPATIBLE = function(informacion) {
+    this.info = informacion;
     this.enumeracion = 10;
     this.identificador = "E_LLAMADA_DATO_INCOMPATIBLE";
     this
@@ -354,6 +365,7 @@ var modulo = function(zl) {
       .tipo(informacion.obtenido)
   }
   zl.error.E_LLAMADA_DATOS_INCOMPLETOS = function(informacion) {
+    this.info = informacion;
     this.enumeracion = 11;
     this.identificador = "E_LLAMADA_DATOS_INCOMPLETOS";
     this
@@ -368,9 +380,9 @@ var modulo = function(zl) {
       .desindentar();
   }
   zl.error.E_NOMBRE_NO_DEFINIDO = function(informacion) {
+    this.info = informacion;
     this.enumeracion = 12;
     this.identificador = "E_NOMBRE_NO_DEFINIDO";
-    console.log(informacion);
     this
       .resaltarLinea(informacion.posicion[0])
       .texto("Error: el dato con nombre ")
@@ -391,6 +403,7 @@ var modulo = function(zl) {
 
   }
   zl.error.E_OPERACION_TIPO_INCOMPATIBLE_BINARIO = function(informacion) {
+    this.info = informacion;
     this.enumeracion = 13;
     this.identificador = "E_OPERACION_TIPO_INCOMPATIBLE_BINARIO";
     console.log(informacion);
@@ -406,7 +419,7 @@ var modulo = function(zl) {
       .desindentar();
   }
   zl.error.E_OPERACION_NO_DEFINIDA = function(informacion) {
-    console.log(informacion);
+    this.info = informacion;
     this.enumeracion = 14;
     this.identificador = "E_OPERACION_NO_DEFINIDA";
     this
@@ -422,6 +435,7 @@ var modulo = function(zl) {
       .desindentar();
   }
   zl.error.E_CONDICION_NO_BOOLEANA = function(informacion) {
+    this.info = informacion;
     this.enumeracion = 15;
     this.identificador = "E_CONDICION_NO_BOOLEANA";
     this
@@ -436,6 +450,7 @@ var modulo = function(zl) {
       .desindentar();
   }
   zl.error.E_VECES_NO_NUMERICO = function(informacion) {
+    this.info = informacion;
     this.enumeracion = 16;
     this.identificador = "E_VECES_NO_NUMERICO";
     this
@@ -450,6 +465,7 @@ var modulo = function(zl) {
       .desindentar();
   }
   zl.error.E_ASIGNACION_INCOMPATIBLE = function(informacion) {
+    this.info = informacion;
     this.enumeracion = 17;
     this.identificador = "E_ASIGNACION_INCOMPATIBLE";
     this
@@ -465,6 +481,7 @@ var modulo = function(zl) {
       .tipo(informacion.obtenido);
   }
   zl.error.E_TIPO_NO_EXISTE = function(informacion) {
+    this.info = informacion;
     this.enumeracion = 18;
     this.identificador = "E_TIPO_NO_EXISTE";
     this
@@ -474,6 +491,7 @@ var modulo = function(zl) {
       .texto(" no existe");
   }
   zl.error.E_FLECHA_INCORRECTA = function(informacion) {
+    this.info = informacion;
     this.enumeracion = 19;
     this.identificador = "E_FLECHA_INCORRECTA";
     this
@@ -488,6 +506,7 @@ var modulo = function(zl) {
       .desindentar();
   }
   zl.error.E_ACCESO_A_DATO_LOCAL = function(informacion) {
+    this.info = informacion;
     this.enumeracion = 20;
     this.identificador = "E_ACCESO_A_DATO_LOCAL";
     this
@@ -502,6 +521,7 @@ var modulo = function(zl) {
       .desindentar();
   }
   zl.error.E_LECTURA_ILEGAL = function(informacion) {
+    this.info = informacion;
     this.enumeracion = 21;
     this.identificador = "E_LECTURA_ILEGAL";
     this
@@ -516,6 +536,7 @@ var modulo = function(zl) {
       .desindentar();
   }
   zl.error.E_ESCRITURA_ILEGAL = function(informacion) {
+    this.info = informacion;
     this.enumeracion = 22;
     this.identificador = "E_ESCRITURA_ILEGAL";
     this
@@ -530,6 +551,7 @@ var modulo = function(zl) {
       .desindentar();
   }
   zl.error.E_INDICE_NO_LISTA_NO_RELACION = function(informacion) {
+    this.info = informacion;
     this.enumeracion = 23;
     this.identificador = "E_INDICE_NO_LISTA_NO_RELACION";
     this
@@ -544,6 +566,7 @@ var modulo = function(zl) {
       .desindentar();
   }
   zl.error.E_CONVERSOR_NO_EXISTE = function(informacion) {
+    this.info = informacion;
     this.enumeracion = 24;
     this.identificador = "E_CONVERSOR_NO_EXISTE";
     this
@@ -558,6 +581,7 @@ var modulo = function(zl) {
       .desindentar();
   }
   zl.error.E_EJECUCION_INDICE_DESCONTROLADO = function(informacion) {
+    this.info = informacion;
     this.enumeracion = 500;
     this.identificador = "E_EJECUCION_INDICE_DESCONTROLADO";
     this
@@ -572,6 +596,7 @@ var modulo = function(zl) {
       .desindentar();
   }
   zl.error.E_EJECUCION_CONVERSION_INVALIDA = function(informacion) {
+    this.info = informacion;
     this.enumeracion = 501;
     this.identificador = "E_EJECUCION_CONVERSION_INVALIDA";
     this
@@ -584,6 +609,11 @@ var modulo = function(zl) {
       .desindentar()
       .texto("desindentar")
       .desindentar();
+  }
+
+  zl.error.unserializeError = function(e) {
+    // TODO: Hack
+    return zl.error.newError(zl.error[e.identificador], e.info);
   }
 
   return zl;

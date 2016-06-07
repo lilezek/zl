@@ -109,7 +109,7 @@ function createWindows() {
   editor.loadURL(`file://${appDir}/e-index.html`);
 
   // Open the DevTools.
-  // editor.webContents.openDevTools();
+  editor.webContents.openDevTools();
 
   // Emitted when the window is closed.
   editor.on('closed', () => {
