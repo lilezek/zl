@@ -109,7 +109,7 @@ function createWindows() {
   editor.loadURL(`file://${appDir}/e-index.html`);
 
   // Open the DevTools.
-  editor.webContents.openDevTools();
+  // editor.webContents.openDevTools();
 
   // Emitted when the window is closed.
   editor.on('closed', () => {
@@ -135,7 +135,7 @@ function createWindows() {
   canvas.loadURL(`file://${appDir}/e-canvas.html`);
 
   // Open the DevTools.
-  // canvas.webContents.openDevTools();
+  canvas.webContents.openDevTools();
 
   // Emitted when the window is closed.
   canvas.on('closed', () => {
@@ -196,7 +196,7 @@ function enrutamientosIPC() {
   enrutar('ejecutando', editor);
   enrutar('ejecutado', editor);
   enrutar('errorejecucion', editor);
-  enrutar('pausar', editor);
+  enrutar('pausar', editor, () => editor.focus());
 }
 
 

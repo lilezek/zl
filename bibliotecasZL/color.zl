@@ -59,10 +59,11 @@ Datos
   c es EsteModulo de Salida
 Algoritmo
   /*
+  console.log($entrada.l);
   $salida.c.inicio({
-    rojo: $entrada.l.v[0],
-    verde: $entrada.l.v[1],
-    azul: $entrada.l.v[2],
+    rojo: $entrada.l.$miembros.v[0],
+    verde: $entrada.l.$miembros.v[1],
+    azul: $entrada.l.$miembros.v[2],
     transparencia: 1
   });
   */

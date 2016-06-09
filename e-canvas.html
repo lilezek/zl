@@ -72,6 +72,18 @@
 <script>
   // SCRIPT SOLO EJECUCION Y ENTORNO
   var carga = null;
+
+  function abortarIPC() {
+    if (carga) {
+      zl.Abortar(carga);
+      carga = null;
+      ipc.removeAllListeners('continuar');
+      ipc.send('ejecutado');
+    }
+  }
+
+  ipc.on('abortar', abortarIPC);
+
   ipc.on("ejecutar", function(event, arg) {
     var compilation = $("#helparea").get(0);
     var {
@@ -109,15 +121,6 @@
       zl.Ejecutar(carga);
     }
   })
-
-  ipc.on('abortar', function abortarIPC() {
-    if (carga) {
-      zl.Abortar(carga);
-      carga = null;
-      ipc.removeAllListeners('continuar');
-      ipc.send('ejecutado');
-    }
-  });
 
   //TODO: Conectar
   zl.io.clear = function() {}

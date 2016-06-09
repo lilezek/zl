@@ -84,21 +84,208 @@
 
 <body onresize="return canvasEscala();">
   <div class="main">
-    <textarea class="editor" id="editor">
-Configuracion
-  importar "bibliotecasZL/relacion.zl"
-  importar "bibliotecasZL/lista.zl"
-  importar "bibliotecasZL/punto.zl"
-  integrar "bibliotecasZL/teclado.zl"
-  integrar "bibliotecasZL/canvas.zl"
+<textarea class="editor" id="editor">Configuracion
+  fps <- 60
   integrar "bibliotecasZL/basico.zl"
-  ancho <- 1920
-  alto <- 1080
+  integrar "bibliotecasZL/canvas.zl"
 Fin
 
-Subrutina mostrar
+Subrutina Inicio
 Datos
+  centro es Punto
+  alto es Numero
+  ancho es Numero
 Algoritmo
+  Fondo [
+    fondo <- "blanco" como color
+  ]
+  centro <- {900,200} como punto
+  alto <- 200
+  ancho <- 300
+  // Cuerpo
+  colorrelleno [
+    relleno <- "amarillo" como color
+  ]
+  rectangulo [
+    esquina <- centro - {150,0} como punto
+    ancho <- ancho
+    alto <- alto
+  ]
+  elipse [
+    centro <- centro
+    ancho <- ancho
+    alto <- alto
+  ]
+  pausar
+  // Mono
+  colorrelleno [
+    relleno <- {59,103,133} como color
+  ]
+  elipse [
+    centro <- {0, 0+alto} como punto + centro
+    ancho <- ancho
+    alto <- alto
+  ]
+  rectangulo [
+    esquina <- {0+(ancho*0.1),0+(alto*1.4)} como punto + centro
+    ancho <- 30
+    alto <- 30
+  ]
+  rectangulo [
+    esquina <- {0-(ancho*0.1)-30,0+(alto*1.4)} como punto + centro
+    ancho <- 30
+    alto <- 30
+  ]
+  pausar
+  // Brazos y pies
+  colorrelleno [
+    relleno <- "amarillo" como color
+  ]
+  rectangulo [
+    esquina <- {0,0+alto*0.5} como punto + centro
+    ancho <- ancho
+    alto <- 30
+  ]
+  rectangulo [
+    esquina <- {0-ancho,0+alto*0.5} como punto + centro
+    ancho <- ancho
+    alto <- 30
+  ]
+  pausar
+  // Ojos
+  colorrelleno [
+    relleno <- {255,255,255} como color
+  ]
+  elipse [
+    centro <- {0-ancho*0.15-1, 0} como punto + centro
+    ancho <- ancho*0.3
+    alto <- ancho*0.3
+  ]
+  elipse [
+    centro <- {0+ancho*0.15+1, 0} como punto + centro
+    ancho <- ancho*0.3
+    alto <- ancho*0.3
+  ]
+  colorrelleno [
+    relleno <- {113,76,56} como color
+  ]
+  elipse [
+    centro <- {0+ancho*0.15+1, 0} como punto + centro
+    ancho <- ancho*0.15
+    alto <- ancho*0.15
+  ]
+  colorrelleno [
+    relleno <- {129,118,73} como color
+  ]
+  elipse [
+    centro <- {0-ancho*0.15+1, 0} como punto + centro
+    ancho <- ancho*0.15
+    alto <- ancho*0.15
+  ]
+  colorrelleno [
+    relleno <- {0,0,0} como color
+  ]
+  elipse [
+    centro <- {0+ancho*0.15+1, 0} como punto + centro
+    ancho <- ancho*0.07
+    alto <- ancho*0.07
+  ]
+  elipse [
+    centro <- {0-ancho*0.15+1, 0} como punto + centro
+    ancho <- ancho*0.07
+    alto <- ancho*0.07
+  ]
+  pausar
+  // Boca
+  elipse [
+    centro <- {0, 0+alto/2} como punto + centro
+    ancho <- ancho*0.6
+    alto <- ancho*0.15
+  ]
+  colorrelleno [
+    relleno <- "amarillo" como color
+  ]
+  rectangulo [
+    esquina <- {0-ancho/2,0+alto/2-ancho*0.075} como punto + centro
+    ancho <- ancho
+    alto <- ancho*0.075
+  ]
+  pausar
+  // Gafas
+  colorrelleno [
+    relleno <- {0,0,0} como color
+  ]
+  rectangulo [
+    esquina <- {0+ancho*0.3+1,0-ancho*0.0375} como punto + centro
+    ancho <- ancho*0.2
+    alto <- ancho*0.075
+  ]
+  rectangulo [
+    esquina <- {0-ancho*0.5+1,0-ancho*0.0375} como punto + centro
+    ancho <- ancho*0.2
+    alto <- ancho*0.075
+  ]
+  sinrelleno []
+  colorborde [
+    borde <- {140,140,140} como color
+  ]
+  grosorborde [
+    grosor <- 10
+  ]
+  elipse [
+    centro <- {0-ancho*0.15-1, 0} como punto + centro
+    ancho <- ancho*0.3
+    alto <- ancho*0.3
+  ]
+  elipse [
+    centro <- {0+ancho*0.15+1, 0} como punto + centro
+    ancho <- ancho*0.3
+    alto <- ancho*0.3
+  ]
+  pausar
+  // Resto del mono
+  sinborde []
+  colorrelleno [
+    relleno <- "amarillo" como color
+  ]
+  rectangulo [
+    esquina <- {0-ancho/2,0+alto*0.65} como punto + centro
+    ancho <- ancho
+    alto <- alto*0.35
+  ]
+  colorrelleno [
+    relleno <- {59,103,133} como color
+  ]
+  rectangulo [
+    esquina <- {0-ancho*0.35,0+alto*0.80} como punto + centro
+    ancho <- ancho*0.7
+    alto <- alto*0.20
+  ]
+  pausar
+  // Zapatos
+  colorrelleno [
+    relleno <- {0,0,0} como color
+  ]
+  rectangulo [
+    esquina <- {0+(ancho*0.1),0+(alto*1.4)+30} como punto + centro
+    ancho <- 60
+    alto <- 30
+  ]
+  rectangulo [
+    esquina <- {0-(ancho*0.1)-60,0+(alto*1.4)+30} como punto + centro
+    ancho <- 60
+    alto <- 30
+  ]
+  elipse [
+    centro <- {0-(ancho*0.1)-60, 0+(alto*1.4)+45} como punto + centro
+    ancho <- 30
+    alto <- 30
+  ]
+  elipse [
+    centro <- {0+(ancho*0.1)+60, 0+(alto*1.4)+45} como punto + centro
+    ancho <- 30
+    alto <- 30
+  ]
 Fin
 </textarea>
     <div class="v divisor"></div>
@@ -139,7 +326,7 @@ Fin
       window.onbeforeunload = function(e) {
          if (confirm('¿Seguro que quiere abandonar el editor?'))
           return;
-        return false;         
+        return false;
       };
 
 
