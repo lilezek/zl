@@ -85,208 +85,206 @@
 
 <body>
   <div class="main">
-<textarea class="editor" id="editor">Configuracion
-  fps <- 60
-  integrar "bibliotecasZL/basico.zl"
+<textarea class="editor" id="editor">// Desarrollado con ayuda de Ginés García Mateos
+
+Configuracion
+  importar "bibliotecasZL/relacion.zl"
+  importar "bibliotecasZL/lista.zl"
+  importar "bibliotecasZL/punto.zl"
+  integrar "bibliotecasZL/teclado.zl"
   integrar "bibliotecasZL/canvas.zl"
+  integrar "bibliotecasZL/basico.zl"
+  ancho <- 1920
+  alto <- 1080
+Fin
+
+Subrutina GenerarObstaculo
+Datos
+  obstaculos es Lista(Punto) global
+  obstaculoLibre es numero
+  coordX es Numero
+  coordXmax es Numero
+  i es numero
+  altura es Numero
+  puntuacion es Numero Global
+Algoritmo
+  coordXmax <- 2000
+  i <- 1
+  obstaculoLibre <- 0
+  Repetir 6 veces
+    obstaculos(i).leercomponentes [
+      posx -> coordX
+    ]
+    Si coordX <= -100 hacer
+      obstaculoLibre <- i
+    Fin
+    i <- i + 1
+    Si coordXMax < coordX + 320 hacer
+      coordXmax <- coordX + 320
+    Fin
+  Fin
+  Si obstaculoLibre > 0 hacer
+    aleatorio [
+      minimo <- 200
+      maximo <- 700
+      resultado -> altura
+    ]
+    obstaculos(obstaculoLibre) <- {coordXMax,altura} como punto
+    puntuacion <- puntuacion + 1
+  Fin
 Fin
 
 Subrutina Inicio
 Datos
-  centro es Punto
-  alto es Numero
-  ancho es Numero
+  pajaro es Punto Global
+  velocidad es Numero Global
+  obstaculos es Lista(Punto) global
+  puntuacion es Numero global
+  t es Numero Global
 Algoritmo
-  Fondo [
-    fondo <- "blanco" como color
+  puntuacion <- 0
+  pajaro <- {500, 500} como punto
+  velocidad <- 0
+  t <- 0
+  obstaculos <- {
+    {2000,50} como punto,
+    {3000,500} como punto,
+    {4000,700} como punto,
+    {5000,500} como punto,
+    {6000,700} como punto,
+    {7000,500} como punto
+  }
+  cargarImagen [
+    url <- "http://dis.um.es/~ginesgm/images/fondo2.png"
   ]
-  centro <- {900,200} como punto
-  alto <- 200
-  ancho <- 300
-  // Cuerpo
-  colorrelleno [
-    relleno <- "amarillo" como color
+  cargarImagen [
+    url <- "http://dis.um.es/~ginesgm/images/fondo3.png"
   ]
-  rectangulo [
-    esquina <- centro - {150,0} como punto
-    ancho <- ancho
-    alto <- alto
+  cargarImagen [
+    url <- "http://dis.um.es/~ginesgm/images/fondo3.png"
   ]
-  elipse [
-    centro <- centro
-    ancho <- ancho
-    alto <- alto
+  cargarImagen [
+    url <- "http://dis.um.es/~ginesgm/images/bird1.png"
   ]
-  pausar
-  // Mono
-  colorrelleno [
-    relleno <- {59,103,133} como color
+  cargarImagen [
+    url <- "http://dis.um.es/~ginesgm/images/bird2.png"
   ]
-  elipse [
-    centro <- {0, 0+alto} como punto + centro
-    ancho <- ancho
-    alto <- alto
+  cargarImagen [
+    url <- "http://dis.um.es/~ginesgm/images/palo1.png"
   ]
-  rectangulo [
-    esquina <- {0+(ancho*0.1),0+(alto*1.4)} como punto + centro
-    ancho <- 30
-    alto <- 30
+  cargarImagen [
+    url <- "http://dis.um.es/~ginesgm/images/palo2.png"
   ]
-  rectangulo [
-    esquina <- {0-(ancho*0.1)-30,0+(alto*1.4)} como punto + centro
-    ancho <- 30
-    alto <- 30
+  esconderRaton []
+Fin
+
+Subrutina Fotograma
+Datos
+  pajaro es Punto Global
+  velocidad es Numero Global
+  d es numero
+  arriba es booleano
+  abajo es booleano
+  obstaculos es Lista(Punto) global
+  i es numero
+  t es Numero Global
+  puntuacion es Numero global
+  reiniciar es booleano
+Algoritmo
+  t <- t + 1
+  delta [
+    delta -> d
   ]
-  pausar
-  // Brazos y pies
-  colorrelleno [
-    relleno <- "amarillo" como color
+  teclapulsada [
+    tecla <- "ARRIBA"
+    estapulsada -> arriba
   ]
-  rectangulo [
-    esquina <- {0,0+alto*0.5} como punto + centro
-    ancho <- ancho
-    alto <- 30
+
+  teclapulsada [
+    tecla <- "ABAJO"
+    estapulsada -> abajo
   ]
-  rectangulo [
-    esquina <- {0-ancho,0+alto*0.5} como punto + centro
-    ancho <- ancho
-    alto <- 30
+
+  posicionraton [
+    posicion -> pajaro
   ]
-  pausar
-  // Ojos
-  colorrelleno [
-    relleno <- {255,255,255} como color
+  pajaro("x") <- 500
+
+  velocidad <- velocidad + 25 * d
+
+  dibujarImagen [
+    url <- "http://dis.um.es/~ginesgm/images/fondo2.png"
+    esquina <- {0,0} como punto
+    ancho <- 1920
+    alto <- 1080
   ]
-  elipse [
-    centro <- {0-ancho*0.15-1, 0} como punto + centro
-    ancho <- ancho*0.3
-    alto <- ancho*0.3
+  dibujarImagen [
+    url <- "http://dis.um.es/~ginesgm/images/fondo3.png"
+    esquina <- {-2*t%1920,860} como punto
+    ancho <- 1920
+    alto <- 220
   ]
-  elipse [
-    centro <- {0+ancho*0.15+1, 0} como punto + centro
-    ancho <- ancho*0.3
-    alto <- ancho*0.3
+  dibujarImagen [
+    url <- "http://dis.um.es/~ginesgm/images/fondo3.png"
+    esquina <- {1920-2*t%1920,860} como punto
+    ancho <- 1920
+    alto <- 220
   ]
-  colorrelleno [
-    relleno <- {113,76,56} como color
+  Si (pajaro("y")%80) > 40 hacer
+    dibujarImagen [
+      url <- "http://dis.um.es/~ginesgm/images/bird1.png"
+      esquina <- {pajaro("x")-50,pajaro("y")-50} como punto
+      ancho <- 120
+      alto <- 100
+    ]
+  si no hacer
+    dibujarImagen [
+      url <- "http://dis.um.es/~ginesgm/images/bird2.png"
+      esquina <- {pajaro("x")-50,pajaro("y")-50} como punto
+      ancho <- 120
+      alto <- 100
+    ]
+  Fin
+  i <- 1
+  Repetir 6 veces
+    obstaculos(i) <- obstaculos(i) - {velocidad,0} como punto * d
+        colorrelleno [
+      relleno <- "negro" como color
+    ]
+    dibujarImagen [
+      url <- "http://dis.um.es/~ginesgm/images/palo1.png"
+      esquina <- obstaculos(i) + {0,200} como punto
+      ancho <- 80
+      alto <- 1080-obstaculos(i)("y")-200
+    ]
+    dibujarImagen [
+      url <- "http://dis.um.es/~ginesgm/images/palo2.png"
+      esquina <- obstaculos(i) + {0,-200-obstaculos(i)("y")} como punto
+      ancho <- 80
+      alto <- obstaculos(i)("y")
+    ]
+    i <- i + 1
+  Fin
+  generarobstaculo []
+  // Choca con algún obstaculo
+  i <- 1
+  Repetir 6 veces
+    Si (((pajaro("x") - obstaculos(i)("x"))*(pajaro("x") - obstaculos(i)("x"))) < 900)
+     y (((pajaro("y") - obstaculos(i)("y"))*(pajaro("y") - obstaculos(i)("y"))) > 16000) hacer
+      reiniciar <- verdadero
+    Fin
+    i <- i + 1
+  Fin
+  tamañofuentetexto [
+    tamaño <- 50
   ]
-  elipse [
-    centro <- {0+ancho*0.15+1, 0} como punto + centro
-    ancho <- ancho*0.15
-    alto <- ancho*0.15
+  dibujartexto [
+    mensaje <- puntuacion como texto
+    centro <- {50,100} como punto
   ]
-  colorrelleno [
-    relleno <- {129,118,73} como color
-  ]
-  elipse [
-    centro <- {0-ancho*0.15+1, 0} como punto + centro
-    ancho <- ancho*0.15
-    alto <- ancho*0.15
-  ]
-  colorrelleno [
-    relleno <- {0,0,0} como color
-  ]
-  elipse [
-    centro <- {0+ancho*0.15+1, 0} como punto + centro
-    ancho <- ancho*0.07
-    alto <- ancho*0.07
-  ]
-  elipse [
-    centro <- {0-ancho*0.15+1, 0} como punto + centro
-    ancho <- ancho*0.07
-    alto <- ancho*0.07
-  ]
-  pausar
-  // Boca
-  elipse [
-    centro <- {0, 0+alto/2} como punto + centro
-    ancho <- ancho*0.6
-    alto <- ancho*0.15
-  ]
-  colorrelleno [
-    relleno <- "amarillo" como color
-  ]
-  rectangulo [
-    esquina <- {0-ancho/2,0+alto/2-ancho*0.075} como punto + centro
-    ancho <- ancho
-    alto <- ancho*0.075
-  ]
-  pausar
-  // Gafas
-  colorrelleno [
-    relleno <- {0,0,0} como color
-  ]
-  rectangulo [
-    esquina <- {0+ancho*0.3+1,0-ancho*0.0375} como punto + centro
-    ancho <- ancho*0.2
-    alto <- ancho*0.075
-  ]
-  rectangulo [
-    esquina <- {0-ancho*0.5+1,0-ancho*0.0375} como punto + centro
-    ancho <- ancho*0.2
-    alto <- ancho*0.075
-  ]
-  sinrelleno []
-  colorborde [
-    borde <- {140,140,140} como color
-  ]
-  grosorborde [
-    grosor <- 10
-  ]
-  elipse [
-    centro <- {0-ancho*0.15-1, 0} como punto + centro
-    ancho <- ancho*0.3
-    alto <- ancho*0.3
-  ]
-  elipse [
-    centro <- {0+ancho*0.15+1, 0} como punto + centro
-    ancho <- ancho*0.3
-    alto <- ancho*0.3
-  ]
-  pausar
-  // Resto del mono
-  sinborde []
-  colorrelleno [
-    relleno <- "amarillo" como color
-  ]
-  rectangulo [
-    esquina <- {0-ancho/2,0+alto*0.65} como punto + centro
-    ancho <- ancho
-    alto <- alto*0.35
-  ]
-  colorrelleno [
-    relleno <- {59,103,133} como color
-  ]
-  rectangulo [
-    esquina <- {0-ancho*0.35,0+alto*0.80} como punto + centro
-    ancho <- ancho*0.7
-    alto <- alto*0.20
-  ]
-  pausar
-  // Zapatos
-  colorrelleno [
-    relleno <- {0,0,0} como color
-  ]
-  rectangulo [
-    esquina <- {0+(ancho*0.1),0+(alto*1.4)+30} como punto + centro
-    ancho <- 60
-    alto <- 30
-  ]
-  rectangulo [
-    esquina <- {0-(ancho*0.1)-60,0+(alto*1.4)+30} como punto + centro
-    ancho <- 60
-    alto <- 30
-  ]
-  elipse [
-    centro <- {0-(ancho*0.1)-60, 0+(alto*1.4)+45} como punto + centro
-    ancho <- 30
-    alto <- 30
-  ]
-  elipse [
-    centro <- {0+(ancho*0.1)+60, 0+(alto*1.4)+45} como punto + centro
-    ancho <- 30
-    alto <- 30
-  ]
+  si reiniciar hacer
+    inicio []
+  fin
 Fin
 </textarea>
     <div class="v divisor"></div>
@@ -337,32 +335,7 @@ Fin
         matchBrackets: true
       });
 
-      if (parametrosArray.length > 1) {
-        parametrosArray = parametrosArray[1].split("&");
-        for (var i = 0; i < parametrosArray.length; i++) {
-          var x = parametrosArray[i].split("=");
-          parametros[x[0]] = x[1];
-        }
-      }
-      delete parametrosArray;
-
-      if (parametros["programa"] && parametros["programa"].indexOf("..") === -1) {
-        $("#run").html("Cargando").prop("disabled", true);
-        $.ajax("programas/" + parametros["programa"], {
-          dataType: "text",
-          type: "get",
-          success: function(data) {
-            editor.setValue(data);
-            if (lasttimeout) {
-              clearTimeout(lasttimeout);
-            }
-            lasttimeout = setTimeout(Compile, 250, editor.getValue());
-            $("#run").prop("disabled", true).html("Compilando");
-          }
-        });
-      } else {
-        Compile(editor.getValue());
-      }
+      Compile(editor.getValue());
 
       editor.on("change", function TriggerChangeEditor(cm, ev) {
         var movido = 0;
@@ -429,7 +402,6 @@ Fin
           fotogramaAsincrono: lastCompilation.fotogramaAsincrono
         }));
         zip.file("estilo.css", zipestilo);
-        zip.file("ejecucion.js", zipejecucion);
         zip.file("async.min.js", zipasync);
         zip.file("jquery-2.1.4.min.js", zipjquery);
         zip.file("utils.js", ziputils);
@@ -442,7 +414,8 @@ Fin
       }
 
       ipc.on("compilado", function(event, args) {
-        var [e, compilado] = args;
+        var {compilado} = args;
+        var e = args.error;
         var compilation = $("#helparea").get(0);
         if (e) {
           if (e._tipo === "zl.Error") {
@@ -462,7 +435,6 @@ Fin
         } else {
           lastCompilation = compilado;
           lastCompilation.modulo = zl.entorno.unserializeModulo(lastCompilation.modulo);
-          console.log(lastCompilation.modulo);
           zl.autocompletar.alimentarTabla(lastCompilation.modulo);
           if (minify)
             lastjs = js_beautify(uglify(js_beautify(lastCompilation.javascript)));
@@ -496,6 +468,7 @@ Fin
       }
 
       var corriendo = false;
+      var ultimaLineaPausar = null;
 
       ipc.on('ejecutando', function() {
         corriendo = true;
@@ -506,7 +479,8 @@ Fin
         corriendo = false;
         $("#run").prop("disabled", false).html("Empezar");
         $("#continue").prop('disabled', true);
-        editor.removeLineClass(ultimaLineaPausar, "background", "CodeMirror-line-pausar");
+        if (ultimaLineaPausar)
+          editor.removeLineClass(ultimaLineaPausar, "background", "CodeMirror-line-pausar");
         ultimoEntorno = null;
       })
 
@@ -525,8 +499,7 @@ Fin
           return false;
         if (!corriendo)
           ipc.send("ejecutar", {
-            lastCompilation: lastCompilation,
-            lastjs: lastjs,
+            javascript: lastjs,
             zlcode: editor.getValue()
           });
         else
@@ -624,14 +597,6 @@ Fin
         }
       });
 
-      $.ajax("ejecucion.js", {
-        dataType: "text",
-        type: "get",
-        success: function(data) {
-          zipejecucion = data;
-        }
-      });
-
       $.ajax("terceros/jquery-2.1.4.min.js", {
         dataType: "text",
         type: "get",
@@ -660,30 +625,28 @@ Fin
     <script>
       // Entrada/Salida de texto:
       var isBottom = true;
+      var lineas = [];
       $("#output").get(0).onscroll = function(ev) {
         $this = $("#output");
         var t = $this.get(0);
         isBottom = (t.scrollTop + $this.innerHeight() >= t.scrollHeight);
       };
 
-      zl.io = zl.io || {};
-      zl.io.lineas = [];
 
-      zl.io.outWrite = function(html) {
+      ipc.on("escribir", function(event, html) {
+        var plain = zl.escapeHtml(html);
         var t = $("#output").get(0);
-        if (zl.io.lineas.length > 50) {
-          zl.io.lineas = zl.io.lineas.slice(20);
-          zl.io.lineas.push(zl.escapeHtml(html));
-        } else {
-          zl.io.lineas.push(zl.escapeHtml(html));
+        if (lineas.length > 50) {
+          lineas = lineas.slice(20);
         }
-        t.innerHTML = zl.io.lineas.join('');
+        lineas.push(plain);
+        t.innerHTML = lineas.join('');
         if (isBottom) {
           t.scrollTop = t.scrollHeight;
         }
-      }
+      });
 
-      zl.io.inRead = function(callback) {
+      ipc.on("leer", function() {
         $("#input").prop("disabled", false);
         $("#input").keypress(function(e) {
           if (e.which == 13) {
@@ -691,22 +654,23 @@ Fin
             var v = $("#input").val();
             $("#input").val("");
             $("#input").prop('disabled', true);
-            callback(null, v);
+            ipc.send("leido", v);
           }
         });
         $("#input").focus();
-      }
+      })
 
-      zl.io.abortRead = function() {
+
+      ipc.on("abortarleer", function() {
         $("#input").off("keypress");
         $("#input").val("");
         $("#input").prop('disabled', true);
-      }
+      });
 
-      zl.io.clear = function() {
+      ipc.on("limpiar", function() {
         $("#output").get(0).innerHTML = "";
-        zl.io.lineas = [];
-      }
+        lineas = [];
+      });
 
       ipc.on("pausar", function(event, valores) {
         var [$local, $global, $entrada, $salida, pos] = valores;
@@ -719,10 +683,10 @@ Fin
         mostrarDatos();
       })
 
-      zl.io.abortPause = function() {
+      ipc.on("abortarpausa", function() {
         $("#continue").prop('disabled', true);
         editor.removeLineClass(ultimaLineaPausar, "background", "CodeMirror-line-pausar");
-      }
+      });
     </script>
 
 </body>

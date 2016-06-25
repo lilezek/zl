@@ -20,7 +20,7 @@ Datos
   mensaje es Texto de Entrada
 Algoritmo
   /*
-  $exterior.$io.outWrite($entrada.mensaje+"\n");
+  $exterior.$evento('escribir',$entrada.mensaje+"\n");
   */
 Fin
 
@@ -29,7 +29,7 @@ Datos
   letra es Letra de Entrada
 Algoritmo
   /*
-  $exterior.$io.outWrite($entrada.letra+"\n");
+  $exterior.$evento('escribir',$entrada.letra+"\n");
   */
 Fin
 
@@ -38,7 +38,7 @@ Datos
   numero es Numero de Entrada
 Algoritmo
   /*
-  $exterior.$io.outWrite($exterior.$precision($entrada.numero)+"\n");
+  $exterior.$evento('escribir',$exterior.$precision($entrada.numero)+"\n");
   */
 Fin
 
@@ -47,17 +47,11 @@ Datos
   mensaje es Texto de Salida
 Algoritmo
   /*
-  if ($exterior.$continuar) {
-    var oldabortar = $exterior.$abortar;
-    var self = $exterior;
-    $exterior.$abortar = $exterior.$io.abortRead;
-    $exterior.$io.inRead(function(err, value) {
-      self.$abortar = oldabortar;
-      done(null, {
-        mensaje: value
-      });
+  $exterior.$eventoasincrono('leer', {}, function(err, value) {
+    done(null, {
+      mensaje: value
     });
-  }
+  });
   */
 Fin
 
@@ -66,22 +60,16 @@ Datos
   numero es Numero de Salida
 Algoritmo
   /*
-  if ($exterior.$continuar) {
-    var oldabortar = $exterior.$abortar;
-    var self = $exterior;
-    $exterior.$abortar = $exterior.$io.abortRead;
-    $exterior.$io.inRead(function cbck(err, value) {
-      var x = parseFloat(value);
-      if (isNaN(x))
-        $exterior.$io.inRead(cbck);
-      else {
-        self.$abortar = oldabortar;
-        done(null, {
-          numero: x
-        });
-      }
-    });
-  }
+  $exterior.$eventoasincrono('leer', {}, function cbck(err, value) {
+    var x = parseFloat(value);
+    if (isNaN(x))
+      $exterior.$eventoasincrono('leer', {}, cbck);
+    else {
+      done(null, {
+        numero: x
+      });
+    }
+  });
   */
 Fin
 
@@ -90,7 +78,7 @@ Datos
 
 Algoritmo
   /*
-  $exterior.$io.clear();
+  $exterior.$evento('limpiar');
   */
 Fin
 
@@ -140,7 +128,7 @@ Datos
   delta es Numero de salida
 Algoritmo
 	/*
-  $salida.delta = $exterior.$delta/1000;
+  $salida.delta = $exterior.$evento('delta')/1000;
   */
 Fin
 
@@ -203,7 +191,7 @@ Datos
   milisegundos es Numero de Salida
 Algoritmo
   /*
-  //$salida.milisegundos = (new Date().getTime()) - startTime.getTime();
+  $salida.milisegundos = (new Date().getTime()) - startTime.getTime();
   */
 Fin
 

@@ -7,7 +7,7 @@
 
   <script src="utils.js"></script>
   <script src="error.js"></script>
-  <script src="ejecucion.js"></script>
+  <script src="ejecutor.js"></script>
   <script src="entorno.js"></script>
 </head>
 
@@ -40,17 +40,150 @@
   var mouseX = 0;
   var mouseY = 0;
   var canvas = document.getElementById("canvas");
+  var ejecutor = zl.ejecutor.newEjecutor();
+  var corriendo = false;
+  var canvasSize = {};
 
-  zl.io = zl.io || {};
-  zl.io.posicionRatonCanvas = function() {
-    return [mouseX, mouseY];
+  // TODO: Completar esta tabla
+  var table = {
+    "8": "BORRAR",
+    "31": "",
+    "32": "ESPACIO",
+    "33": "!",
+    "34": "\"",
+    "35": "#",
+    "36": "$",
+    "37": "IZQUIERDA",
+    "38": "ARRIBA",
+    "39": "DERECHA",
+    "40": "ABAJO",
+    "41": ")",
+    "42": "*",
+    "43": "+",
+    "45": "-",
+    "47": "/",
+    "48": "0",
+    "49": "1",
+    "50": "2",
+    "51": "3",
+    "52": "4",
+    "53": "5",
+    "54": "6",
+    "55": "7",
+    "56": "8",
+    "57": "9",
+    "58": ":",
+    "59": ";",
+    "60": "<",
+    "61": "=",
+    "62": ">",
+    "63": "?",
+    "64": "@",
+    "65": "A",
+    "66": "B",
+    "67": "C",
+    "68": "D",
+    "69": "E",
+    "70": "F",
+    "71": "G",
+    "72": "H",
+    "73": "I",
+    "74": "J",
+    "75": "K",
+    "76": "L",
+    "77": "M",
+    "78": "N",
+    "79": "O",
+    "80": "P",
+    "81": "Q",
+    "82": "R",
+    "83": "S",
+    "84": "T",
+    "85": "U",
+    "86": "V",
+    "87": "W",
+    "88": "X",
+    "89": "Y",
+    "90": "Z",
+    "91": "[",
+    "92": "\\",
+    "93": "]",
+    "94": "^",
+    "95": "_",
+    "96": "`",
+    "123": "{",
+    "124": "|",
+    "125": "}",
+    "126": "~",
+    "127": "",
+    "188": ",",
+    "190": "."
   }
 
-  zl.lienzo = {};
+  var pulsadas = {};
+  $(document).on("keydown", function(e) {
+    pulsadas[table[e.which] || e.which] = true;
+  }).on("keyup", function(e) {
+    pulsadas[table[e.which] || e.which] = false;
+  });
+
+  ejecutor.on('lienzo', function() {
+    return canvas;
+  });
+
+  ejecutor.on('abortar', eventoAbortar = function(e) {
+    abortarIPC();
+  });
+
+  ejecutor.on('fin', function() {
+    abortarIPC();
+  })
+
+  var eventoLimpiar;
+  ejecutor.on('limpiar', eventoLimpiar = function() {
+    ipc.send("limpiar", {});
+  })
+
+  ejecutor.onA('leer', function(arg, callback) {
+    ipc.send("leer", {});
+    ipc.once("leido", function(texto) {
+      callback(null, texto);
+    })
+  })
+
+  ejecutor.on('escribir', function(plain) {
+    ipc.send("escribir", plain);
+  })
+
+  ejecutor.on('prefotograma', function(arg) {
+    // true significa detener la ejecución antes de pasar al fotograma
+    // false, null, undefined, 0, o "" significa continuar
+    return !corriendo;
+  })
+
+  ejecutor.onA('pausar', function(arg, done) {
+    ipc.send("pausar", arg)
+    ipc.once("continuar", function() {
+      callback(null, null);
+    })
+  })
+
+  ejecutor.on('posicionraton', function() {
+    return [mouseX, mouseY];
+  })
+
+  ejecutor.on('teclas', function() {
+    return pulsadas;
+  });
+
+  ejecutor.on('tamañolienzo', function(arg) {
+    canvasSize = arg;
+    canvasEscala();
+  })
 
   function canvasEscala() {
-    $("canvas").attr("width", zl.lienzo.ancho || window.innerWidth);
-    $("canvas").attr("height", zl.lienzo.alto || window.innerHeight);
+    $("canvas").attr("width", canvasSize.ancho || window.innerWidth);
+    $("canvas").attr("height", canvasSize.alto || window.innerHeight);
     return true;
   }
 
@@ -74,99 +207,23 @@
   var carga = null;
 
   function abortarIPC() {
-    if (carga) {
-      zl.Abortar(carga);
-      carga = null;
-      ipc.removeAllListeners('continuar');
-      ipc.send('ejecutado');
-    }
+    corriendo = false;
+    ipc.removeAllListeners('continuar');
+    ipc.removeAllListeners('leido');
+    ipc.send('ejecutado');
   }
 
   ipc.on('abortar', abortarIPC);
 
   ipc.on("ejecutar", function(event, arg) {
-    var compilation = $("#helparea").get(0);
     var {
-      zlcode
+      javascript
     } = arg;
-    var {
-      lastCompilation
-    } = arg;
-    var {
-      lastjs
-    } = arg;
-    if (!carga) {
-      var configuraciones = lastCompilation.modulo.configuracion;
-      if ("ancho" in configuraciones) {
-        zl.lienzo.ancho = configuraciones["ancho"];
-      }
-      if ("alto" in configuraciones) {
-        zl.lienzo.alto = configuraciones["alto"];
-      }
-      carga = zl.Cargar(lastjs);
-      carga.$asincrono.inicio = lastCompilation.modulo.subrutinas.inicio && lastCompilation.modulo.subrutinas.inicio.modificadores.asincrona;
-      carga.$asincrono.fotograma = lastCompilation.modulo.subrutinas.fotograma && lastCompilation.modulo.subrutinas.fotograma.modificadores.asincrona;
-      carga.$alAcabar = function() {
-        abortarIPC();
-      }
-      carga.$alError = function(e) {
-        this.$continuar = false;
-        if (zl.error.esError(e)) {
-          ipc.send('errorejecucion', e);
-        } else
-          throw e;
-      }
-      canvasEscala();
-      ipc.send('ejecutando');
-      zl.Ejecutar(carga);
-    }
+    corriendo = true;
+    eventoLimpiar();
+    ejecutor.ejecutar(javascript);
+    canvasEscala();
   })
-
-  //TODO: Conectar
-  zl.io.clear = function() {}
-
-  zl.io.outWrite = function(html) {
-    var t = $("#output").get(0);
-    if (zl.io.lineas.length > 50) {
-      zl.io.lineas = zl.io.lineas.slice(20);
-      zl.io.lineas.push(zl.escapeHtml(html));
-    } else {
-      zl.io.lineas.push(zl.escapeHtml(html));
-    }
-    t.innerHTML = zl.io.lineas.join('');
-    if (isBottom) {
-      t.scrollTop = t.scrollHeight;
-    }
-  }
-
-  zl.io.inRead = function(callback) {
-    $("#input").prop("disabled", false);
-    $("#input").keypress(function(e) {
-      if (e.which == 13) {
-        $(this).off("keypress");
-        var v = $("#input").val();
-        $("#input").val("");
-        $("#input").prop('disabled', true);
-        callback(null, v);
-      }
-    });
-    $("#input").focus();
-  }
-
-  zl.io.abortRead = function() {}
-
-  zl.io.clear = function() {
-
-  }
-
-  zl.io.pause = function($local, $global, $entrada, $salida, pos, callback) {
-    ipc.send("pausar", [$local, $global, $entrada, $salida, pos])
-    ipc.once("continuar", function() {
-      callback(null, null);
-    })
-  }
-
-  zl.io.abortPause = function() {}
 </script>
 
 </html>

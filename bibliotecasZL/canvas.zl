@@ -6,18 +6,35 @@ Fin
 
 /*
   Biblioteca de dibujado de ZL.
-  Para funcionar, hace falta que $exterior.$canvas sea un
-  DOM HTML de tipo canvas, y que $exterior.$ctx2d sea su contexto
-  2d.
+  Para funcionar, hace falta que el evento 'lienzo' devuelva un canvas HTML5.
+  A ese canvas se le extraerá el contexto 2d.
 */
+
+Subrutina Primitiva Preinicio
+Datos
+
+Algoritmo
+  /*
+  $entrada['$canvas'] = $exterior.$evento('lienzo', {});
+  if (!$entrada['$canvas']) {
+    $exterior.$error('No se ha podido obtener el lienzo');
+  } else {
+    $entrada['$ctx2d'] = $self.$canvas.getContext("2d");
+  }
+  $exterior.$evento('tamañolienzo', {
+    ancho: $exterior.$principalPrototipo.$configuracion.ancho,
+    alto: $exterior.$principalPrototipo.$configuracion.alto
+  })
+  */
+Fin
 
 Subrutina Primitiva Fondo
 Datos
   fondo es Color de Entrada
 Algoritmo
   /*
-  $exterior.$ctx2d.fillStyle = "rgba("+~~$entrada.fondo.$miembros.r+","+~~$entrada.fondo.$miembros.g+","+~~$entrada.fondo.$miembros.b+ "," + $entrada.fondo.$miembros.a + ")";
-  $exterior.$ctx2d.fillRect(0, 0, $exterior.$canvas.width, $exterior.$canvas.height);
+  $self.$ctx2d.fillStyle = "rgba("+~~$entrada.fondo.$miembros.r+","+~~$entrada.fondo.$miembros.g+","+~~$entrada.fondo.$miembros.b+ "," + $entrada.fondo.$miembros.a + ")";
+  $self.$ctx2d.fillRect(0, 0, $self.$canvas.width, $self.$canvas.height);
   */
 Fin
 
@@ -32,9 +49,9 @@ Algoritmo
 	var h = $entrada.alto >= 0 ? $entrada.alto : 0;
   var x = $entrada.centro.$miembros.px;
   var y = $entrada.centro.$miembros.py;
-	$exterior.$ctx2d.beginPath();
+	$self.$ctx2d.beginPath();
 	if (w == h) {
-		$exterior.$ctx2d.arc(x,y,w / 2, 0, 6.283185307179586, false);
+		$self.$ctx2d.arc(x,y,w / 2, 0, 6.283185307179586, false);
 	} else {
 		var w2 = w/2;
 		var h2 = h/2;
@@ -48,20 +65,20 @@ Algoritmo
 		xm = x + w2,       // x-middle
 		ym = y + h2;       // y-middle
 
-		$exterior.$ctx2d.moveTo(x, ym);
-		$exterior.$ctx2d.bezierCurveTo(x, ym - oy, xm - ox, y, xm, y);
-		$exterior.$ctx2d.bezierCurveTo(xm + ox, y, xe, ym - oy, xe, ym);
-		$exterior.$ctx2d.bezierCurveTo(xe, ym + oy, xm + ox, ye, xm, ye);
-		$exterior.$ctx2d.bezierCurveTo(xm - ox, ye, x, ym + oy, x, ym);
+		$self.$ctx2d.moveTo(x, ym);
+		$self.$ctx2d.bezierCurveTo(x, ym - oy, xm - ox, y, xm, y);
+		$self.$ctx2d.bezierCurveTo(xm + ox, y, xe, ym - oy, xe, ym);
+		$self.$ctx2d.bezierCurveTo(xe, ym + oy, xm + ox, ye, xm, ye);
+		$self.$ctx2d.bezierCurveTo(xm - ox, ye, x, ym + oy, x, ym);
 	}
-	$exterior.$ctx2d.closePath();
+	$self.$ctx2d.closePath();
   if ($self.$miembros.$estiloRelleno) {
-    //$exterior.$ctx2d.globalAlpha = fillAlpha;
-    $exterior.$ctx2d.fill();
+    //$self.$ctx2d.globalAlpha = fillAlpha;
+    $self.$ctx2d.fill();
   }
   if ($self.$miembros.$estiloBordes) {
-    //$exterior.$ctx2d.globalAlpha = strokeAlpha;
-    $exterior.$ctx2d.stroke();
+    //$self.$ctx2d.globalAlpha = strokeAlpha;
+    $self.$ctx2d.stroke();
   }
   */
 Fin
@@ -77,19 +94,19 @@ Algoritmo
   var h = $entrada.alto >= 0 ? $entrada.alto : 0;
   var x = $entrada.esquina.$miembros.px;
   var y = $entrada.esquina.$miembros.py;
-  //if (lineWidth % 2 == 1) $exterior.$ctx2d.translate(0.5,0.5);
-  $exterior.$ctx2d.beginPath();
-  $exterior.$ctx2d.rect(x,y,w,h);
-  $exterior.$ctx2d.closePath();
+  //if (lineWidth % 2 == 1) $self.$ctx2d.translate(0.5,0.5);
+  $self.$ctx2d.beginPath();
+  $self.$ctx2d.rect(x,y,w,h);
+  $self.$ctx2d.closePath();
   if ($self.$miembros.$estiloRelleno) {
-    //$exterior.$ctx2d.globalAlpha = fillAlpha;
-    $exterior.$ctx2d.fill();
+    //$self.$ctx2d.globalAlpha = fillAlpha;
+    $self.$ctx2d.fill();
   }
   if ($self.$miembros.$estiloBordes) {
-    //$exterior.$ctx2d.globalAlpha = strokeAlpha;
-    $exterior.$ctx2d.stroke();
+    //$self.$ctx2d.globalAlpha = strokeAlpha;
+    $self.$ctx2d.stroke();
   }
-  //if (lineWidth % 2 == 1) $exterior.$ctx2d.translate(-0.5,-0.5);
+  //if (lineWidth % 2 == 1) $self.$ctx2d.translate(-0.5,-0.5);
   */
 Fin
 
@@ -98,7 +115,7 @@ Datos
   relleno es Color de Entrada
 Algoritmo
   /*
-  $exterior.$ctx2d.fillStyle = "rgba("+~~$entrada.relleno.$miembros.r+","+~~$entrada.relleno.$miembros.g+","+~~$entrada.relleno.$miembros.b + "," + $entrada.relleno.$miembros.a + ")";
+  $self.$ctx2d.fillStyle = "rgba("+~~$entrada.relleno.$miembros.r+","+~~$entrada.relleno.$miembros.g+","+~~$entrada.relleno.$miembros.b + "," + $entrada.relleno.$miembros.a + ")";
   $self.$miembros.$estiloRelleno = {
     r: $entrada.r,
     g: $entrada.g,
@@ -113,7 +130,7 @@ Datos
 Algoritmo
 	/*
   $self.$miembros.$grosorLinea = $entrada.grosor >= 0 ? $entrada.grosor : 0;
-	$exterior.$ctx2d.lineWidth = $self.$miembros.$grosorLinea;
+	$self.$ctx2d.lineWidth = $self.$miembros.$grosorLinea;
   */
 Fin
 
@@ -123,7 +140,7 @@ Datos
 Algoritmo
   /*
 	$self.$miembros.$estiloBordes = "rgba(" + $entrada.borde.$miembros.r + "," + $entrada.borde.$miembros.g + "," + $entrada.borde.$miembros.b + "," + $entrada.borde.$miembros.a + ")";
-	$exterior.$ctx2d.strokeStyle = $self.$miembros.$estiloBordes;
+	$self.$ctx2d.strokeStyle = $self.$miembros.$estiloBordes;
 	//strokeAlpha = parseFloat(a);
   */
 Fin
@@ -151,7 +168,7 @@ Datos
 	posicion es Punto de Salida
 Algoritmo
 	/*
-  var p = $exterior.$ratonCanvas();
+  var p = $exterior.$evento('posicionraton', {});
   $salida.posicion.$miembros = {
   	px: p[0],
     py: p[1]
@@ -175,8 +192,7 @@ Datos
   final es Punto de Entrada
 Algoritmo
 	/*
-  var c = document.getElementById("canvas");
-  var ctx = c.getContext("2d");
+  var ctx = $self.$ctx2d;
   ctx.beginPath();
   ctx.moveTo($entrada.principio.$miembros.px, $entrada.principio.$miembros.py);
   ctx.lineTo($entrada.final.$miembros.px, $entrada.final.$miembros.py);
@@ -194,12 +210,12 @@ Datos
 Algoritmo
   /*
   if ($self.$miembros.$estiloBordes){
-    $exterior.$ctx2d.beginPath();
-    $exterior.$ctx2d.fillStyle = $self.$miembros.$estiloBordes;
-    $exterior.$ctx2d.arc($entrada.punto.$miembros.px, $entrada.punto.$miembros.py, $self.$miembros.$grosorLinea / 2, 0, 6.283185307179586, false);
-    $exterior.$ctx2d.fill();
-    $exterior.$ctx2d.fillStyle = $self.$miembros.$estiloRelleno;
-    $exterior.$ctx2d.closePath();
+    $self.$ctx2d.beginPath();
+    $self.$ctx2d.fillStyle = $self.$miembros.$estiloBordes;
+    $self.$ctx2d.arc($entrada.punto.$miembros.px, $entrada.punto.$miembros.py, $self.$miembros.$grosorLinea / 2, 0, 6.283185307179586, false);
+    $self.$ctx2d.fill();
+    $self.$ctx2d.fillStyle = $self.$miembros.$estiloRelleno;
+    $self.$ctx2d.closePath();
   }
   */
 Fin
@@ -211,19 +227,19 @@ Datos
   punto3 es Punto de Entrada
 Algoritmo
   /*
-  $exterior.$ctx2d.beginPath();
-  $exterior.$ctx2d.moveTo($entrada.punto1.$miembros.px,$entrada.punto1.$miembros.py);
-  $exterior.$ctx2d.lineTo($entrada.punto2.$miembros.px,$entrada.punto2.$miembros.py);
-  $exterior.$ctx2d.lineTo($entrada.punto3.$miembros.px,$entrada.punto3.$miembros.py);
-  $exterior.$ctx2d.lineTo($entrada.punto1.$miembros.px,$entrada.punto1.$miembros.py);
-  $exterior.$ctx2d.closePath();
+  $self.$ctx2d.beginPath();
+  $self.$ctx2d.moveTo($entrada.punto1.$miembros.px,$entrada.punto1.$miembros.py);
+  $self.$ctx2d.lineTo($entrada.punto2.$miembros.px,$entrada.punto2.$miembros.py);
+  $self.$ctx2d.lineTo($entrada.punto3.$miembros.px,$entrada.punto3.$miembros.py);
+  $self.$ctx2d.lineTo($entrada.punto1.$miembros.px,$entrada.punto1.$miembros.py);
+  $self.$ctx2d.closePath();
   if ($self.$miembros.$estiloRelleno !== null) {
-    //$exterior.$ctx2d.globalAlpha = fillAlpha;
-    $exterior.$ctx2d.fill();
+    //$self.$ctx2d.globalAlpha = fillAlpha;
+    $self.$ctx2d.fill();
   }
   if ($self.$miembros.$estiloBordes !== null) {
-    //$exterior.$ctx2d.globalAlpha = strokeAlpha;
-    $exterior.$ctx2d.stroke();
+    //$self.$ctx2d.globalAlpha = strokeAlpha;
+    $self.$ctx2d.stroke();
   }
   */
 Fin
@@ -235,8 +251,8 @@ Datos
 Algoritmo
   /*
   if ($self.$miembros.$estiloRelleno !== null) {
-    //$exterior.$ctx2d.globalAlpha = fillAlpha;
-    $exterior.$ctx2d.fillText($entrada.mensaje,$entrada.centro.$miembros.px,$entrada.centro.$miembros.py);
+    //$self.$ctx2d.globalAlpha = fillAlpha;
+    $self.$ctx2d.fillText($entrada.mensaje,$entrada.centro.$miembros.px,$entrada.centro.$miembros.py);
   }
   */
 Fin
@@ -247,7 +263,7 @@ Datos
   ancho es Numero de Salida
 Algoritmo
   /*
-  $salida.ancho = $exterior.$ctx2d.measureText($entrada.texto).width;
+  $salida.ancho = $self.$ctx2d.measureText($entrada.texto).width;
   */
 Fin
 
@@ -256,7 +272,7 @@ Datos
   tamaño es Numero de Entrada
 Algoritmo
   /*
-  $exterior.$ctx2d.font = $self.$miembros.$estiloFuente = "normal "+$entrada.tamaño+"pt arial";
+  $self.$ctx2d.font = $self.$miembros.$estiloFuente = "normal "+$entrada.tamaño+"pt arial";
   */
 Fin
 
@@ -292,7 +308,7 @@ Datos
 Algoritmo
   /*
   var img = $self.$miembros.$cacheDeImagenes[$entrada.url];
-  $exterior.$ctx2d.drawImage(img, $entrada.esquina.$miembros.px, $entrada.esquina.$miembros.py, $entrada.ancho, $entrada.alto);
+  $self.$ctx2d.drawImage(img, $entrada.esquina.$miembros.px, $entrada.esquina.$miembros.py, $entrada.ancho, $entrada.alto);
   */
 Fin
 

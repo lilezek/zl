@@ -16,7 +16,7 @@ Datos
   estaPulsada es booleano de Salida
 Algoritmo
   /*
-  $salida.estapulsada = Boolean($exterior.$teclas()[$entrada.tecla.toUpperCase()]);
+  $salida.estapulsada = Boolean($exterior.$evento('teclas', {})[$entrada.tecla.toUpperCase()]);
   */
 Fin
 
@@ -25,6 +25,6 @@ Datos
   teclas es Relacion(Texto, Booleano) de Salida
 Algoritmo
   /*
-  $salida.teclas.$miembros.v = $exterior.$writeJson({}, $exterior.$teclas());
+  $salida.teclas.$miembros.v = $exterior.$writeJson({}, $exterior.$evento('teclas', {}));
   */
 Fin

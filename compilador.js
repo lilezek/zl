@@ -42,7 +42,6 @@ var modulo = function(zl, async) {
   // en zl
   // Devuelve un objeto con el javascript generado,
   // el módulo (ver entorno.js) y una lista de dependencias.
-  // TODO: Cambiar el orden de los atributos
   zl.Compilar = function(zlcode, ensamblados, done) {
     var compilado;
     var configuraciones = {};

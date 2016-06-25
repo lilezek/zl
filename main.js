@@ -61,7 +61,10 @@ if (cluster.isMaster) {
       zl.Compilar(zlcode, {}, function(e, compilado) {
         process.send({
           msgid: 'compilado',
-          ccontenido: cJSON.stringify([e, compilado])
+          ccontenido: cJSON.stringify({
+            error: e,
+            compilado: compilado
+          })
         });
       });
     }
@@ -109,7 +112,7 @@ function createWindows() {
   editor.loadURL(`file://${appDir}/e-index.html`);
 
   // Open the DevTools.
-  // editor.webContents.openDevTools();
+  editor.webContents.openDevTools();
 
   // Emitted when the window is closed.
   editor.on('closed', () => {
@@ -197,6 +200,12 @@ function enrutamientosIPC() {
   enrutar('ejecutado', editor);
   enrutar('errorejecucion', editor);
   enrutar('pausar', editor, () => editor.focus());
+
+  // Eventos de entrada-salida de texto:
+  enrutar('leer', editor);
+  enrutar('escribir', editor);
+  enrutar('limpiar', editor);
+  enrutar('leido', canvas);
 }
 
 

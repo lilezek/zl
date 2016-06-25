@@ -5,6 +5,7 @@
 \usepackage{fancyvrb}
 \usepackage[dvipsnames]{xcolor}
 \usepackage[spanish]{babel}
+\usepackage[numbers]{natbib}
 
 \hypersetup{
 	colorlinks,
@@ -61,7 +62,7 @@
 	
 	\begin{itemize}
 		\item El lenguaje debe estar en la medida de lo posible en castellano, para no asumir que el alumno entiende inglés.
-		\item El lenguaje tendrá tipos de datos, con nombres comunes. Por ejemplo, se evitará el uso de Mapa y Vector, y se usarán nombres como Relación y Lista respectivamente.
+		\item El lenguaje tendrá tipos de datos con nombres comunes. Por ejemplo, se evitará el uso de Mapa y Vector, y se usarán nombres como Relación y Lista respectivamente.
 		\item No debe asumir automáticamente conversiones de datos. Bajo mi perspectiva, el alumno debe ser consciente de que los datos tienen un representación que se puede convertir, pero que el ordenador no es inteligente y hay que dar órdenes explícitas.
 		\item Que no requiera instalador, importantísimo para evitar frustraciones con el software. 
 		\item Si fuera posible, integrable con la herramienta Descubre, para aprovechar el sistema de usuarios y de compartir los ejemplos que ya tiene.
@@ -70,7 +71,24 @@
 	
 	Estos son los puntos fundamentales que podrían simplificar el aprendizaje del desarrollo algorítmico y la programación.
 	
-	\section{Estado del arte}
+	\section{Ideas extraídas de los distintos proyectos}
+	
+	Las ideas que más me han gustado y que desarrollo en el siguiente capítulo son:
+	
+	\begin{itemize}
+		\item Editor y ejecución (compilación transparente) en una misma web como Descubre o CodeCombat.
+		\item Un lenguaje propio simplificado como iJava. 
+		\item Mezcla de imperativo y con objetos (aunque mayoritariamente imperativo) con una lista de subrutinas para dibujar como Processing.
+		\item Intentar advertir de los errores de compilación con lenguaje sencillo evitando tecnicismos si es posible, como con el editor de Khan Academy
+		\item Ofrecer un editor que ayude al alumno a escribir el código, sugiriendo nombres, autocompletando según el contexto...
+	\end{itemize}
+	
+	%TODO: en vez de una sección por cada sistema de aprendizaje, hacer una sección con los sistemas
+	% otro con los compiladores, y otro con los IDEs.
+	
+	\chapter{Estado del arte}
+	
+	\section{Entornos de aprendizaje a la programación}
 	
 	Investigando proyectos con puntos comunes a lo que busco, estos son los proyectos que he podido ver y me han sorprendido en algún o varios aspectos. Existen muchos más, pero estos ofrecen en conjunto lo mismo (o lo más destacable) que el resto.
 	
@@ -184,98 +202,97 @@
 	Acceso: 
 	\href{https://es.khanacademy.org/computing/hour-of-code/hour-of-code-tutorial/p/intro-to-drawing}{Intro to Drawing}
 	
-	\section{Ideas extraídas de los distintos proyectos}
+	\section{Compiladores y analizadores escritos en javascript}
 	
-	Las ideas que más me han gustado y que desarrollo en el siguiente capítulo son:
+	\subsection{Jison - Bison para javascript}
 	
-	\begin{itemize}
-		\item Editor y ejecución (compilación transparente) en una misma web como Descubre o CodeCombat.
-		\item Un lenguaje propio simplificado como iJava. 
-		\item Mezcla de imperativo y con objetos (aunque mayoritariamente imperativo) con una lista de subrutinas para dibujar como Processing.
-		\item Intentar advertir de los errores de compilación con lenguaje sencillo evitando tecnicismos si es posible, como con el editor de Khan Academy
-		\item Ofrecer un editor que ayude al alumno a escribir el código, sugiriendo nombres, autocompletando según el contexto...
-	\end{itemize}
+	Jison es un proyecto escrito en Javascript que ofrece las herramientas similares a GNU Bison, un analizador de gramáticas libres de contexto de tipo LALR(1) \cite{bison}.
 	
-	%TODO: en vez de una sección por cada sistema de aprendizaje, hacer una sección con los sistemas
-	% otro con los compiladores, y otro con los IDEs.
+	Según mis cálculos (indicados más adelante) en el apartado \textit{Definición del lenguaje ZL} es necesario al menos un analizador que avance 3 tokens antes de conocer la derivación a realizar. Así que descarto Jison ya que no creo que sea suficientemente potente para analizar ZL. 
 	
-	\chapter{Metas y objetivos}
+	Acceso:
+	\href{https://github.com/zaach/jison}{Github de jison}	
 	
-	Esta es la lista de metas y objetivos desarrollados en el proyecto. Hay otra lista en la sección posibles ampliaciones futuras sobre otras ideas que podrían implementarse en un futuro.
+	\subsection{Analizador descendente recursivo por prioridad de operadores}
 	
+	El analizador descendente (Top Down) por orden de prioridad de operadores (Operator Precedence) fue presentado por Vaughan Pratt en el año 73 \cite{acmtdop}. El analizador se basa en definir unos símbolos, unas expresiones y unos operadores (indicando su prioridad de forma numérica) con funciones recursivas que indican el comportamiento a la hora de ir avanzando recursivamente.
+	
+	
+	En principio mi plan era utilizar este analizador como LL(3), pero mientras avanzaba con la implementación del análisis, ceñirse estrictamente al uso de este analizador era cada vez más difícil. 
+	
+	Sin embargo, este tipo de análisis ha inspirado la forma en la que he escrito el analizador sintáctico, usando reglas de derivación de forma recursiva donde en cada una de ellas se indica
+	cómo se debe avanzar y cuál es el resultado generado. 
+	
+	Acceso:
+	\href{http://javascript.crockford.com/tdop/tdop.html}{Texto de Douglas Crockford}
+	
+	\section{Editores de texto para Javascript y HTML}
+	
+	Lo primero que he encontrado ha sido el editor Codemirror. Es el mismo editor que usa el proyecto Descubre de la facultad. No me he dedicado en buscar otros editores porque este tiene
+	todo lo que necesito para poder preparar el entorno, y además su API está muy bien documentada\cite{codemirrorapi}.
+	
+	Acceso:
+	\href{http://codemirror.net/}{Página web oficial de codemirror.}
+	
+	\chapter{Análisis de objetivos y metodología}
+	
+	\section{Desarrollo de un entorno de programación}
+	
+	\subsection{Compilador del lenguaje ZL}
+	
+	\subsection{Editor de texto inteligente}
+	
+	\section{Definición del lenguaje ZL}
+	
+	%TODO: LL(3)
+	%Conflictos LL(1) https://en.wikipedia.org/wiki/LL_parser#Solutions_to_LL.281.29_Conflicts
+	
+	\subsection{Descripción de la notación BNF ampliada}
+	
+	\subsection{Gramática BNF del lenguaje}
+	La gramática del lenguaje en formato BNF se puede ver en el \hyperref[app:a]{Apéndice A}. De ella, cabe destacar de la gramática las 4 expresiones y los cuatro grupos de operadores, para poder definir correctamente el orden en el cuál los operadores se reducen. En la implementación no uso esa técnica para definir el orden de las operaciones, sino que una vez construido el árbol de la expresión, cambio sus ramas para que respeten el orden de los operadores. 
+		
 	\hfill
 	
-	Muchas de estas metas salen del conjunto de ideas después de haber visto el estado del arte, y también del escrito de Bret Victor\cite{bretvictor}
+	Por otro lado, los número en el lenguaje permiten indicar base 2, 10 o 16 de la siguiente manera:
+		
+	\begin{itemize}
+		\item $51966$ como número en base 10
+		\item $51966|10$ como el mismo número
+		\item $CAFE|16$ o $cafe|16$ como el mismo número en base hexadecimal.
+		\item $1100101011111110|2$ como el número en base binaria.
+	\end{itemize}
+		
 	
-	\section{Lenguaje de programación}
+	\subsection{Descripción de la semántica}
 	
-	\subsection{Sintaxis básica}
+		
+	\chapter{Diseño y resolución del trabajo realizado}
 	
-	\subsection{Listas y relaciones (vectores y mapas)}
+	\section{Estructura del compilador para ZL}
 	
-	\subsection{Uso de código nativo}
+	\subsection{Análisis léxico}
 	
-	\subsection{Configuración del código}
+	\subsection{Análisis sintáctico}
 	
-	\subsection{Definición de nuevos tipos}
+	\subsection{Análisis semántico}
 	
-	\subsection{Sobrecarga de operadores}
+	\section{Editor inteligente - Autocompletado}
 	
-	\subsection{Definición de funciones y procedimientos}
+	\subsection{Determinando el contexto del cursor en el editor}
 	
-	\subsection{Contratos (precondiciones y postcondiciones)}
+	\subsection{Algoritmos de similitud de nombres}
 	
-	\section{Editor de código}
+	\section{Triple plataforma - Web, Electron y NodeJS}
 	
-	\subsection{Coloreado}
+	\chapter{Conclusiones y vías futuras}
 	
-	\subsection{Autocompletado simple}
+	\section{Posibles mejoras}
 	
-	\subsection{Autocompletado con contexto}
+	\bibliographystyle{amsplain}
+	\bibliography{biblio}
 	
-	\subsection{Guardar y cargar el código}
-	
-	\subsection{Ayuda a la edición de valores}
-	
-	\subsection{Autoindentado}
-	
-	\subsection{Autocomentado de código que se rompe}
-	
-	\section{Entorno de ejecución}
-	
-	\subsection{Entrada y salida de texto}
-	
-	\subsection{Dibujo y lienzo}
-	
-	\subsection{Entorno de ejecución sin editor}
-	
-	\subsection{WebRTC}
-	
-	\subsection{Gráficas}
-	
-	\subsection{Descarga y subida de ficheros}
-	
-	\subsection{Multi lienzo}
-	
-	\section{Depuración de código}
-	
-	\subsection{Errores en tiempo de compilación}
-	
-	a
-	
-	\subsection{Errores en tiempo de ejecución}
-	
-	a
-	
-	\subsection{Pausas (puntos de ruptura)}
-	
-	\subsection{Lectura del estado de los datos al pausar}
-	
-	\subsection{Guardado del estado entre fotogramas}
-	
-	\subsection{Edición del estado de los datos al pausar}
-	
-	\subsection{Optimización del código generado}
+\iffalse
 	
 	\chapter{Lenguaje zl}
 	\section{Introducción}
@@ -288,21 +305,7 @@
 		y aceptando tildes y eñes en los nombres.
 		\item Con un único tipo de datos para representar números enteros y decimales (similar a Javascript).
 	\end{itemize}
-	
-	\section{Definición formal del lenguaje}
-	La gramática del lenguaje en formato BNF se puede ver en el \hyperref[app:a]{Apéndice A}. De ella, cabe destacar de la gramática las 4 expresiones y los cuatro grupos de operadores, para poder definir correctamente el orden en el cuál los operadores se reducen. En la implementación no uso esa técnica para definir el orden de las operaciones, sino que una vez construido el árbol de la expresión, cambio sus ramas para que respeten el orden de los operadores. 
-	
-	\hfill
-	
-	Por otro lado, los número en el lenguaje permiten indicar base 2, 10 o 16 de la siguiente manera:
-	
-	\begin{itemize}
-		\item $51966$ como número en base 10
-		\item $51966|10$ como el mismo número
-		\item $CAFE|16$ o $cafe|16$ como el mismo número en base hexadecimal.
-		\item $1100101011111110|2$ como el número en base binaria.
-	\end{itemize}
-	
+
 	\section{Subrutinas y datos}
 	
 	\section{Modulos y tipos}
@@ -342,20 +345,12 @@
 	\section{Tipos de datos y sobrecarga de operadores} 
 	
 	\chapter{Ideas y ampliaciones futuras} 
-	
+
+\fi	
+
 	\appendix
 	\chapter{Notación BNF (extendida) del lenguaje} \label{app:a}
 	
 	\VerbatimInput{../sintaxis.txt}
-	
-	\begin{thebibliography}{9}
-		
-		\bibitem{bretvictor}
-		Bret Victor,
-		\emph{Learnable Programming},
-		\href{http://worrydream.com/#!/LearnableProgramming}{worrydream.com},
-		2012.
-		
-	\end{thebibliography}
 	
 \end{document}

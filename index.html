@@ -31,7 +31,7 @@
   <script src="analizador.js"></script>
   <script src="zlsintaxis.js"></script>
   <script src="error.js"></script>
-  <script src="ejecucion.js"></script>
+  <script src="ejecutor.js"></script>
   <script src="sintaxis.js"></script>
   <script src="entorno.js"></script>
   <script src="semantica.js"></script>
@@ -84,208 +84,209 @@
 
 <body onresize="return canvasEscala();">
   <div class="main">
-<textarea class="editor" id="editor">Configuracion
-  fps <- 60
-  integrar "bibliotecasZL/basico.zl"
+<textarea class="editor" id="editor">// Desarrollado con ayuda de Ginés García Mateos
+
+Configuracion
+  importar "bibliotecasZL/relacion.zl"
+  importar "bibliotecasZL/lista.zl"
+  importar "bibliotecasZL/punto.zl"
+  integrar "bibliotecasZL/teclado.zl"
   integrar "bibliotecasZL/canvas.zl"
+  integrar "bibliotecasZL/basico.zl"
+  ancho <- 1920
+  alto <- 1080
+Fin
+
+Subrutina GenerarObstaculo
+Datos
+  obstaculos es Lista(Punto) global
+  obstaculoLibre es numero
+  coordX es Numero
+  coordXmax es Numero
+  i es numero
+  altura es Numero
+  puntuacion es Numero Global
+Algoritmo
+  coordXmax <- 2000
+  i <- 1
+  obstaculoLibre <- 0
+  Repetir 6 veces
+    obstaculos(i).leercomponentes [
+      posx -> coordX
+    ]
+    Si coordX <= -100 hacer
+      obstaculoLibre <- i
+    Fin
+    i <- i + 1
+    Si coordXMax < coordX + 320 hacer
+      coordXmax <- coordX + 320
+    Fin
+  Fin
+  Si obstaculoLibre > 0 hacer
+    aleatorio [
+      minimo <- 200
+      maximo <- 700
+      resultado -> altura
+    ]
+    obstaculos(obstaculoLibre) <- {coordXMax,altura} como punto
+    puntuacion <- puntuacion + 1
+  Fin
 Fin
 
 Subrutina Inicio
 Datos
-  centro es Punto
-  alto es Numero
-  ancho es Numero
+  pajaro es Punto Global
+  velocidad es Numero Global
+  obstaculos es Lista(Punto) global
+  puntuacion es Numero global
+  t es Numero Global
 Algoritmo
-  Fondo [
-    fondo <- "blanco" como color
+  puntuacion <- 0
+  pajaro <- {500, 500} como punto
+  velocidad <- 0
+  t <- 0
+  obstaculos <- {
+    {2000,50} como punto,
+    {3000,500} como punto,
+    {4000,700} como punto,
+    {5000,500} como punto,
+    {6000,700} como punto,
+    {7000,500} como punto
+  }
+  cargarImagen [
+    url <- "http://dis.um.es/~ginesgm/images/fondo2.png"
   ]
-  centro <- {900,200} como punto
-  alto <- 200
-  ancho <- 300
-  // Cuerpo
-  colorrelleno [
-    relleno <- "amarillo" como color
+  cargarImagen [
+    url <- "http://dis.um.es/~ginesgm/images/fondo3.png"
   ]
-  rectangulo [
-    esquina <- centro - {150,0} como punto
-    ancho <- ancho
-    alto <- alto
+  cargarImagen [
+    url <- "http://dis.um.es/~ginesgm/images/fondo3.png"
   ]
-  elipse [
-    centro <- centro
-    ancho <- ancho
-    alto <- alto
+  cargarImagen [
+    url <- "http://dis.um.es/~ginesgm/images/bird1.png"
   ]
-  pausar
-  // Mono
-  colorrelleno [
-    relleno <- {59,103,133} como color
+  cargarImagen [
+    url <- "http://dis.um.es/~ginesgm/images/bird2.png"
   ]
-  elipse [
-    centro <- {0, 0+alto} como punto + centro
-    ancho <- ancho
-    alto <- alto
+  cargarImagen [
+    url <- "http://dis.um.es/~ginesgm/images/palo1.png"
   ]
-  rectangulo [
-    esquina <- {0+(ancho*0.1),0+(alto*1.4)} como punto + centro
-    ancho <- 30
-    alto <- 30
+  cargarImagen [
+    url <- "http://dis.um.es/~ginesgm/images/palo2.png"
   ]
-  rectangulo [
-    esquina <- {0-(ancho*0.1)-30,0+(alto*1.4)} como punto + centro
-    ancho <- 30
-    alto <- 30
+  esconderRaton []
+Fin
+
+Subrutina Fotograma
+Datos
+  pajaro es Punto Global
+  velocidad es Numero Global
+  d es numero
+  arriba es booleano
+  abajo es booleano
+  obstaculos es Lista(Punto) global
+  i es numero
+  t es Numero Global
+  puntuacion es Numero global
+  reiniciar es booleano
+Algoritmo
+  t <- t + 1
+  delta [
+    delta -> d
   ]
-  pausar
-  // Brazos y pies
-  colorrelleno [
-    relleno <- "amarillo" como color
+  teclapulsada [
+    tecla <- "ARRIBA"
+    estapulsada -> arriba
   ]
-  rectangulo [
-    esquina <- {0,0+alto*0.5} como punto + centro
-    ancho <- ancho
-    alto <- 30
+
+  teclapulsada [
+    tecla <- "ABAJO"
+    estapulsada -> abajo
   ]
-  rectangulo [
-    esquina <- {0-ancho,0+alto*0.5} como punto + centro
-    ancho <- ancho
-    alto <- 30
+
+  posicionraton [
+    posicion -> pajaro
   ]
-  pausar
-  // Ojos
-  colorrelleno [
-    relleno <- {255,255,255} como color
+  pajaro("x") <- 500
+
+  velocidad <- velocidad + 25 * d
+
+  dibujarImagen [
+    url <- "http://dis.um.es/~ginesgm/images/fondo2.png"
+    esquina <- {0,0} como punto
+    ancho <- 1920
+    alto <- 1080
   ]
-  elipse [
-    centro <- {0-ancho*0.15-1, 0} como punto + centro
-    ancho <- ancho*0.3
-    alto <- ancho*0.3
+  dibujarImagen [
+    url <- "http://dis.um.es/~ginesgm/images/fondo3.png"
+    esquina <- {-2*t%1920,860} como punto
+    ancho <- 1920
+    alto <- 220
   ]
-  elipse [
-    centro <- {0+ancho*0.15+1, 0} como punto + centro
-    ancho <- ancho*0.3
-    alto <- ancho*0.3
+  dibujarImagen [
+    url <- "http://dis.um.es/~ginesgm/images/fondo3.png"
+    esquina <- {1920-2*t%1920,860} como punto
+    ancho <- 1920
+    alto <- 220
   ]
-  colorrelleno [
-    relleno <- {113,76,56} como color
+  Si (pajaro("y")%80) > 40 hacer
+    dibujarImagen [
+      url <- "http://dis.um.es/~ginesgm/images/bird1.png"
+      esquina <- {pajaro("x")-50,pajaro("y")-50} como punto
+      ancho <- 120
+      alto <- 100
+    ]
+  si no hacer
+    dibujarImagen [
+      url <- "http://dis.um.es/~ginesgm/images/bird2.png"
+      esquina <- {pajaro("x")-50,pajaro("y")-50} como punto
+      ancho <- 120
+      alto <- 100
+    ]
+  Fin
+  i <- 1
+  Repetir 6 veces
+    obstaculos(i) <- obstaculos(i) - {velocidad,0} como punto * d
+        colorrelleno [
+      relleno <- "negro" como color
+    ]
+    dibujarImagen [
+      url <- "http://dis.um.es/~ginesgm/images/palo1.png"
+      esquina <- obstaculos(i) + {0,200} como punto
+      ancho <- 80
+      alto <- 1080-obstaculos(i)("y")-200
+    ]
+    dibujarImagen [
+      url <- "http://dis.um.es/~ginesgm/images/palo2.png"
+      esquina <- obstaculos(i) + {0,-200-obstaculos(i)("y")} como punto
+      ancho <- 80
+      alto <- obstaculos(i)("y")
+    ]
+    i <- i + 1
+  Fin
+  generarobstaculo []
+  // Choca con algún obstaculo
+  i <- 1
+  Repetir 6 veces
+    Si (((pajaro("x") - obstaculos(i)("x"))*(pajaro("x") - obstaculos(i)("x"))) < 900)
+     y (((pajaro("y") - obstaculos(i)("y"))*(pajaro("y") - obstaculos(i)("y"))) > 16000) hacer
+      reiniciar <- verdadero
+    Fin
+    i <- i + 1
+  Fin
+  tamañofuentetexto [
+    tamaño <- 50
   ]
-  elipse [
-    centro <- {0+ancho*0.15+1, 0} como punto + centro
-    ancho <- ancho*0.15
-    alto <- ancho*0.15
+  dibujartexto [
+    mensaje <- puntuacion como texto
+    centro <- {50,100} como punto
   ]
-  colorrelleno [
-    relleno <- {129,118,73} como color
-  ]
-  elipse [
-    centro <- {0-ancho*0.15+1, 0} como punto + centro
-    ancho <- ancho*0.15
-    alto <- ancho*0.15
-  ]
-  colorrelleno [
-    relleno <- {0,0,0} como color
-  ]
-  elipse [
-    centro <- {0+ancho*0.15+1, 0} como punto + centro
-    ancho <- ancho*0.07
-    alto <- ancho*0.07
-  ]
-  elipse [
-    centro <- {0-ancho*0.15+1, 0} como punto + centro
-    ancho <- ancho*0.07
-    alto <- ancho*0.07
-  ]
-  pausar
-  // Boca
-  elipse [
-    centro <- {0, 0+alto/2} como punto + centro
-    ancho <- ancho*0.6
-    alto <- ancho*0.15
-  ]
-  colorrelleno [
-    relleno <- "amarillo" como color
-  ]
-  rectangulo [
-    esquina <- {0-ancho/2,0+alto/2-ancho*0.075} como punto + centro
-    ancho <- ancho
-    alto <- ancho*0.075
-  ]
-  pausar
-  // Gafas
-  colorrelleno [
-    relleno <- {0,0,0} como color
-  ]
-  rectangulo [
-    esquina <- {0+ancho*0.3+1,0-ancho*0.0375} como punto + centro
-    ancho <- ancho*0.2
-    alto <- ancho*0.075
-  ]
-  rectangulo [
-    esquina <- {0-ancho*0.5+1,0-ancho*0.0375} como punto + centro
-    ancho <- ancho*0.2
-    alto <- ancho*0.075
-  ]
-  sinrelleno []
-  colorborde [
-    borde <- {140,140,140} como color
-  ]
-  grosorborde [
-    grosor <- 10
-  ]
-  elipse [
-    centro <- {0-ancho*0.15-1, 0} como punto + centro
-    ancho <- ancho*0.3
-    alto <- ancho*0.3
-  ]
-  elipse [
-    centro <- {0+ancho*0.15+1, 0} como punto + centro
-    ancho <- ancho*0.3
-    alto <- ancho*0.3
-  ]
-  pausar
-  // Resto del mono
-  sinborde []
-  colorrelleno [
-    relleno <- "amarillo" como color
-  ]
-  rectangulo [
-    esquina <- {0-ancho/2,0+alto*0.65} como punto + centro
-    ancho <- ancho
-    alto <- alto*0.35
-  ]
-  colorrelleno [
-    relleno <- {59,103,133} como color
-  ]
-  rectangulo [
-    esquina <- {0-ancho*0.35,0+alto*0.80} como punto + centro
-    ancho <- ancho*0.7
-    alto <- alto*0.20
-  ]
-  pausar
-  // Zapatos
-  colorrelleno [
-    relleno <- {0,0,0} como color
-  ]
-  rectangulo [
-    esquina <- {0+(ancho*0.1),0+(alto*1.4)+30} como punto + centro
-    ancho <- 60
-    alto <- 30
-  ]
-  rectangulo [
-    esquina <- {0-(ancho*0.1)-60,0+(alto*1.4)+30} como punto + centro
-    ancho <- 60
-    alto <- 30
-  ]
-  elipse [
-    centro <- {0-(ancho*0.1)-60, 0+(alto*1.4)+45} como punto + centro
-    ancho <- 30
-    alto <- 30
-  ]
-  elipse [
-    centro <- {0+(ancho*0.1)+60, 0+(alto*1.4)+45} como punto + centro
-    ancho <- 30
-    alto <- 30
-  ]
+  Si arriba hacer
+    pausar
+  Fin
+  si reiniciar hacer
+    inicio []
+  fin
 Fin
 </textarea>
     <div class="v divisor"></div>
@@ -320,15 +321,94 @@ Fin
       var minify = false;
       var errorLineas = [];
 
-      var carga = null;
-
-
       window.onbeforeunload = function(e) {
          if (confirm('¿Seguro que quiere abandonar el editor?'))
           return;
         return false;
       };
 
+      // TODO: Completar esta tabla
+      var table = {
+        "8": "BORRAR",
+        "31": "",
+        "32": "ESPACIO",
+        "33": "!",
+        "34": "\"",
+        "35": "#",
+        "36": "$",
+        "37": "IZQUIERDA",
+        "38": "ARRIBA",
+        "39": "DERECHA",
+        "40": "ABAJO",
+        "41": ")",
+        "42": "*",
+        "43": "+",
+        "45": "-",
+        "47": "/",
+        "48": "0",
+        "49": "1",
+        "50": "2",
+        "51": "3",
+        "52": "4",
+        "53": "5",
+        "54": "6",
+        "55": "7",
+        "56": "8",
+        "57": "9",
+        "58": ":",
+        "59": ";",
+        "60": "<",
+        "61": "=",
+        "62": ">",
+        "63": "?",
+        "64": "@",
+        "65": "A",
+        "66": "B",
+        "67": "C",
+        "68": "D",
+        "69": "E",
+        "70": "F",
+        "71": "G",
+        "72": "H",
+        "73": "I",
+        "74": "J",
+        "75": "K",
+        "76": "L",
+        "77": "M",
+        "78": "N",
+        "79": "O",
+        "80": "P",
+        "81": "Q",
+        "82": "R",
+        "83": "S",
+        "84": "T",
+        "85": "U",
+        "86": "V",
+        "87": "W",
+        "88": "X",
+        "89": "Y",
+        "90": "Z",
+        "91": "[",
+        "92": "\\",
+        "93": "]",
+        "94": "^",
+        "95": "_",
+        "96": "`",
+        "123": "{",
+        "124": "|",
+        "125": "}",
+        "126": "~",
+        "127": "",
+        "188": ",",
+        "190": "."
+      }
+
+      var pulsadas = {};
+      $(document).on("keydown", function(e) {
+        pulsadas[table[e.which] || e.which] = true;
+      }).on("keyup", function(e) {
+        pulsadas[table[e.which] || e.which] = false;
+      });
 
       if (parametrosArray.length > 1) {
         parametrosArray = parametrosArray[1].split("&");
@@ -402,10 +482,10 @@ Fin
         "Cmd-Enter": autocompletar
       });
 
-      zl.lienzo = {};
+      var canvasSize = {};
       function canvasEscala() {
-        $("canvas").attr("width", zl.lienzo.ancho || window.innerWidth);
-        $("canvas").attr("height", zl.lienzo.alto || window.innerHeight);
+        $("canvas").attr("width", canvasSize.ancho || window.innerWidth);
+        $("canvas").attr("height", canvasSize.alto || window.innerHeight);
         return true;
       }
 
@@ -444,42 +524,131 @@ Fin
         return true;
       }
 
+      // TODO: que sea un error ZL.
+      var __errorAbortar = 'abortar';
+      var errorAbortar = null;
+      var corriendo;
+
+      // Ejecución de código
+      var ejecutor = zl.ejecutor.newEjecutor();
+      ejecutor.on('lienzo', function() {
+        return $('canvas').get(0);
+      });
+
+      var eventoAbortar;
+      var ultimaLineaPausar;
+      ejecutor.on('abortar', eventoAbortar = function(e) {
+        $("#input").off("keypress");
+        $("#input").val("");
+        $("#input").prop('disabled', true);
+        if (e) {
+          for (var i = 0; i < e.lineasDeError().length; i++) {
+            var x = e.lineasDeError()[i] - 1;
+            errorLineas.push(editor.addLineClass(x, "background", "CodeMirror-line-error"));
+          }
+        }
+        $("#continue").prop('disabled', true);
+        if (ultimaLineaPausar)
+          editor.removeLineClass(ultimaLineaPausar, "background", "CodeMirror-line-pausar");
+        $("#run").html("Empezar");
+        corriendo = false;
+      });
+
+      ejecutor.on('fin', function() {
+        $("#run").html("Empezar");
+        corriendo = false;
+      })
+
+      var eventoLimpiar;
+      var lineas = [];
+      ejecutor.on('limpiar', eventoLimpiar = function() {
+        $("#output").get(0).innerHTML = "";
+        lineas = [];
+      })
+
+      ejecutor.onA('leer', function(arg, callback) {
+        $("#input").prop("disabled", false);
+        $("#input").keypress(function(e) {
+          if (e.which == 13) {
+            $(this).off("keypress");
+            var v = $("#input").val();
+            $("#input").val("");
+            $("#input").prop('disabled', true);
+            callback(errorAbortar, v);
+          }
+        });
+        $("#input").focus();
+      })
+
+      ejecutor.on('escribir', function(plain) {
+        var t = $("#output").get(0);
+        if (lineas.length > 50) {
+          lineas = lineas.slice(20);
+          lineas.push(zl.escapeHtml(plain));
+        } else {
+          lineas.push(zl.escapeHtml(plain));
+        }
+        t.innerHTML = lineas.join('');
+        if (isBottom) {
+          t.scrollTop = t.scrollHeight;
+        }
+      })
+
+      ejecutor.on('prefotograma', function(arg) {
+        // true significa detener la ejecución antes de pasar al fotograma
+        // false, null, undefined, 0, o "" significa continuar
+        return !corriendo;
+      })
+
+
+      var continuarCallback;
+      ejecutor.onA('pausar', function(arg, done) {
+        var [$local, $global, $entrada, $salida, pos, callback] = arg;
+        var cursor = editor.posFromIndex(pos);
+        console.log(arg);
+        $("#continue").prop('disabled', false);
+        continuarCallback = done;
+        ultimoEntorno = [$local, $global, $entrada, $salida];
+        ultimaLineaPausar = cursor.line;
+        editor.addLineClass(ultimaLineaPausar, "background", "CodeMirror-line-pausar");
+        saltarAlCodigo(cursor.line, cursor.ch);
+        mostrarDatos();
+      })
+
+      var mouseX = 0;
+      var mouseY = 0;
+      var canvas = document.getElementById("canvas");
+      ejecutor.on('posicionraton', function(){
+          return [mouseX, mouseY];
+      })
+
+      ejecutor.on('teclas', function() {
+        return pulsadas;
+      });
+
+      ejecutor.on('tamañolienzo', function(arg) {
+        canvasSize = arg;
+        canvasEscala();
+      })
+
       $("#run").click(function() {
         if (!lastCompilation)
           return false;
         var compilation = $("#helparea").get(0);
         var zlcode = editor.getValue();
-        if (!carga) {
-          $("#run").html("Abortar");
-          carga = zl.Cargar(lastjs);
-          carga.$asincrono.inicio = lastCompilation.modulo.subrutinas.inicio && lastCompilation.modulo.subrutinas.inicio.modificadores.asincrona;
-          carga.$asincrono.fotograma = lastCompilation.modulo.subrutinas.fotograma && lastCompilation.modulo.subrutinas.fotograma.modificadores.asincrona;
-          carga.$alAcabar = function() {
-            carga = null;
-            $("#run").html("Empezar");
-          }
-          carga.$alError = function(e) {
-            this.$continuar = false;
-            if (zl.error.esError(e)) {
-              compilation.innerHTML = "" + e.vincularCodigo(e);
-              for (var i = 0; i < e.lineasDeError().length; i++) {
-                var x = e.lineasDeError()[i] - 1;
-                errorLineas.push(editor.addLineClass(x, "background", "CodeMirror-line-error"));
-              }
-            } else
-              throw e;
-          }
-          zl.Ejecutar(carga);
+        if (!corriendo) {
+          corriendo = true;
+          ejecutor.ejecutar(lastjs);
+          $('#run').html('Abortar');
+          eventoLimpiar();
         } else {
-          zl.Abortar(carga);
-          carga = null;
-
+          corriendo = false;
           $("#run").html("Empezar");
           compilation.innerHTML = "";
+          eventoAbortar();
         }
       });
 
-      var continuarCallback;
       var ultimoEntorno;
       $("#continue").click(function() {
         $("#continue").prop('disabled', true);
@@ -552,7 +721,6 @@ Fin
           fotogramaAsincrono: lastCompilation.fotogramaAsincrono
         }));
         zip.file("estilo.css", zipestilo);
-        zip.file("ejecucion.js", zipejecucion);
         zip.file("async.min.js", zipasync);
         zip.file("jquery-2.1.4.min.js", zipjquery);
         zip.file("utils.js", ziputils);
@@ -570,71 +738,6 @@ Fin
         var t = $this.get(0);
         isBottom = (t.scrollTop + $this.innerHeight() >= t.scrollHeight);
       };
-
-      zl.io = zl.io || {};
-      zl.io.lineas = [];
-
-      zl.io.outWrite = function(html) {
-        var t = $("#output").get(0);
-        if (zl.io.lineas.length > 50) {
-          zl.io.lineas = zl.io.lineas.slice(20);
-          zl.io.lineas.push(zl.escapeHtml(html));
-        } else {
-          zl.io.lineas.push(zl.escapeHtml(html));
-        }
-        t.innerHTML = zl.io.lineas.join('');
-        if (isBottom) {
-          t.scrollTop = t.scrollHeight;
-        }
-      }
-
-      zl.io.inRead = function(callback) {
-        $("#input").prop("disabled", false);
-        $("#input").keypress(function(e) {
-          if (e.which == 13) {
-            $(this).off("keypress");
-            var v = $("#input").val();
-            $("#input").val("");
-            $("#input").prop('disabled', true);
-            callback(null, v);
-          }
-        });
-        $("#input").focus();
-      }
-
-      zl.io.abortRead = function() {
-        $("#input").off("keypress");
-        $("#input").val("");
-        $("#input").prop('disabled', true);
-      }
-
-      zl.io.clear = function() {
-        $("#output").get(0).innerHTML = "";
-        zl.io.lineas = [];
-      }
-
-      zl.io.pause = function($local, $global, $entrada, $salida, pos, callback) {
-        var cursor = editor.posFromIndex(pos);
-        $("#continue").prop('disabled', false);
-        continuarCallback = callback;
-        ultimoEntorno = [$local, $global, $entrada, $salida];
-        ultimaLineaPausar = cursor.line;
-        editor.addLineClass(ultimaLineaPausar, "background", "CodeMirror-line-pausar");
-        saltarAlCodigo(cursor.line, cursor.ch);
-        mostrarDatos();
-      }
-
-      zl.io.abortPause = function() {
-        $("#continue").prop('disabled', true);
-        editor.removeLineClass(ultimaLineaPausar, "background", "CodeMirror-line-pausar");
-      }
-
-      var mouseX = 0;
-      var mouseY = 0;
-      var canvas = document.getElementById("canvas");
-      zl.io.posicionRatonCanvas = function() {
-        return [mouseX, mouseY];
-      }
 
       var handleMouseMove = function(e) {
         var rect = canvas.getBoundingClientRect();
@@ -682,7 +785,7 @@ Fin
       }
 
       function mostrarDatos() {
-        if (evaluando && carga && lastCompilation && ultimoEntorno) {
+        if (evaluando && lastCompilation && ultimoEntorno) {
           var subrutina = lastCompilation.modulo.subrutinaPorPosicion(editor.indexFromPos(editor.getCursor()));
           var compilation = $("#helparea").empty();
           var local = $("<div class='datosEjecucion local'>Datos locales:<br></div>").appendTo(compilation);
@@ -729,14 +832,6 @@ Fin
         type: "get",
         success: function(data) {
           zipindex = data;
-        }
-      });
-
-      $.ajax("ejecucion.js", {
-        dataType: "text",
-        type: "get",
-        success: function(data) {
-          zipejecucion = data;
         }
       });
 

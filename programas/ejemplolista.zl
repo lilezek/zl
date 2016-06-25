@@ -12,14 +12,12 @@ Algoritmo
   l.inicio [
     tamaño <- 2
   ]
-  l.escribir [
-    indice <- 1
-    valor <- 1
+  l(1) <- 1
+  mostrarNumero [
+    numero <- l(1)
   ]
-  l.leer [
-    indice <- 1
-    valor -> x
-  ]
+  l(1) <- 2
+  x <- l(1)
   mostrarNumero [
     numero <- x
   ]
