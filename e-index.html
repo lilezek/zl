@@ -88,203 +88,18 @@
 <textarea class="editor" id="editor">// Desarrollado con ayuda de Ginés García Mateos
 
 Configuracion
-  importar "bibliotecasZL/relacion.zl"
   importar "bibliotecasZL/lista.zl"
-  importar "bibliotecasZL/punto.zl"
-  integrar "bibliotecasZL/teclado.zl"
-  integrar "bibliotecasZL/canvas.zl"
   integrar "bibliotecasZL/basico.zl"
-  ancho <- 1920
-  alto <- 1080
-Fin
-
-Subrutina GenerarObstaculo
-Datos
-  obstaculos es Lista(Punto) global
-  obstaculoLibre es numero
-  coordX es Numero
-  coordXmax es Numero
-  i es numero
-  altura es Numero
-  puntuacion es Numero Global
-Algoritmo
-  coordXmax <- 2000
-  i <- 1
-  obstaculoLibre <- 0
-  Repetir 6 veces
-    obstaculos(i).leercomponentes [
-      posx -> coordX
-    ]
-    Si coordX <= -100 hacer
-      obstaculoLibre <- i
-    Fin
-    i <- i + 1
-    Si coordXMax < coordX + 320 hacer
-      coordXmax <- coordX + 320
-    Fin
-  Fin
-  Si obstaculoLibre > 0 hacer
-    aleatorio [
-      minimo <- 200
-      maximo <- 700
-      resultado -> altura
-    ]
-    obstaculos(obstaculoLibre) <- {coordXMax,altura} como punto
-    puntuacion <- puntuacion + 1
-  Fin
 Fin
 
 Subrutina Inicio
 Datos
-  pajaro es Punto Global
-  velocidad es Numero Global
-  obstaculos es Lista(Punto) global
-  puntuacion es Numero global
-  t es Numero Global
+  l es Lista(Numero)
 Algoritmo
-  puntuacion <- 0
-  pajaro <- {500, 500} como punto
-  velocidad <- 0
-  t <- 0
-  obstaculos <- {
-    {2000,50} como punto,
-    {3000,500} como punto,
-    {4000,700} como punto,
-    {5000,500} como punto,
-    {6000,700} como punto,
-    {7000,500} como punto
-  }
-  cargarImagen [
-    url <- "http://dis.um.es/~ginesgm/images/fondo2.png"
+  l.inicio [
+    tamaño <- 3
   ]
-  cargarImagen [
-    url <- "http://dis.um.es/~ginesgm/images/fondo3.png"
-  ]
-  cargarImagen [
-    url <- "http://dis.um.es/~ginesgm/images/fondo3.png"
-  ]
-  cargarImagen [
-    url <- "http://dis.um.es/~ginesgm/images/bird1.png"
-  ]
-  cargarImagen [
-    url <- "http://dis.um.es/~ginesgm/images/bird2.png"
-  ]
-  cargarImagen [
-    url <- "http://dis.um.es/~ginesgm/images/palo1.png"
-  ]
-  cargarImagen [
-    url <- "http://dis.um.es/~ginesgm/images/palo2.png"
-  ]
-  esconderRaton []
-Fin
-
-Subrutina Fotograma
-Datos
-  pajaro es Punto Global
-  velocidad es Numero Global
-  d es numero
-  arriba es booleano
-  abajo es booleano
-  obstaculos es Lista(Punto) global
-  i es numero
-  t es Numero Global
-  puntuacion es Numero global
-  reiniciar es booleano
-Algoritmo
-  t <- t + 1
-  delta [
-    delta -> d
-  ]
-  teclapulsada [
-    tecla <- "ARRIBA"
-    estapulsada -> arriba
-  ]
-
-  teclapulsada [
-    tecla <- "ABAJO"
-    estapulsada -> abajo
-  ]
-
-  posicionraton [
-    posicion -> pajaro
-  ]
-  pajaro("x") <- 500
-
-  velocidad <- velocidad + 25 * d
-
-  dibujarImagen [
-    url <- "http://dis.um.es/~ginesgm/images/fondo2.png"
-    esquina <- {0,0} como punto
-    ancho <- 1920
-    alto <- 1080
-  ]
-  dibujarImagen [
-    url <- "http://dis.um.es/~ginesgm/images/fondo3.png"
-    esquina <- {-2*t%1920,860} como punto
-    ancho <- 1920
-    alto <- 220
-  ]
-  dibujarImagen [
-    url <- "http://dis.um.es/~ginesgm/images/fondo3.png"
-    esquina <- {1920-2*t%1920,860} como punto
-    ancho <- 1920
-    alto <- 220
-  ]
-  Si (pajaro("y")%80) > 40 hacer
-    dibujarImagen [
-      url <- "http://dis.um.es/~ginesgm/images/bird1.png"
-      esquina <- {pajaro("x")-50,pajaro("y")-50} como punto
-      ancho <- 120
-      alto <- 100
-    ]
-  si no hacer
-    dibujarImagen [
-      url <- "http://dis.um.es/~ginesgm/images/bird2.png"
-      esquina <- {pajaro("x")-50,pajaro("y")-50} como punto
-      ancho <- 120
-      alto <- 100
-    ]
-  Fin
-  i <- 1
-  Repetir 6 veces
-    obstaculos(i) <- obstaculos(i) - {velocidad,0} como punto * d
-        colorrelleno [
-      relleno <- "negro" como color
-    ]
-    dibujarImagen [
-      url <- "http://dis.um.es/~ginesgm/images/palo1.png"
-      esquina <- obstaculos(i) + {0,200} como punto
-      ancho <- 80
-      alto <- 1080-obstaculos(i)("y")-200
-    ]
-    dibujarImagen [
-      url <- "http://dis.um.es/~ginesgm/images/palo2.png"
-      esquina <- obstaculos(i) + {0,-200-obstaculos(i)("y")} como punto
-      ancho <- 80
-      alto <- obstaculos(i)("y")
-    ]
-    i <- i + 1
-  Fin
-  generarobstaculo []
-  // Choca con algún obstaculo
-  i <- 1
-  Repetir 6 veces
-    Si (((pajaro("x") - obstaculos(i)("x"))*(pajaro("x") - obstaculos(i)("x"))) < 900)
-     y (((pajaro("y") - obstaculos(i)("y"))*(pajaro("y") - obstaculos(i)("y"))) > 16000) hacer
-      reiniciar <- verdadero
-    Fin
-    i <- i + 1
-  Fin
-  tamañofuentetexto [
-    tamaño <- 50
-  ]
-  dibujartexto [
-    mensaje <- puntuacion como texto
-    centro <- {50,100} como punto
-  ]
-  si reiniciar hacer
-    inicio []
-  fin
+  l(4) <- 2
 Fin
 </textarea>
     <div class="v divisor"></div>
@@ -475,7 +290,8 @@ Fin
         $("#run").prop("disabled", false).html("Abortar");
       })
 
-      ipc.on('ejecutado', function ejecutadoIPC() {
+      var ejecutadoIPC;
+      ipc.on('ejecutado', ejecutadoIPC = function() {
         corriendo = false;
         $("#run").prop("disabled", false).html("Empezar");
         $("#continue").prop('disabled', true);
@@ -484,14 +300,11 @@ Fin
         ultimoEntorno = null;
       })
 
-      ipc.on('errorejecucion', function(e) {
+      ipc.on('errorejecucion', function(ev, e) {
         ejecutadoIPC();
         var compilation = $("#helparea").empty();
-        compilation.innerHTML = "" + e.vincularCodigo(e);
-        for (var i = 0; i < e.lineasDeError().length; i++) {
-          var x = e.lineasDeError()[i] - 1;
-          errorLineas.push(editor.addLineClass(x, "background", "CodeMirror-line-error"));
-        }
+        var zle = zl.error.newError(zl.error[e.error], e.informacion);
+        compilation.innerHTML = "" + zle;
       })
 
       $("#run").click(function() {

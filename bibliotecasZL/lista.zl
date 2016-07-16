@@ -13,6 +13,23 @@ Algoritmo
   */
 Fin
 
+Subrutina Primitiva CambiarTamaño
+Datos
+  NuevoTamaño es Numero de Entrada
+  v es Interno Global
+Algoritmo
+  /*
+  var x = $entrada['nuevotamaño'];
+  var v = $self.$miembros.v;
+  while (x > v.length) {
+    v.push(undefined);
+  }
+  while (x < v.length) {
+    v.pop();
+  }
+  */
+Fin
+
 Subrutina Primitiva OperadorAccesoLectura LeerLista
 Datos
   derecha es Numero de Entrada
@@ -20,7 +37,18 @@ Datos
   resultado es Generico(1) de Salida
 Algoritmo
   /*
-  $salida.resultado = $entrada.izquierda.$miembros.v[$entrada.derecha-1];
+  var x = $entrada.derecha-1;
+  var s = $entrada.izquierda.$miembros.v.length;
+  if (x < 0 || x >= s) {
+    $exterior.$error({
+      error: 'E_EJECUCION_INDICE_DESCONTROLADO',
+      informacion: {
+        indice: x+1,
+        tam: s
+      }
+    });
+  }
+  $salida.resultado = $entrada.izquierda.$miembros.v[~~x];
   */
 Fin
 
@@ -31,6 +59,17 @@ Datos
   izquierda es EsteModulo(Generico(1)) de Entrada de Salida
 Algoritmo
   /*
-  $salida.izquierda.$miembros.v[$entrada.derecha-1] = $entrada.resultado;
+  var x = $entrada.derecha-1;
+  var s = $salida.izquierda.$miembros.v.length;
+  if (x < 0 || x >= s) {
+    $exterior.$error({
+      error: 'E_EJECUCION_INDICE_DESCONTROLADO',
+      informacion: {
+        indice: x+1,
+        tam: s
+      }
+    });
+  }
+  $salida.izquierda.$miembros.v[~~x] = $entrada.resultado;
   */
 Fin

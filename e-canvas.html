@@ -132,6 +132,9 @@
   });
 
   ejecutor.on('abortar', eventoAbortar = function(e) {
+    if (e) {
+      ipc.send('errorejecucion', e);
+    }
     abortarIPC();
   });
 

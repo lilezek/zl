@@ -909,15 +909,20 @@ var modulo = function(zl) {
   }
 
   zl.entorno.unserializeModulo = function(s) {
-    var r = zl.writeJson(zl.entorno.newModulo(),s);
+    var r;
+    if (s.constructor !== Modulo) {
+      r = zl.writeJson(zl.entorno.newModulo(),s);
+    } else {
+      r = s;
+    }
     for (var k in r.integraciones) {
-      r.integraciones[k] = zl.writeJson(zl.entorno.newModulo(),r.integraciones[k]);
+      r.integraciones[k] = zl.entorno.unserializeModulo(r.integraciones[k]);
     }
     for (var k in r.importes) {
-      r.importes[k] = zl.writeJson(zl.entorno.newModulo(),r.importes[k]);
+      r.importes[k] = zl.entorno.unserializeModulo(r.importes[k]);
     }
     for (var k in r.subrutinas) {
-      r.subrutinas[k] = zl.writeJson(zl.entorno.newSubrutina(),r.subrutinas[k]);
+      r.subrutinas[k] = zl.entorno.unserializeModulo(r.subrutinas[k]);
     }
 
     // TODO: Sin acabar.

@@ -45,6 +45,7 @@ function __runAt60hz(callback) {
 }
 
 var running;
+var __continue = true;
 
 function __runAtnthHz(freq, callback) {
   if (interval)
@@ -62,6 +63,8 @@ function __runAtnthHz(freq, callback) {
 
 var framing;
 function __frameA(prepareNextFrame, frame) {
+  if (!__continue)
+    return;
   if (!$exterior.$evento('prefotograma', {}))
     prepareNextFrame(__frameA.bind(this, prepareNextFrame, frame));
   if (framing)
@@ -73,6 +76,8 @@ function __frameA(prepareNextFrame, frame) {
 }
 
 function __frame(prepareNextFrame, frame) {
+  if (!__continue)
+    return;
   if (!$exterior.$evento('prefotograma', {}))
     prepareNextFrame(__frame.bind(this, prepareNextFrame, frame));
   if (framing)
@@ -118,6 +123,8 @@ function __asyncNextCallbackIfNotResult(error, result, eventarray, obj, callback
 }
 
 function __emitAsyncEvent(event, obj, callback) {
+  if (!__continue)
+    return;
   if (event in $exterior.$evasync && $exterior.$evasync[event].length > 0) {
     __asyncNextCallbackIfNotResult(null, null, $exterior.$evasync[event], obj, callback);
   } else {
@@ -181,10 +188,10 @@ function __export() {
   module.exports = $exterior;
 }
 
-$exterior.$error = function(msg) {
+$exterior.$error = function(error) {
   // TODO: Introducir un error en tiempo de ejecución.
-  if (!__emitEvent('abortar', {error: msg}))
-    throw msg;
+  if (!__emitEvent('abortar', error))
+    __continue = false;
 }
 
 $exterior.$precision = $exterior.$precision || function __precision(arg) {

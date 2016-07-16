@@ -585,15 +585,10 @@ var modulo = function(zl) {
     this.enumeracion = 500;
     this.identificador = "E_EJECUCION_INDICE_DESCONTROLADO";
     this
-      .resaltarLinea(informacion.posicion[0])
-      .texto("Error: " + this.identificador)
-      .indentar()
-      .texto("identacion")
-      .indentar()
-      .texto("identacion")
-      .desindentar()
-      .texto("desindentar")
-      .desindentar();
+      .texto("Error: se ha intentado acceder a una lista de tamaño ")
+      .texto(informacion.tam+'')
+      .texto(" al indice ")
+      .texto(informacion.indice+'');
   }
   zl.error.E_EJECUCION_CONVERSION_INVALIDA = function(informacion) {
     this.info = informacion;
@@ -609,6 +604,13 @@ var modulo = function(zl) {
       .desindentar()
       .texto("desindentar")
       .desindentar();
+  }
+  zl.error.E_EJECUCION_GENERICO_TEXTO = function(informacion) {
+    this.info = informacion;
+    this.enumeracion = 502;
+    this.identificador = "E_EJECUCION_GENERICO_TEXTO";
+    this
+      .texto("Error: " + informacion)
   }
 
   zl.error.unserializeError = function(e) {

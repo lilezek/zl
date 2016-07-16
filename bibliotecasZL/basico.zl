@@ -218,12 +218,15 @@ Datos
 Algoritmo
   /*
   if (isNaN($entrada.t)) {
-  	$exterior.$alError($exterior.$error.newError($exterior.$error.E_EJECUCION_CONVERSION_INVALIDA, {
-    		tipoBase: "texto",
-        tipoObjetivo: "numero",
-       	valor: $entrada.t,
-        adicional: "No es un número válido."
-  		}));
+  	$exterior.$error({
+      error: 'E_EJECUCION_CONVERSION_INVALIDA',
+      informacion: {
+      		tipoBase: "texto",
+          tipoObjetivo: "numero",
+         	valor: $entrada.t,
+          adicional: "No es un número válido."
+    		}
+    });
   } else {
   	$salida.n = parseFloat($entrada.t);
   }

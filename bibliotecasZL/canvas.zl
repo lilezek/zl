@@ -17,7 +17,10 @@ Algoritmo
   /*
   $entrada['$canvas'] = $exterior.$evento('lienzo', {});
   if (!$entrada['$canvas']) {
-    $exterior.$error('No se ha podido obtener el lienzo');
+    $exterior.$error({
+      error: ''E_EJECUCION_GENERICO_TEXTO',
+      informacion: 'No se ha podido obtener el lienzo'
+    });
   } else {
     $entrada['$ctx2d'] = $self.$canvas.getContext("2d");
   }
@@ -289,11 +292,14 @@ Algoritmo
     done(null, {});
   }
   img.onerror = function(e) {
-    done($exterior.$error.newError($exterior.$error.E_EJECUCION_IMAGEN_NO_CARGA, {
+    $exterior.$error({
+      error: 'E_EJECUCION_IMAGEN_NO_CARGA',
+      informacion: {
     		url: $entrada.url,
         motivo: e,
         adicional: "No se pudo cargar la imagen."
-  		}));
+    	}
+    });
   }
   img.src = $entrada.url;
   */

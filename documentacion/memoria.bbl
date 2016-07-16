@@ -5,18 +5,63 @@
   \href{http://www.ams.org/mathscinet-getitem?mr=#1}{#2}
 }
 \providecommand{\href}[2]{#2}
-\begin{thebibliography}{1}
+\begin{thebibliography}{10}
+
+\bibitem{codemirrorautocomplete}
+Codemirror, \emph{Codemirror: Autocomplete demo},
+  \url{https://codemirror.net/demo/complete.html}, 2016.
 
 \bibitem{codemirrorapi}
-Codemirror, \emph{Codemirror manual},
+\bysame, \emph{Codemirror manual},
   \url{https://codemirror.net/doc/manual.html#overview}, 2016.
+
+\bibitem{bnf}
+Lars~Marius Garshol, \emph{Bnf and ebnf: What are they and how do they work?},
+  \url{http://www.garshol.priv.no/download/text/bnf.html}, 2008.
 
 \bibitem{bison}
 GNU, \emph{Bison - gnu project}, \url{https://www.gnu.org/software/bison/},
   2014.
 
+\bibitem{codemirrorsyntaxhighlight}
+Ingo, \emph{Codemirror (source) syntax highlighting},
+  \url{http://ckeditor.com/addon/codemirror}, 2015.
+
+\bibitem{pegjs}
+David Majda, \emph{Peg.js}, \url{http://pegjs.org}, 2010-2016.
+
+\bibitem{mundoingles}
+El~mundo, \emph{El 63\% de los alumnos españoles no comprende el inglés al
+  finalizar la eso},
+  \url{http://www.elmundo.es/elmundo/2012/06/21/espana/1340281749.html}, 2012.
+
 \bibitem{acmtdop}
 Vaughnan~R. Pratt, \emph{Top down operator precedence},
   \url{http://dl.acm.org/citation.cfm?id=512931}, 1973.
+
+\bibitem{lookahead}
+Tim Vroom, \emph{Using look-ahead and look-behind},
+  \url{http://www.perlmonks.org/?node_id=518444}, 2005.
+
+\bibitem{dcg}
+Wikipedia, \emph{Definite clause grammar},
+  \url{https://en.wikipedia.org/wiki/Definite_clause_grammar}, 2016.
+
+\bibitem{conflictoll3}
+\bysame, \emph{Ll parser, solutions to ll(1) conflicts},
+  \url{https://en.wikipedia.org/wiki/LL_parser#Solutions_to_LL.281.29_Conflicts},
+  2016.
+
+\bibitem{memorysafety}
+\bysame, \emph{Memory safety},
+  \url{https://en.wikipedia.org/wiki/Memory_safety}, 2016.
+
+\bibitem{statictypecheck}
+\bysame, \emph{Static type checking},
+  \url{https://en.wikipedia.org/wiki/Static_type-checking}, 2016.
+
+\bibitem{typesafety}
+\bysame, \emph{Type safety}, \url{https://en.wikipedia.org/wiki/Type_safety},
+  2016.
 
 \end{thebibliography}
