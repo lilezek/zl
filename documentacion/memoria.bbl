@@ -15,6 +15,10 @@ Codemirror, \emph{Codemirror: Autocomplete demo},
 \bysame, \emph{Codemirror manual},
   \url{https://codemirror.net/doc/manual.html#overview}, 2016.
 
+\bibitem{async}
+Caolan con~multiples autores., \emph{Async documentation},
+  \url{http://caolan.github.io/async/}, 2016.
+
 \bibitem{bnf}
 Lars~Marius Garshol, \emph{Bnf and ebnf: What are they and how do they work?},
   \url{http://www.garshol.priv.no/download/text/bnf.html}, 2008.
@@ -23,9 +27,19 @@ Lars~Marius Garshol, \emph{Bnf and ebnf: What are they and how do they work?},
 GNU, \emph{Bison - gnu project}, \url{https://www.gnu.org/software/bison/},
   2014.
 
+\bibitem{javascriptfunctional}
+Marijn Haverbeke, \emph{Eloquent javascript: Functional programming},
+  \url{http://eloquentjavascript.net/1st_edition/chapter6.html}, 2013.
+
 \bibitem{codemirrorsyntaxhighlight}
 Ingo, \emph{Codemirror (source) syntax highlighting},
   \url{http://ckeditor.com/addon/codemirror}, 2015.
+
+\bibitem{microsoftresearchautocomplete}
+Surajit Chaudhuri \&~Raghav Kaushik, \emph{Extending autocompletion to tolerate
+  errors},
+  \url{http://www.microsoft.com/en-us/research/publication/extending-autocompletion-to-tolerate-errors/},
+  2016.
 
 \bibitem{pegjs}
 David Majda, \emph{Peg.js}, \url{http://pegjs.org}, 2010-2016.
@@ -39,13 +53,46 @@ El~mundo, \emph{El 63\% de los alumnos españoles no comprende el inglés al
 Vaughnan~R. Pratt, \emph{Top down operator precedence},
   \url{http://dl.acm.org/citation.cfm?id=512931}, 1973.
 
+\bibitem{jnsigwt}
+GWT Project, \emph{Writing native javascript methods},
+  \url{http://www.gwtproject.org/doc/latest/DevGuideCodingBasicsJSNI.html},
+  ¿2016?
+
+\bibitem{syntaxhighlight}
+Advait Sarkar, \emph{The impact of syntax colouring on program comprehension},
+  \url{http://www.ppig.org/sites/default/files/2015-PPIG-26th-Sarkar.pdf},
+  ¿2015?
+
+\bibitem{callbackhell}
+J.~Hegedus \& Hugo M.G.~@ StackOverflow, \emph{What is callback hell and how
+  why rx solves it?},
+  \url{http://stackoverflow.com/questions/25098066/what-is-callback-hell-and-how-and-why-rx-solves-it#25098230},
+  2014.
+
+\bibitem{javascriptasync}
+Joe \& T. Jameson~@ StackOverflow, \emph{Why is node.js asynchronous?},
+  \url{http://stackoverflow.com/questions/17607280/why-is-node-js-asynchronous},
+  2013.
+
 \bibitem{lookahead}
 Tim Vroom, \emph{Using look-ahead and look-behind},
   \url{http://www.perlmonks.org/?node_id=518444}, 2005.
 
+\bibitem{levensthein}
+Wikipedia, \emph{Distancia de edición},
+  \url{https://es.wikipedia.org/wiki/Distancia_de_Levenshtein}, 2015.
+
+\bibitem{breakpoint}
+\bysame, \emph{Breakpoint}, \url{https://en.wikipedia.org/wiki/Breakpoint},
+  2016.
+
 \bibitem{dcg}
-Wikipedia, \emph{Definite clause grammar},
+\bysame, \emph{Definite clause grammar},
   \url{https://en.wikipedia.org/wiki/Definite_clause_grammar}, 2016.
+
+\bibitem{diff}
+\bysame, \emph{Diff utility}, \url{https://en.wikipedia.org/wiki/Diff_utility},
+  2016.
 
 \bibitem{conflictoll3}
 \bysame, \emph{Ll parser, solutions to ll(1) conflicts},
@@ -55,6 +102,15 @@ Wikipedia, \emph{Definite clause grammar},
 \bibitem{memorysafety}
 \bysame, \emph{Memory safety},
   \url{https://en.wikipedia.org/wiki/Memory_safety}, 2016.
+
+\bibitem{peg}
+\bysame, \emph{Parsing expression grammar},
+  \url{https://en.wikipedia.org/wiki/Parsing_expression_grammar}, 2016.
+
+\bibitem{lcs}
+\bysame, \emph{Problema de la subsecuencia común más larga},
+  \url{https://es.wikipedia.org/wiki/Problema_de_Subsecuencia_Com%C3%BAn_mas_Larga},
+  2016.
 
 \bibitem{statictypecheck}
 \bysame, \emph{Static type checking},

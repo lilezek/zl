@@ -38,6 +38,13 @@
 <modificador> ::= "interna"
     | "primitiva"
     | "conversora"
+    | "asincrona" 
+    | "operadorsuma" 
+    | "operadorresta"
+    | "operadorproducto" 
+    | "operadordivision"
+    | "operadoraccesolectura"
+    | "operadoraccesoescritura"
 
 <nombre> ::= <nombreSimple>
 
