@@ -539,7 +539,9 @@ elipse [
 
 	\chapter{Diseño y resolución del trabajo realizado}
 	
-	Para la realización del trabajo he usado Atom (como editor de código), Chrome (es rápido) y Firefox (ofrece mejor información de depuración) como entornos de ejecución para el IDE, NodeJS para pruebas unitarias y ejecución sin entorno, TexStudio para escribir este documento, GIMP 2 para la edición de las imágenes e, indistintamente, Linux y Windows.  
+	%TODO: Reescribir la introducción.
+	
+	Para la realización del trabajo he usado como herramientas de trabajo Atom (como editor de código), Chrome (es rápido) y Firefox (ofrece mejor información de depuración) como entornos de ejecución para el IDE, NodeJS para pruebas unitarias y ejecución sin entorno, TexStudio para escribir este documento, GIMP 2 para la edición de las imágenes e, indistintamente, Linux y Windows.  
 	
 	\vspace{10px}
 	Atom: \href{https://atom.io/}{https://atom.io/}
@@ -554,7 +556,9 @@ elipse [
 	 
 	Texstudio: \href{http://texstudio.sourceforge.net/}{http://texstudio.sourceforge.net/}
 	
-			\subsection{Compilador del lenguaje ZL}
+			\subsection{Compilador de ZL}
+			%TODO: Purgar
+			 
 			En una primera aproximación el compilador se construyó usando PEG.js\cite{pegjs}, que en su descripción dice ser más potente que LL(k) o LR(k). Sin embargo, no fui capaz de hacer análisis de un trozo ambiguo de ZL. El problema lo localicé al intentar analizar el siguiente trozo de pseudo-ZL (en los inicios, la sintaxis era mucho más sencilla):
 			
 			\begin{BVerbatim}
@@ -586,7 +590,33 @@ elipse [
 			
 			Viendo la serie de problemas que tenía con gramáticas sencillas pero ambiguas, lo único que quedaba era o alterar los compiladores ya escritos o implementar uno por cuenta propia. Uno que ofrezca los mismos mecanismos que los otros compiladores pero que me permita romper el comportamiento por defecto (que admita cierta flexibilidad) para añadir información de error, o para resolver el problema de los múltiples si condicionales. Al final me decanté por la segunda opción, con la esperanza de que llevase menos tiempo que alterar PEG.js.
 	
-	\section{Estructura del compilador para ZL}
+	\section{Compilador de ZL}
+	
+	%TODO: Esta parte es la nueva introducción.
+	
+	Todo analizador se puede ver como una máquina de estados que, por cada paso que se da, cambia su estado y consume una parte de la entrada a analizar. La complejidad de la máquina de estados puede variar, permitiendo análisis más o menos complejos. Para ZL, el compilador define tres fases de análisis más una cuarta fase de generación de código.
+	
+	%TODO: Imagen de las fases de análisis
+	
+	\vspace{10px}
+	
+	Durante estas fases se generan estructuras de datos cada vez más complejas, que permiten una conversión a Javascript. Salvo durante la primera fase, todas las fases trabajan con estructuras en forma de árbol (la tabla de símbolos y un árbol de análisis). Durante el análisis inicial (sintáctico y semántico) el analizador debe generar el primer árbol a partir de una cadena de símbolos, que son el texto del código a compilar. La implementación de esta parte pasa por usar una máquina de estados en el que se mantiene \textbf{una pila de colas de elementos} a avanzar, así como \textbf{la posición del siguiente carácter a leer} en el próximo avance. De esto se habla en más detalle en la sección `Pila de colas auxiliares para el análisis descendente recursivo'. 
+	
+	\vspace{10px}
+	
+	Las siguientes fases trabajan con árboles. De la primera fase se obtiene un árbol que representa las estructuras sintácticas, de las cuales se extraen nombres (de subrutinas, de datos...) para rellenar una tabla de símbolos\footnote{Tabla que relaciona nombres de subrutinas, nombres de variables, etc... con sus estructuras.}. La tabla de símbolos se rellena realizando una normalización y adicionalmente, durante este proceso se realizan ciertas comprobaciones semánticas (nombres no repetidos, tipos de datos existentes...), lanzando una excepción en caso de conflicto. De este análisis se habla con más detalle en la sección `Análisis sintáctico'.
+	
+	\vspace{10px}
+	
+	En la tercera fase se realizan comprobaciones semánticas para cada una de las sentencias dentro de las subrutinas. Se analiza cada sentencia en busca de código ilegal: nombres que se usan pero no existen, operaciones entre dos tipos de datos no válidos, etc... con el objetivo de lanzar una excepción y detener el proceso de compilación en caso de encontrar alguna. Durante esta fase se altera el árbol inicial generado en la primera fase, añadiendo para cada expresión qué tipo de datos tiene como resultado. Por ejemplo, el árbol que represente $2 * 7$ tendrá en su información que el resultado es de tipo `numero'.  Se profundiza en esta fase en la sección `Análisis semántico'.
+	
+	\vspace{10px}
+	
+	En la cuarta y última fase simplemente se hace un mapeo de cada elemento en el árbol generado a Javascript, usando en ciertas partes la tabla de símbolos como información auxiliar. Para cada operación en una expresión, para cada sentencia, para cada subrutina... existe una forma Javascript equivalente de forma que al ejecutar una evaluación del Javascript, se obtiene el mismo significado semántico que el código ZL. 
+	
+	
+	%TODO: Redistribuir esta introducción
+	%TODO: Describir el estado del compilador en un momento dado.
 	
 	Por haber elegido la construcción de un lenguaje cercano al lenguaje natural aparecen ambigüedades, sobretodo por usar las mismas palabras reservadas en contextos distintos: `si' para indicar el equivalente a `if' o `else' (en C), `no' para indicar negación de verdad o `else'... Esto causa que el lenguaje sea LL(3) (para ver el lenguaje en formato BNF extendido, \hyperref[app:a]{ver apendice A}) en la siguiente regla de derivación:
 	
@@ -638,7 +668,85 @@ elipse [
 	
 	El segundo árbol se itera desde el nodo raíz, que es un módulo, y mientras se itera se rellena una tabla de símbolos. Si la raíz es un módulo, los nodos hijos del nodo raíz son subrutinas. A su vez, los nodos que son subrutinas tienen a su vez hijos que son datos (con sus nombres y sus tipos). Durante esta iteración se hacen unas comprobaciones: se evitan nombres repetidos, se comprueban que existen tipos de datos, etc...
 	
+	\vspace{10px}
+	
 	Después de obtener la tabla de símbolos se pasan las dos últimas fases: se comprueba semánticamente que las operaciones generan expresiones válidas, y que las asignaciones de datos son de tipos compatibles. Durante este proceso se añade información al árbol sobre cuál es el tipo de datos que genera cada expresión, útil para determinar la compatibilidad de las operaciones. 	
+	
+	\subsection{Justificación de la elección de análisis descendente recursivo}
+	
+	%TODO: Revisar léxico reducción derivación
+	
+	Después de analizar las distintas alternativas de analizadores para Javascript se optó por usar PEG.js. Sin embargo, se detectó una ambigüedad en la cual hay que avanzar hasta 3 tokens para determinar la regla de reducción correcta. Después de varios intentos con PEG.js por analizar la ambigüedad se descartó la herramienta. 
+	
+	\vspace{10px}
+	
+	Como la otra herramienta (Jison) ofrece un análisis LALR(1) de un solo token de anticipación se acabó optando por una solución personalizada: un analizador descendente (se inicia el análisis buscando la estructura más grande) recursivo (los no terminales, a los que llamo reglas, tienen asociada una función). 
+	
+	\vspace{10px}
+	
+	De las posibles alternativas se ha escogido un análisis descendente por que es más intuitivo (y más fácil de depurar), y un análisis recursivo para poder tener el control de cómo se debe avanzar (o incluso retroceder, en caso de ambigüedad) cada regla. 
+	
+	\vspace{10px}
+	
+	A diferencia de, por ejemplo Jison, cada regla tiene una función asociada para calcular el resultado de la derivación, pero y he aquí la diferencia, cada función asociada debe indicar también como se ha de avanzar.
+	
+	\vspace{10px}
+	
+	Se ha visto necesaria esta forma de hacer las reglas de reducción para obtener control total tanto de los errores al no poder avanzar como para solucionar las ambigüedades. 
+	
+	\subsection{Pila de colas auxiliares para el análisis descendente recursivo}
+	
+	Para los mecanismos de avance y retroceso se han diseñado unas funcionalidades que facilitan al desarrollador (en este caso yo mismo, pero en vías futuras podrían ser otros desarrolladores) a escribir las reglas de avance. 
+	
+	\vspace{10px}
+	
+	Todas estas funcionalidades hacen uso de una pila de colas de elementos (terminales o no terminales). En un momento dado, el analizador está en un estado (que es una cola), y cuando se va a avanzar, se desencola un elemento. Antes de avanzar, se apila ese estado. Entonces se inicia el avance (se llama a la función asociada a la regla). Cuando se acaba el avance, se desapila el estado, para continuar desencolando. Las colas contienen elementos que pueden ser reglas (no terminales), o tokens o símbolos (terminales).
+	
+	\vspace{10px}
+	
+	Inicialmente, \textbf{la pila está vacía}. El cursor que apunta al texto a analizar está en 0 (posición inicial). A partir de ese estado, las funcionalidades que hacen uso de la pila de colas son las siguientes:
+	
+	\vspace{10px}
+	\noindent
+	\textbf{avanzarUno}: \textbf{parte principal del analizador}. Desencola un elemento de la cola actual. Después, apila la cola actual. Entonces, si el elemento es un no terminal, se llama a la función asociada, con una nueva cola vacía. En caso de ser un terminal, se intenta avanzar usando las expresiones regulares asociadas al terminal, avanzando el cursor tantos caracteres como se han leído, y saltando espacios y comentarios. Si no se pudo avanzar se propaga una excepción.
+	
+	\vspace{10px}
+	\noindent
+	\textbf{avanzar}: si se llama con un argumento, vacía la cola actual e introduce en la cola el argumento, que puede ser un token, un símbolo o una regla. Después, (independientemente de si se llama con algún argumento o no) realiza `avanzarUno' todos los elementos de la cola.  \textbf{avanzar('miregla')} equivale a \textbf{acumular('miregla')} y después \textbf{avanzar()}.
+	
+	\vspace{10px}
+	\noindent
+	\textbf{retroceder}: retrocede uno o varios tokens ya avanzados, símbolos, reglas. Si no se ha avanzado nada el comportamiento es no definido. Es útil para retroceder tokens avanzados en casos de ambigüedad, LL(2) o LL(3) después de comprobar si el 2º o el 3er token no es el esperado. 
+	
+	\vspace{10px}
+	\noindent
+	\textbf{acumular}: encola un token, un símbolo o una regla. Útil para avanzar varias veces un conjunto de reglas, tokens o símbolos.
+	
+	\vspace{10px}
+	\noindent
+	\textbf{intentar}: recibe un array bidimensional de opciones. Cada array dentro del array es una secuencia de reglas, símbolos o tokens. Se usa para representar las distintas opciones a seguir, aplicándose la primera secuencia que se pueda avanzar completamente. Si no se puede avanzar ninguna de las secuencias en el array, lanza una excepción. 
+	
+	\vspace{10px}
+	\noindent
+	\textbf{intento}: acumula en la cola un array bidimensional de opciones. El método \textbf{intentar} equivale a primero hacer un \textbf{intento} para acumular en la cola seguido de \textbf{avanzar} para avanzar la cola.
+	
+	\vspace{10px}
+	\noindent
+	\textbf{avanzarVarios}: avanza la cola tantas veces como se pueda. Equivale a crear una copia de la cola, \textbf{avanzar}, recuperar la cola de la copia y repetir, tantas veces como se pueda. 
+	
+	\vspace{10px}
+	\noindent
+	\textbf{avanzarVariosObligatorio}: al igual que \textbf{avanzarVarios} avanza la cola tantas veces como se pueda, pero si no se puede avanzar al menos una vez entonces lanza una excepción. Equivale a llamar a \textbf{avanzar}, recuperar la cola y entonces llamar a avanzarVarios.
+	
+	\vspace{10px}
+	\textbf{arbol}: después de avanzar reglas, tokens o símbolos, se generan ramas, una por cada \textbf{avanzar}. Si se avanzan n veces, se generan n ramas, siendo la primera la rama 0. \textbf{arbol(2)} accede a la rama generada por el 3er avanzar. Si se llama sin argumento se obtiene el árbol de la regla actual.
+	
+	\vspace{10px}
+	\textbf{registrarResultado}: es el equivalente al \$\$ en Bison. Se usa para registrar el resultado de la regla actual.
+	
+	\vspace{10px}
+	\textbf{resultado}: al igual que el método \textbf{arbol}, después de avanzar un token, un símbolo o una regla se genera un resultado (en el caso de token o símbolo es el texto que hizo \textit{matching} la expresión regular, en caso de una regla es la que se registra con \textbf{registrarResultado}). Si se avanzan n veces, \textbf{resultado(0)} es el resultado generado por el primer avanzar. Si se llama sin argumento, se obtiene el resultado de la regla actual.
+	
 	
 	\subsection{Introducción al analizador}
 
@@ -1235,7 +1343,7 @@ xhttp.send();
 
 	 Como se puede ver en la imagen, utilizo \textit{async.waterfall} una utilidad\cite{async} que simplifca la ejecución en cascada de trozos asíncronos.
 	
-	\section{Editor inteligente - Autocompletado}
+	\section{Editor inteligente}
 	
 	El primer editor `inteligente' que usé fue Delphi. Por inteligente se puede entender el funcionamiento del editor a ayudar a la escritura del código, coloreando el texto, sugiriendo nombres, etc... Por ejemplo, en Java, la clase JButton tiene más de 350 métodos. Acordarse de todos es una tarea compleja, y por eso los editores modernos tienen (entre otras cosas) sistemas de autocompletado. 
 	
@@ -1372,6 +1480,8 @@ En la llamada a <span class="subrutina">cubo</span> el dato
 
 	
 	\section{Triple plataforma - Web, Electron y NodeJS}
+	
+	%TODO: Eliminar para ahorrar espacio
 	
 	Además del IDE web existen otras dos plataformas (menos probadas, pueden contener errores) basadas en NodeJS y Electron. NodeJS permite la ejecución de código sin IDE, que puede ser útil para implementar por ejemplo un juez online como el que tiene iJava. NodeJS ejecuta código Javascript fuera del explorador, al igual que se ejecutaría Python o Perl. 
 	
