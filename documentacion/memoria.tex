@@ -604,7 +604,7 @@ elipse [
 	
 	\vspace{10px}
 	
-	Las siguientes fases trabajan con árboles. De la primera fase se obtiene un árbol que representa las estructuras sintácticas, de las cuales se extraen nombres (de subrutinas, de datos...) para rellenar una tabla de símbolos\footnote{Tabla que relaciona nombres de subrutinas, nombres de variables, etc... con sus estructuras.}. La tabla de símbolos se rellena realizando una normalización y adicionalmente, durante este proceso se realizan ciertas comprobaciones semánticas (nombres no repetidos, tipos de datos existentes...), lanzando una excepción en caso de conflicto. De este análisis se habla con más detalle en la sección `Análisis sintáctico'.
+	Las siguientes fases trabajan con árboles. De la primera fase se obtiene un árbol que representa las estructuras sintácticas, que en la segunda fase se usa para extraer nombres (de subrutinas, de datos...) y rellenar una tabla de símbolos\footnote{Tabla que relaciona nombres de subrutinas, nombres de variables, etc... con sus estructuras.}. La tabla de símbolos se rellena realizando una normalización y adicionalmente, durante este proceso se realizan ciertas comprobaciones semánticas (nombres no repetidos, tipos de datos existentes...), lanzando una excepción en caso de conflicto. De este análisis se habla con más detalle en la sección `Análisis sintáctico', y la definición de los elementos que componen la tabla están en `Tabla de símbolos'.
 	
 	\vspace{10px}
 	
@@ -700,7 +700,11 @@ elipse [
 	
 	\vspace{10px}
 	
-	Todas estas funcionalidades hacen uso de una pila de colas de elementos (terminales o no terminales). En un momento dado, el analizador está en un estado (que es una cola), y cuando se va a avanzar, se desencola un elemento. Antes de avanzar, se apila ese estado. Entonces se inicia el avance (se llama a la función asociada a la regla). Cuando se acaba el avance, se desapila el estado, para continuar desencolando. Las colas contienen elementos que pueden ser reglas (no terminales), o tokens o símbolos (terminales).
+	Todas estas funcionalidades hacen uso de una pila de colas de elementos (terminales o no terminales). En un momento dado, el analizador está en un estado (que es una cola), y cuando se va a avanzar, se desencola un elemento. Antes de avanzar, se apila ese estado, (después de haber desencolado el elemento). Entonces se inicia el avance (se llama a la función asociada a la regla). Cuando se acaba el avance, se desapila el estado, para continuar desencolando. Las colas contienen elementos que pueden ser reglas (no terminales), o tokens o símbolos (terminales).
+	
+	\vspace{10px}
+	
+	\textbf{Nota al lector}: se recomienda que esta sección, que contiene las definiciones de los métodos del analizador, se lea acompañando a las dos siguientes secciones: `Tratamiento de la recursividad izquierda' y `de la ambigüedad', donde se hacen uso de estos métodos con ejemplos. 
 	
 	\vspace{10px}
 	
@@ -708,52 +712,257 @@ elipse [
 	
 	\vspace{10px}
 	\noindent
-	\textbf{avanzarUno}: \textbf{parte principal del analizador}. Desencola un elemento de la cola actual. Después, apila la cola actual. Entonces, si el elemento es un no terminal, se llama a la función asociada, con una nueva cola vacía. En caso de ser un terminal, se intenta avanzar usando las expresiones regulares asociadas al terminal, avanzando el cursor tantos caracteres como se han leído, y saltando espacios y comentarios. Si no se pudo avanzar se propaga una excepción.
+	\textbf{avanzarUno}: \textbf{parte principal del analizador}. Desencola un elemento de la cola actual. Después, apila la cola actual. Entonces, si el elemento es un no terminal, se llama a la función asociada, con una nueva cola vacía. En caso de ser un terminal, se intenta avanzar usando las expresiones regulares asociadas al terminal, avanzando el cursor tantos caracteres como se han leído, y saltando espacios y comentarios. Si no se pudo avanzar (la expresión regular no hace match) se propaga una excepción. Las funciones asociadas a reglas pueden lanzar excepciones también, para que los desarrolladores puedan propagar errores que no sean puramente léxicos.
 	
 	\vspace{10px}
 	\noindent
-	\textbf{avanzar}: si se llama con un argumento, vacía la cola actual e introduce en la cola el argumento, que puede ser un token, un símbolo o una regla. Después, (independientemente de si se llama con algún argumento o no) realiza `avanzarUno' todos los elementos de la cola.  \textbf{avanzar('miregla')} equivale a \textbf{acumular('miregla')} y después \textbf{avanzar()}.
+	\textbf{avanzar}: si se llama con un argumento, vacía la cola actual e introduce en la cola el argumento, que puede ser un token, un símbolo o una regla. Después, (independientemente de si se llama con algún argumento o no) realiza `avanzarUno' a todos los elementos de la cola.  \textbf{avanzar('miregla')} equivale a \textbf{acumular('miregla')} y después \textbf{avanzar()}.
 	
 	\vspace{10px}
 	\noindent
-	\textbf{retroceder}: retrocede uno o varios tokens ya avanzados, símbolos, reglas. Si no se ha avanzado nada el comportamiento es no definido. Es útil para retroceder tokens avanzados en casos de ambigüedad, LL(2) o LL(3) después de comprobar si el 2º o el 3er token no es el esperado. 
+	\textbf{retroceder}: retrocede uno o varios tokens ya avanzados, símbolos, reglas. Si no se ha avanzado nada el comportamiento es no definido. Es útil para retroceder tokens avanzados en casos de ambigüedad, después de comprobar si el 2º o el 3er token no es el esperado. 
 	
 	\vspace{10px}
 	\noindent
-	\textbf{acumular}: encola un token, un símbolo o una regla. Útil para avanzar varias veces un conjunto de reglas, tokens o símbolos.
+	\textbf{acumular}: encola un token, un símbolo o una regla. Útil para preparar la cola para usarla con otros métodos de avance.
 	
 	\vspace{10px}
 	\noindent
-	\textbf{intentar}: recibe un array bidimensional de opciones. Cada array dentro del array es una secuencia de reglas, símbolos o tokens. Se usa para representar las distintas opciones a seguir, aplicándose la primera secuencia que se pueda avanzar completamente. Si no se puede avanzar ninguna de las secuencias en el array, lanza una excepción. 
+	\textbf{intentar}: recibe un array bidimensional de opciones. Cada array dentro del array representa una cola en orden de izquierda a derecha. Esta utilidad intenta avanzar las distintas colas hasta que consigue avanzar una cola por completo. Si no se consigue avanzar ninguna se propaga una excepción. Si se consigue avanzar una cola parcialmente pero se encuentra con un elemento que no se puede avanzar se lanza una excepción. Por lo tanto, las colas deben fallar en el primer elemento, o acertar en todos para que el intento sea efectivo.
 	
 	\vspace{10px}
 	\noindent
-	\textbf{intento}: acumula en la cola un array bidimensional de opciones. El método \textbf{intentar} equivale a primero hacer un \textbf{intento} para acumular en la cola seguido de \textbf{avanzar} para avanzar la cola.
+	\textbf{intento}: acumula en la cola un array bidimensional como el descrito en el método anterior. El método anterior \textbf{intentar} equivale a primero hacer un \textbf{intento} para acumular en la cola seguido de \textbf{avanzar} para avanzar la cola.
 	
 	\vspace{10px}
 	\noindent
-	\textbf{avanzarVarios}: avanza la cola tantas veces como se pueda. Equivale a crear una copia de la cola, \textbf{avanzar}, recuperar la cola de la copia y repetir, tantas veces como se pueda. 
+	\textbf{avanzarVarios}: avanza la cola tantas veces como se pueda. Antes de empezar a avanzar la cola se mantiene una copia (profunda) de la cola. Si se consigue avanzar la cola, se vuelve a intentar avanzar la copia, tantas veces como se pueda antes de que se capture una excepción.   
 	
 	\vspace{10px}
 	\noindent
-	\textbf{avanzarVariosObligatorio}: al igual que \textbf{avanzarVarios} avanza la cola tantas veces como se pueda, pero si no se puede avanzar al menos una vez entonces lanza una excepción. Equivale a llamar a \textbf{avanzar}, recuperar la cola y entonces llamar a avanzarVarios.
+	\textbf{avanzarVariosObligatorio}: al igual que \textbf{avanzarVarios} avanza la cola tantas veces como se pueda, pero si no se puede avanzar al menos una vez entonces se propaga la excepción capturada.
 	
 	\vspace{10px}
-	\textbf{arbol}: después de avanzar reglas, tokens o símbolos, se generan ramas, una por cada \textbf{avanzar}. Si se avanzan n veces, se generan n ramas, siendo la primera la rama 0. \textbf{arbol(2)} accede a la rama generada por el 3er avanzar. Si se llama sin argumento se obtiene el árbol de la regla actual.
+	\noindent
+	\textbf{arbol}: después de avanzar reglas, tokens o símbolos, se generan ramas, una por cada vez que se llame a \textbf{avanzar}, \textbf{avanzarVarios}, \textbf{avanzarVariosObligatorio} o \textbf{intentar}. Si se avanzan n veces, se generan n ramas, siendo la primera la rama 0. \textbf{arbol(2)} accede a la rama generada por el 3er avance. Si se llama sin argumento se obtiene el árbol de la regla actual, es decir, el nodo padre de todas estas ramas. El árbol para cada regla inicia vacío.
 	
 	\vspace{10px}
-	\textbf{registrarResultado}: es el equivalente al \$\$ en Bison. Se usa para registrar el resultado de la regla actual.
+	\noindent
+	\textbf{registrarResultado}: asocia al nodo del árbol de la regla actual un resultado, que se utilizará para obtener información tratada del análisis. Cuando se avanza un terminal el resultado equivale al texto completo que hizo \textit{match} a la expresión regular. Sin embargo, las reglas no terminales deben registrar de forma explícita su resultado. 
 	
 	\vspace{10px}
-	\textbf{resultado}: al igual que el método \textbf{arbol}, después de avanzar un token, un símbolo o una regla se genera un resultado (en el caso de token o símbolo es el texto que hizo \textit{matching} la expresión regular, en caso de una regla es la que se registra con \textbf{registrarResultado}). Si se avanzan n veces, \textbf{resultado(0)} es el resultado generado por el primer avanzar. Si se llama sin argumento, se obtiene el resultado de la regla actual.
-	
-	
-	\subsection{Introducción al analizador}
+	\noindent
+	\textbf{resultado}: se utiliza para obtener los resultados de los avances, registrados por el método \textbf{registrarResultado} o por el \textit{matching} de expresiones regulares. Existe un paralelismo entre el método \textbf{arbol} y el método \textbf{resultado}: si \textbf{arbol(2)} devuelve el árbol de análisis del tercer avance, \textbf{resultado(2)} devuelve el resultado previamente registrado del tercer avance.
 
+	\vspace{10px}
+	
+	Cuando se avanza un \textbf{intento}, el resultado de ese avance es un entero que indica el índice del intento que salió bien. Es decir, si en un intento se pasan 3 colas, y se puede avanzar la última, el resultado de ese avance será el número 2. 
+	
+	\vspace{10px}
+	
+	Cuando se avanza con \textbf{avanzarVarios} o \textbf{avanzarVariosObligatorios} el resultado es un array con cada uno de los resultados individuales. Si se avanza 7 veces la misma cola, se obtiene un array de longitud 7 cuyos elementos son el resultado de cada uno de los avances individuales. 
+	
+
+	\subsection{Tratamiento de la recursividad izquierda}
+	
+	Por ser este analizador recursivo y descendente ninguna regla puede contener recursividad por la izquierda. La recursividad es el problema que desemboca en una recursión infinita cuándo una regla se contiene a sí misma en su definición como el primer elemento a reducir (y por ello está en la izquierda). Si se intentase avanzar tal regla, para poder avanzar debería reducirse a si misma de nuevo, cayendo en un bucle sin fin.
+	
+	Supongamos como regla recursiva por la izquierda la concatenación de nombres separados por punto que se pueden realizar en lenguajes orientados a objetos como Java (System.out.println por ejemplo), y para hacerlo un poco más complejo se permiten números también. Si se quisiera analizar el nombre con la siguiente regla:
+	
+	
+\begin{BVerbatim}
+; Ejemplo de texto válido 
+System.14.out.println
+
+; Expresiónes regulares para terminales
+nombreSimple ::= <(\w+)>
+numero ::= <(\d+)>
+
+; Regla para el análisis
+nombre ::= <nombre> . <nombreSimple> ; Recursivo izquierda
+	| <nombre> . <numero> ; Recursivo izquierda
+	| <nombreSimple> ; No recursivo
+	| <numero> ; No recursivo
+\end{BVerbatim}	
+
+	Para que la regla se pueda avanzar correctamente, tiene que existir al menos una alternativa en la regla que no sea recursiva por la izquierda. Si todas fueran recursivas por la izquierda, se debe factorizar por la izquierda primero para obtener reglas equivalentes con al menos una sin recursividad\cite{conflictoll3}. Como en este caso ya hay una alternativa no recursiva, se puede escribir el código que trata con la recursividad:
+	
+\begin{BVerbatim}
+{
+  // Primero, se debe avanzar las opciones no recursivas.
+  this
+    .intentar([
+    ["nombreSimple"],
+    ["numero"]]);
+  // Después se avanza tantas veces como se 
+  // pueda el resto de las opciones recursivas,
+  // pero sin incluir en el 
+  // principio (que hace recursiva) la propia regla.
+  this
+	  .acumular(".") // Factor común .
+	  .intento([
+	  ["nombreSimple"],
+	  ["numero"]]);
+	  .avanzarVarios(); // Intentar avanzar 0 o más veces.
+}
+\end{BVerbatim}
+
+	\vspace{10px}
+
+	La lógica detrás de este algoritmo es, que si se avanza primero las opciones no recursivas, se rompe la recursividad, ya que si no se puede avanzar ninguna se lanza una excepción. En caso de que se avance alguna de las opciones no recursivas, se intenta avanzar múltiples veces el resto de las opciones eliminando el elemento recursivo, ya que se puede asumir que todo lo avanzado hasta ahora equivale a ese elemento. Por lo tanto se consigue un avance equivalente y no recursivo infinito. 
+	
+	\subsection{Tratamiento de la ambigüedad}
+	
+	El problema de la ambigüedad en ZL ha determinado (en parte) el uso de un analizador propio, descartando los analizadores estudiados anteriormente. Para el tratamiento de la ambigüedad el método sugerido es avanzar paso a paso los primeros elementos que hacen ambigua las opciones. Si tomamos un ejemplo de ambigüedad donde solo se puede saber si debemos avanzar o no después de leer el segundo token, el algoritmo a seguir con las funcionalidades del analizador es el siguiente:
+	
+\begin{BVerbatim}
+; Esta regla es ambigüa porque aunque se lea el token <Y> no se sabe que opción tomar.
+X ::= <Y> <Z>
+  | <Y> <Y>
+  | <Z> <Z>
+
+{
+  try {
+  // Intentar Y Z o Y Y (conflictos de primer token)
+  this
+    .avanzar('Y');
+    .intentar([
+      ['Z'],
+      ['Y']
+    ])
+    // Aquí el código si se pudo avanzar Y Z o Y Y
+  }
+  catch (e) {
+    // Si se caza un error no se pudo 
+    // avanzar el primer elemento o el segundo
+    if (this.arbol().length == 1) {
+      // Se ha podido avanzar el primer Y 
+      // pero no el segundo elemento, error sintáctico 
+      // y propagación del error:
+      throw e;
+    } else {
+      // No se ha podido avanzar ni la 
+      // primera Y, probar entonces con Z Z
+      this
+        .avanzar('Z')
+        .avanzar('Z')
+      ;
+    }
+  }
+}
+\end{BVerbatim}
+
+	En este algoritmo se hace uso de \textbf{\textit{try/catch}}, método para capturar excepciones en Javascript. El objetivo es intentar avanzar primero el token `YY' o `YZ'. Si salta una excepción, entonces descartamos las opciones `YY' y `YZ'. Entonces hay que ver si el fallo está al intentar leer el primer token o el segundo token. Si se falla al leer el primer token (es decir, no se puede leer ni una `Y'), se intenta la opción `ZZ', pero si el fallo está en el segundo token hay que propagar el error, pues el texto a analizar no coincide con ninguna de las tres opciones. 
+
+
+	\subsection{De BNF extendido a javascript}
+	
+	Como el analizador es complejo y cada regla debe definir su comportamiento de forma explícita aquí se enumeran algunos pasos a dar para convertir una regla en BNF a una regla en el analizador. Los ejemplos son notación BNF extendida y después el contenido equivalente de una regla. Se sugiere al lector que vea estos ejemplos con algunas de las reglas en el fichero \textbf{zlsintaxis.js}.
+	
+	\vspace{10px}
+	
+	Ejemplo sencillo de uso de reglas:
+	
+	\begin{BVerbatim}
+X ::= <Y> <Z>
+
+{
+ this
+  .avanzar('Y')
+  .avanzar('Z')
+  ;
+}
+	\end{BVerbatim}
+	
+	\vspace{10px}
+	Típica cadena de expresiones sin importar el orden de las operaciones (1 + 2 * 4 - 13...):
+	
+	\begin{BVerbatim}
+EXP ::= <EXP> <OP> <NUM>
+    | <NUM>
+    
+Que es equivalente a (sin recursividad por la izquierda):
+
+EXP ::= <NUM> (<OP> <NUM>)*    
+ 
+{
+  // Esta regla es muy sencilla de escribir usando la cola
+  this
+   .avanzar('NUM')
+    .acumular('OP')
+    .acumular('NUM')
+   .avanzarVarios()
+   ;
+   // Tratar aquí la operación comprobando el operador y el número.
+   
+} 
+	\end{BVerbatim}
+	
+	\vspace{10px}
+	
+	Regla con dos reglas opcionales en medio:
+	
+	\begin{BVerbatim}
+X ::= <Y> (<A> <B>)? <Z>
+
+Es equivalente a
+
+X ::= <Y> <A> <B> <Z>
+    | <Y> <Z>
+    
+Que equivale a
+
+{
+ this
+  .avanzar('Y') // Factor común para evitar conflictos
+  .intentar([
+   ['A', 'B', 'Z'],
+   ['Z']
+  ])
+}
+	\end{BVerbatim}
+	
+	\vspace{10px}
+	
+	Una regla completa para calcular una operación simple de suma o resta.
+	
+\begin{BVerbatim}
+exp ::= <term> <OPA> <term>     
+    | <term>                
+// exp:
+a.regla('exp', function() {
+  // Avanzar primero un 'term'
+  this
+    .avanzar('term')
+    ;
+  // Después intentar avanzar un 'OPA' y un 'term'
+  try {
+    this
+      .avanzar('OPA')
+      .avanzar('term')
+    ;
+    // Si no salta una excepción, se ha podido avanzar 'OPA' y 'term'
+    // en este caso $$ = $1 + $3 o $$ = $1 - $3 
+    if (this.resultado(1) == '+')
+      this.registrarResultado(this.resultado(0) + this.resultado(2)))
+    else
+      this.registrarResultado(this.resultado(0) - this.resultado(2)))
+  } catch (err) {
+    // Si salta una excepción, no se ha podido avanzar 'OPA' o 'term'
+    // en este caso $$ = parseFloat($1)
+    this.registrarResultado(parseFloat(this.resultado(0)));
+  }
+})
+\end{BVerbatim}
+
+	\subsection{Introducción al analizador}
+	
+	%TODO: Recolocar esta sección entera y purgar si ya no sirve
+	
 	El analizador está definido en el fichero \textbf{analisis.js} y se usa en el \textbf{zlsintaxis.js}. En analisis.js se puede ver la implementación del analizador y en zlsintaxis.js el uso de la herramienta.
 	
 	\vspace{10px}
-
+	
 	El \textbf{analizador} ofrece mecanismos funcionales\cite{javascriptfunctional} para definir reglas, símbolos y tokens. Cada símbolo y cada token se definen en base a una expresión regular, que representa el lenguaje regular que evalúa cada símbolo o token. Ambos mecanismos se usan para definir el léxico del lenguaje, de forma similar a Flex. Sin embargo, a diferencia de Flex, no hay un mecanismo que rompa en tokens y símbolos el texto de entrada, sino que cuando una regla explícitamente pida avanzar un token, se avanzará (si es posible, si no se encuentra el token entonces se lanzará una excepción).
 	
 	\vspace{10px}
@@ -761,37 +970,37 @@ elipse [
 	Por otro lado, en las reglas se debe definir explícitamente como se avanza (o retrocede) así como cuál es el resultado de cada regla (si se pudo aplicar). A diferencia de Bison, dentro de una regla no solo se define cuál es el resultado generado. Si un usuario de bison (en lenguaje C) escribe:
 	
 	\begin{BVerbatim}
-exp: term OPA term     { $$ = ($2 == '+' ? $1 + $3 : $1 - $3); }
-| term                { $$ = $1; }
+	exp: term OPA term     { $$ = ($2 == '+' ? $1 + $3 : $1 - $3); }
+	| term                { $$ = $1; }
 	\end{BVerbatim}
 	
 	Usando el analizador propio puede obtener el equivalente:
 	
 	\begin{BVerbatim}
-// exp:
-a.regla('exp', function() {
- // Avanzar primero un 'term'
- this
-  .avanzar('term')
-  ;
- // Después intentar avanzar un 'OPA' y un 'term'
- try {
-  this
-   .avanzar('OPA')
-   .avanzar('term')
-   ;
-  // Si no salta una excepción, se ha podido avanzar 'OPA' y 'term'
-  // en este caso $$ = $1 + $3 o $$ = $1 - $3 
-  if (this.resultado(1) == '+')
-   this.registrarResultado(this.resultado(0) + this.resultado(2)))
-  else
-   this.registrarResultado(this.resultado(0) - this.resultado(2)))
- } catch (err) {
-  // Si salta una excepción, no se ha podido avanzar 'OPA' o 'term'
-  // en este caso $$ = $1
-  this.registrarResultado(this.resultado(0));
- }
-})
+	// exp:
+	a.regla('exp', function() {
+	// Avanzar primero un 'term'
+	this
+	.avanzar('term')
+	;
+	// Después intentar avanzar un 'OPA' y un 'term'
+	try {
+	this
+	.avanzar('OPA')
+	.avanzar('term')
+	;
+	// Si no salta una excepción, se ha podido avanzar 'OPA' y 'term'
+	// en este caso $$ = $1 + $3 o $$ = $1 - $3 
+	if (this.resultado(1) == '+')
+	this.registrarResultado(this.resultado(0) + this.resultado(2)))
+	else
+	this.registrarResultado(this.resultado(0) - this.resultado(2)))
+	} catch (err) {
+	// Si salta una excepción, no se ha podido avanzar 'OPA' o 'term'
+	// en este caso $$ = $1
+	this.registrarResultado(this.resultado(0));
+	}
+	})
 	\end{BVerbatim}
 	
 	Como se puede observar, a diferencia de usar bison, con el analizador cada regla indica de forma explícita como se debe resolver. Se vuelve mucho más complejo, pero permite controlar al detalle las excepciones, las ambigüedades y la información de error que se propaga. 
@@ -836,116 +1045,18 @@ a.regla('exp', function() {
 	
 	\vspace{10px}
 	\textbf{resultado}: al igual que el método \textbf{arbol}, después de avanzar un token, un símbolo o una regla se genera un resultado (en el caso de token o símbolo es el texto que hizo \textit{matching} la expresión regular, en caso de una regla es la que se registra con \textbf{registrarResultado}). Si se avanzan n veces, \textbf{resultado(0)} es el resultado generado por el primer avanzar. Si se llama sin argumento, se obtiene el resultado de la regla actual.
-	
-	\subsection{Obtener las reglas a partir del BNF extendido}
-	
-	Como el analizador es complejo y cada regla debe definir su comportamiento de forma explícita aquí se enumeran algunos pasos a dar para convertir una regla en BNF a una regla en el analizador. Los ejemplos son notación BNF extendida y después el contenido equivalente de una regla. Sugiero al lector que vea estos ejemplos con algunas de las reglas en el fichero \textbf{zlsintaxis.js}.
-	
-	\vspace{10px}
-	
-	Ejemplo sencillo de uso de reglas:
-	
-	\begin{BVerbatim}
-X ::= <Y> <Z>
 
-{
- this
-  .avanzar('Y')
-  .avanzar('Z')
-  ;
-}
-	\end{BVerbatim}
-
-	\vspace{10px}
-	Una regla con distintas derivaciones (dos de ellas LL(2)):
-	
-	\begin{BVerbatim}
-X ::= <Y> <Z>
-    | <Y> <Y>
-    | <Z> <Z>
-    
-{
- try {
-  // Intentar Y Z o Y Y (conflictos LL(1))
-  this
-   .avanzar('Y');
-   .intentar([
-    ['Z'],
-    ['Y']
-   ])
-  // Aquí el código si se pudo avanzar Y Z o Y Y
- }
- catch (e) {
-  // Si se caza un error no se pudo avanzar el primer elemento o el segundo
-  if (this.arbol().length == 1) {
-   // Se ha podido avanzar el primer Y pero no el segundo elemento, error sintáctico y propagación del error:
-   throw e;
-  } else {
-   // No se ha podido avanzar ni la primera Y, probar entonces con Z Z
-   this
-    .avanzar('Z')
-    .avanzar('Z')
-	;
-  }
- }
-}
-	\end{BVerbatim}
-	
-	\vspace{10px}
-	Típica cadena de expresiones sin importar el orden de las operaciones (1 + 2 * 4 - 13...):
-	
-	\begin{BVerbatim}
-EXP ::= <EXP> <OP> <NUM>
-    | <NUM>
-    
-Que es equivalente a (sin recursividad por la izquierda):
-
-EXP ::= <NUM> (<OP> <NUM>)*    
- 
-{
-  // Esta regla es muy sencilla de escribir usando la cola
-  this
-   .avanzar('NUM')
-    .acumular('OP')
-    .acumular('NUM')
-   .avanzarVarios()
-   ;
-} 
-	\end{BVerbatim}
-	
-	Regla con dos reglas opcionales en medio:
-	
-	\begin{BVerbatim}
-X ::= <Y> (<A> <B>)? <Z>
-
-Es equivalente a
-
-X ::= <Y> <A> <B> <Z>
-    | <Y> <Z>
-    
-Que equivale a
-
-{
- this
-  .avanzar('Y') // Factor común para evitar conflictos por ser LL(2)
-  .intentar([
-   ['A', 'B', 'Z'],
-   ['Z']
-  ])
-}
-	\end{BVerbatim}
-	
 	\subsection{Tabla de símbolos}
 	
 	En el fichero \textbf{entorno.js} se definen varias clases: Modulo, Subrutina, Tipo, TipoInstancia, Declaración y Operación. Las tablas de símbolos se rellenan de forma recursiva: se crea un Modulo vacío al cual se le pasa el árbol generado por el análisis sintáctico. Este módulo a su vez hace lo mismo con las subrutinas y, las subrutinas, hacen a su vez lo mismo con las declaraciones de datos.
 	
 	\vspace{10px}
 	
-	Como tabla de símbolos uso una instancia de \textbf{Modulo} que representa un módulo de ZL. Tal clase puede contener a su vez otros módulos (importados o integrados), puede contener tipos de datos (de módulos importados, además de los tipos primitivos numero, texto, letra, booleano e interno\footnote{Este tipo de datos solo se usa para implementar nuevos tipos de datos nativos}), y puede contener también subrutinas.
+	Como tabla de símbolos se una instancia de la clase \textbf{Modulo} que representa un módulo de ZL. Tal clase puede contener a su vez otros módulos (importados o integrados), puede contener tipos de datos (de módulos importados, además de los tipos primitivos numero, texto, letra, booleano e interno\footnote{Este tipo de datos solo se usa para implementar nuevos tipos de datos nativos}), y puede contener también subrutinas.
 	
 	\vspace{10px}
 	
-	Las subrutinas se representan, obviamente, mediante la clase Subrutina. Almacenan la información de las distintas \textbf{declaraciones} de datos así como la posición dentro del código ZL de las distintas partes (dónde empieza y acaba la cabecera de la subrutina, donde empieza y acaban las declaraciones de datos, donde empieza el algoritmo...) para poder tener un \textbf{contexto inteligente} a la hora de \textbf{autocompletar}. Si una Subrutina pertenece a un Modulo que, a su vez, ha sido importado, y por lo tanto, es un nuevo tipo de datos, tal subrutina se comportará como un método del tipo de datos. Los \textbf{datos} de ámbito \textbf{global} se comportarán a su vez como \textbf{miembros} de la clase (si hablasemos de clases). 
+	Las subrutinas se representan mediante la clase \textbf{Subrutina}. Almacenan la información de las distintas \textbf{declaraciones} de datos así como la posición dentro del código ZL de las distintas partes (dónde empieza y acaba la cabecera de la subrutina, donde empieza y acaban las declaraciones de datos, donde empieza el algoritmo...) para poder tener un \textbf{contexto inteligente} a la hora de \textbf{autocompletar}. Si una Subrutina pertenece a un Modulo que, a su vez, ha sido importado, y por lo tanto, es un nuevo tipo de datos, tal subrutina se comportará como un método del tipo de datos. Los \textbf{datos} de ámbito \textbf{global} se comportarán a su vez como \textbf{miembros} de la clase (si hablasemos de clases). 
 	
 	\vspace{10px}
 	
@@ -966,7 +1077,7 @@ Que equivale a
 	
 	\subsection{Análisis léxico}
 	
-	El análisis léxico (y el sintáctico) se hace con el analizador que, a diferencia de un esquema Flex + Bison, no hay dos componentes distintos. No hay un componente que primero rompa en tokens de distintas clases el texto, sino que son las reglas sintácticas las que dicen que tokens esperan ver. Es decir, si una regla no indica que ahora hay que intentar avanzar un token X, no se va a intentar `romper' el texto con ese token.
+	El análisis léxico (y el sintáctico) se hace con el analizador que, a diferencia de un esquema (por ejemplo) Flex + Bison, no hay dos componentes distintos. No hay un componente que primero rompa en tokens de distintas clases el texto, sino que son las reglas sintácticas dicen que tokens esperan ver, al avanzar usando la cola. Es decir, si al llamar a un método de avance del analizador en la cola hay un terminal, se intentará entonces analizar con una expresión regular ese terminal en la posición actual del texto. 
 	
 	Los tokens y los símbolos del lenguaje se definen en el analizador mediante los métodos simbolo y token. Se puede ver cuales son los símbolos y los tokens de ZL al principio de \textbf{zlsintaxis.js}. 
 	
@@ -976,7 +1087,7 @@ Que equivale a
 	
 	\vspace{10px}
 	
-	A ojos del analizador no existe diferencia entre token y símbolo, salvo que los tokens tienen un número de prioridad que, al final, no se usa porque las reglas definen explícitamente el orden de cada avance, aunque podría usarse dentro de las reglas. 
+	A ojos del analizador no existe diferencia entre token y símbolo, salvo que los tokens tienen un número de prioridad que, al final, no se usa porque las reglas definen explícitamente el orden de cada avance, aunque se definieron para un posible uso dentro de las reglas. 
 
 	\vspace{10px}
 	
@@ -992,11 +1103,11 @@ Que equivale a
 	
 	\vspace{10px}
 	
-	Lo último destacable del léxico es que los espacios y los comentarios (de tipo C, Javascript, Java, C++...) se ignoran todos salvo un caso muy específico (\hyperref[subrutinasprimitivas]{subrutinas primitivas}).
+	Lo último destacable del léxico es que los espacios y los comentarios (de tipo C, Javascript, Java, C++...) se ignoran todos salvo un caso muy específico: las (\hyperref[subrutinasprimitivas]{subrutinas primitivas}).
 	
 	\subsection{Análisis sintáctico}
 	
-	De este análisis se ha hablado en los distintos apartados anteriores. En la introducción al analizador y el apartado que explica como obtener las reglas a partir del BNF se indica como son las reglas sintácticas del lenguaje. Se puede ver en detalle como se implementa cada regla en el fichero \textbf{zlsintaxis.js}, después de pasar la sección que define el léxico. 
+	En la introducción al analizador y el apartado que explica como obtener las reglas a partir del BNF se indica como son las reglas sintácticas del lenguaje. Se puede ver en detalle como se implementa cada regla en el fichero \textbf{zlsintaxis.js}, después del trozo de código que define el léxico. 
 	
 	\vspace{10px}
 	
@@ -1004,7 +1115,154 @@ Que equivale a
 	
 	\vspace{10px}
 	
-	La implementación del análisis sintáctico así como las reglas que intervienen en cada estructura gramatical se pueden ver en el fichero \textbf{zlsintaxis.js}, así que me centraré en describir la estructura sintáctica del lenguaje, en vez de describir el proceso analítico que se puede ver en el propio código.
+	La implementación del análisis sintáctico así como las reglas que intervienen en cada estructura gramatical se pueden ver en el fichero \textbf{zlsintaxis.js}, y voy a tomar algunas reglas\footnote{Lo mejor hubiera sido ponerlas todas, pero se haría muy largo y muy pesado de leer.} de este fichero para explicar cómo se genera el árbol sintáctico usando los métodos de registrar resultado.
+	
+	\vspace{10px}
+	
+	Saltemos por ejemplo a la regla \textbf{Subrutina}. Esta regla se usa para analizar las subrutinas dentro de un módulo. Sintácticamente hablando, la subrutina tiene una cabecera con un nombre y unos modificadores de subrutina, una sección de datos y una algorítmica. El árbol que se genere de una subrutina tendrá pues, que contener toda esta información:
+	
+\begin{BVerbatim}
+{
+    // Cabecera
+  this.avanzar(":subrutina") // terminal
+    .acumular("subModificador").avanzarVarios()
+    .avanzar("nombreSimple")
+    // Datos
+    .avanzar("datos") // terminal
+    .acumular("declaracion").avanzarVarios()
+    // Algoritmo
+    .avanzar("algoritmo") // terminal
+    .acumular("sentencia").avanzarVarios()
+    // Fin
+    .avanzar("fin"); // terminal
+  var sub = {
+    nombre: this.resultado(2),
+    modificadores: this.resultado(1),
+    datos: this.resultado(4) || [],
+    sentencias: this.resultado(6) || [],
+    secciones: {
+      cabecera: [this.arbol(0).begin, this.arbol(2).end],
+      datos: [this.arbol(3).begin, this.arbol(4).end],
+      algoritmo: [this.arbol(5).begin, this.arbol(7).begin]
+    }
+  };
+  // Buscar si es primitiva y leer el comentario:
+  for (var i = 0; i < sub.modificadores.length; i++) {
+    if (sub.modificadores[i].toLowerCase() === "primitiva") {
+      sub.segmentoPrimitivo = 
+        this.texto.substring(sub.secciones.algoritmo[0] + 10, 
+        sub.secciones.algoritmo[1]).trim();
+    }
+  }
+  this.registrarResultado(sub);
+  return this;
+}
+\end{BVerbatim}
+
+	\vspace{10px}
+	
+	En todas las reglas se debe devolver el objeto `this' para mantener un patrón de Javascript llamado patrón de cadena (que no es de interés para este trabajo en concreto). Antes del \textit{return} se puede ver que se registra el resultado `sub', un objeto Javascript que contiene toda la información relacionada con la subrutina: nombre, modificadores (de subrutina), datos (declaraciones), sentencias (lista de sentencias que componen el algoritmo), y un objeto secciones que contiene donde empieza y acaba en el texto cada sección de la subrutina. 
+	
+	\vspace{10px}
+	
+	Adicionalmente hay un bucle `for' que analiza la lista de modificadores en busca del modificador `primitiva'. Este modificador altera el análisis, haciendo que, si está presente, se añada un nuevo elemento al resultado con el texto en crudo de la sección algoritmo. Para entender por qué se hace esto, ver la sección \hyperref[subrutinasprimitivas]{subrutina primitiva}.
+	
+	\vspace{10px}
+	
+	Como siguiente ejemplo tomo la regla \textit{listaValores}, que busca una lista de valores separados por comas, que componen el contenido de una lista. Es obligatorio que haya al menos un valor en esta lista, y el primer elemento hay que tratarlo distinto pues no es precedido de ninguna coma.
+	
+\begin{BVerbatim}
+{
+  this.expresion()
+    .acumular(",")
+    .acumular("expresion").avanzarVarios();
+  var res = [this.resultado(0)];
+  for (var i = 0; i < this.resultado(1).length; i++) {
+    res.push(this.resultado(1)[i][1]);
+  }
+  this.registrarResultado(res);
+  return this;
+}
+\end{BVerbatim}
+
+	\vspace{10px}
+
+	En esta regla cabe destacar un mecanismo no descrito en la documentación anterior: si una regla tiene un nombre sin espacios lo siguiente es equivalente:
+	
+\begin{BVerbatim}
+this.expresion();
+y
+this.avanzar("expresion");
+\end{BVerbatim}	
+
+	\vspace{10px}
+
+	Después se puede ver como se define un array, al que se le van a concatenar los `expresion' ignorando la coma (que es un separador y no tiene interés semántico). Para entender bien la línea this.resultado(1)[i][1] ponemos el esquema del árbol de resultados generado al analizar 1,4+7,pi-3:
+	
+	
+	
+	\begin{center}
+	\includegraphics[width=0.5\linewidth]{analisisejemplo}
+	
+	En este diagrama, this.resultado(1) es el nodo avanzarVarios. this.resultado(1)[i] es la i-ésima secuencia compuesta de una coma seguida de una expresión. this.resultado(1)[i][1] es la expresión de tal secuencia. 
+	\end{center}
+
+	\vspace{10px}
+
+	Tomando como último ejemplo el si condicional, estructura algorítmica que puede llevar concatenado otro si condicional (equivalente a un else):
+	
+\begin{BVerbatim}
+{
+  // Romper la ambiguedad LL(3) entre
+  // si no x hacer
+  // si no hacer
+  try {
+    this.avanzar("si")
+      .avanzar("no")
+      .avanzar("hacer")
+  } catch (e) {
+    if (!zl.error.esError(e))
+      throw e;
+    // Si no se puede hacer el si no hacer, intentar la reducción de verdad
+    this.retroceder(this.arbol().length);
+    this.avanzar("si")
+      .expresion()
+      .avanzar("hacer")
+      .acumular("sentencia").avanzarVarios();
+    this.intentar([
+      ["fin"],
+      ["sinocondicional"],
+      ["sino"]
+    ]);
+    var intento = this.resultado(4);
+    if (intento == 0) {
+      this.registrarResultado({
+      condicion: this.resultado(1),
+      sentencias: this.resultado(3)
+      });
+    } else {
+      this.registrarResultado({
+        condicion: this.resultado(1),
+        sentencias: this.resultado(3),
+        siguiente: this.resultado(4, intento, 0)
+      });
+    }
+    return this;
+  }
+  // Si no se llama al catch, es porque se pudo hacer un si no hacer.
+  // En el caso de si no hacer, retroceder 3 y lanzar error:
+  this.retroceder(3);
+  throw zl.error.newError(zl.error.E_SIMBOLO, this.arbol());
+});
+\end{BVerbatim}
+	
+	Esta regla se vuelve más compleja ya que contiene el código explícito que rompe una ambigüedad de tres tokens: `si no hacer'/`si no \{expresion\} hacer'. La primera equivale a un \textit{else} en C y la segunda a un \textit{if(!\{expresion\})} en C (negación de una expresión dentro de una condición). La lógica detrás del algoritmo para romper la ambigüedad es la siguiente: se intenta (con try) avanzar si-no-hacer. Si se consigue, entonces no es un \textbf{sicondicional} (es un \textbf{sino}), se retrocede 3 tokens y se lanza una excepción. Con esto se consigue que el algoritmo de análisis intente la siguiente opción posible, y descarte el \textbf{sicondicional}. 
+	
+	\vspace{10px}
+	
+	En caso de que el intento si-no-hacer falle (se capture una excepción), se descarta la ambigüedad y se intenta avanzar la regla sin problemas. Para distinguir si la excepción capturada es a causa de un error en el análisis o de un error de Javascript utilizo la función esError de la biblioteca zl.error, que devuelve verdadero si el objeto capturado en la excepción es un error zl. En caso de que el error no sea de análisis lo propago.
+	
+	%TODO: Borrar de aquí para abajo
 	
 	\vspace{10px}
 	
