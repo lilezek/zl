@@ -17,8 +17,6 @@ Warning--entry type for "statictypecheck" isn't style-file defined
 --line 51 of file biblio.bib
 Warning--entry type for "pegjs" isn't style-file defined
 --line 59 of file biblio.bib
-Warning--entry type for "lookahead" isn't style-file defined
---line 67 of file biblio.bib
 Warning--entry type for "mundoingles" isn't style-file defined
 --line 75 of file biblio.bib
 Warning--entry type for "conflictoll3" isn't style-file defined
@@ -31,8 +29,6 @@ Warning--entry type for "codemirrorsyntaxhighlight" isn't style-file defined
 --line 107 of file biblio.bib
 Warning--entry type for "codemirrorautocomplete" isn't style-file defined
 --line 115 of file biblio.bib
-Warning--entry type for "javascriptfunctional" isn't style-file defined
---line 123 of file biblio.bib
 Warning--entry type for "levensthein" isn't style-file defined
 --line 131 of file biblio.bib
 Warning--entry type for "lcs" isn't style-file defined
@@ -55,45 +51,45 @@ Warning--entry type for "syntaxhighlight" isn't style-file defined
 --line 203 of file biblio.bib
 Warning--entry type for "microsoftresearchautocomplete" isn't style-file defined
 --line 211 of file biblio.bib
-You've used 26 entries,
+You've used 24 entries,
             2213 wiz_defined-function locations,
-            604 strings with 6837 characters,
-and the built_in function-call counts, 5308 in all, are:
-= -- 432
-> -- 152
+            602 strings with 6759 characters,
+and the built_in function-call counts, 4985 in all, are:
+= -- 403
+> -- 153
 < -- 0
 + -- 69
-- -- 42
-* -- 262
-:= -- 789
-add.period$ -- 26
-call.type$ -- 26
-change.case$ -- 104
+- -- 43
+* -- 242
+:= -- 763
+add.period$ -- 24
+call.type$ -- 24
+change.case$ -- 96
 chr.to.int$ -- 0
-cite$ -- 26
-duplicate$ -- 286
-empty$ -- 625
-format.name$ -- 42
-if$ -- 1177
+cite$ -- 24
+duplicate$ -- 264
+empty$ -- 577
+format.name$ -- 43
+if$ -- 1095
 int.to.chr$ -- 0
-int.to.str$ -- 26
-missing$ -- 26
-newline$ -- 88
-num.names$ -- 42
-pop$ -- 260
+int.to.str$ -- 24
+missing$ -- 24
+newline$ -- 82
+num.names$ -- 43
+pop$ -- 240
 preamble$ -- 1
-purify$ -- 78
+purify$ -- 72
 quote$ -- 0
-skip$ -- 181
+skip$ -- 167
 stack$ -- 0
-substring$ -- 131
-swap$ -- 26
+substring$ -- 122
+swap$ -- 24
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 104
+type$ -- 96
 warning$ -- 0
-while$ -- 42
-width$ -- 28
-write$ -- 217
-(There were 26 warnings)
+while$ -- 43
+width$ -- 26
+write$ -- 201
+(There were 24 warnings)

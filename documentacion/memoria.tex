@@ -64,8 +64,6 @@
 
 	Algunos de los puntos que se han perseguido durante la creación de este trabajo son los siguientes:
 	
-	%TODO: Eliminar este itemize
-	
 	\begin{itemize}
 		\item El lenguaje debe estar en la medida de lo posible en castellano. Es posible que iniciados que no conozcan inglés se beneficien de este punto.
 		\item El lenguaje preferiblemente será tipado, con comprobación de tipos \cite{statictypecheck}\cite{typesafety} y sin operaciones de memoria \cite{memorysafety} (como los punteros de C o C++, que permiten el bypass de tipos). 
@@ -91,18 +89,14 @@
 	Durante el estado del arte se han localizado algunos puntos que considero importantes para el trabajo. Por ejemplo, uno de los proyectos (\textbf{Descubre}) define un lenguaje propio (\textbf{iJava}, un derivado imperativo de Java), al igual que este trabajo que define su propio lenguaje (ZL). Por otra parte, todos los proyectos estudiados coinciden en que se \textbf{desarrollan sobre web} y que \textbf{compilan de forma transparente}, y ofrecen un editor `inteligente' (con autocompletado, con coloreado de sintaxis...), objeto que se busca también en este trabajo. Se prefiere un lenguaje común antes que un lenguaje ingenieril, ya que es posible que sea más sencillo de entender para usuarios nuevos, a la hora de mostrar errores en la compilación (el proyecto Khan Academy \hyperref[app:d]{hace uso de esta técnica}).
 	
 	\chapter{Estado del arte}
-	
-	%TODO: Cita sobre utilidad de los sitios.
 
-	Se ha basado el estudio del arte en tres partes: la primera ha sido buscar proyectos enfocados al aprendizaje de la programación. Estos sitios aunque \hyperref[app:b]{estéticamente} parecen enfocados a personas jóvenes son muy útiles realmente para cualquiera que quisiera iniciarse (según afirman ellos mismos).  
+	Se ha basado el estudio del arte en tres partes: la primera ha sido buscar proyectos enfocados al aprendizaje de la programación. Estos sitios aunque \hyperref[app:b]{estéticamente} parecen enfocados a personas jóvenes son muy útiles realmente para cualquiera que quisiera iniciarse (según afirman estos sitios).  
 	
 	Como todos los sistemas desarrollados son web, todos usan como tecnología HTML5 (Canvas para dibujar) y Javascript.
 
 	La segunda parte ha sido enfocada en estudiar los diferentes analizadores gramaticales disponibles en Javascript. La creación de un lenguaje nuevo (ZL, del cual se habla más adelante) y su propio compilador (se descarta la opción de hacer un intérprete) impone la necesidad de usar alguna técnica de análisis del lenguaje. El compilador del lenguaje deberá compilar a Javascript para poder ser evaluado dentro del marco del explorador web.
 	
 	Por último, una vez que se tiene el lenguaje y el compilador, falta un editor para poder escribir el código que se va a compilar. En la práctica aquí no hago un estudio de distintas alternativas de editores de texto en HTML+Javascript porque previo al proyecto ya conozco una tecnología que ofrece todo lo necesario (en concreto, Codemirror de la cual se habla en su sección del estado del arte), y que además es la misma tecnología que usan proyectos de los cuales se estudia (Descubre, por ejemplo, integra su editor Codemirror para poder escribir código iJava).
-	
-	\vspace{10px}
 	
 	\section{Entornos de aprendizaje a la programación}
 	
@@ -114,9 +108,10 @@
 	
 	La herramienta Descubre, desarrollada por Juan Antonio Sánchez Laguna, Marcos Menárguez Tortosa, y Juan Antonio Martínez Navarro, reúne un editor de un lenguaje propio (\textbf{iJava}), un entorno con un editor de texto (\textbf{CodeMirror}, con coloreado de sintaxis entre otras ayudas a la escritura de código) y un entorno de ejecución que permite escribir \textbf{programas} de \textbf{entrada} (usando diálogos bloqueantes) y \textbf{salida} de texto (a un div HTML), o bien para \textbf{dibujar en un lienzo} de 320x320 (en HTML5 canvas).
 	
-	%TODO: Cita al manual de iJava
+	iJava es un lenguaje que retira de Java la orientación a objetos, convirtiéndolo en un lenguaje imperativo que respeta la sintaxis de Java. Parece 
+	sensato pensar que este lenguaje es un buen puente entre los alumnos que se inician y quieran programar en Java en un futuro.
 	
-	iJava es un lenguaje que retira de Java la orientación a objetos, convirtiéndolo en un lenguaje imperativo que respeta la sintaxis de Java. Parece sensato pensar que este lenguaje es un buen puente entre los alumnos que se inician y quieran programar en Java en un futuro.
+	Manual de iJava: \url{http://descubre.inf.um.es/aprende.php}
 	
 	El estilo de programación y las funcionalidades que ofrece están inspiradas en Processing, otro lenguaje y entorno de programación que prima la sencillez y se enfoca en el dibujado:
 	
@@ -125,8 +120,6 @@
 	Otro punto destacable de esta herramienta es que \textbf{los usuarios pueden registrarse}, almacenar sus códigos para editarlos en un futuro y, si los usuarios marcan los \textbf{códigos} como \textbf{públicos}, \textbf{cualquiera puede clonar} el código y hacer una ramificación. 
 	
 	Usando esa parte de la herramienta, docentes como Ginés García Mateos han subido de forma pública a Descubre programas públicos (por ejemplo, una versión del Arkanoid) que alumnos pueden clonar y editar para sus propias versiones.
-	
-	%TODO: Cita de arkanoid
 	
 	\vspace{10px}
 	
@@ -221,64 +214,27 @@
 	Acceso: 
 	\href{https://es.khanacademy.org/computing/hour-of-code/hour-of-code-tutorial/p/intro-to-drawing}{Intro to Drawing}
 	
-	\section{Resumen de teoría de compiladores}
-	
-	Toda está sección hace referencia a la documentación de la asignatura de compiladores por el grado de ingeniería informática en la Universidad de Murcia.
-	%TODO: Rellenar esta sección con la teoría de la asignatura.
-	
-	\subsection{Estructura básica de un compilador}
-	
-	Un compilador es una herramienta que obtiene, a partir de un código escrito en lenguaje fuente (lenguaje de alto nivel), código escrito en otro lenguaje destino (lenguaje de bajo nivel). La utilidad de esta herramienta reside en transformar de un lenguaje atribuido de unas utilidades (normalmente la facilidad de escribir código) en otro lenguaje con otras utilidades (normalmente un lenguaje que se puede ejecutar en algún autómata). 
-	
-	\vspace{10px}
-	
-	Un ejemplo de compilador podría ser \textbf{GNU GCC}, que traduce (entre otros lenguajes) C a código ensamblador de la máquina que lo ejecuta. El código ensamblador es, por norma general, más complejo de escribir para realizar las mismas tareas que un código escrito en C. Sin embargo, el código ensamblador \textbf{correctamente estructurado} puede ser ejecutado directamente por el hardware, a diferencia de C.
-		
-	\subsection{Análisis léxico}
-	
-	\subsection{Análisis sintáctico descendente}
-	
-	\subsection{Análisis sintáctico ascendente}
-	
-	\subsection{Árbol sintáctico}
-	
-	\subsection{Análisis semántico}
-	
-	\subsection{Generación de código}
-
-	\section{Desarrollo de compiladores en javascript}
-	
-	%TODO: Reestructurar esta sección
-	%TODO: Describir como funcionan los analizadores, pero no hablar de ZL.
-	
 	\subsection{Analizador ascendente: Jison}
 	
 	Jison es un proyecto escrito en Javascript que ofrece las herramientas similares a GNU Bison, un analizador de gramáticas libres de contexto de tipo LALR(1) \cite{bison}.
 	
-	Según mis cálculos (indicados más adelante) en el apartado \textit{Definición del lenguaje ZL} es necesario al menos un analizador que avance 3 tokens antes de conocer la derivación a realizar. Así que descarto Jison ya que no creo que sea suficientemente potente para analizar ZL. 
+	El análisis se basa en dos fases: una primera fase rompe en tokens el texto (análisis léxico) y una segunda analiza los tokens y toma unas reglas u otras (análisis sintáctico).  
 	
 	Acceso:
 	\href{https://github.com/zaach/jison}{Github de jison}	
 	
 	\subsection{Análisis descendente: pegjs}
 	
-	El analizador de gramáticas de expresiones\cite{peg} (en inglés Parsing Expression Grammar, o PEG) es un tipo de analizador que se define como más potente que cualquier LL(K) o LR(K)\cite{pegjs}. Mi primer intento fue usar este analizador para parsear ZL (más adelante hablo de los problemas que tuve y que me hicieron cambiar de analizador) ya que tiene una herramienta online que me permitía probarlo y así definir el lenguaje desde el principio. Además, al estar escrito en Javascript se adecuaba perfectamente a mis necesidades:
+	El analizador de gramáticas de expresiones\cite{peg} (en inglés Parsing Expression Grammar, o PEG) es un tipo de analizador que se define como más potente que cualquier LL(K) o LR(K)\cite{pegjs}. Tiene una herramienta online para probar el analizador que define un metalenguaje para definir las reglas de un lenguaje a analizar. Al igual que Jison está escrito en Javascript.
 	
 	Acceso a la prueba online:
 	\href{http://pegjs.org/online}{http://pegjs.org/online}
 	
 	\subsection{Analizador descendente por prioridad de operadores}
 	
-	%TODO: Formalizar apartado, revistar teoría de compiladores.
-	
 	El analizador descendente (Top Down) por orden de prioridad de operadores (Operator Precedence) fue presentado por Vaughan Pratt en el año 73 \cite{acmtdop}. El analizador se basa en definir unos símbolos, unas expresiones y unos operadores (indicando su prioridad de forma numérica) con funciones recursivas que indican el comportamiento a la hora de ir avanzando recursivamente.
 	
-	En principio mi plan era utilizar este analizador como LL(3), pero mientras avanzaba con la implementación del análisis, ceñirse estrictamente al uso de este analizador era cada vez más difícil. 
-	
-	Sin embargo, este tipo de análisis ha inspirado la forma en la que he escrito el analizador sintáctico, usando reglas de derivación de forma recursiva donde en cada una de ellas se indica
-	cómo se debe avanzar y cuál es el resultado generado. 
-	
-	Acceso:
+	Se puede encontrar más información sobre la teoría y una implementación del analizador en este sitio: 
 	\href{http://javascript.crockford.com/tdop/tdop.html}{Texto de Douglas Crockford}
 		
 	\section{Editores de texto para Javascript y HTML}
@@ -294,41 +250,28 @@
 	%TODO: Edu: ¿Capítulo vacío?
 	
 	\section{Objetivos para un nuevo entorno de aprendizaje de programación}
+	
+	Los objetivos principales han sido crear un lenguaje con palabras cercanas al lenguaje común español, un editor de texto inteligente y un compilador de dicho lenguaje, buscando en la medida de lo posible la facilidad y la utilidad. 
+	
+	\vspace{10px}
+	
+	El primer objetivo pasa por definir el lenguaje. Este objetivo es básicamente encontrar una forma de definir el lenguaje, en el cual me acabé decantando por la forma de Backus-Naur\cite{bnf} con alguna modificación, aunque también estudié la posibilidad de usar DCG\cite{dcg} pero la descarté por parecer más compleja de entender. 
+	
+	\vspace{10px}
 
-	%TODO: Revisar esta sección.
-	
-	Los objetivos principales han sido crear un lenguaje con palabras cercanas al lenguaje común español, un editor de texto amigable y un compilador de dicho lenguaje, buscando en la medida de lo posible el respaldo de unos usuarios a los que medía su grado de entedimiento.
+	El segundo objetivo es escribir el compilador, pero para ello es necesario un entorno para poder probar el el propio compilador, así que como objetivo intermedio se hizo el editor. Se escogió Codemirror porque es sencillo, tiene buena documentación, ofrece un plugin para colorear texto\cite{codemirrorsyntaxhighlight} y otro para autocompletar\cite{codemirrorautocomplete}. 
 	
 	\vspace{10px}
 	
-	%TODO: eliminar el feedback.
-	He empleado una metodología que he separado en tres pasos: investigación, implementación y feedback. Con esos tres pasos he hecho varias iteraciones. En esta sección la parte de la implementación solo la resumo ya que más adelante se habla en detalle de las implementaciones.
-	
-	\vspace{10px}
-	
-	El primer objetivo era definir el lenguaje. Aunque ha ido cambiando a lo largo de todo el proyecto, gran parte de lo definido al principio no ha cambiado. Aquí la investigación ha sido básicamente encontrar una forma de definir el lenguaje, en el cual me acabé decantando por la forma de BNF\cite{bnf} con alguna modificación, aunque también estudié la posibilidad de usar DCG\cite{dcg} pero la descarté por parecer más compleja de entender. 
-	
-	La implementación ha sido sencillamente escribir la sintaxis en formato BNF (\hyperref[app:a]{en el apéndice A o el fichero sintaxis.txt}), y el feedback ha sido preguntar a los usuarios sobre que estructuras y palabras les han parecido más sencillas de comprender dando a elegir entre varias opciones (las constantes booleanas verdadero/falso o cierto/falso o verdadero/mentira, entre otras).
-	
-	\vspace{10px}
-	
-	%TODO: Informal
-	El segundo objetivo es escribir el compilador, pero para ello necesito un editor para poder ir haciendo las pruebas, así que como objetivo intermedio se hace el editor. La investigación aquí es corta: ya conozco codemirror y además se usa en Descubre para iJava, sé que ofrece un plugin sencillo para colorear texto\cite{codemirrorsyntaxhighlight} y un plugin para autocompletar\cite{codemirrorautocomplete}. 
-	
-	La implementación para este objetivo es relativamente sencilla, y se divide entre los ficheros \textbf{index.html} (se instancia el editor), \textbf{autocompletar.js} (se definen las órdenes de autocompletado) y \textbf{editor.js} (se definen las órdenes de coloreado de sintaxis). Aquí el feedback que he podido obtener de los usuarios ha sido relativo a la facilidad de lectura del texto y a la facilidad del autocompletado, habiendo cambiado el algoritmo de autocompletado gracias a las indicaciones de los usuarios (de un algoritmo LCS\cite{lcs} a uno que use distancias de Levensthein\cite{levensthein}). 
-	
-	Una vez definido lenguaje y editor, falta el último objetivo, el más complejo y quizá el más importante: el compilador. Al principio, al ver las distintas alternativas de analizadores escritos en Javascript opté por usar pegjs (en la siguiente sección se explica con más detalle), pero al final he escrito mi propio analizador. La diferencia entre escribir mi propio analizador y usar otro tampoco es tan grande ya que después de analizar la gramática libre de contexto hay que generar una tabla de símbolos, hacer comprobaciones semánticas y luego transformar a Javascript, que es la parte más compleja con diferencia.
-	
-	El compilador se separa en varios ficheros, pero como son muchos entraré en más detalle sobre la implementación en la sección de la estructura del compilador para ZL. De aquí no puedo obtener mucho feedback salvo la generación de errores si el código escrito no pasa alguna de las fases de compilación, para ver si los usuarios son capaces de entender los errores y corregirlos.
+	Una vez definido lenguaje y  con un editor en el entorno, falta el último objetivo, que es el compilador de dicho lenguaje. Tal compilador debe ser capaz de compilar el lenguaje definido como primer objetivo, el cual tiene ambigüedades porque usa lenguaje cercano al lenguaje natural.
 	
 	\section{Definición del lenguaje ZL}
 	
-	A la hora de definir el lenguaje ZL el esfuerzo se ha enfocado en que fuese cercano al lenguaje natural, y que estuviese en español\cite{mundoingles}. Si bien la definición del lenguaje se podría someter a pruebas (como encuestas) para comprobar su eficacia y pulir 
-	los defectos y deficiencias que pudiera tener, se ha basado principalmente en mi experiencia como programador. 
+	A la hora de definir el lenguaje ZL el esfuerzo se ha enfocado en que fuese cercano al lenguaje natural, y que estuviese en español\cite{mundoingles}. Si bien la definición del lenguaje se podría someter a pruebas (como encuestas) para comprobar su eficacia y pulir los defectos y deficiencias que pudiera tener, se ha basado principalmente en mi experiencia como programador. 
 	
 	\vspace{10px}
 	
-	El léxico se ha escogido por su cercanía al lenguaje natural, y no en base a su `practicidad'. Si asumimos que es práctico usar palabras cortas y estructuras sencillas como podría ser bucle `while' de C (y de Java, C\#...) se ha preferido usar estructuras más cercanas al lenguaje humano: `mientras <se de una condición> hacer <un conjunto de pasos> fin', aunque sean más largas de escribir y más complejas de analizar.
+	El léxico se ha escogido por su cercanía al lenguaje natural, y no en base a su `practicidad'. Si asumimos que es práctico usar palabras cortas y estructuras sencillas como podría ser bucle `while' de C (y de Java, C\#...) se ha preferido usar estructuras más cercanas al lenguaje humano: `mientras \textit{se de una condición} hacer \textit{un conjunto de pasos} fin', aunque sean más largas de escribir y más complejas de analizar.
 	
 	\vspace{10px}
 	
@@ -338,24 +281,30 @@
 	
 	\subsection{Notación BNF ampliada}
 	
-	La notación BNF que utilizo para dar una definición formal al lenguaje es una notación BNF a la cual he añadido paréntesis para agrupar, y los operadores *, + y ? como operadores de repetición. Funcionan como en las expresiones regulares: * para indicar cero o más veces, + para indicar uno o más veces, y ? para indicar cero o una veces. También utilizo los corchetes \[\] para agrupar un conjunto opcional (cero o una veces), equivalente a usar paréntesis y el símbolo ?.
+	La notación BNF que utilizo para dar una definición formal al lenguaje es una notación BNF a la cual he añadido paréntesis para agrupar, y los operadores *, + y ? como operadores de repetición. Funcionan como en las expresiones regulares: * para indicar cero o más veces, + para indicar uno o más veces, y ? para indicar cero o una veces. También utilizo los corchetes [
+	] para agrupar un conjunto opcional (cero o una veces), equivalente a usar paréntesis y el símbolo ?.
+	
+	\vspace{10px}
 	
 	Los siguientes ejemplos son equivalentes en BNF:
 	
 	\begin{BVerbatim}
-	BNF extendido:
-	a ::= b c?
-	x ::= (y z)*
-	j ::= k (l m)+
+BNF extendido:
+a ::= b c?
+x ::= (y z)*
+j ::= k (l m)+
 	
-	BNF:
-	a ::= b
-	| b c
-	j_plus ::= l m
-	| j_plus l m	
-	j ::= k j_plus
-	x ::= 
-	| y z x
+BNF:
+a ::= b
+  | b c
+
+j_plus ::= l m
+       | j_plus l m	
+
+j ::= k j_plus
+
+x ::= 
+  | y z x
 	\end{BVerbatim}
 	
 	Por último, utilizo los puntos y comas para indicar comentario.
@@ -370,7 +319,7 @@
 	
 	\vspace{10px}
 	
-	El lenguaje es totalmente insensible a mayúsculas y minúsculas salvo para los literales de tipo texto, similar a Pascal. 
+	El lenguaje es totalmente insensible a mayúsculas y minúsculas salvo para los literales de tipo texto. Es decir, cualquier nombre o palabra reservada se acepta en cualquier combinación de mayúsculas y minúsculas y no altera el comportamiento. Sin embargo, los literales de texto si difieren en mayúsculas o minúsculas, y pueden alterar el comportamiento.
 	
 	\vspace{10px}
 	
@@ -416,7 +365,7 @@ Fin
 	
 	\vspace{10px}
 	
-	En el \textbf{cuerpo} de la subrutina obligatoriamente aparecen los \textbf{datos} (definición del léxico) y el \textbf{algoritmo} (sobre el léxico definido) en ese orden. En los datos se indica la definición de cada uno de los elementos del léxico, con un nombre, un tipo de datos, y un modificador (opcional) de ámbito (local, global, o de entrada o salida). En el algoritmo se reúnen \textbf{sentencias}, que son los pasos a realizar sobre los datos definidos.  
+	En el \textbf{cuerpo} de la subrutina obligatoriamente aparecen los \textbf{datos} (definición del léxico) y el \textbf{algoritmo} (sobre el léxico definido) en ese orden. En los datos se indica la definición de cada uno de los elementos del léxico, con un nombre, un tipo de datos, y un modificador (opcional) de ámbito (local, global, o de entrada o salida). Los modificadores de ámbito son los que dicen cuales van a ser los datos de salida (datos devueltos por la subrutina), los datos de entrada (argumentos de la subrutina), datos locales y datos globales (datos compartidos entre subrutinas). En el algoritmo se reúnen \textbf{sentencias}, que son los pasos a realizar sobre los datos definidos. Las operaciones (lecturas o escrituras) están restringidas si los datos son de entrada o de salida.   
 	
 	\vspace{10px}
 	
@@ -435,7 +384,7 @@ array(1) <- 0
 	
 	\vspace{10px}
 	
-	La \textbf{asignación} se define como un nombre ($dospi$) o un lvalor ($array(0)$), seguido de una flecha que apunta hacia la izquierda (para que se intuya que la información `fluye' de derecha a izquierda) y finalmente seguido de una expresión. Las expresiones son similares a las expresiones que se pueden encontrar en Java o en C, sustituyendo ciertos operadores por otros operadores:
+	La \textbf{asignación} se define como un nombre ($dospi$) o un lvalor\footnote{Un lvalor o un valor izquierdo es la estructura sintáctica del lenguaje que se acepta en el lado izquierdo de una asignación. Pueden ser nombres o nombres seguidos de un acceso, como en el segundo ejemplo.}, seguido de una flecha que apunta hacia la izquierda (para que se intuya que la información `fluye' de derecha a izquierda) y finalmente seguido de una expresión. Las expresiones son similares a las expresiones que se pueden encontrar en Java o en C, sustituyendo ciertos operadores por otros operadores:
 	
 	\vspace{10px}
 	
@@ -491,10 +440,7 @@ elipse [
 
 	\section{Desarrollo de un entorno de programación}
 	
-	%TODO: citar khan academy error
 	Al igual que Descubre o Codecombat, el principal objetivo del trabajo es crear un entorno para facilitar la programación. Este sistema debe estar compuesto de al menos un editor de texto, el compilador del lenguaje diseñado y las herramientas de entrada y salida (barras de texto para escribir, lienzos para dibujar, eventos de teclado...). Recomendablemente el entorno debe tener información sobre depuración (errores al escribir el código, información de depuración al pausar el código, etc...) como tienen también otros entornos (Descubre o Codecombat, por ejemplo).
-	
-	%TODO: Introducir qué es ZL
 	
 	\subsection{Editor de texto inteligente}
 	
@@ -502,7 +448,7 @@ elipse [
 	
 	\vspace{10px}
 	
-	El objetivo de esta parte del trabajo es intentar imitar esas características sobre ZL. Por una parte, habrá que identificar cuales son los distintos tokens del lenguaje (números, palabras clave, cadenas literales de texto, comentarios...) para hacer una clasificación y un coloreado a cada clase. Es sabido que el coloreado de sintaxis es una parte fundamental a la hora de reducir el tiempo de entendimiento del código a analizar para nuevos alumnos, como indica el trabajo de Advair Sarkar\cite{syntaxhighlight}.
+	El objetivo de esta parte del trabajo es intentar imitar esas características sobre ZL. Por una parte, habrá que identificar cuales son los distintos tokens del lenguaje (números, palabras clave, cadenas literales de texto, comentarios...) para hacer una clasificación y un coloreado a cada clase. Es sabido que el coloreado de sintaxis es una parte fundamental a la hora de reducir el tiempo de lectura del código a analizar para nuevos alumnos, como indica el trabajo de Advair Sarkar\cite{syntaxhighlight}.
 	
 	\vspace{10px}
 	
@@ -544,8 +490,10 @@ elipse [
 	\section{Compilador de ZL}
 	
 	Todo analizador se puede ver como una máquina de estados que, por cada paso que se da, cambia su estado y consume una parte de la entrada a analizar. La complejidad de la máquina de estados puede variar, permitiendo análisis más o menos complejos. Para ZL, el compilador define tres fases de análisis más una cuarta fase de generación de código.
-	
-	%TODO: Imagen de las fases de análisis
+		
+\begin{center}
+\includegraphics[width=1\linewidth]{fasesanalisis}
+\end{center}
 	
 	\vspace{10px}
 	
@@ -561,7 +509,7 @@ elipse [
 	
 	\vspace{10px}
 	
-	En la cuarta y última fase simplemente se hace un mapeo de cada elemento en el árbol generado a Javascript, usando en ciertas partes la tabla de símbolos como información auxiliar. Para cada operación en una expresión, para cada sentencia, para cada subrutina... existe una forma Javascript equivalente de forma que al ejecutar una evaluación del Javascript, se obtiene el mismo significado semántico que el código ZL. 
+	En la cuarta y última fase se genera el código Javascript. Para ello se usan el árbol generado en las fases anteriores así como la tabla de símbolos. Se recorre el árbol de forma recursiva obteniendo las subrutinas del módulo, generando una función Javascript por cada subrutina. Los detalles de la generación de código Javascript se puede ver en los apartados `Código nativo, implementación de las subrutinas nativas' y `Código asíncrono convertido en código bloqueante'.
 	
 	\subsection{Justificación de la elección de análisis descendente recursivo}
 	
@@ -847,97 +795,6 @@ a.regla('exp', function() {
 })
 \end{BVerbatim}
 
-	\subsection{Introducción al analizador}
-	
-	%TODO: Recolocar esta sección entera y purgar si ya no sirve
-	
-	El analizador está definido en el fichero \textbf{analisis.js} y se usa en el \textbf{zlsintaxis.js}. En analisis.js se puede ver la implementación del analizador y en zlsintaxis.js el uso de la herramienta.
-	
-	\vspace{10px}
-	
-	El \textbf{analizador} ofrece mecanismos funcionales\cite{javascriptfunctional} para definir reglas, símbolos y tokens. Cada símbolo y cada token se definen en base a una expresión regular, que representa el lenguaje regular que evalúa cada símbolo o token. Ambos mecanismos se usan para definir el léxico del lenguaje, de forma similar a Flex. Sin embargo, a diferencia de Flex, no hay un mecanismo que rompa en tokens y símbolos el texto de entrada, sino que cuando una regla explícitamente pida avanzar un token, se avanzará (si es posible, si no se encuentra el token entonces se lanzará una excepción).
-	
-	\vspace{10px}
-	
-	Por otro lado, en las reglas se debe definir explícitamente como se avanza (o retrocede) así como cuál es el resultado de cada regla (si se pudo aplicar). A diferencia de Bison, dentro de una regla no solo se define cuál es el resultado generado. Si un usuario de bison (en lenguaje C) escribe:
-	
-	\begin{BVerbatim}
-	exp: term OPA term     { $$ = ($2 == '+' ? $1 + $3 : $1 - $3); }
-	| term                { $$ = $1; }
-	\end{BVerbatim}
-	
-	Usando el analizador propio puede obtener el equivalente:
-	
-	\begin{BVerbatim}
-	// exp:
-	a.regla('exp', function() {
-	// Avanzar primero un 'term'
-	this
-	.avanzar('term')
-	;
-	// Después intentar avanzar un 'OPA' y un 'term'
-	try {
-	this
-	.avanzar('OPA')
-	.avanzar('term')
-	;
-	// Si no salta una excepción, se ha podido avanzar 'OPA' y 'term'
-	// en este caso $$ = $1 + $3 o $$ = $1 - $3 
-	if (this.resultado(1) == '+')
-	this.registrarResultado(this.resultado(0) + this.resultado(2)))
-	else
-	this.registrarResultado(this.resultado(0) - this.resultado(2)))
-	} catch (err) {
-	// Si salta una excepción, no se ha podido avanzar 'OPA' o 'term'
-	// en este caso $$ = $1
-	this.registrarResultado(this.resultado(0));
-	}
-	})
-	\end{BVerbatim}
-	
-	Como se puede observar, a diferencia de usar bison, con el analizador cada regla indica de forma explícita como se debe resolver. Se vuelve mucho más complejo, pero permite controlar al detalle las excepciones, las ambigüedades y la información de error que se propaga. 
-	
-	\vspace{10px}
-	
-	Cuando un \textbf{Analizador} ya define un lenguaje (como ZL), se puede usar el método \textit{empezar} para generar un \textbf{Analisis}, que es otra clase distinta de Analizador. Esta nueva instancia de Analisis es \textbf{this} dentro de las funciones que definen las reglas. La clase Analisis trabaja con una cola de reglas, tokens o símbolos, que se acumulan previamente antes de avanzar en el análisis. Los métodos para trabajar con la clase Analisis son los siguientes:
-	
-	\vspace{10px}
-	\noindent
-	\textbf{avanzar}: si se llama con un argumento, vacía la cola e introduce en la cola el argumento, que puede ser un token, un símbolo o una regla. Después, (independientemente de si se llama con algún argumento o no) avanza todos los elementos de la cola. \textbf{avanzar('miregla')} equivale a \textbf{acumular('miregla')} y después \textbf{avanzar()}.
-	
-	\vspace{10px}
-	\noindent
-	\textbf{retroceder}: retrocede uno o varios tokens ya avanzados, símbolos, reglas. Si no se ha avanzado nada el comportamiento es no definido. Es útil para retroceder tokens avanzados en casos de LL(2) o LL(3) después de comprobar si el 2º o el 3er token no es el esperado. 
-	
-	\vspace{10px}
-	\noindent
-	\textbf{acumular}: acumula en la cola un token, un símbolo o una regla. Útil para avanzar varias veces un conjunto de reglas, tokens o símbolos.
-	
-	\vspace{10px}
-	\noindent
-	\textbf{intentar}: recibe un array bidimensional de opciones. Cada array dentro del array es una secuencia de reglas, símbolos o tokens. Se usa para representar las distintas opciones a seguir, aplicándose la primera secuencia que se pueda avanzar completamente. Si no se puede avanzar ninguna de las secuencias en el array, lanza una excepción. 
-	
-	\vspace{10px}
-	\noindent
-	\textbf{intento}: acumula en la cola un array bidimensional de opciones. El método \textbf{intentar} equivale a primero hacer un \textbf{intento} para acumular en la cola seguido de \textbf{avanzar} para avanzar la cola.
-	
-	\vspace{10px}
-	\noindent
-	\textbf{avanzarVarios}: avanza la cola tantas veces como se pueda. Equivale a crear una copia de la cola, \textbf{avanzar}, recuperar la cola de la copia y repetir, tantas veces como se pueda. 
-	
-	\vspace{10px}
-	\noindent
-	\textbf{avanzarVariosObligatorio}: al igual que \textbf{avanzarVarios} avanza la cola tantas veces como se pueda, pero si no se puede avanzar al menos una vez entonces lanza una excepción. Equivale a llamar a \textbf{avanzar}, recuperar la cola y entonces llamar a avanzarVarios.
-	
-	\vspace{10px}
-	\textbf{arbol}: después de avanzar reglas, tokens o símbolos, se generan ramas, una por cada \textbf{avanzar}. Si se avanzan n veces, se generan n ramas, siendo la primera la rama 0. \textbf{arbol(2)} accede a la rama generada por el 3er avanzar. Si se llama sin argumento se obtiene el árbol de la regla actual.
-	
-	\vspace{10px}
-	\textbf{registrarResultado}: es el equivalente al \$\$ en Bison. Se usa para registrar el resultado de la regla actual.
-	
-	\vspace{10px}
-	\textbf{resultado}: al igual que el método \textbf{arbol}, después de avanzar un token, un símbolo o una regla se genera un resultado (en el caso de token o símbolo es el texto que hizo \textit{matching} la expresión regular, en caso de una regla es la que se registra con \textbf{registrarResultado}). Si se avanzan n veces, \textbf{resultado(0)} es el resultado generado por el primer avanzar. Si se llama sin argumento, se obtiene el resultado de la regla actual.
-
 	\subsection{Tabla de símbolos}
 	
 	En el fichero \textbf{entorno.js} se definen varias clases: Modulo, Subrutina, Tipo, TipoInstancia, Declaración y Operación. Las tablas de símbolos se rellenan de forma recursiva: se crea un Modulo vacío al cual se le pasa el árbol generado por el análisis sintáctico. Este módulo a su vez hace lo mismo con las subrutinas y, las subrutinas, hacen a su vez lo mismo con las declaraciones de datos.
@@ -956,7 +813,7 @@ a.regla('exp', function() {
 	
 	\vspace{10px}
 	
-	Un objeto \textbf{TipoInstancia} es una n-tupla \{TipoPrincipal, TipoGenerico1, TipoGenerico2, ...\} donde el TipoPrincipal representa el tipo de la instancia, y los tipos genéricos los tipos que rellenan un \textit{template} (equivalente a los \textit{templates} de C++ o Java). Por ejemplo, si un necesita una Lista de números, escribe Lista(Numero), y el objeto será una n-tupla \{Lista, Numero\}. Si un usuario pide un mapa de texto a texto, escribe Relacion(Texto, Texto) y la n-tupla será \{Relacion, Texto, Texto\}. También se pueden anidar instancias genéricas de tipos, si por ejemplo se hace un diccionario de sinónimos: Relacion(Texto, Lista(Texto)) donde la n-tupla sería \{Relacion, Texto, \{Lista, Texto\}\}.
+	Un objeto \textbf{TipoInstancia} es una n-tupla \{TipoPrincipal, TipoGenerico1, TipoGenerico2, ...\} donde el TipoPrincipal representa el tipo de la instancia, y los tipos genéricos los tipos que rellenan un \textit{template} (equivalente a los \textit{templates} de C++ o Java). Por ejemplo, si en ZL se necesita una Lista de números, se escribe Lista(Numero), y el objeto será una n-tupla \{Lista, Numero\}. Si un usuario pide un mapa de texto a texto, escribe Relacion(Texto, Texto) y la n-tupla será \{Relacion, Texto, Texto\}. También se pueden anidar instancias genéricas de tipos, si por ejemplo se hace un diccionario de sinónimos: Relacion(Texto, Lista(Texto)) donde la n-tupla sería \{Relacion, Texto, \{Lista, Texto\}\}.
 	
 	\vspace{10px}
 	
@@ -991,21 +848,27 @@ a.regla('exp', function() {
 
 	\vspace{10px}
 	
-	A demás de los símbolos y los tokens, la lista de palabras reservadas se puede encontrar al principio del fichero \textbf{zlsintaxis.js}. El resto del fichero son las reglas que determinan el análisis sintáctico.
+	La lista de palabras reservadas se puede encontrar al principio del fichero \textbf{zlsintaxis.js}. Se utiliza para no procesar palabras reservadas como nombres. El resto del fichero son las reglas que determinan el análisis sintáctico.
 	
 	\vspace{10px}
 	
-	Lo último destacable del léxico es que los espacios y los comentarios (de tipo C, Javascript, Java, C++...) se ignoran todos salvo un caso muy específico: las (\hyperref[subrutinasprimitivas]{subrutinas primitivas}).
+	Lo último destacable del léxico es que los espacios y los comentarios (de tipo C, Javascript, Java, C++...) se ignoran todos salvo un caso muy específico: \textbf{subrutinas primitivas}. Las subrutinas primitivas aceptan, en vez de código ZL en el algoritmo, un único comentario multilínea que se copia tal cual al código final en la compilación, permitiendo escribir código Javascript embebido en código ZL. De esta técnica se habla más adelante y en detalle en la sección `Código nativo, implementación de las subrutinas primitivas'.
 	
 	\subsection{Análisis sintáctico}
 	
-	En la introducción al analizador y el apartado que explica como obtener las reglas a partir del BNF se indica como son las reglas sintácticas del lenguaje. Se puede ver en detalle como se implementa cada regla en el fichero \textbf{zlsintaxis.js}, después del trozo de código que define el léxico. 
+	El analizador está definido en el fichero \textbf{analisis.js} y se usa en el \textbf{zlsintaxis.js}. En analisis.js se puede ver la implementación del analizador y en zlsintaxis.js el uso de la herramienta.
 	
 	\vspace{10px}
 	
-	Además, en el fichero \textbf{sintaxis.js} se hace uso del analizador construido en \textbf{zlsintaxis.js}, ofreciendo varias funciones (para intentar obtener la configuración ZL, para hacer análisis del módulo, etc..).
+	En la introducción al analizador y el apartado que explica como obtener las reglas a partir del BNF se indica como son las reglas sintácticas del lenguaje. Se puede ver en detalle como se implementa cada regla en el fichero \textbf{zlsintaxis.js}.
 	
 	\vspace{10px}
+	
+	Además, en el fichero \textbf{sintaxis.js} se hace uso del analizador construido en \textbf{zlsintaxis.js}, ofreciendo varias funciones (para obtener la configuración ZL, para hacer análisis del módulo, etc..).
+	
+	\vspace{10px}
+	
+	%TODO: eliminar la nota al pie.
 	
 	La implementación del análisis sintáctico así como las reglas que intervienen en cada estructura gramatical se pueden ver en el fichero \textbf{zlsintaxis.js}, y voy a tomar algunas reglas\footnote{Lo mejor hubiera sido ponerlas todas, pero se haría muy largo y muy pesado de leer.} de este fichero para explicar cómo se genera el árbol sintáctico usando los métodos de registrar resultado.
 	
@@ -1053,7 +916,7 @@ a.regla('exp', function() {
 
 	\vspace{10px}
 	
-	En todas las reglas se debe devolver el objeto `this' para mantener un patrón de Javascript llamado patrón de cadena (que no es de interés para este trabajo en concreto). Antes del \textit{return} se puede ver que se registra el resultado `sub', un objeto Javascript que contiene toda la información relacionada con la subrutina: nombre, modificadores (de subrutina), datos (declaraciones), sentencias (lista de sentencias que componen el algoritmo), y un objeto secciones que contiene donde empieza y acaba en el texto cada sección de la subrutina. 
+	En todas las reglas se debe devolver el objeto `this' para mantener un patrón de Javascript llamado patrón de cadena\footnote{El patrón cadena permite encadenar una llamada tras otra. Se puede ver en el ejemplo: this.avanzar(...).acumular(...).avanzar(...).etc... Es un patrón muy utilizado en las bibliotejas de Javascript.}. Antes del \textit{return} se puede ver que se registra el resultado `sub', un objeto Javascript que contiene toda la información relacionada con la subrutina: nombre, modificadores (de subrutina), datos (declaraciones), sentencias (lista de sentencias que componen el algoritmo), y un objeto secciones que contiene donde empieza y acaba en el texto cada sección de la subrutina. 
 	
 	\vspace{10px}
 	
@@ -1090,8 +953,6 @@ this.avanzar("expresion");
 	\vspace{10px}
 
 	Después se puede ver como se define un array, al que se le van a concatenar los `expresion' ignorando la coma (que es un separador y no tiene interés semántico). Para entender bien la línea this.resultado(1)[i][1] ponemos el esquema del árbol de resultados generado al analizar 1,4+7,pi-3:
-	
-	
 	
 	\begin{center}
 	\includegraphics[width=0.5\linewidth]{analisisejemplo}
@@ -1152,11 +1013,11 @@ this.avanzar("expresion");
 	
 	\vspace{10px}
 	
-	En caso de que el intento si-no-hacer falle (se capture una excepción), se descarta la ambigüedad y se intenta avanzar la regla sin problemas. Para distinguir si la excepción capturada es a causa de un error en el análisis o de un error de Javascript utilizo la función esError de la biblioteca zl.error, que devuelve verdadero si el objeto capturado en la excepción es un error zl. En caso de que el error no sea de análisis lo propago.
+	En caso de que el intento si-no-hacer falle (se capture una excepción), se descarta la ambigüedad y se intenta avanzar la regla sin problemas. Para distinguir si la excepción capturada es a causa de un error en el análisis o de un error de Javascript utilizo la función \textit{esError} de la biblioteca zl.error, que devuelve verdadero si el objeto capturado en la excepción es un error zl. En caso de que el error no sea de análisis lo propago.
 	
 	\vspace{10px}
 	
-	Por otro lado, en el fichero \textbf{entorno.js} se definen las distintas clases que componen la tabla de símbolos. Cada clase tiene un método rellenarDesdeArbol que recibe un árbol como el generado en las reglas para rellenar cada uno de los elementos de la tabla. Por ejemplo, si vemos el objeto que se rellena en la regla subrutina, y vemos el método rellenarDesdeArbol de subrutina \footnote{La subrutina está parcialmente pegada porque es demasiado larga, aunque la primera parte da una idea de como se rellena la estructura}:
+	Por otro lado, en el fichero \textbf{entorno.js} se definen las distintas clases que componen la tabla de símbolos. Cada clase tiene un método rellenarDesdeArbol que recibe un árbol como el generado en las reglas para rellenar cada uno de los elementos de la tabla. Por ejemplo, si vemos el objeto que se rellena en la regla subrutina, y vemos el método rellenarDesdeArbol de subrutina \footnote{La subrutina no se incluye completa, solo la parte que genera el árbol.}:
 	\begin{BVerbatim}
 Subrutina.prototype.rellenarDesdeArbol = function(arbol) {
   // Posicion de la subrutina:
@@ -1248,7 +1109,7 @@ Subrutina.prototype.rellenarDesdeArbol = function(arbol) {
 	
 	%TODO: cambiar esta sección por generación de código
 	
-	El nombre de código nativo suele referirse en el contexto informático como el código que es capaz de ejecutar directamente un CPU. En el contexto de este trabajo, me refiero a código nativo como código no para el CPU (en ensamblador) sino como código en Javascript, que puede ser evaluado por la plataforma web. 
+	El nombre de código nativo suele referirse en el contexto informático como el código que es capaz de ejecutar directamente una CPU. En el contexto de este trabajo, me refiero a código nativo como código no para la CPU (en ensamblador) sino como código en Javascript, que puede ser evaluado por la plataforma web. 
 	
 	\vspace{10px}
 	
@@ -1286,7 +1147,7 @@ Subrutina.prototype.rellenarDesdeArbol = function(arbol) {
 	
 	Se recomienda al lector que si quiere avanzar en el proceso de escritura de código nativo para comunicarse con el `exterior' que mire los códigos en \textbf{bibliotecasZL/*.zl}, especialmente \textbf{basico.zl}.
 	
-	\subsection{Código asíncrono convertido código bloqueante}
+	\subsection{Código asíncrono convertido a código bloqueante}
 	
 	Javascript usa el paradigma de código asíncrono \cite{javascriptasync}. `Romper' ese paradigma para que ZL corra de forma bloqueante sobre Javascript ha sido, sin duda alguna, la parte más compleja de todo el proyecto. 
 	
@@ -1367,6 +1228,18 @@ xhttp.send();
 	\end{center}
 
 	 Como se puede ver en la imagen, utilizo \textit{async.waterfall} una utilidad\cite{async} que simplifca la ejecución en cascada de trozos asíncronos.
+	 
+	 \vspace{10px}
+	 
+	 La función async.waterfall recibe un array de funciones, que se comportan de una forma específica: todas ellas van a recibir como último argumento una función, a la que se le va a llamar \textit{done}. Después del array recibe una última función, a la que llamamos \textit{callback}.
+	 
+	 \vspace{10px}
+	 
+	 Cuando una función acabe su cometido asíncrono, debe llamar a su último argumento: a la función \textit{done}. Al llamar a esa función se le da paso a la siguiente función. A la función \textit{done} se le debe llamar con el primer argumento nulo, y el resto de argumentos se pasarán a la siguiente función. El primer argumento se usa para propagar un error, pero si es nulo no se propaga nada.   
+	 
+	 \vspace{10px}
+	 
+	 Salvo la primera función que solo recibe la función \textit{done}, el resto de las funciones reciben como argumentos los argumentos pasados en la función anterior a través de \textit{done}. La última función, al llamar a \textit{done}, en vez de dar paso a la siguiente función (pues no existe) lo que sucede es que se llama a la función `callback'.
 	
 	\section{Editor inteligente}
 	
@@ -1421,9 +1294,11 @@ xhttp.send();
 	
 	\vspace{10px}
 	
-	En un principio planteé el uso del algoritmo `subsecuencia común más larga'\cite{lcs}, que localiza la subsecuencia (subconjunto de caracteres en un texto respetando el orden) más larga entre un texto y otro. La elección fue en parte a que es el algoritmo que usa la utilidad `diff'\cite{diff} para evaluar las diferencias. Sin embargo, después varias pruebas, opté por usar un algoritmo en distancias de edición\cite{levensthein}, que penaliza en menor medida los textos desordenados.
+	En un principio planteé el uso del algoritmo `subsecuencia común más larga'\cite{lcs}, que localiza la subsecuencia (subconjunto de caracteres en un texto respetando el orden) más larga entre un texto y otro. Esta es la solución que usa la utilidad `diff'\cite{diff} para evaluar las diferencias. Sin embargo, después varias pruebas, opté por usar otro algoritmo: el algoritmo de distancias de edición\cite{levensthein}, que penaliza en menor medida los textos desordenados.
 	
-	La única diferencia notable entre un algoritmo u otro es el siguiente:
+	\vspace{10px}
+	
+	Las diferencias notables entre un algoritmo u otro son:
 	
 	\vspace{10px}
 	
@@ -1502,13 +1377,14 @@ En la llamada a <span class="subrutina">cubo</span> el dato
 	
 	A izquierda, el IDE antes de `Empezar' la ejecución. A la derecha, el IDE tras pasar por la sentencia `pausar'. Durante la pausa se muestra información de depuración, pero hay que activarlo pulsando Ctrl+F9 (Cmd+F9 en Mac OS X en teoría, no se ha podido probar por falta de material).
 	\end{center}
-
 	
 	\section{Triple plataforma - Web, Electron y NodeJS}
 	
 	%TODO: Eliminar para ahorrar espacio
 	
-	Además del IDE web existen otras dos plataformas (menos probadas, pueden contener errores) basadas en NodeJS y Electron. NodeJS permite la ejecución de código sin IDE, que puede ser útil para implementar por ejemplo un juez online como el que tiene iJava. NodeJS ejecuta código Javascript fuera del explorador, al igual que se ejecutaría Python o Perl. 
+	Este trabajo principalmente funciona sobre Web, pero se ha programado para ser compatible con tres plataformas distintas. 
+	
+	Además del IDE web existen otras dos plataformas (menos probadas y que podrían contener errores) basadas en NodeJS (ejecución de scripts Javascript de forma independiente) y Electron (un entorno similar al web pero sin necesidad de un explorador). NodeJS permite la ejecución de código sin IDE, que puede ser útil para implementar por ejemplo un juez online como el que tiene iJava en el proyecto Descubre. NodeJS ejecuta código Javascript fuera del explorador, al igual que se ejecutaría Python o Perl. 
 	
 	\vspace{10px}
 	
@@ -1516,40 +1392,24 @@ En la llamada a <span class="subrutina">cubo</span> el dato
 	
 	\vspace{10px}
 	
-	Electron por otra parte mezcla una versión `standalone' de Chromium con NodeJS, lo que permite tener el IDE offline sin depender del explorador web. Además, en ordenadores sin mucha capacidad de cómputo la versión web es lenta porque la compilación (que se hace automáticamente) bloquea la ejecución del editor, ya que los exploradores web ejecutan las páginas en monohilo. En la versión de Electron se usa NodeJS para pedirle al sistema operativo un proceso nuevo, al cual se le ordena la compilación. Como el editor y la compilación corren en procesos distintos, es el sistema operativo el que evita el bloqueo del editor aunque la compilación tarde unos segundos.  
+	Por otra parte Electron permite tener multiples ventanas para, por ejemplo, separar el lienzo de dibujado del editor de código, haciendo que la interfaz de usuario del entorno pueda ser más flexible. 
 	
 	\chapter{Conclusiones y vías futuras}
 	
-	Lo primero que quiero concluir es que hacer este trabajo ha sido muy gratificante, tanto por la ayuda y alabanzas que he recibido de profesores como de compañeros que todavía son alumnos.
+	Este trabajo ha tenido como objetivo crear un entorno sin instalación que permita convertir un lenguaje cercano al lenguaje natural en instrucciones, para que alumnos sin conocimientos puedan iniciarse en la programación. 
 	
-	\vspace{10px}
+	Las metas propuestas se han logrado ya que se ha conseguido un compilador para el lenguaje, que está en castellano y es sencillo de leer, así como el entorno que une el editor y el compilador en uno. 
 	
-	Durante el principio tenía la sensación de que había pocas herramienta de aprendizaje para la programación, sin embargo en el estudio del estado del arte he visto tantos sistemas tan completos y complejos (de implementar) que he cambiado de pensar. 
+	El entorno con el lenguaje ofrece funcionalidades similares a las que se pueden encontrar en el trabajo Descubre, que antes de que se plantease el proyecto fue el punto de inspiración. Con ZL se puede dibujar en un lienzo con llamadas imperativas así como escribir programas de entrada y salida de texto. 
 	
-	\vspace{10px}
+	A todas esas funcionalidades se han añadido otras que parecían útiles como la capacidad de parar el código en un línea concreta. Poder parar la ejecución puede facilitar la comprensión del flujo de ejecución del código, que es una parte fundamental del pensamiento algorí 
 	
-	A lo largo del proyecto me ha sido difícil mantener el objetivo de que fuese sencillo de usar mientras trabajaba el sistema. Si lo he conseguido ha sido gracias, en gran parte, a la cantidad de recursos útiles que se pueden encontrar en internet sobre las tecnologías que he usado.
+	Para que el proyecto se pueda mejorar y se pueda continuar se ha puesto especial esfuerzo en que se pueda añadir funcionalidades al proyecto en forma de código nativo embebido en el código ZL. Así cualquier docente que encuentre útil esta herramienta podrá usarla para sus propios propósitos. 
 	
-	\vspace{10px}
+	Otra posible forma de mejorar este trabajo sería someterlo a pruebas con distintos usuarios para comprobar el grado de utilidad. Las decisiones de diseño se han tomado en base a la experiencia personal, y podrían ser sometidas a encuestas para cambiar entre otras cosas las estructuras sintácticas o el léxico. 
+	 
 	
-	Me gustaría agradecer especialmente a Juan Antonio Sánchez Laguna la ayuda sobre lo referente al estudio del arte, sus ideas sobre iJava (que me inspiraron para realizar este proyecto). A Eduardo Martínez Gracia por ayudar a formalizar los temas relacionados con análisis del lenguaje. También a Daniel Marín Sánchez por ayudarme en la parte más compleja del proyecto: romper la asincronía.
-	
-	Aunque el trabajo dista de estar `tan acabado' como me gustaría, ha llegado a un punto muy avanzado.  
-	
-	\section{Posibles mejoras}
-	
-	Enumero las siguientes mejoras he visto en otros proyectos o se me han ocurrido, pero no he podido implementar en el tiempo de un TFG (las ordeno de mayor a menor importancia):
-	
-	\begin{itemize}
-		\item Ofrecer una alternativa simpleZL, donde solo haya una subrutina y todas las bibliotecas estén incluídas por defecto.
-		\item Detectar escrituras y lecturas, para evitar que un dato no escrito se lea.
-		\item Integración con Descubre, como alternativa a iJava.
-		\item Ofrecer una biblioteca WebRTC para la comunicación entre programas a través de internet.
-		
-	\end{itemize}
-	
-	%TODO: cambiar enlaces de la wikipedia.
-	
+	 
 	\bibliographystyle{amsplain}
 	\bibliography{biblio}
 
@@ -1583,31 +1443,6 @@ En la llamada a <span class="subrutina">cubo</span> el dato
 	
 	A izquierda, cometo el error de escribir \textit{ellipse} sin argumentos, y a la derecha se puede ver como se usa un lenguaje poco formal (Oh noes! vs Error: signature of function...), acerca del error que he cometido.
 	\end{center}
-
-	
-	\chapter{Descripción de la semántica}
-	
-	%TODO: quitar esta sección
-	
-	Las estructuras semánticas del lenguaje se puede clasificar en módulos, subrutinas, algoritmos, datos y configuraciones. Parte de la semántica es compleja y está enfocada para los posibles docentes y para usuarios avanzados. Los alumnos nuevos que quieran aprender pueden centrarse en escribir solo algunas subrutinas e ignorar todo el resto de las estructuras.
-	
-	\vspace{10px}
-	
-	Para darle flexibilidad al lenguaje, el lenguaje está pensado para escribirse en módulos. Los módulos se pueden ver como unidades de código que se pueden compilar, y a su vez los módulos pueden incluir otros módulos. Un módulo puede tener configuraciones, y puede tener subrutinas. 
-	
-	\vspace{10px}
-	
-	Las subrutinas son la estructura básica de ejecución. En una subrutina se define un algoritmo, que indica el comportamiento de la subrutina, así como los datos que el algoritmo va a usar. A su vez, la subrutina puede tener modificadores que alteran el comportamiento del código sobre la subrutina. Por ejemplo, el modificador \textbf{subrutina primitiva} permite ejecutar código nativo javascript en una subrutina (ver más adelante la sección Código nativo), que está definida en ZL.
-	
-	\vspace{10px}
-	
-	Los datos, dentro de una subrutina, se definen por un nombre, un tipo, y un ámbito: local, de entrada, de salida, de entrada y salida, o global. Cuando un dato es de tipo local, solo la subrutina que lo define conoce su valor y puede acceder a él. Los datos de ámbito de entrada se proporcionan al llamar a la subrutina, y no se pueden escribir sobre ellos. Los datos de ámbito de salida se deben proporcionar en la subrutina y son leídos (opcionalmente) al llamar a la subrutina. Los datos de tipo global tienen ámbito \textbf{dentro de un módulo}. Todas las subrutinas que definan el mismo dato (que debe, por obligación de compilación, coincidir en tipo y nombre) podrán compartir el valor, y estos datos deben inicializarse en la \textbf{subrutina inicio} de cada módulo (cada módulo inicializará sus datos globales), usándose esa subrutina como constructor. 
-	
-	\vspace{10px}
-	
-	Una configuración define constantes que pueden ser útiles para el entorno (como por ejemplo, el número de fotogramas por segundo, cuántos decimales se imprimen por defecto, el ancho y el alto del lienzo...), además de permitir incluir módulos de dos formas distintas: \textbf{integrar} o \textbf{importar}. \textbf{Integrar} un módulo equivaldría a un `\#include' de C o C++, donde el código se `copia y pega' en el lugar de la directiva. Las subrutinas del módulo integrado forman parte del entorno del módulo que lo integra. Por otra parte, \textbf{importar} un módulo equivale a un `import' de Java. Se crea un nuevo tipo de dato (una clase si hablamos en términos Java) cuyas subrutinas pasan a ser parte de ese tipo (como si fuesen miembros, en Java).
-	
-	\vspace{10px}
 	
 
 \end{document}
