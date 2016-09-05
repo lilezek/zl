@@ -32,7 +32,7 @@
 }
 
 \author{Ezequiel Santamaría Navarro}
-\title{Trabajo fin de grado sobre la construcción de un entorno de aprendizaje pre-universitario para la programación.}
+\title{Trabajo fin de grado sobre la construcción de un entorno de aprendizaje preuniversitario para la programación.}
 
 
 %\renewcommand{\abstractname}{Abstracto}
@@ -42,15 +42,156 @@
 \begin{document}
 	\maketitle
 	\tableofcontents
-	
+	\listoffigures
+		
 	\begin{abstract}
-		Proceso de creación de un lenguaje sencillo, de un entorno de programación sin instalación y con herramientas para facilitar el desarrollo en español.
+		La facultad de informática de la Universidad de Murcia (FIUM) aloja una plataforma, la plataforma Descubre, que ofrece unas herramientas para el aprendizaje de la informática a alumnos preuniversitarios (aquellos que estudian Bachillerato y secundaria). El objetivo de esta herramienta es que estos alumnos descubran su vocación. Si están interesados en la informática este es un buen punto de partida para empezar, ya que en la herramienta se pueden encontrar ejemplos hechos por profesores y alumnos, así como tutoriales y documentación. 
+		
+		La FIUM durante varios años ha impulsado con herramientas y concursos la enseñanza extraescolar de la informática. Para ello han desarrollado sus propios servicios de programación. Han desarrollado un sistema propio donde los alumnos registrados pueden subir códigos que ejecutan órdenes para dibujar en un lienzo, consiguiendo hacer videojuegos animando dibujos entre otros programas.
+		
+		El objetivo de este trabajo no es otro sino replicar estas fantásticas herramientas con un lenguaje propio, cercano al lenguaje natural español, y enfocado para que sea fácil de leer. 
 	\end{abstract}
 	
+	\chapter{Extended Abstract}
+	
+	The Facultad de Informática de la Universidad de Murcia (FIUM - Computer Science School of Murcia's University) hosts a learning platform, named Descubre, which offers to pre-university students (those who are not yet studying in university) tools to learn computer programming. The aim of this platform is ... Students who are interested in computer science are able to begin using Descubre, where newbies can find examples of code done by teachers or even other students, also they would find tutorials and documentation. 
+	
+	Descubre's compiler works with a language developed by FIUM. This language (named iJava) is inherited from Java. It offers a Java-like syntax, but iJava is not object oriented; instead it is an imperative language which removes the complexity of objects.
+	
+	During many years the FIUM promoted with tools and contests extracurricular teaching of computer programming for pre-univesitary students. They have been developed their own platform that uses iJava as language, where students sign-up to share their programs with the rest of students. They can clone other's codes and edit them.
+	
+	As Descubre, the main objective of this work is to develop a new platform, with a new language, easy to read (for Spanish students) using near natural language to execute code in the web browser. Users can write code in 
+	
+	All the code done during this work can be found at \url{www.github.com/lilezek/zl}. Part of this documentation reference files from there. 
+	
+	This work is divided in three parts:
+	
+	\begin{itemize}
+		\item Formal definition of a new language, named \textbf{ZL}, easy to read for Spanish students.
+		\item Compiler for ZL. The compiler will transform ZL code into Javascript code, and compiler must be written in Javascript, so compiler can be executed in any Web Browser.
+		\item Code editor to write new ZL codes, with automatic suggestion for auto-completing code and automatic compiling.
+	\end{itemize} 
+	
+	Formal definition of langage is based on common Spanish. Almost-all keywords are common words in Spanish, so it should be easy to read for common students. Formal description of the language is written in extended Backus Normal Form, and can be found in \hyperref[app:a]{Appendix A}.
+	
+	ZL is an imperative language with procedures and no functions. It is statically typed (type coherency is checked at compile time, at third stage), and it is memory safe (there are no pointers, and every operation is checked for type coherency). Every procedure is called \textbf{subrutina} (subroutine) and can contain an arbitrary amount of input and output data. The arguments of subroutines are associated by name. Type conversion must be done explicitly using a subroutine or using \textbf{type converter operator} `como' (wich literally means as, or like). Each name associates a name (which represents an argument) to an expression with an arrow. Arrow can point to left or right, meaning input data or output data: 
+	
+	\vspace{10px}
+	
+\begin{BVerbatim}
+In a C-like syntax users expect:
+
+result = pyramidVolume(3,4,4);
+
+Where users must remember the order of arguments 
+for writing new code and reading old code.
+In ZL, the order is irrelevant. Reading of code is easier
+as readers does not have to remember how pyramidVolume
+was defined, but writing may be harder as writers must
+remember words, which may be harder than remember order.
+
+pyramidVolume [
+  baseLongitude <- 3 // Input 
+  baseWidth <- 4     // Input
+  height <- 4        // Input
+  volume -> result   // Output
+]
+\end{BVerbatim}
+
+	\vspace{10px}
+
+	We hope that this kind of visually writing will help newbies to understand the code, if every argument name is chosen correctly. Otherwise it could add confusion to readers.
+
+	ZL is divided in modules, which are a single, ZL code file, containing a configuration section (which is optional) and an arbitrary amount of subroutines. Every module can import more modules in two ways: using the keyword `integrar' (literally means integrate) or using the keyword `importar' (which means import) followed by the path of the file which defines the module (some modules can be found at \textbf{bibliotecasZL/*.zl}).
+	
+	Every algorithmic piece of code must be contained inside a subroutine like Java code that must be inside Java methods. Every subroutine can define variables of local and global scope. Variables that does not contain any tag are local: can not be accessed from anywhere but the subroutine which contains it. Also, the value between calls to this subroutine is not defined. When defining a variable as global it value is shared among all subroutines of the same Module, and it value is consistent between calls.  
+	
+	\textit{Integrating} a module acts like copy-pasting the said module. All the subroutines located inside integrated module are available in the scope of integrator, like \textit{\#include} would do in C or C++.
+	
+	In the other hand, \textit{importing} a module acts as Java imports other classes: it does generate a new type which can be used to define new variables. Every subroutine within imported module acts like a method. Global variables of subroutines of the imported module are \textbf{NOT} shared between two or more instances of the same type. In other words: global variables can be used as members like Java offers. 
+	
+	To use importing semantics lets advanced users and teachers can extend the number of types of the language, creating new types and defining their behavior. ZL is also provided with mechanism to overload operators, so expressions with new types could enrich (or could add complexity) the language. 
+	
+	ZL also contains generic semantics, letting types to be generic defined. When a type is defined to accept a generic type, it behaves similar as generic types in Java: any compatible type can be used in the instantiation of the generic variable. A type `X' is compatible to be used in a generic type of `Y', if type `X' contains at least every subroutine in its definition with the same exact number of inputs and outputs (globals and locals doesn't matter).  
+	
+	At this point, ZL may seem a complex language, because it features new type definition with operator overload, generic types, two different ways of importing third-party code and subroutines with name-associated arguments. This complexity is not aimed for new students, but to teachers to be able to extend the language without the need of reimplementing it (theoretically there is no need to write anything but ZL code to extend the language). 
+
+	Several examples of usage of ZL can be found in \textbf{programas/*.zl}. There are simple examples for students to learn basic usage of the language. More advanced code can be found in \textbf{bibliotecasZL/*.zl} that contain native Javascript code, operator overloading and generic types. 
+	
+	Formal definition is used as guide to write the compiler. The compiler is written from scratch, after discarding\footnote{ZL is ambiguous before seeking third token. It means that analyzer must advance three tokens in some syntactic structures to be sure which rule must be taken to get a correct analysis. These compilers seem not to be strong enough to achieve this task.} some already Javascript written compilers. It uses top-down recursive model, where each derivation rule is associated with a Javascript function. 
+	
+	The compiler is divided in four stages. Each stage gets data from a structure and produces a new structure. First stage gets ZL code as input and produces a syntatic tree. Second stage uses this tree to generate a table of symbols, which register names and symbols. Third stage uses the tree and the table of symbols to ensure that there is no illegal code (ensuring semantic coherence). If third stage succedes then the code is finally converted into Javascript.
+	
+	The compiler maps each syntactic structure of ZL into structures of Javascript. After that, with the use of eval\cite{javascripteval} is easy to execute generated code.
+	
+	To help advanced students or teachers to add new functionality to ZL, there is a mechanism similar to JNSI (JavaScript Native Interface) of GWT (Google Web Toolkit). In GWT you can write native Javascript code inside Java by using a multi-line comment and a method modifier (\hyperref[fig:jnsiexample]{Figure 1.1}).
+
+\begin{figure}
+\centering
+\includegraphics[width=1\linewidth]{jnsiexample}
+\caption[Example of JNSI]{Example of JNSI. The keyword native modifies the method, so it can receive a comment begining with /*- and ending with -*/, embeding Javascript code.}
+\label{fig:jnsiexample}
+\end{figure}
+
+	In ZL, using the keyword \textbf{primitiva} and mulitcomment lets developers to write native Javascript code, as can be seen in \hyperref[fig:zlcode]{figure 1.2}.
+	
+	\begin{figure}
+	\label{fig:zlcode}
+	\centering
+	\includegraphics[width=1\linewidth]{zlyjs}
+	\caption[Native JavaScript code written in ZL]{At left, ZL code. At right, JavaScript code. The keyword \textbf{primitiva} modifies the subroutine, so it must contain a multi line comment, embedding Javascript code.}
+	\end{figure}
+	
+	There are plenty of functionality already written as native code using this technique. This functionality let new students to easily draw simple figures into a canvas, and also let them to write text-based programs (with input and output of text). It is achieved by using HTML5 (Canvas, text input, ...) functionality embedded into ZL subroutines, and can be found at the directory \textbf{bibliotecasZL/*.zl} of the project.  
+
+	As part of the programming environment, users can write ZL code directly in the Web Browser with the aid of an \textit{intelligent} editor. The intelligence provided to the editor relies on automatic suggestion of keywords and names, to aim students to auto-complete code without the need of memorize full names. This is a key part of the project as ZL is a verbose language, and it may be harder to memorize than professional languages which are shorter to write.
+	
+	At first, when a user writes code triggers the automatic suggestion which shows a list inside a popup with possible options \hyperref[fig:beforecompletion]{(Figure 1.3)}.
+	
+	
+\begin{figure}
+\centering
+\includegraphics[width=0.7\linewidth]{beforecompletion}
+\caption[Automatic suggestion]{Automatic suggestion. Writing partial names forces the editor to sort the possible options.}
+\label{fig:beforecompletion}
+\end{figure}
+
+	Every time a programmer uses auto-completion, the editor inputs the full structure selected by the user, so it doesn't have the need to remember the structure, arguments and names \hyperref[fig:aftercompletion]{(Figure 1.4)}.
+	
+\begin{figure}
+\centering
+\includegraphics[width=0.7\linewidth]{aftercompletion}
+\caption[Automatic completion]{Automatic completion. After select ellipse option, the editor fulfills all the arguments with a default value where possible.}
+\label{fig:aftercompletion}
+\end{figure}
+
+	This part seemed really necessary because, as it is pointed before, reading ZL may be easier, but writing may be harder (a lot) without any aid. We see that remembering every argument of every subroutine is not an attractive feature for a language, which is worst if it is used by new students. Memorizing structures (in ZL there are just 2 loop structures and 3 conditionals) which are composed by three or four keywords does not seem a problem, but it does seem to remember around fifty subroutines with two or more arguments (because return values in ZL are arguments too). 
+	
+	Each time the code successfully compiles, one of the compilation stages generates a table of symbols. This table is used to populate all the suggestions of auto-completion. If a user writes a new subroutine, it is added into the table and therefore into the list of automatic suggestions.
+	
+	The list is sorted using Levensthein's distance\cite{levensthein}. For every possible option from the list, the editor calculates this distance between the suggestion and user's input. After that, items with less distance appear first. That is the reason that makes `elip' show `elipse' before any other option in \hyperref[fig:beforecompletion]{figure 1.3}.
+	
+	The editor is also provided with syntax highlight. If a line contains an error it is colored in pink (like `elip' line in \hyperref[fig:beforecompletion]{figure 1.3}). Every keyword is colored in dark pink, and every string in red. 
+	
+	If code fails to be compiled because user inputs wrong syntax, or it does not pass any semantic test, the user interface displays an error in common language to warn the user why the code is refused to be compiled. Errors are generated the first three of the four compiling stages, as a throw value (with helpful data to construct a message). The editor catches the thrown error, then calls a constructor using the thrown error, which generates an HTML code that is embedded into the user interface. 
+	
+	ZL code can be debugged by using breakpoints which are part of the code itself. Users can write `pausar' (translated to pause) as a sentence inside an algorithm  which breaks the code in two parts: the code before the pause executes normally, then the code is stopped. A button in the user interface with a label `continuar' (to continue) is shown. This button will resume the execution of code when pressed, which resumes the execution of the second part: the part after the pause (\hyperref[fig:pausa]{figure 1.5}).  
+	
+\begin{figure}
+\centering
+\includegraphics[width=0.48\linewidth]{pausa1}
+\includegraphics[width=0.48\linewidth]{pausa2}
+\caption[Breakpoint: pause example.]{At left, the code is written but is not executed, and it contains a breakpoint at line sixteen. At right the code is executed and paused at breakpoint. The right top section of the interface shows debug information with the values of the variables at the moment of the pause. At the bottom right section we can see that continue button is not enabled until code is paused.}
+\label{fig:pausa}
+\end{figure}
+
+	To end this abstract, it is rational think that the aim of this tool is not giving users a professional language for producing programs. Having this tool may get new learners of computer programming lesser busy reading and writing code but how to produce and understand algorithms, but advanced students should jump over professional languages which have more community, better efficiency, more tools to produce professional and maintainable code, and more testing of stability. 
+
+	We hope all these features will be helpful to new Spanish learners of computer programming, and also to teachers that can create their own learning framework. It would be great to have the language tested to new users to measure the learning curve of this language inside this environment, to see what parts can be changed to get a better language in terms of learning success. 
 	
 	\chapter{Introducción}
 	
-	El objetivo fundamental de este trabajo es conseguir un entorno de desarollo (o IDE) sencillo para aquellos que se inician en el mundo de la programación tengan una alternativa a las herramientas profesionales que si bien son muy útiles para los ingenieros informáticos también son más complejas de usar. Algunas de las técnicas usadas para simplificar este proceso se basan entre otras de abstraer al usuario del ciclo de compilación y ejecución, autocompletado de código y creación de un lenguaje de programación cercano al lenguaje natural español. 
+	El objetivo fundamental de este trabajo es conseguir un entorno de desarrollo (o IDE) sencillo para aquellos que se inician en el mundo de la programación tengan una alternativa a las herramientas profesionales que si bien son muy útiles para los ingenieros informáticos también son más complejas de usar. Algunas de las técnicas usadas para simplificar este proceso se basan entre otras de abstraer al usuario del ciclo de compilación y ejecución, autocompletado de código y creación de un lenguaje de programación cercano al lenguaje natural español. 
 	
 	\vspace{10px}
 	
@@ -158,6 +299,7 @@
 	Scracth es un proyecto impulsado por el MIT para el desarrollo de pequeños proyectos con dibujos, animaciones y sonidos. Está enfocado para que niños programen y compartan contenido multimedia (historietas, animaciones e incluso juegos) con el resto del mundo. 
 	
 	Scratch carece de lenguaje escrito. Su editor ofrece un panel bidimensional en el que se pueden encajar unas piezas dentro de otras que equivalen a estructuras de control, sentencias de asignación, etc... Es un lenguaje dirigido por eventos donde un evento es una pieza a la que le siguen más piezas que equivalen a su funcionalidad. Los eventos son tales como \textbf{Al clickar}, \textbf{Al empezar}, \textbf{Al pulsar una tecla}...
+	
 	
 	\begin{center}
 	\includegraphics[width=0.7\linewidth]{scratch}

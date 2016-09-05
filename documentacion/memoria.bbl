@@ -60,6 +60,11 @@ Surajit Chaudhuri \&~Raghav Kaushik, \emph{Extending autocompletion to tolerate
 \bibitem{pegjs}
 David Majda, \emph{Peg.js}, \url{http://pegjs.org}, 2010-2016.
 
+\bibitem{javascripteval}
+MDN, \emph{Javascript - eval},
+  \url{https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval},
+  2016.
+
 \bibitem{mundoingles}
 El~mundo, \emph{El 63\% de los alumnos españoles no comprende el inglés al
   finalizar la eso},

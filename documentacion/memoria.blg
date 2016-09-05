@@ -3,93 +3,95 @@ Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: memoria.aux
 The style file: amsplain.bst
 Database file #1: biblio.bib
+Warning--entry type for "javascripteval" isn't style-file defined
+--line 1 of file biblio.bib
 Warning--entry type for "bison" isn't style-file defined
---line 9 of file biblio.bib
+--line 17 of file biblio.bib
 Warning--entry type for "acmtdop" isn't style-file defined
---line 18 of file biblio.bib
-Warning--entry type for "codemirrorapi" isn't style-file defined
 --line 26 of file biblio.bib
+Warning--entry type for "codemirrorapi" isn't style-file defined
+--line 34 of file biblio.bib
 Warning--entry type for "typesafety" isn't style-file defined
---line 35 of file biblio.bib
-Warning--entry type for "memorysafety" isn't style-file defined
 --line 43 of file biblio.bib
-Warning--entry type for "statictypecheck" isn't style-file defined
+Warning--entry type for "memorysafety" isn't style-file defined
 --line 51 of file biblio.bib
-Warning--entry type for "pegjs" isn't style-file defined
+Warning--entry type for "statictypecheck" isn't style-file defined
 --line 59 of file biblio.bib
+Warning--entry type for "pegjs" isn't style-file defined
+--line 67 of file biblio.bib
 Warning--entry type for "mundoingles" isn't style-file defined
---line 75 of file biblio.bib
-Warning--entry type for "conflictoll3" isn't style-file defined
 --line 83 of file biblio.bib
-Warning--entry type for "dcg" isn't style-file defined
+Warning--entry type for "conflictoll3" isn't style-file defined
 --line 91 of file biblio.bib
-Warning--entry type for "bnf" isn't style-file defined
+Warning--entry type for "dcg" isn't style-file defined
 --line 99 of file biblio.bib
-Warning--entry type for "codemirrorsyntaxhighlight" isn't style-file defined
+Warning--entry type for "bnf" isn't style-file defined
 --line 107 of file biblio.bib
-Warning--entry type for "codemirrorautocomplete" isn't style-file defined
+Warning--entry type for "codemirrorsyntaxhighlight" isn't style-file defined
 --line 115 of file biblio.bib
+Warning--entry type for "codemirrorautocomplete" isn't style-file defined
+--line 123 of file biblio.bib
 Warning--entry type for "levensthein" isn't style-file defined
---line 131 of file biblio.bib
-Warning--entry type for "lcs" isn't style-file defined
 --line 139 of file biblio.bib
-Warning--entry type for "javascriptasync" isn't style-file defined
+Warning--entry type for "lcs" isn't style-file defined
 --line 147 of file biblio.bib
-Warning--entry type for "breakpoint" isn't style-file defined
+Warning--entry type for "javascriptasync" isn't style-file defined
 --line 155 of file biblio.bib
-Warning--entry type for "diff" isn't style-file defined
+Warning--entry type for "breakpoint" isn't style-file defined
 --line 163 of file biblio.bib
-Warning--entry type for "callbackhell" isn't style-file defined
+Warning--entry type for "diff" isn't style-file defined
 --line 171 of file biblio.bib
-Warning--entry type for "async" isn't style-file defined
+Warning--entry type for "callbackhell" isn't style-file defined
 --line 179 of file biblio.bib
-Warning--entry type for "jnsigwt" isn't style-file defined
+Warning--entry type for "async" isn't style-file defined
 --line 187 of file biblio.bib
-Warning--entry type for "peg" isn't style-file defined
+Warning--entry type for "jnsigwt" isn't style-file defined
 --line 195 of file biblio.bib
-Warning--entry type for "syntaxhighlight" isn't style-file defined
+Warning--entry type for "peg" isn't style-file defined
 --line 203 of file biblio.bib
-Warning--entry type for "microsoftresearchautocomplete" isn't style-file defined
+Warning--entry type for "syntaxhighlight" isn't style-file defined
 --line 211 of file biblio.bib
-You've used 24 entries,
+Warning--entry type for "microsoftresearchautocomplete" isn't style-file defined
+--line 219 of file biblio.bib
+You've used 25 entries,
             2213 wiz_defined-function locations,
-            602 strings with 6759 characters,
-and the built_in function-call counts, 4985 in all, are:
-= -- 403
-> -- 153
+            606 strings with 6884 characters,
+and the built_in function-call counts, 5195 in all, are:
+= -- 420
+> -- 160
 < -- 0
-+ -- 69
-- -- 43
-* -- 242
-:= -- 763
-add.period$ -- 24
-call.type$ -- 24
-change.case$ -- 96
++ -- 72
+- -- 45
+* -- 252
+:= -- 796
+add.period$ -- 25
+call.type$ -- 25
+change.case$ -- 100
 chr.to.int$ -- 0
-cite$ -- 24
-duplicate$ -- 264
-empty$ -- 577
-format.name$ -- 43
-if$ -- 1095
+cite$ -- 25
+duplicate$ -- 275
+empty$ -- 601
+format.name$ -- 45
+if$ -- 1141
 int.to.chr$ -- 0
-int.to.str$ -- 24
-missing$ -- 24
-newline$ -- 82
-num.names$ -- 43
-pop$ -- 240
+int.to.str$ -- 25
+missing$ -- 25
+newline$ -- 85
+num.names$ -- 45
+pop$ -- 250
 preamble$ -- 1
-purify$ -- 72
+purify$ -- 75
 quote$ -- 0
-skip$ -- 167
+skip$ -- 174
 stack$ -- 0
-substring$ -- 122
-swap$ -- 24
+substring$ -- 127
+swap$ -- 25
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 96
+type$ -- 100
 warning$ -- 0
-while$ -- 43
-width$ -- 26
-write$ -- 201
-(There were 24 warnings)
+while$ -- 45
+width$ -- 27
+write$ -- 209
+(There were 25 warnings)
