@@ -1,14 +1,28 @@
 \select@language {spanish}
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {1.1}{\ignorespaces Example of JNSI}}{4}{figure.1.1}
+\contentsline {figure}{\numberline {1.1}{\ignorespaces Example of JSNI}}{4}{figure.1.1}
 \contentsline {figure}{\numberline {1.2}{\ignorespaces Native JavaScript code written in ZL}}{4}{figure.1.2}
 \contentsline {figure}{\numberline {1.3}{\ignorespaces Automatic suggestion}}{5}{figure.1.3}
 \contentsline {figure}{\numberline {1.4}{\ignorespaces Automatic completion}}{6}{figure.1.4}
 \contentsline {figure}{\numberline {1.5}{\ignorespaces Breakpoint: pause example.}}{7}{figure.1.5}
 \addvspace {10\p@ }
 \addvspace {10\p@ }
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Ejemplo de Scratch.}}{13}{figure.3.1}
+\contentsline {figure}{\numberline {3.2}{\ignorespaces \IeC {\'A}rbol de proyectos en Scratch.}}{14}{figure.3.2}
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Resolviendo un problema en code.org}}{14}{figure.3.3}
 \addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Ejemplo de autocompletado.}}{23}{figure.4.1}
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Diagrama de ejemplo de intercambios usando eventos.}}{24}{figure.4.2}
 \addvspace {10\p@ }
+\contentsline {figure}{\numberline {5.1}{\ignorespaces Fases de compilaci\IeC {\'o}n.}}{26}{figure.5.1}
+\contentsline {figure}{\numberline {5.2}{\ignorespaces Ejemplo de an\IeC {\'a}lisis.}}{38}{figure.5.2}
+\contentsline {figure}{\numberline {5.3}{\ignorespaces Ejemplo de c\IeC {\'o}digo generado y c\IeC {\'o}digo nativo.}}{45}{figure.5.3}
+\contentsline {figure}{\numberline {5.4}{\ignorespaces C\IeC {\'o}digo nativo que muestra una alerta.}}{46}{figure.5.4}
+\contentsline {figure}{\numberline {5.5}{\ignorespaces Diferencias entre c\IeC {\'o}digo as\IeC {\'\i }ncrono y s\IeC {\'\i }ncrono.}}{48}{figure.5.5}
+\contentsline {figure}{\numberline {5.6}{\ignorespaces Ejemplos de distintos contextos en autocompletado.}}{51}{figure.5.6}
+\contentsline {figure}{\numberline {5.7}{\ignorespaces Autocompletado con filtro por tipos}}{52}{figure.5.7}
+\contentsline {figure}{\numberline {5.8}{\ignorespaces Ejemplo de c\IeC {\'o}digo err\IeC {\'o}neo y mensaje de error.}}{54}{figure.5.8}
+\contentsline {figure}{\numberline {5.9}{\ignorespaces Ejemplo de uso de pausa (breakpoint).}}{54}{figure.5.9}
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }

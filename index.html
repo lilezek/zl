@@ -638,9 +638,9 @@ Fin
         var zlcode = editor.getValue();
         if (!corriendo) {
           corriendo = true;
-          ejecutor.ejecutar(lastjs);
           $('#run').html('Abortar');
           eventoLimpiar();
+          ejecutor.ejecutar(lastjs);
         } else {
           corriendo = false;
           $("#run").html("Empezar");
