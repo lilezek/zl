@@ -56,15 +56,11 @@
 	
 	The \textit{Facultad de Informática de la Universidad de Murcia} (FIUM - Computer Science School of Murcia's University) hosts a learning platform, named Descubre, which offers high school students (those who are not yet studying in the university) tools to learn computer programming. This platform aims for making students discover their vocations. Students interested in computer science are able to get to know this field using Descubre, where novices can find examples of source code submitted by teachers or even other students, also they will also find tutorials and documentation. 
 	
-	Descubre's compiler works with a language developed by FIUM. This language (named iJava) is based on Java. It offers a Java-like syntax, but iJava is not object oriented; it is instead an imperative language which removes the complexity of objects.
-	
-	%TODO extracurricular o early classes
+	Descubre's compiler works with a language developed by FIUM. This language (named iJava) is based on Java. It offers a Java-like syntax, but also offers an imperative approach which removes the complexity of objects.
 	
 	During many years the FIUM promoted extracurricular teaching of computer programming for high school students with tools and contests. They have developed their own platform that uses iJava as language, where students sign-up to share their programs with the rest of the students. Also, anyone can clone other's code and edit it.
 	
-	%TODO natual languaje o common languaje
-	
-	Like Descubre, the main objective of this work is to develop a new platform, with a new language, easy to read (for Spanish students) using near natural language to execute code in the web browser.
+	The main objective of this work is to develop a new platform like Descubre, with a new language, easy to read (for Spanish students) using near natural language to execute code in the web browser.
 	
 	All the code done during this work can be found at \url{www.github.com/lilezek/zl}. Part of this documentation references files from there. 
 	
@@ -78,25 +74,29 @@
 	
 	ZL's formal definition is based on common Spanish. Almost all keywords are common words in Spanish, so it should be easy to read for new students. The language's grammar is written in extended Backus Normal Form, and can be found in \hyperref[app:a]{Appendix A}.
 	
-	This language is case insensitive. All but literals can be written in capital or 
+	This language is case insensitive. All but literals can be written in capital or lower case, and it does not matter for the execution of the code. 
 	
-	ZL is an imperative language that does not use functions but only procedures. It is statically typed (type coherency is checked at compile time), and it is memory safe (there are no pointers, and every operation is checked for type coherency). Every procedure is called \textbf{subrutina} (subroutine) and can contain an arbitrary amount of input and output data. The arguments of subroutines are associated by name. Type conversion must be done explicitly using a subroutine or using \textbf{type converter operator} `como' (wich literally means as or like). Each argument associates a name to an expression using an arrow. Arrows can point to left or right, meaning input data or output data respectively: 
+	ZL is an imperative language that does not use functions but only procedures. It is statically typed (type coherency is checked at compile time), and it is memory safe (there are no pointers, and every operation is checked for type coherency). Every procedure is called \textbf{subrutina} (subroutine) and can contain an arbitrary amount of input and output data. The arguments of subroutines are associated by name. Type conversion must be done explicitly using a subroutine or using the \textbf{type converter operator} called `como' (wich literally means as or like in Spanish). Each argument associates a name to an expression using an arrow. Arrows can point to left or right, meaning input data or output parameter respectively: 
+	
+	In a C-like syntax users expect
+	
+		\vspace{10px}
+	
+\begin{BVerbatim}
+result = pyramidVolume(3,4,4);
+\end{BVerbatim}
+	
+	\vspace{10px}
+	
+	where users must remember the order of arguments 
+	for writing new code and reading old code.
+	In ZL, the order is irrelevant. The reading of the code 
+	is easier as readers do not have to remember how 
+	pyramidVolume was defined. 
 	
 	\vspace{10px}
 	
 \begin{BVerbatim}
-In a C-like syntax users expect
-
-result = pyramidVolume(3,4,4);
-
-where users must remember the order of arguments 
-for writing new code and reading old code.
-In ZL, the order is irrelevant. The reading of the code 
-is easier as readers do not have to remember how 
-pyramidVolume was defined. However, writing may be harder 
-as writers must remember words, which may be harder than 
-remember order.
-
 pyramidVolume [
   baseLongitude <- 3 // Input 
   baseWidth <- 4     // Input
@@ -128,9 +128,9 @@ pyramidVolume [
 
 	Several examples of usage of ZL can be found in \textbf{programas/*.zl}. There are simple examples for students to learn the basic usage of the language. More advanced code can be found in \textbf{bibliotecasZL/*.zl} that contains native Javascript code, operator overloading and generic types. 
 	
-	Formal definition is used as a guide to write the compiler. The compiler is written from scratch, after discarding\footnote{ZL is ambiguous before seeking third token. It means that the analyzer must advance three tokens in some syntactic structures to make sure which rule must be taken in order to get a correct analysis. These compilers do not seem to be strong enough to achieve this task.} some already Javascript written compilers. It uses top-down recursive model, where each derivation rule is associated with a Javascript function. 
+	Formal definition is used as a guide to write the compiler. The compiler is written from scratch, after discarding\footnote{ZL is ambiguous before seeking third token. It means that the analyzer must advance three tokens in some syntactic structures to make sure which rule must be taken in order to get a correct analysis. These compilers do not seem to be strong enough to achieve this task.} some already Javascript written compilers. It uses a top-down recursive model, where each derivation rule is associated with a Javascript function. 
 	
-	The compiler is divided in four stages. Each stage gets data from a structure and produces a new structure. First stage gets ZL code as input and produces a syntactic tree. Second stage uses this tree to generate a table of symbols, which register names and symbols. Third stage uses the tree and the table of symbols to ensure that there is no illegal code (ensuring semantic coherence). If third stage succeeds then the code is finally converted into Javascript.
+	The compiler is divided in four stages. Each stage gets data from a structure and produces a new structure. First stage gets ZL code as input and produces a syntactic tree. Second stage uses this tree to generate a symbol table, which register names and symbols. Third stage uses the tree and the symbol table to ensure that there is no illegal code (ensuring semantic coherence). If third stage succeeds then the code is finally converted into Javascript.
 	
 	The compiler maps each syntactic structure of ZL into structures of Javascript. After that, with the use of eval\cite{javascripteval} is easy to execute generated code.
 	
@@ -156,7 +156,7 @@ pyramidVolume [
 
 	As part of the programming environment, users can write ZL code directly in the web browser with the aid of an \textit{intelligent} editor. The intelligence provided to the editor relies on automatic suggestion of keywords and names, to aid students to auto-complete code without the need of memorizing full names. This is a key part of the project as ZL is a verbose language, and it may be harder to memorize than professional languages which are shorter to write.
 	
-	At first, when a user writes code triggers the automatic suggestion which shows a list inside a popup with possible options \hyperref[fig:beforecompletion]{(Figure 1.3)}.
+	When a user writes code (of at least 3 letters) triggers the automatic suggestion which shows a list inside a popup with possible options \hyperref[fig:beforecompletion]{(Figure 1.3)}.
 	
 	
 \begin{figure}
@@ -166,7 +166,7 @@ pyramidVolume [
 \label{fig:beforecompletion}
 \end{figure}
 
-	Every time a programmer uses auto-completion, the editor inputs a template for the structure selected by the user, so he/she does not have the need to remember the structure, arguments and names \hyperref[fig:aftercompletion]{(Figure 1.4)}.
+	Every time a programmer uses auto-completion, the editor fulfills a template for the structure selected by the user, so he/she does not have the need to remember the structure, arguments and names \hyperref[fig:aftercompletion]{(Figure 1.4)}.
 	
 \begin{figure}
 \centering
@@ -175,17 +175,17 @@ pyramidVolume [
 \label{fig:aftercompletion}
 \end{figure}
 
-	This part seemed really necessary because, as it was pointed before, reading ZL may be easier, but writing may be (a lot) harder without any help. We see that remembering every argument of every subroutine is not an attractive feature for a language, which is worse if it is used by new students. Memorizing structures (in ZL there are just two loop structures and three conditionals) composed by three or four keywords does not seem like a problem. However, having to remember over fifty subroutines with two or more arguments (because return values in ZL are arguments too) will most likely be an issue. 
+	This part seemed really necessary because, as it was pointed out before, reading ZL may be easier, but writing may be (a lot) harder without any help. We see that remembering every argument of every subroutine is not an attractive feature for a language. In the case of new students, this will likely be a real problem. Memorizing structures (in ZL there are just two loop structures and three conditionals) composed by three or four keywords does not seem like a hard task. However, having to remember over fifty subroutines with two or more arguments (because return values in ZL are arguments too) will most likely be an issue. 
 	
-	Each time the code successfully compiles, one of the compilation stages generates a table of symbols. This table is used to populate all the suggestions of the auto-completion. If a user writes a new subroutine, it is added into the table and therefore into the list of automatic suggestions.
+	Each time the code successfully compiles, one of the compilation stages generates a symbol table. This table is used to populate all the suggestions of the auto-completion. If a user writes a new subroutine, it is added into the table and therefore into the list of automatic suggestions.
 	
-	The list is sorted using Levensthein's distance\cite{levensthein}. For every possible option from the list, the editor calculates this distance between the suggestion and the user's input. After that, items with less distance appear first. That is the reason that makes `elip' show `elipse' before any other option in \hyperref[fig:beforecompletion]{figure 1.3}.
+	 For every possible option from the list, the editor calculates this distance between the suggestion and the user's input. This distance is Levensthein's distance\cite{levensthein}. After that, items with less distance appear first. That is the reason that makes `elip' show `elipse' before any other option in \hyperref[fig:beforecompletion]{figure 1.3}.
 	
 	The editor is also provided with syntax highlighting. If a line contains an error it is colored in pink (like `elip' line in \hyperref[fig:beforecompletion]{figure 1.3}). Every keyword is colored in dark pink, and every string in red. 
 	
-	If the code fails to be compiled because the user inputs wrong syntax, or it does not pass any semantic test, the user interface displays an error in common language to warn the user why the code is refused to be compiled. Errors are generated the first three of the four compiling stages, as an exception (with helpful data to construct a message). The editor catches the thrown error, then calls a constructor using the thrown error, which generates an HTML code that is embedded into the user interface. 
+	If the code fails to be compiled because the user inputs wrong syntax, or it does not pass any semantic test, the user interface displays an error in common language to warn the user why the code is refused to be compiled. Errors are generated at the first three of the four compiling stages, as an exception (with helpful data to construct a message). The editor catches the thrown error, then calls a constructor using the thrown error, which generates an HTML code that is embedded into the user interface. 
 	
-	ZL code can be debugged by using breakpoints which are part of the code itself. Users can write `pausar' (pause) as a sentence inside an algorithm  which breaks the code in two parts: the code before the pause executes normally, then the code is stopped. A button in the user interface with a label `continuar' (continue) is shown. This button will resume the execution of the code when pressed, running the second part (the one after the pause, \hyperref[fig:pausa]{figure 1.5}).  
+	ZL code can be debugged by using breakpoints which are part of the code itself. Users can write `pausar' (pause) as a sentence inside an algorithm  which breaks the code in two parts: the code before the pause executes normally, then the code is stopped. A button in the user interface with a label `continuar' (continue) is shown. When pressed, this button will resume the execution of the code, running the second part (the one after the pause, \hyperref[fig:pausa]{figure 1.5}).  
 	
 \begin{figure}
 \centering
@@ -195,7 +195,7 @@ pyramidVolume [
 \label{fig:pausa}
 \end{figure}
 
-	To end this abstract, it is rational to think that the aim of this tool is not giving users a professional language to produce programs. Having this tool may get new learners of computer programming lesser busy reading and writing code, and a bigger focus on how to produce and understand algorithms. We do not suggest advanced students to keep using ZL, but we suggest to move onto professional languages which have a bigger community, more efficiency, a greater number of tools to produce professional and maintainable code, and more testing of stability. 
+	To end this abstract, it is rational to think that the aim of this tool is not giving users a professional language to produce programs. Having this tool may get new learners of computer programming less busy reading and writing code, and focusing more on how to produce and understand algorithms. We do not suggest advanced students to keep using ZL, but we suggest to move onto professional languages which have a bigger community, more efficiency, a greater number of tools to produce professional and maintainable code, and more testing of stability. 
 
 	We hope that all these features will be helpful to new Spanish learners of computer programming, and also to teachers that will be able to create their own learning framework using ZL. It would be great to have the language tested by new users to measure the learning curve of this language inside this environment, to see what parts can be changed to get a better language in terms of learning success. 
 	
@@ -400,13 +400,53 @@ pyramidVolume [
 	Se puede encontrar más información sobre la teoría y una implementación del analizador en este sitio: 
 	\href{http://javascript.crockford.com/tdop/tdop.html}{Texto de Douglas Crockford}
 		
-	\section{Editores de texto para Javascript y HTML}
+	\section{Editor de código y entorno de programación}
+	
+	El entorno está divido en 4 partes: editor de texto, lienzo de dibujo, apartado auxiliar para depuración, y apartado para entrada y salida de texto con botones de inicio y aborto de la ejecución.
+	
+	\subsection{Editor de texto HTML5 y Javascript}
 	
 	Lo primero que he encontrado ha sido el editor Codemirror. Es el mismo editor que usa el proyecto Descubre de la facultad. No me he dedicado en buscar otros editores porque este tiene
 	todo lo que necesito para poder preparar el entorno, y además su API está muy bien documentada\cite{codemirrorapi}.
 	
 	Acceso:
 	\href{http://codemirror.net/}{Página web oficial de codemirror.}
+	
+	\subsection{Coloreado de sintaxis}
+	
+	El propio editor de texto CodeMirror visto en el apartado anterior tiene elementos para configurar un autocompletado basado en tokens. 
+	
+	\vspace{10px}
+	
+	Cada token se clasifica en una clase u otra, y después cada clase tiene un estilo CSS asociado. De esta forma, con una buena clasificación y una hoja de estilos CSS se puede conseguir configurar este aspecto del editor.
+	
+	\subsection{Autocompletado}
+	
+	Existe un plugin para facilitar el autocompletado de código para CodeMirror, aunque solo ofrece un menú contextual al escribir texto. 
+	
+	\vspace{10px}
+	
+	A este plugin habría que añadirle la funcionalidad sobre qué elementos deben aparecer en el menú contextual, así como en qué orden y qué acción realizaría cada elección.
+	
+	\subsubsection{Elementos para la lista de autocompletado}
+	
+	Editores como Code::Blocks (para C++) y Eclipse (para Java) permiten autocompletar estructuras (sintácticas del lenguaje) así como nombres (de funciones, de métodos, de clases, de variables...).
+	
+	\vspace{10px}
+	
+	En el menú contextual también se muestra información adicional sobre los métodos en Java, si estos han sido previamente comentados usando algún estándar como Javadoc\cite{javadoc}.
+	
+	\vspace{10px}
+	
+	Las entradas de los menús contextuales a la hora de sugerir opciones para autocompletar varía dependiendo de la posición donde se está escribiendo el código, así como del código incluido previamente. En otras palabras, el autocompletado se puede hacer sensible al contexto y entonces dependería del código escrito anteriormente, ofreciendo mejores resultados.
+	
+	\subsection{Compilado transparente - Autocompilado}
+	
+	Todos los entornos de aprendizaje vistos con anterioridad tienen un botón para iniciar la ejecución, pero el compilado es transparente. Sin embargo, los usuarios reciben un mensaje de error cuando cometen un error al escribir código, lo que da a pensar que el código se está compilando (o al menos, analizando) de forma periódica, automática y transparente mientras el usuario escribe. 
+	
+	\vspace{10px}
+	
+	Todo apunta a que cuando el usuario deja de teclear durante un corto periodo de tiempo, se inicia la compilación. Esta compilación se almacena para su posterior uso, ya sea para mostrar un mensaje de error o para permitir el inicio de la ejecución, al pulsar un botón de inicio.
 	
 	\chapter{Análisis de objetivos y metodología}
 	
