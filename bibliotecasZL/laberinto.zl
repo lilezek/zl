@@ -1,0 +1,116 @@
+Configuracion
+  nombreModulo <- "laberinto"
+  importar "bibliotecasZL/lista.zl"
+  integrar "bibliotecasZL/canvas.zl"
+Fin
+
+Subrutina Primitiva AlgoritmoGeneratriz
+Datos
+
+Algoritmo
+  /*
+  var cells = $self.$miembros.v;
+  var h = cells.length;
+  var w = cells[0].length;
+  var newpoint = false;
+
+  var 
+
+  do {
+    for (var i = 0; i < h; i++) {
+      for (var j = 0; j < w; j++) {
+        var esquina =
+
+      }
+    }
+  } while(newpoint);
+
+  */
+Fin
+
+Subrutina Primitiva Inicio
+Datos
+  ancho es numero de entrada
+  alto es numero de entrada
+Algoritmo
+  /*
+  $self.$miembros.v = [];
+  for (var i = 0; i < $entrada.alto; i++) {
+    var arr = [];
+    for (var j = 0; j < $entrada.ancho; j++) {
+      arr.push(0);
+    }
+    $self.$miembros.v.push(arr);
+  }
+  $self.algoritmogeneratriz({
+    w: $entrada.ancho,
+    h: $entrada.alto,
+    px: 0,
+    py: 0
+  })
+  */
+Fin
+
+Subrutina Primitiva Dibujar
+Datos
+  posX es numero de entrada
+  posY es numero de entrada
+  alto es numero de entrada
+  ancho es numero de entrada
+Algoritmo
+  /*
+  var h = $self.$miembros.v.length;
+  var w = $self.$miembros.v[0].length;
+
+  var cW = $entrada.ancho/w;
+  var cH = $entrada.alto/h;
+
+  // Hack:
+  var esquina = {
+    $miembros: {
+      px: 0,
+      py: 0
+    }
+  }
+
+  $self.grosorborde({
+    grosor: 0
+  });
+
+  for (var i = 0; i < h; i++) {
+    for (var j = 0; j < w; j++) {
+      esquina.$miembros.px = $entrada.posx + cW * j;
+      esquina.$miembros.py = $entrada.posy + cH * i;
+      if ($self.$miembros.v[i][j] == 1) {
+        $self.colorrelleno({
+          relleno: {
+            $miembros: {
+              r: 0,
+              g: 0,
+              b: 0,
+              a: 1
+            }
+          }
+        });
+      }
+      else if ($self.$miembros.v[i][j] == 2) {
+        $self.colorrelleno({
+          relleno: {
+            $miembros: {
+              r: 0xff,
+              g: 0xff,
+              b: 0xff,
+              a: 1
+            }
+          }
+        });
+      }
+      $self.rectangulo({
+        esquina: esquina,
+        alto: cH,
+        ancho: cW
+      });
+    }
+  }
+  */
+Fin
