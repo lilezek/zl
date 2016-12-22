@@ -15,7 +15,8 @@ var modulo = function(zl) {
     var integraciones = simbolo.arrayDeIntegraciones();
     for (var i = 0; i < integraciones.length; i++) {
       var nombre = integraciones[i].configuracion.nombremodulo;
-      resultado += "$in." + nombre + ".call(this, $in);"
+      if (nombre != '$internal')
+        resultado += "$in." + nombre + ".call(this, $in);"
     }
     resultado += "this.$miembros={";
     var coma = "";
