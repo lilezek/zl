@@ -284,24 +284,26 @@ Datos
   url es Texto de Entrada
 Algoritmo
   /*
-  // TODO: crear la caché fuera de esta subrutina
-  $self.$miembros.$cacheDeImagenes = $self.$miembros.$cacheDeImagenes || {};
-  var img = new Image();
-  img.onload = function() {
-    $self.$miembros.$cacheDeImagenes[$entrada.url] = img;
-    done(null, {});
-  }
-  img.onerror = function(e) {
-    $exterior.$error({
-      error: 'E_EJECUCION_IMAGEN_NO_CARGA',
-      informacion: {
-    		url: $entrada.url,
-        motivo: e,
-        adicional: "No se pudo cargar la imagen."
-    	}
-    });
-  }
-  img.src = $entrada.url;
+  return new Promise((res, rej) => {
+    $self.$miembros.$cacheDeImagenes = $self.$miembros.$cacheDeImagenes || {};
+    var img = new Image();
+    img.onload = function() {
+      $self.$miembros.$cacheDeImagenes[$entrada.url] = img;
+      res({});
+    }
+    img.onerror = function(e) {
+      $exterior.$error({
+        error: 'E_EJECUCION_IMAGEN_NO_CARGA',
+        informacion: {
+          url: $entrada.url,
+          motivo: e,
+          adicional: "No se pudo cargar la imagen."
+        }
+      });
+      rej(e);
+    }
+    img.src = $entrada.url;
+  })
   */
 Fin
 

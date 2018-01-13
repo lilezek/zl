@@ -47,11 +47,8 @@ Datos
   mensaje es Texto de Salida
 Algoritmo
   /*
-  $exterior.$eventoasincrono('leer', {}, function(err, value) {
-    done(null, {
-      mensaje: value
-    });
-  });
+  console.log($exterior.$eventoasincrono);
+  $salida.mensaje = await $exterior.$eventoasincrono('leer', {});
   */
 Fin
 
@@ -60,16 +57,12 @@ Datos
   numero es Numero de Salida
 Algoritmo
   /*
-  $exterior.$eventoasincrono('leer', {}, function cbck(err, value) {
-    var x = parseFloat(value);
-    if (isNaN(x))
-      $exterior.$eventoasincrono('leer', {}, cbck);
-    else {
-      done(null, {
-        numero: x
-      });
-    }
-  });
+  let x;
+  while (isNaN(x)) {
+    const value = await $exterior.$eventoasincrono('leer', {});
+    x = parseFloat(value);
+  }
+  $salida.numero = x;
   */
 Fin
 
