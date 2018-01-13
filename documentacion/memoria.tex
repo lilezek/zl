@@ -43,12 +43,13 @@
 	
 	\maketitle
 	
-	\centering
-	\textbf{Declaración de originalidad.}
-	
-	\vspace{50px}
-	
-	Yo, Ezequiel Santamaría Navarro, soy el único autor de este trabajo, que engloba la memoria, así como de la definición total de ZL, de su compilador, y del entorno construido alrededor del compilador y del lenguaje. 
+	\begin{center}
+		\textbf{Declaración de originalidad.}
+		
+		\vspace{50px}
+		
+		Yo, Ezequiel Santamaría Navarro, soy el único autor de este trabajo, que engloba la memoria, así como de la definición total de ZL, de su compilador, y del entorno construido alrededor del compilador y del lenguaje. 
+	\end{center}
 	
 	\tableofcontents
 	\listoffigures
@@ -458,6 +459,18 @@ pyramidVolume [
 	
 	Todo apunta a que cuando el usuario deja de teclear durante un corto periodo de tiempo, se inicia la compilación. Esta compilación se almacena para su posterior uso, ya sea para mostrar un mensaje de error o para permitir el inicio de la ejecución, al pulsar un botón de inicio.
 	
+	\section{Técnicas de compilación y ejecución en JavaScript}
+	
+	Como mejora adicional al trabajo original, se ha hecho un estudio del estado del arte de los entorno de ejecución de JavaScript en 2017. También se han estudiado otros lenguajes con propiedades similares para utilizar parte de sus técnicas.
+	
+	\subsection{Async/Await}
+	
+	%TODO: Añadir información sobre async/await
+	
+	\subsection{Control de errores}
+	
+	%TODO: Añadir información sobre el control de errores de GoLang, así como panic.
+	
 	\chapter{Análisis de objetivos y metodología}
 	
 	%TODO: Edu: ¿Capítulo vacío?
@@ -729,7 +742,7 @@ elipse [
 	
 	\vspace{10px}
 	
-	En la cuarta y última fase se genera el código Javascript. Para ello se usan el árbol generado en las fases anteriores así como la tabla de símbolos. Se recorre el árbol de forma recursiva obteniendo las subrutinas del módulo, generando una función Javascript por cada subrutina. Los detalles de la generación de código Javascript se puede ver en los apartados `Código nativo, implementación de las subrutinas nativas' y `Código asíncrono convertido en código bloqueante'.
+	En la cuarta y última fase se genera el código Javascript. Para ello se usan el árbol generado en las fases anteriores así como la tabla de símbolos. Se recorre el árbol de forma recursiva obteniendo las subrutinas del módulo, generando una función Javascript por cada subrutina. Los detalles de la generación de código Javascript se puede ver en los apartados `Código nativo, implementación de las subrutinas nativas' y `Código  convertido en código bloqueante'.
 	
 	\subsection{Justificación de la elección de análisis descendente recursivo}
 	
