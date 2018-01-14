@@ -1,118 +1,184 @@
-var modulo = function(zl) {
-  "use strict";
-
-  var espaciosPorTabulacion = "  ";
+const mod = zl => {
+  const espaciosPorTabulacion = "  ";
 
   zl.error = zl.error || {};
 
-  function Error() {
-    this._tipo = "zl.Error";
-    this.representacion = "";
-    this.info = {};
-    this.flags = {
-      html: (typeof require !== "function")
-    };
-    this.indentacion = 0;
-    this._lineas = [];
-    this.codigo = "";
+  class Error {
+    constructor() {
+      this._tipo = "zl.Error";
+      this.representacion = "";
+      this.info = {};
+      this.flags = {
+        html: (typeof require !== "function")
+      };
+      this.indentacion = 0;
+      this._lineas = [];
+      this.codigo = "";
 
-    Object.defineProperty(this, "lineasDeError", {
-      get: function() {
-        return this._lineas;
-      },
-      set: function(v) {
-        if (Object.prototype.toString.call(v) === '[object Array]') {
-          this._lineas = v;
-        } else {
-          this._lineas.push(v);
+      Object.defineProperty(this, "lineasDeError", {
+        get() {
+          return this._lineas;
+        },
+        set(v) {
+          if (Object.prototype.toString.call(v) === '[object Array]') {
+            this._lineas = v;
+          } else {
+            this._lineas.push(v);
+          }
         }
+      });
+
+      return this;
+    }
+
+    texto(t) {
+      let tab = espaciosPorTabulacion;
+      const self = this;
+      t.replace(/\n/g, () => self._nlinea());
+      if (this.flags.html) {
+        tab = tab.replace(/ /g, "&nbsp;");
       }
-    });
-
-    return this;
-  }
-
-  Error.prototype.texto = function(t) {
-    var tab = espaciosPorTabulacion;
-    var self = this;
-    t.replace(/\n/g, function() {
-      return self._nlinea();
-    });
-    if (this.flags.html) {
-      tab = tab.replace(/ /g, "&nbsp;");
+      t.replace(/\t/g, tab);
+      this.representacion += t;
+      return this;
     }
-    t.replace(/\t/g, tab);
-    this.representacion += t;
-    return this;
-  }
 
-  Error.prototype._nlinea = function() {
-    var resultado = "";
-    if (this.flags.html) {
-      resultado += "<br>";
-    } else {
-      for (var i = 0; i < this.indentacion; i++)
-        resultado += "\t";
-      resultado += "\n";
+    _nlinea() {
+      let resultado = "";
+      if (this.flags.html) {
+        resultado += "<br>";
+      } else {
+        for (let i = 0; i < this.indentacion; i++)
+          resultado += "\t";
+        resultado += "\n";
+      }
+      return resultado;
     }
-    return resultado;
-  }
 
-  Error.prototype.nuevaLinea = function() {
-    this.representacion += this._nlinea();
-    return this;
-  }
-
-  Error.prototype.subrutina = function(sub) {
-    var html = this.flags.html;
-    if (typeof sub === "string") {
-      this.representacion += (html ? "<span class='subrutina'>" : "") +
-        sub +
-        (html ? "</span>" : "");
-    } else if (typeof sub === "object") {
-      this.representacion += (html ? "<span class='subrutina'>" : "") +
-        sub.nombre +
-        (html ? "</span>" : "");
+    nuevaLinea() {
+      this.representacion += this._nlinea();
+      return this;
     }
-    return this;
-  }
 
-  Error.prototype.dato = function(dato) {
-    var html = this.flags.html;
-    if (typeof dato === "string") {
-      this.representacion += (html ? "<span class='dato'>" : "") +
-        dato +
-        (html ? "</span>" : "");
-    } else if (typeof dato === "object") {
-      this.representacion += (html ? "<span class='dato'>" : "") +
-        dato.nombre +
-        (html ? "</span>" : "");
+    subrutina(sub) {
+      const html = this.flags.html;
+      if (typeof sub === "string") {
+        this.representacion += (html ? "<span class='subrutina'>" : "") +
+          sub +
+          (html ? "</span>" : "");
+      } else if (typeof sub === "object") {
+        this.representacion += (html ? "<span class='subrutina'>" : "") +
+          sub.nombre +
+          (html ? "</span>" : "");
+      }
+      return this;
     }
-    return this;
-  }
 
-  Error.prototype.modulo = function(modulo) {
-    var html = this.flags.html;
-    if (typeof modulo === "string") {
-      this.representacion += (html ? "<span class='modulo'>" : "") +
-        modulo +
-        (html ? "</span>" : "");
-    } else if (typeof modulo === "object") {
-      this.representacion += (html ? "<span class='modulo'>" : "") +
-        modulo.nombre +
-        (html ? "</span>" : "");
+    dato(dato) {
+      const html = this.flags.html;
+      if (typeof dato === "string") {
+        this.representacion += (html ? "<span class='dato'>" : "") +
+          dato +
+          (html ? "</span>" : "");
+      } else if (typeof dato === "object") {
+        this.representacion += (html ? "<span class='dato'>" : "") +
+          dato.nombre +
+          (html ? "</span>" : "");
+      }
+      return this;
     }
-    return this;
+
+    modulo(modulo) {
+      const html = this.flags.html;
+      if (typeof modulo === "string") {
+        this.representacion += (html ? "<span class='modulo'>" : "") +
+          modulo +
+          (html ? "</span>" : "");
+      } else if (typeof modulo === "object") {
+        this.representacion += (html ? "<span class='modulo'>" : "") +
+          modulo.nombre +
+          (html ? "</span>" : "");
+      }
+      return this;
+    }
+
+    tipo(tipo) {
+      const html = this.flags.html;
+      if (typeof tipo === "string") {
+        this.representacion += (html ? "<span class='tipo'>" : "") +
+          tipo +
+          (html ? "</span>" : "");
+      } else if (typeof tipo === "object") {
+        this.representacion += (html ? "<span class='tipo'>" : "") +
+          recursivoTipoInstancia(tipo) +
+          (html ? "</span>" : "");
+      }
+      return this;
+    }
+
+    resaltarLinea(posicion) {
+      // TODO: resaltar la línea correctamente en la opción no html
+      if (this.flags.html)
+        this.representacion += "<span class='linea' onclick='saltarAlCodigo($linea{" + (posicion + 1) + "},0);'>$linea{" + (posicion + 1) + "}</span>";
+      else
+        this.representacion += "Posicion: $linea{" + (posicion + 1) + "}\n";
+      return this;
+    }
+
+    indentar() {
+      this.indentacion += 1;
+      if (this.flags.html) {
+        this.representacion += "<span class='indentacion error'>";
+      }
+      return this;
+    }
+
+    desindentar() {
+      this.indentacion -= 1;
+      if (this.flags.html) {
+        this.representacion += "</span>";
+      }
+      return this;
+    }
+
+    vincularCodigo(codigo) {
+      this.codigo = codigo;
+      this.lineasDeError = [];
+    }
+
+    toString() {
+      const self = this;
+      if (this.indentacion != 0) {
+        throw "La indentacion no es correcta. Se ha terminado de construir el error con " + this.indentacion + " indentaciones.";
+      }
+      if (this.flags.html) {
+        var r = this.representacion.replace(/\$linea\{(\d*)\}/ig, (match, p1) => {
+          // Contar lineas hasta la posición:
+          const linea = (self.codigo.substring(0, parseInt(p1)).split("\n").length);
+          self.lineasDeError = linea;
+          return "" + linea;
+        });
+        return "<div class='error'>" + r + "</div>";
+      } else {
+        var r = this.representacion.replace(/\$linea\{(\d*)\}/ig, (match, p1) => {
+          // Contar lineas hasta la posición:
+          const linea = (self.codigo.substring(0, parseInt(p1)).split("\n").length);
+          self.lineasDeError = linea;
+          return "" + linea;
+        });
+        return r;
+      }
+    }
   }
 
   function recursivoTipoInstancia(dato) {
-    var resultado;
+    let resultado;
     if (dato.tipo) {
       resultado = dato.tipo.nombre;
       if (dato.genericos.length)
         resultado += "(";
-      var coma = "";
-      for (var i = 0; i < dato.genericos.length; i++) {
+      let coma = "";
+      for (let i = 0; i < dato.genericos.length; i++) {
         resultado += coma + recursivoTipoInstancia(dato.genericos[i]);
         coma = ",";
       }
@@ -123,83 +189,13 @@ var modulo = function(zl) {
     return resultado;
   }
 
-  Error.prototype.tipo = function(tipo) {
-    var html = this.flags.html;
-    if (typeof tipo === "string") {
-      this.representacion += (html ? "<span class='tipo'>" : "") +
-        tipo +
-        (html ? "</span>" : "");
-    } else if (typeof tipo === "object") {
-      this.representacion += (html ? "<span class='tipo'>" : "") +
-        recursivoTipoInstancia(tipo) +
-        (html ? "</span>" : "");
-    }
-    return this;
-  }
-
-  Error.prototype.resaltarLinea = function(posicion) {
-    // TODO: resaltar la línea correctamente en la opción no html
-    if (this.flags.html)
-      this.representacion += "<span class='linea' onclick='saltarAlCodigo($linea{" + (posicion + 1) + "},0);'>$linea{" + (posicion + 1) + "}</span>";
-    else
-      this.representacion += "Posicion: $linea{" + (posicion + 1) + "}\n";
-    return this;
-  }
-
-  Error.prototype.indentar = function() {
-    this.indentacion += 1;
-    if (this.flags.html) {
-      this.representacion += "<span class='indentacion error'>";
-    }
-    return this;
-  }
-
-  Error.prototype.desindentar = function() {
-    this.indentacion -= 1;
-    if (this.flags.html) {
-      this.representacion += "</span>";
-    }
-    return this;
-  }
-
-  Error.prototype.vincularCodigo = function(codigo) {
-    this.codigo = codigo;
-    this.lineasDeError = [];
-  }
-
-  Error.prototype.toString = function() {
-    var self = this;
-    if (this.indentacion != 0) {
-      throw "La indentacion no es correcta. Se ha terminado de construir el error con " + this.indentacion + " indentaciones.";
-    }
-    if (this.flags.html) {
-      var r = this.representacion.replace(/\$linea\{(\d*)\}/ig, function(match, p1) {
-        // Contar lineas hasta la posición:
-        var linea = (self.codigo.substring(0, parseInt(p1)).split("\n").length);
-        self.lineasDeError = linea;
-        return "" + linea;
-      });
-      return "<div class='error'>" + r + "</div>";
-    } else {
-      var r = this.representacion.replace(/\$linea\{(\d*)\}/ig, function(match, p1) {
-        // Contar lineas hasta la posición:
-        var linea = (self.codigo.substring(0, parseInt(p1)).split("\n").length);
-        self.lineasDeError = linea;
-        return "" + linea;
-      });
-      return r;
-    }
-  }
-
-  zl.error.newError = function(constructor, informacion) {
-    var err = new Error();
+  zl.error.newError = (constructor, informacion) => {
+    const err = new Error();
     constructor.call(err, informacion);
     return err;
   }
 
-  zl.error.esError = function(err) {
-    return err && err.constructor && err.constructor.name === "Error";
-  }
+  zl.error.esError = err => err && err.constructor && err.constructor.name === "Error"
 
   // distintos errores:
   zl.error.E_SIMBOLO = function(informacion) {
@@ -236,8 +232,8 @@ var modulo = function(zl) {
     this.info = informacion;
     this.enumeracion = 3;
     this.identificador = "E_NOMBRE_SUBRUTINA_YA_USADO";
-    var moduloNueva = informacion.modulo;
-    var moduloAnterior = informacion.otraSubrutina.padre;
+    const moduloNueva = informacion.modulo;
+    const moduloAnterior = informacion.otraSubrutina.padre;
     this
       .resaltarLinea(informacion.posicion[0])
       .texto("Error: la subrutina ")
@@ -338,7 +334,7 @@ var modulo = function(zl) {
       .texto("Los datos de la subrutina son: ")
       .nuevaLinea()
       .indentar();
-    for (var k in informacion.subrutina.declaraciones) {
+    for (const k in informacion.subrutina.declaraciones) {
       this
         .dato(informacion.subrutina.declaraciones[k])
         .texto(" es ")
@@ -392,7 +388,7 @@ var modulo = function(zl) {
       .texto("La lista de los datos actualmente declarados son: ")
       .nuevaLinea()
       .indentar();
-    for (var k in informacion.declaraciones) {
+    for (const k in informacion.declaraciones) {
       this
         .dato(informacion.declaraciones[k])
         .texto(" es ")
@@ -613,16 +609,14 @@ var modulo = function(zl) {
       .texto("Error: " + informacion)
   }
 
-  zl.error.unserializeError = function(e) {
-    // TODO: Hack
-    return zl.error.newError(zl.error[e.identificador], e.info);
-  }
+  zl.error.unserializeError = e => // TODO: Hack
+  zl.error.newError(zl.error[e.identificador], e.info)
 
   return zl;
-}
+};
 
 if (typeof module !== "undefined")
-  module.exports = modulo;
+  module.exports = mod;
 else {
-  this.zl = modulo(this.zl || {});
+  this.zl = mod(this.zl || {});
 }

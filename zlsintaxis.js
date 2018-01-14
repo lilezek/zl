@@ -1,9 +1,7 @@
-var modulo = function(zl) {
-  "use strict";
-
+const zlsintaxis = zl => {
   zl.sintaxis = zl.sintaxis || {};
 
-  var palabrasReservadas = {
+  const palabrasReservadas = {
     "no": true,
     "y": true,
     "o": true,
@@ -32,7 +30,7 @@ var modulo = function(zl) {
 
   // Usando el analizador que he construido, genero los símbolos del lenguaje
 
-  var a = zl.sintaxis.zlAnalizador = zl.analizador.newAnalizador();
+  const a = zl.sintaxis.zlAnalizador = zl.analizador.newAnalizador();
   a.simbolo("<-");
   a.simbolo(".", /^\./);
   a.simbolo("no", /^no(?![a-záéíóúñ0-9])/i);
@@ -108,7 +106,7 @@ var modulo = function(zl) {
       ["nombre", "<-", "texto"],
       ["nombre", "<-", "numero"]
     ]);
-    var intento = this.resultado(0);
+    const intento = this.resultado(0);
     if (intento == 0) {
       this.registrarResultado({
         tipo: "importar",
@@ -127,12 +125,12 @@ var modulo = function(zl) {
         tipoValor: "number"
       });
     } else if (intento === 2) {
-      var valor = this.resultado(0, intento, 2);
+      let valor = this.resultado(0, intento, 2);
       valor = valor.substring(1, valor.length - 1);
       this.registrarResultado({
         tipo: "configurar",
         nombre: this.resultado(0, intento, 0),
-        valor: valor,
+        valor,
         tipoValor: "string"
       });
     }
@@ -144,7 +142,7 @@ var modulo = function(zl) {
       ["decimal"],
       ["entero"]
     ]);
-    var intento = this.resultado(0);
+    const intento = this.resultado(0);
     this.registrarResultado(this.resultado(0, intento, 0));
     return this;
   });
@@ -159,7 +157,7 @@ var modulo = function(zl) {
 
   a.regla("nombre", function() {
     this.avanzar("nombreSimple");
-    var resultado;
+    let resultado;
     this.registrarResultado(resultado = this.resultado(0));
     // Comprobar que el resultado no es una palabra reservada
     if (resultado.toLowerCase() in palabrasReservadas) {
@@ -188,19 +186,19 @@ var modulo = function(zl) {
   a.regla("tipo", function() {
     this.nombre()
       .acumular("(").acumular("genericidad").acumular(")").avanzarVarios()
-    var genericos = new Array();
-    for (var i = 0; i < this.resultado(1).length; i++) {
+    let genericos = new Array();
+    for (let i = 0; i < this.resultado(1).length; i++) {
       genericos = genericos.concat(this.resultado(1, i, 1));
     }
     this.registrarResultado({
       tipo: this.resultado(0),
-      genericos: genericos
+      genericos
     })
     return this;
   });
 
   a.regla("genericidad", function() {
-    var resultado = [];
+    const resultado = [];
     this.intentar([
       ["tipo"],
       ["numero"]
@@ -212,7 +210,7 @@ var modulo = function(zl) {
         ["tipo"],
         ["numero"]
       ]).avanzarVarios();
-    for (var i = 0; i < this.resultado(1).length; i++) {
+    for (let i = 0; i < this.resultado(1).length; i++) {
       var intento = this.resultado(1, i, 1);
       resultado.push(this.resultado(1, i, 1, intento, 0));
     }
@@ -233,7 +231,7 @@ var modulo = function(zl) {
       .acumular("sentencia").avanzarVarios()
       // Fin
       .avanzar("fin");
-    var sub = {
+    const sub = {
       nombre: this.resultado(2),
       modificadores: this.resultado(1),
       datos: this.resultado(4) || [],
@@ -245,7 +243,7 @@ var modulo = function(zl) {
       }
     };
     // Buscar primitiva:
-    for (var i = 0; i < sub.modificadores.length; i++) {
+    for (let i = 0; i < sub.modificadores.length; i++) {
       if (sub.modificadores[i].toLowerCase() === "primitiva") {
         sub.segmentoPrimitivo = this.texto.substring(sub.secciones.algoritmo[0] + 10, sub.secciones.algoritmo[1]).trim();
       }
@@ -263,8 +261,8 @@ var modulo = function(zl) {
       ["mientras"],
       ["pausar"]
     ]);
-    var x = this.resultado(0);
-    var r = this.resultado(0, x, 0);
+    const x = this.resultado(0);
+    let r = this.resultado(0, x, 0);
     if (x == 5)
       r = {
         tipo: "pausar"
@@ -282,7 +280,7 @@ var modulo = function(zl) {
       ])
       .avanzar("<-")
       .expresion();
-    var intento = this.resultado(0);
+    const intento = this.resultado(0);
     this.registrarResultado({
       variable: this.resultado(0, intento, 0),
       valor: this.resultado(2)
@@ -291,7 +289,7 @@ var modulo = function(zl) {
   });
 
   a.regla("llamada", function() {
-    var contexto = null;
+    let contexto = null;
     try {
       this.lvalor().avanzar(".");
       contexto = this.resultado(0);
@@ -300,16 +298,16 @@ var modulo = function(zl) {
         throw e;
       this.retroceder(this.arbol().length);
     }
-    var indice = this.arbol().length;
+    const indice = this.arbol().length;
     this
       .nombre()
       .avanzar("[")
       .acumular("llamadaAsignacion").avanzarVarios()
       .avanzar("]")
 
-    var entrada = [];
-    var salida = [];
-    for (var i = 0; i < this.resultado(indice+2).length; i++) {
+    const entrada = [];
+    const salida = [];
+    for (let i = 0; i < this.resultado(indice+2).length; i++) {
       if (this.resultado(indice+2)[i].tipo == "entrada") {
         entrada.push(this.resultado(indice+2)[i]);
       } else {
@@ -317,10 +315,10 @@ var modulo = function(zl) {
       }
     }
     this.registrarResultado({
-      contexto: contexto,
+      contexto,
       nombre: this.resultado(indice),
-      entrada: entrada,
-      salida: salida,
+      entrada,
+      salida,
     });
   });
 
@@ -358,7 +356,7 @@ var modulo = function(zl) {
         ["->", "nombre", "(", "listaAcceso", ")"],
         ["->", "nombre"]
       ]);
-    var intento = this.resultado(1);
+    const intento = this.resultado(1);
     this.registrarResultado({
       tipo: (intento ? "salida" : "entrada"),
       izq: this.resultado(0),
@@ -389,7 +387,7 @@ var modulo = function(zl) {
         ["sinocondicional"],
         ["sino"]
       ]);
-      var intento = this.resultado(4);
+      const intento = this.resultado(4);
       if (intento == 0) {
         this.registrarResultado({
           condicion: this.resultado(1),
@@ -421,7 +419,7 @@ var modulo = function(zl) {
         ["sinocondicional"],
         ["sino"]
       ])
-    var intento = this.resultado(5);
+    const intento = this.resultado(5);
     if (intento == 0) {
       this.registrarResultado({
         condicion: this.resultado(2),
@@ -483,7 +481,7 @@ var modulo = function(zl) {
       if (this.arbol().length == 1)
         this.registrarResultado(this.resultado(0));
       else {
-        var intento = this.resultado(1);
+        const intento = this.resultado(1);
         this.registrarResultado({
           izq: this.resultado(0),
           der: this.resultado(2),
@@ -504,7 +502,7 @@ var modulo = function(zl) {
       ["+"],
       ["no"]
     ]).evaluacion();
-    var intento = this.resultado(0);
+    const intento = this.resultado(0);
     this.registrarResultado({
       der: this.resultado(1),
       op: this.resultado(0, intento, 0)
@@ -525,7 +523,7 @@ var modulo = function(zl) {
       ["(", "expresion", ")"]
     ]);
     var intento = this.resultado(0);
-    var evalResultado = null;
+    let evalResultado = null;
     if (intento == 8)
       evalResultado = {
         valor: this.resultado(0, intento, 1),
@@ -551,7 +549,7 @@ var modulo = function(zl) {
       ["como", "tipo"],
       ["(", "listaAcceso", ")"]
     ]).avanzarVarios();
-    for (var i = 0; i < this.resultado(1).length; i++) {
+    for (let i = 0; i < this.resultado(1).length; i++) {
       var intento = this.resultado(1, i);
       if (intento === 0) {
         evalResultado = {
@@ -560,8 +558,8 @@ var modulo = function(zl) {
           tipo: "conversion"
         }
       } else if (intento === 1) {
-        var arr = this.resultado(1,i,intento,1);
-        for (var j = 0; j < arr.length; j++) {
+        const arr = this.resultado(1,i,intento,1);
+        for (let j = 0; j < arr.length; j++) {
           evalResultado = {
             izq: evalResultado,
             der: arr[j],
@@ -580,13 +578,13 @@ var modulo = function(zl) {
       .acumular("(")
       .acumular("listaAcceso")
       .acumular(")").avanzarVarios();
-    var accesos = [];
-    for (var i = 0; i < this.resultado(1).length; i++) {
+    let accesos = [];
+    for (let i = 0; i < this.resultado(1).length; i++) {
       accesos = accesos.concat(this.resultado(1,i,1));
     }
     this.registrarResultado({
       dato: this.resultado(0),
-      accesos: accesos
+      accesos
     });
     return this;
   });
@@ -594,8 +592,8 @@ var modulo = function(zl) {
   a.regla("listaValores", function() {
     this.expresion()
       .acumular(",").acumular("expresion").avanzarVarios();
-    var res = [this.resultado(0)];
-    for (var i = 0; i < this.resultado(1).length; i++) {
+    const res = [this.resultado(0)];
+    for (let i = 0; i < this.resultado(1).length; i++) {
       res.push(this.resultado(1)[i][1]);
     }
     this.registrarResultado(res);
@@ -613,8 +611,8 @@ var modulo = function(zl) {
   a.regla("listaAcceso", function() {
     this.expresion()
       .acumular(",").acumular("expresion").avanzarVarios();
-    var resultado = [this.resultado(0)];
-    for (var i = 0; i < this.resultado(1).length; i++) {
+    const resultado = [this.resultado(0)];
+    for (let i = 0; i < this.resultado(1).length; i++) {
       resultado.push(this.resultado(1, i, 1));
     }
     this.registrarResultado(resultado);
@@ -622,10 +620,10 @@ var modulo = function(zl) {
   });
 
   return zl;
-}
+};
 
 if (typeof module !== "undefined")
-  module.exports = modulo;
+  module.exports = zlsintaxis;
 else {
-  this.zl = modulo(this.zl || {});
+  this.zl = zlsintaxis(this.zl || {});
 }
