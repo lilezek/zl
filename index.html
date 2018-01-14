@@ -140,6 +140,7 @@ Datos
   obstaculos es Lista(Punto) global
   puntuacion es Numero global
   t es Numero Global
+  error es Error
 Algoritmo
   puntuacion <- 0
   pajaro <- {500, 500} como punto
@@ -155,25 +156,67 @@ Algoritmo
   }
   cargarImagen [
     url <- "http://dis.um.es/~ginesgm/images/fondo2.png"
+    error -> error
   ]
+  si error como booleano hacer 
+    mostrar [
+      mensaje <- error como texto
+    ]
+  fin
   cargarImagen [
     url <- "http://dis.um.es/~ginesgm/images/fondo3.png"
+    error -> error
   ]
+  si error como booleano hacer 
+    mostrar [
+      mensaje <- error como texto
+    ]
+  fin
   cargarImagen [
     url <- "http://dis.um.es/~ginesgm/images/fondo3.png"
+    error -> error
   ]
+  si error como booleano hacer 
+    mostrar [
+      mensaje <- error como texto
+    ]
+  fin
   cargarImagen [
     url <- "http://dis.um.es/~ginesgm/images/bird1.png"
+    error -> error
   ]
+  si error como booleano hacer 
+    mostrar [
+      mensaje <- error como texto
+    ]
+  fin
   cargarImagen [
     url <- "http://dis.um.es/~ginesgm/images/bird2.png"
+    error -> error
   ]
+  si error como booleano hacer 
+    mostrar [
+      mensaje <- error como texto
+    ]
+  fin
   cargarImagen [
     url <- "http://dis.um.es/~ginesgm/images/palo1.png"
+    error -> error
   ]
+  si error como booleano hacer 
+    mostrar [
+      mensaje <- error como texto
+    ]
+  fin
   cargarImagen [
     url <- "http://dis.um.es/~ginesgm/images/palo2.png"
+    error -> error
   ]
+  si error como booleano hacer 
+    mostrar [
+      mensaje <- error como texto
+    ]
+  fin
   esconderRaton []
 Fin
 
@@ -269,7 +312,7 @@ Algoritmo
   i <- 1
   Repetir 6 veces
     Si (((pajaro("x") - obstaculos(i)("x"))*(pajaro("x") - obstaculos(i)("x"))) < 900)
-     y (((pajaro("y") - obstaculos(i)("y"))*(pajaro("y") - obstaculos(i)("y"))) > 16000) hacer
+      y (((pajaro("y") - obstaculos(i)("y"))*(pajaro("y") - obstaculos(i)("y"))) > 16000) hacer
       reiniciar <- verdadero
     Fin
     i <- i + 1
@@ -287,7 +330,7 @@ Algoritmo
   si reiniciar hacer
     inicio []
   fin
-Fin
+Fin  
 </textarea>
     <div class="v divisor"></div>
     <div class="compilation">

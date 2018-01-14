@@ -1,6 +1,7 @@
 Configuracion
   importar "bibliotecasZL/color.zl"
   importar "bibliotecasZL/punto.zl"
+  importar "bibliotecasZL/error.zl"
   nombreModulo <- "canvas"
 Fin
 
@@ -282,25 +283,29 @@ Fin
 Subrutina Primitiva Asincrona CargarImagen
 Datos
   url es Texto de Entrada
+  error es Error de Salida
 Algoritmo
   /*
-  return new Promise((res, rej) => {
+  await new Promise((res, rej) => {
     $self.$miembros.$cacheDeImagenes = $self.$miembros.$cacheDeImagenes || {};
     var img = new Image();
     img.onload = function() {
       $self.$miembros.$cacheDeImagenes[$entrada.url] = img;
-      res({});
+      $salida.error.inicio({mensaje: ""});          
+      res();
     }
     img.onerror = function(e) {
-      $exterior.$error({
-        error: 'E_EJECUCION_IMAGEN_NO_CARGA',
-        informacion: {
-          url: $entrada.url,
-          motivo: e,
-          adicional: "No se pudo cargar la imagen."
-        }
-      });
-      rej(e);
+      // $exterior.$error({
+      //   error: 'E_EJECUCION_IMAGEN_NO_CARGA',
+      //   informacion: {
+      //     url: $entrada.url,
+      //     motivo: e,
+      //     adicional: "No se pudo cargar la imagen."
+      //   }
+      // });
+      // rej(e);
+      $salida.error.inicio({mensaje: "No se pudo cargar la imagen '"+$entrada.url+"'"});      
+      res();
     }
     img.src = $entrada.url;
   })

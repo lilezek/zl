@@ -1,0 +1,41 @@
+Configuracion
+  nombremodulo <- "error"
+Fin
+
+Subrutina Primitiva Inicio
+Datos
+  m es Texto Global
+  mensaje es Texto de Entrada
+Algoritmo
+  /*
+  this.$miembros.m = $entrada.mensaje || "";
+  */
+Fin
+
+Subrutina Mensaje
+Datos
+  m es Texto Global
+  mensaje es Texto de Salida
+Algoritmo
+  mensaje <- m
+Fin
+
+Subrutina Conversora Primitiva EsError 
+Datos
+  e es EsteModulo de Entrada
+  esError es Booleano de Salida
+Algoritmo
+  /*
+  $salida.eserror = $entrada.e.$miembros.m !== "";
+  */
+Fin
+
+Subrutina Conversora Primitiva ErrorComoTexto
+Datos
+  e es EsteModulo de Entrada
+  t es Texto de Salida
+Algoritmo
+  /*
+  $salida.t = $entrada.e.$miembros.m
+  */
+Fin
