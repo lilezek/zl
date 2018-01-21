@@ -11,6 +11,10 @@
 Amzi, \emph{Definite clause grammar},
   \url{http://www.amzi.com/manuals/amzi/pro/ref_dcg.htm}, 2016.
 
+\bibitem{stackoverflow-asyncawait}
+Josh Beam, \emph{Javascript promises vs async/await},
+  \url{https://stackoverflow.com/a/34401662/2832398}, 2015.
+
 \bibitem{memorysafety}
 Emery~D. Berger, \emph{Memory safety},
   \url{https://people.cs.umass.edu/~emery/pubs/fp014-berger.pdf}, 2014.
@@ -43,6 +47,10 @@ Lars~Marius Garshol, \emph{Bnf and ebnf: What are they and how do they work?},
 GNU, \emph{Bison - gnu project}, \url{https://www.gnu.org/software/bison/},
   2014.
 
+\bibitem{golang-error}
+GoLang, \emph{Error handling and go},
+  \url{https://blog.golang.org/error-handling-and-go}, 2011.
+
 \bibitem{codemirrorsyntaxhighlight}
 Ingo, \emph{Codemirror (source) syntax highlighting},
   \url{http://ckeditor.com/addon/codemirror}, 2015.
@@ -64,6 +72,11 @@ David Majda, \emph{Peg.js}, \url{http://pegjs.org}, 2010-2016.
 MDN, \emph{Javascript - eval},
   \url{https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval},
   2016.
+
+\bibitem{javascript-promise}
+\bysame, \emph{Promise docs and examples},
+  \url{https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise},
+  2018.
 
 \bibitem{mundoingles}
 El~mundo, \emph{El 63\% de los alumnos españoles no comprende el inglés al
@@ -104,6 +117,10 @@ J.~Hegedus \& Hugo M.G.~@ StackOverflow, \emph{What is callback hell and how
 Joe \& T. Jameson~@ StackOverflow, \emph{Why is node.js asynchronous?},
   \url{http://stackoverflow.com/questions/17607280/why-is-node-js-asynchronous},
   2013.
+
+\bibitem{ecmascript-asyncawait}
+TC39, \emph{Ecma async/await},
+  \url{https://tc39.github.io/ecmascript-asyncawait/}, 2016.
 
 \bibitem{peg}
 Wikipedia, \emph{A parsing machine for pegs},
