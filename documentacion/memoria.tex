@@ -209,7 +209,7 @@ pyramidVolume [
 	
 	\chapter{Introducción}
 	
-	El objetivo fundamental de este trabajo es conseguir un entorno de desarrollo (o IDE) sencillo para aquellos que se inician en el mundo de la programación tengan una alternativa a las herramientas profesionales que si bien son muy útiles para los ingenieros informáticos también son más complejas de usar. Algunas de las técnicas usadas para simplificar este proceso se basan entre otras de abstraer al usuario del ciclo de compilación y ejecución, autocompletado de código y creación de un lenguaje de programación cercano al lenguaje natural español. 
+	El objetivo fundamental de este trabajo es conseguir un entorno de desarrollo (o IDE) sencillo, para aquellos que se inician en el mundo de la programación. Se quiere ofrecer una alternativa a las herramientas profesionales que, si bien son muy útiles para los ingenieros informáticos, también son más complejas de usar. Algunas de las técnicas usadas para simplificar este proceso se basan entre otras de abstraer al usuario del ciclo de compilación y ejecución, autocompletado de código y creación de un lenguaje de programación cercano al lenguaje natural español. 
 	
 	\vspace{10px}
 	
@@ -374,7 +374,7 @@ pyramidVolume [
 	
 	Khan Academy es una web que ofrece cursos interactivos sobre diversas ramas del conocimiento. A diferencia del resto de los trabajos estudiados, esta web es la única que no se dedica exclusivamente al aprendizaje de la informática y la programación.
 	
-	De entre todas existe una sección para aprender JavaScript. En esta sección se ofrecen distintos tutoriales en los que se va dibujando en un lienzo con unas llamadas sencillas (al estilo de Programming o Descubre). En los tutoriales se va progresando y se va enseñando como dibujar cosas más complejas, introduciendo los distintos elementos de JavaScript (bucles, asignaciones, funciones...) a través de una interfaz que reproduce unos pasos subtitulados al castellano y que interactúa con el editor de código.
+	De entre todas existe una sección para aprender JavaScript. En esta sección se ofrecen distintos tutoriales en los que se va dibujando en un lienzo con unas llamadas sencillas (al estilo de Processing o Descubre). En los tutoriales se va progresando y se va enseñando como dibujar cosas más complejas, introduciendo los distintos elementos de JavaScript (bucles, asignaciones, funciones...) a través de una interfaz que reproduce unos pasos subtitulados al castellano y que interactúa con el editor de código.
 		
 	\vspace{10px}
 	
@@ -384,6 +384,10 @@ pyramidVolume [
 	
 	Acceso: 
 	\href{https://es.khanacademy.org/computing/hour-of-code/hour-of-code-tutorial/p/intro-to-drawing}{Intro to Drawing}
+	
+	\section{Analizadores sintácticos}
+	
+	A la hora de escribir un compilador es importante elegir el analizador sintáctico. Éste se usará para realizar el primer paso en el proceso de compilación, generando alguna estructura de datos (árbol abstracto de sintaxis \cite{ast}). 
 	
 	\subsection{Analizador ascendente: Jison}
 	
@@ -414,8 +418,8 @@ pyramidVolume [
 	
 	\subsection{Editor de texto HTML5 y Javascript}
 	
-	Lo primero que he encontrado ha sido el editor Codemirror. Es el mismo editor que usa el proyecto Descubre de la facultad. No me he dedicado en buscar otros editores porque este tiene
-	todo lo que necesito para poder preparar el entorno, y además su API está muy bien documentada\cite{codemirrorapi}.
+	Lo primero que he encontrado ha sido el editor Codemirror. Es el mismo editor que usa el proyecto Descubre de la facultad. Este proyecto se utiliza en las herramientas de desarrollo de Chrome y Firefox entre otras, y tiene
+	todo lo que necesito para poder preparar el entorno. Además su API está muy bien documentada\cite{codemirrorapi}.
 	
 	Acceso:
 	\href{http://codemirror.net/}{Página web oficial de codemirror.}
@@ -458,7 +462,34 @@ pyramidVolume [
 	
 	\section{Técnicas de compilación y ejecución en JavaScript}
 	
-	Como mejora adicional al trabajo original, se ha hecho un estudio del estado del arte de los entorno de ejecución de JavaScript en 2017. También se han estudiado otros lenguajes con propiedades similares para utilizar parte de sus técnicas.
+	En esta sección se comentan dos técnicas que serán interesantes y útiles para el proyecto, en concreto para hacer síncrono\footnote{En el sentido de que un código que es asíncrono va a bloquear, pero sin que la ejecución congele esperando la respuesta.} en Zl que el código es asíncrono, y para tratar los errores en un lenguaje que carece de cláusulas try-catch como Java o Javascript.
+	
+		\vspace{10px}
+	
+	El control de errores es necesario para poder notificar al programador que una llamada que puede fallar ha fallado o ha ido bien. 
+	
+		\vspace{10px}
+	
+	Un ejemplo sería un conversor de texto a número. Convertir una cadena de texto arbitraria a número podría fallar si su contenido no es un número, o el número representado en la cadena es demasiado grande para caber en la estructura numérica utilizada (64 bits complemento a dos, y 64 bits IEEE754 para Javascript). 
+	
+		\vspace{10px}
+	
+	Por otro lado, para simplificar la ejecución a los usuarios de Zl, se van a utilizar técnicas que convierten código asíncrono en código síncrono. La ventaja principal en presentar en Zl que todo el código es síncrono es básicamente evitar la necesidad de controlar eventos. 
+	
+		\vspace{10px}
+	
+	Por ejemplo, si un usuario quiere cargar una imagen en JavaScript, lo correcto sería hacer la petición para obtener la imagen, y controlar los eventos `onload' y `onerror'. En su lugar, en Zl se presenta la siguiente opción:
+	
+		\vspace{10px}
+	
+\begin{BVerbatim}
+cargarImagen [
+	url <- "http://dis.um.es/~ginesgm/images/fondo2.png"
+	error -> error
+]
+\end{BVerbatim}
+
+	Ésta subrutina hace uso de ambas técnicas (control de errores y ejecución asíncrona), y la definición de la subrutina en JavaScript se puede encontrar en el \hyperref[app:e]{apéndice E}.
 	
 	\subsection{Async/Await}
 	
@@ -505,11 +536,11 @@ fin
 	
 	\vspace{10px}
 	
-	El primer objetivo pasa por definir el lenguaje. Este objetivo es básicamente encontrar una forma de definir el lenguaje, en el cual me acabé decantando por la forma de Backus-Naur\cite{bnf} con alguna modificación, aunque también estudié la posibilidad de usar DCG\cite{dcg} pero la descarté por parecer más compleja de entender. 
+	El primer objetivo pasa por definir formalmente las reglas sintácticas del lenguaje. Básicamente: encontrar una forma de definir el lenguaje, usando alguna notación para definición de gramáticas. Al final se acaba decantando por la forma de Backus-Naur\cite{bnf} con alguna modificación, aunque también se estudió la posibilidad de usar DCG\cite{dcg} pero fue descartada por parecer más compleja de entender. 
 	
 	\vspace{10px}
 
-	El segundo objetivo es escribir el compilador, pero para ello es necesario un entorno para poder probar el el propio compilador, así que como objetivo intermedio se hizo el editor. Se escogió Codemirror porque es sencillo, tiene buena documentación, ofrece un plugin para colorear texto\cite{codemirrorsyntaxhighlight} y otro para autocompletar\cite{codemirrorautocomplete}. 
+	El segundo objetivo es escribir el compilador, pero para ello es necesario un entorno para poder probar el el propio compilador, así que como objetivo intermedio se ha ido escribiendo un editor. Se escogió Codemirror como base porque es sencillo, tiene buena documentación, ofrece un plugin para colorear texto\cite{codemirrorsyntaxhighlight} y otro para autocompletar\cite{codemirrorautocomplete}. 
 	
 	\vspace{10px}
 	
@@ -573,7 +604,7 @@ x ::=
 	
 	\vspace{10px}
 	
-	La primera parte del apéndice define formalmente que un número puede ser un entero o decimal, qué es un \textbf{módulo}, qué es una \textbf{configuración} y qué es una \textbf{subrutina}. Se obvia la definición de número pues es muy sencilla (define las constantes numéricas para el lenguaje), y nos centramos en la definición de módulo: la estructura sintáctica más grande. Cualquier código que sea compilable ZL tiene que seguir la definición de módulo. Así pues, un módulo es la unidad mínima compilable.   
+	La primera parte del apéndice define formalmente que un número puede ser un entero o decimal, qué es un \textbf{módulo}, qué es una \textbf{configuración} y qué es una \textbf{subrutina}. Las partes más sencillas del lenguaje (qué es un número, qué es una cadena) están escritas como expresiones regulares, así que en su lugar se va a detallar las definiciones más complejas. En concreto, la definición más interesante es la de módulo: la estructura sintáctica más grande. Cualquier código que sea compilable ZL tiene que seguir la definición de módulo. Es decir, un módulo es la unidad mínima compilable.   
 	
 	\vspace{10px}
 	
@@ -879,7 +910,7 @@ a.regla("nombre", function() {
 
 	\subsection{Tratamiento de la recursividad izquierda}
 	
-	Por ser este analizador recursivo y descendente ninguna regla puede contener recursividad por la izquierda. La recursividad es el problema que desemboca en una recursión infinita cuándo una regla se contiene a sí misma en su definición como el primer elemento a reducir (y por ello está en la izquierda). Si se intentase avanzar tal regla, para poder avanzar debería reducirse a si misma de nuevo, cayendo en un bucle sin fin.
+	Por ser este analizador recursivo y descendente ninguna regla puede contener recursividad por la izquierda. Tener alguna regla con recursividad por el lado izquierdo desembocaría en una recursión infinita a la hora de analizar. Cuándo una regla se contiene a sí misma en su definición como el primer elemento a reducir (y por ello está en la izquierda), al intentar avanzar tal regla, debería reducirse a si misma de nuevo, cayendo en un bucle sin fin.
 	
 	Supongamos como regla recursiva por la izquierda la concatenación de nombres separados por punto que se pueden realizar en lenguajes orientados a objetos como Java (System.out.println por ejemplo), y para hacerlo un poco más complejo se permiten números también. Si se quisiera analizar el nombre con la siguiente regla:
 	
@@ -1103,7 +1134,7 @@ a.regla('exp', function() {
 	
 	El análisis léxico (y el sintáctico) se hace con el analizador que, a diferencia de un esquema (por ejemplo) Flex + Bison, no hay dos componentes distintos. No hay un componente que primero rompa en tokens de distintas clases el texto, sino que son las reglas sintácticas dicen que tokens esperan ver, al avanzar usando la cola. Es decir, si al llamar a un método de avance del analizador en la cola hay un terminal, se intentará entonces analizar con una expresión regular ese terminal en la posición actual del texto. 
 	
-	Los tokens y los símbolos del lenguaje se definen en el analizador mediante los métodos simbolo y token. Se puede ver cuales son los símbolos y los tokens de ZL al principio de \textbf{zlsintaxis.js}. 
+	Los tokens y los símbolos del lenguaje se definen en el analizador mediante los métodos simbolo y token. Se puede ver cuales son los símbolos y los tokens de ZL al principio de \textbf{zlsintaxis.js}. Éstos tienen una expresión regular asociada, que debe coincidir cuando se intente avanzar un token/un símbolo.
 	
 	\vspace{10px}
 	\noindent
@@ -1115,7 +1146,7 @@ a.regla('exp', function() {
 
 	\vspace{10px}
 	
-	Todas las expresiones regulares tienen el modificador para encontrar la palabra al principio, el modificador de insensibilidad (mayúsculas y minúsculas son equivalentes) y tildes donde sea (admitir la misma palabra con tilde o sin tilde). Por ejemplo: 
+	Todas las expresiones regulares que definen los tokens y los símbolos tienen el modificador para encontrar la palabra al principio, el modificador de insensibilidad (mayúsculas y minúsculas son equivalentes) y tildes donde sea (admitir la misma palabra con tilde o sin tilde). Por ejemplo, para encontrar la palabra `relación', con o sin tilde, en mayúsculas o en minúsculas, se usa la siguiente expresión regular: 
 	
 	\begin{BVerbatim}
 /^(relacion|relación)/i
@@ -1507,7 +1538,7 @@ xhttp.send();
 	\includegraphics[width=0.45\linewidth]{asincrono3}
 	\includegraphics[width=0.45\linewidth]{asincrono2}
 
-	\caption[Diferencias entre código asíncrono y síncrono.]{Arriba, código ZL de ejemplo. A izquierda, código Javascript autogenerado donde stub es una llamada síncrona. El código de ZL se ejecuta en el mismo orden que el código en Javascript. A la derecha, stub pasa a ser una llamada asíncrona. Hay que romper el código en varias fases para poder pasar los callbacks. En la imagen de la derecha, en rojo se ven los bloques de antes y después de la llamada asíncrona, y entre ambos la llamada a stub. En verde, las llamadas a los callbacks.}
+	\caption[Diferencias entre código asíncrono y síncrono.]{Arriba, código ZL de ejemplo. A izquierda, código Javascript autogenerado donde stub es una llamada síncrona. El código de ZL se ejecuta en el mismo orden que el código en Javascript. A la derecha, stub pasa a ser una llamada asíncrona. En rojo se marca la palabra reservada `await' utilizada para esperar a que finalice la ejecución de la llamada asíncrona.}
 \label{fig:asincrono}
 \end{figure}
 
@@ -1570,7 +1601,7 @@ xhttp.send();
 	
 	\vspace{10px}
 	
-	En un principio planteé el uso del algoritmo `subsecuencia común más larga'\cite{lcs}, que localiza la subsecuencia (subconjunto de caracteres en un texto respetando el orden) más larga entre un texto y otro. Esta es la solución que usa la utilidad `diff'\cite{diff} para evaluar las diferencias. Sin embargo, después varias pruebas, opté por usar otro algoritmo: el algoritmo de distancias de edición\cite{levensthein}, que penaliza en menor medida los textos desordenados.
+	En un principio planteé el uso del algoritmo `subsecuencia común más larga'\cite{lcs}, que localiza la subsecuencia (subconjunto de caracteres en un texto respetando el orden) más larga entre un texto y otro. Esta es la solución que usa la utilidad `diff'\cite{diff} para evaluar las diferencias. Sin embargo, después varias pruebas, opté por usar otro algoritmo: el algoritmo de distancias de edición de Levensthein\cite{levensthein}, que penaliza en menor medida los textos desordenados.
 	
 	\vspace{10px}
 	
@@ -1686,7 +1717,7 @@ En la llamada a <span class="subrutina">cubo</span> el dato
 	
 	El entorno con el lenguaje ofrece funcionalidades similares a las que se pueden encontrar en el trabajo Descubre, que antes de que se plantease el proyecto fue el punto de inspiración. Con ZL se puede dibujar en un lienzo con llamadas imperativas así como escribir programas de entrada y salida de texto. 
 	
-	A todas esas funcionalidades se han añadido otras que parecían útiles como la capacidad de parar el código en un línea concreta. Poder parar la ejecución puede facilitar la comprensión del flujo de ejecución del código, que es una parte fundamental del pensamiento algorí 
+	A todas esas funcionalidades se han añadido otras que parecían útiles como la capacidad de parar el código en un línea concreta. Poder parar la ejecución puede facilitar la comprensión del flujo de ejecución del código, que es una parte fundamental del pensamiento algorítmico. 
 	
 	Para que el proyecto se pueda mejorar y se pueda continuar se ha puesto especial esfuerzo en que se pueda añadir funcionalidades al proyecto en forma de código nativo embebido en el código ZL. Así cualquier docente que encuentre útil esta herramienta podrá usarla para sus propios propósitos. 
 	
@@ -1722,11 +1753,43 @@ En la llamada a <span class="subrutina">cubo</span> el dato
 	\chapter{Khan Academy, ejemplo de error al programar} \label{app:d}
 	
 	\begin{center}
-	\includegraphics[width=0.45\linewidth]{khanerror}
-	\includegraphics[width=0.45\linewidth]{khanerror2}
-	
-	A izquierda, cometo el error de escribir \textit{ellipse} sin argumentos, y a la derecha se puede ver como se usa un lenguaje poco formal (Oh noes! vs Error: signature of function...), acerca del error que he cometido.
+		\includegraphics[width=0.45\linewidth]{khanerror}
+		\includegraphics[width=0.45\linewidth]{khanerror2}
+		
+		A izquierda, cometo el error de escribir \textit{ellipse} sin argumentos, y a la derecha se puede ver como se usa un lenguaje poco formal (Oh noes! vs Error: signature of function...), acerca del error que he cometido.
 	\end{center}
+	
+	\chapter{Ejemplo de conversión asíncrona, y de gestión de errores} \label{app:e}
+
+\begin{BVerbatim}
+Subrutina Primitiva Asincrona CargarImagen
+Datos
+url es Texto de Entrada
+error es Error de Salida
+Algoritmo
+/*
+await new Promise((resolver) => {
+  $self.$miembros.$cacheDeImagenes = $self.$miembros.$cacheDeImagenes || {};
+  var img = new Image();
+  img.onload = function() {
+    $self.$miembros.$cacheDeImagenes[$entrada.url] = img;
+    $salida.error.inicio({mensaje: ""});          
+    resolver();
+  }
+  img.onerror = function(e) {
+    $salida.error.inicio({
+      mensaje: "No se pudo cargar la imagen '"+$entrada.url+"'"
+    });      
+    resolver();
+  }
+  img.src = $entrada.url;
+})
+*/
+Fin
+\end{BVerbatim}
+\begin{center}
+	En este ejemplo se define la subrutina como Primitiva y Asíncrona. Al ser primitiva, el código que hay dentro debe ser JavaScript en lugar de Zl (no se compilará, sino que se copiará tal cual en el código compilado objetivo). Por otro lado, al ser asíncrona, se permite el uso de la sintaxis de async/await. En este caso concreto, se hacer `await' sobre una Promesa que carga una imagen, y que se resuelve cuando carga (evento onload) o cuando falla (onerror). Si falla, se escribe la estructura de datos `Error de Salida' poniendo un mensaje de error.
+\end{center}
 	
 
 \end{document}

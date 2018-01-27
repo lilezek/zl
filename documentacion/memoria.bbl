@@ -27,10 +27,6 @@ Codemirror, \emph{Codemirror: Autocomplete demo},
 \bysame, \emph{Codemirror manual},
   \url{https://codemirror.net/doc/manual.html#overview}, 2016.
 
-\bibitem{async}
-Caolan con~multiples autores., \emph{Async documentation},
-  \url{http://caolan.github.io/async/}, 2016.
-
 \bibitem{levensthein}
 Desconocido, \emph{Distancia de edición}, \url{http://levenshtein.net/}, 2000?
 
@@ -63,6 +59,11 @@ Securing Java, \emph{Type safety},
 Surajit Chaudhuri \&~Raghav Kaushik, \emph{Extending autocompletion to tolerate
   errors},
   \url{http://www.microsoft.com/en-us/research/publication/extending-autocompletion-to-tolerate-errors/},
+  2016.
+
+\bibitem{ast}
+Ivan Kochurkin, \emph{Abstract sintax tree},
+  \url{http://blog.ptsecurity.com/2016/07/tree-structures-processing-and-unified.html},
   2016.
 
 \bibitem{pegjs}

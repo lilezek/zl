@@ -9,63 +9,63 @@ Warning--entry type for "ecmascript-asyncawait" isn't style-file defined
 --line 9 of file biblio.bib
 Warning--entry type for "stackoverflow-asyncawait" isn't style-file defined
 --line 17 of file biblio.bib
+Warning--entry type for "ast" isn't style-file defined
+--line 25 of file biblio.bib
 Warning--entry type for "golang-error" isn't style-file defined
---line 26 of file biblio.bib
-Warning--entry type for "javascript-promise" isn't style-file defined
 --line 34 of file biblio.bib
-Warning--entry type for "javadoc" isn't style-file defined
+Warning--entry type for "javascript-promise" isn't style-file defined
 --line 42 of file biblio.bib
+Warning--entry type for "javadoc" isn't style-file defined
+--line 50 of file biblio.bib
 Warning--entry type for "bison" isn't style-file defined
---line 58 of file biblio.bib
+--line 66 of file biblio.bib
 Warning--entry type for "acmtdop" isn't style-file defined
---line 67 of file biblio.bib
-Warning--entry type for "codemirrorapi" isn't style-file defined
 --line 75 of file biblio.bib
+Warning--entry type for "codemirrorapi" isn't style-file defined
+--line 83 of file biblio.bib
 Warning--entry type for "typesafety" isn't style-file defined
---line 84 of file biblio.bib
-Warning--entry type for "memorysafety" isn't style-file defined
 --line 92 of file biblio.bib
-Warning--entry type for "statictypecheck" isn't style-file defined
+Warning--entry type for "memorysafety" isn't style-file defined
 --line 100 of file biblio.bib
-Warning--entry type for "pegjs" isn't style-file defined
+Warning--entry type for "statictypecheck" isn't style-file defined
 --line 108 of file biblio.bib
+Warning--entry type for "pegjs" isn't style-file defined
+--line 116 of file biblio.bib
 Warning--entry type for "mundoingles" isn't style-file defined
---line 124 of file biblio.bib
-Warning--entry type for "conflictoll3" isn't style-file defined
 --line 132 of file biblio.bib
-Warning--entry type for "dcg" isn't style-file defined
+Warning--entry type for "conflictoll3" isn't style-file defined
 --line 140 of file biblio.bib
-Warning--entry type for "bnf" isn't style-file defined
+Warning--entry type for "dcg" isn't style-file defined
 --line 148 of file biblio.bib
-Warning--entry type for "codemirrorsyntaxhighlight" isn't style-file defined
+Warning--entry type for "bnf" isn't style-file defined
 --line 156 of file biblio.bib
-Warning--entry type for "codemirrorautocomplete" isn't style-file defined
+Warning--entry type for "codemirrorsyntaxhighlight" isn't style-file defined
 --line 164 of file biblio.bib
+Warning--entry type for "codemirrorautocomplete" isn't style-file defined
+--line 172 of file biblio.bib
 Warning--entry type for "levensthein" isn't style-file defined
---line 180 of file biblio.bib
-Warning--entry type for "lcs" isn't style-file defined
 --line 188 of file biblio.bib
-Warning--entry type for "javascriptasync" isn't style-file defined
+Warning--entry type for "lcs" isn't style-file defined
 --line 196 of file biblio.bib
-Warning--entry type for "breakpoint" isn't style-file defined
+Warning--entry type for "javascriptasync" isn't style-file defined
 --line 204 of file biblio.bib
-Warning--entry type for "diff" isn't style-file defined
+Warning--entry type for "breakpoint" isn't style-file defined
 --line 212 of file biblio.bib
-Warning--entry type for "callbackhell" isn't style-file defined
+Warning--entry type for "diff" isn't style-file defined
 --line 220 of file biblio.bib
-Warning--entry type for "async" isn't style-file defined
+Warning--entry type for "callbackhell" isn't style-file defined
 --line 228 of file biblio.bib
 Warning--entry type for "jnsigwt" isn't style-file defined
---line 236 of file biblio.bib
-Warning--entry type for "peg" isn't style-file defined
 --line 244 of file biblio.bib
-Warning--entry type for "syntaxhighlight" isn't style-file defined
+Warning--entry type for "peg" isn't style-file defined
 --line 252 of file biblio.bib
-Warning--entry type for "microsoftresearchautocomplete" isn't style-file defined
+Warning--entry type for "syntaxhighlight" isn't style-file defined
 --line 260 of file biblio.bib
+Warning--entry type for "microsoftresearchautocomplete" isn't style-file defined
+--line 268 of file biblio.bib
 You've used 30 entries,
             2213 wiz_defined-function locations,
-            627 strings with 7450 characters,
+            627 strings with 7482 characters,
 and the built_in function-call counts, 6226 in all, are:
 = -- 504
 > -- 192
