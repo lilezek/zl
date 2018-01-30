@@ -462,23 +462,13 @@ pyramidVolume [
 	
 	\section{Técnicas de compilación y ejecución en JavaScript}
 	
-	En esta sección se comentan dos técnicas que serán interesantes y útiles para el proyecto, en concreto para hacer síncrono\footnote{En el sentido de que un código que es asíncrono va a bloquear, pero sin que la ejecución congele esperando la respuesta.} en Zl que el código es asíncrono, y para tratar los errores en un lenguaje que carece de cláusulas try-catch como Java o Javascript.
+	En esta sección se comentan dos técnicas que serán interesantes y útiles para el proyecto. El código Zl va a transformarse a código en JavaScript, que es un lenguaje cuyo entorno de ejecución está fuertemente basado en un sistema por eventos. Sin embargo, Zl no lo es. Para trasformar el código de Zl con un único hilo de ejecución a JavaScript con un sistema basado en eventos se va a utilizar una utilidad que se introdujo en 2017 en JavaScript, comúnmente llamada `async/await'.
 	
+	Por otro lado, en JavaScript se controlan los errores y las excepciones usando la sintaxis `try-catch', sin embargo, en Zl no existe tal sintaxis. Por lo tanto, la forma en la que se le comunica al programador de que ha sucedido un error va a ser distinta, y se se inspira en la forma que tiene GoLang (un lenguaje de programación donde las funciones pueden devolver más de un valor) para controlar los errores.
+
 		\vspace{10px}
 	
-	El control de errores es necesario para poder notificar al programador que una llamada que puede fallar ha fallado o ha ido bien. 
-	
-		\vspace{10px}
-	
-	Un ejemplo sería un conversor de texto a número. Convertir una cadena de texto arbitraria a número podría fallar si su contenido no es un número, o el número representado en la cadena es demasiado grande para caber en la estructura numérica utilizada (64 bits complemento a dos, y 64 bits IEEE754 para Javascript). 
-	
-		\vspace{10px}
-	
-	Por otro lado, para simplificar la ejecución a los usuarios de Zl, se van a utilizar técnicas que convierten código asíncrono en código síncrono. La ventaja principal en presentar en Zl que todo el código es síncrono es básicamente evitar la necesidad de controlar eventos. 
-	
-		\vspace{10px}
-	
-	Por ejemplo, si un usuario quiere cargar una imagen en JavaScript, lo correcto sería hacer la petición para obtener la imagen, y controlar los eventos `onload' y `onerror'. En su lugar, en Zl se presenta la siguiente opción:
+	Un ejemplo de subrutina en Zl que, al compilarse a JavaScript, se controla por eventos y además puede fallar (y habría que controlar el error en caso de fallo) es la siguiente:
 	
 		\vspace{10px}
 	
@@ -489,15 +479,33 @@ cargarImagen [
 ]
 \end{BVerbatim}
 
+	\vspace{10px}
+		
+	Por ejemplo, si un usuario quiere cargar una imagen en JavaScript, lo correcto sería hacer la petición para obtener la imagen, y controlar los eventos `onload' y `onerror'. En Zl la llamada se realiza, \textbf{bloqueando} la ejecución del código en este punto hasta que, internamente, uno de los dos eventos acaba (onload u onerror). 
+
+	\vspace{10px}
+
 	Ésta subrutina hace uso de ambas técnicas (control de errores y ejecución asíncrona), y la definición de la subrutina en JavaScript se puede encontrar en el \hyperref[app:e]{apéndice E}.
 	
 	\subsection{Async/Await}
 	
 	Recientemente se ha adoptado una nueva sintaxis como parte del ECMAScript \cite{ecmascript-asyncawait}. Se suele referir a esta nueva parte del lenguaje de JavaScript como `async/await' y permite detener la ejecución del flujo de código. 
 	
-	Por un lado, existen las funciones asíncronas. Éstas son aquellas que, o son declaradas con la palabra reservada `async', o devuelven un objeto `Promise' \cite{javascript-promise}. 
+	\vspace{10px}
 	
-	Por otro lado, las funciones que son asíncronas se pueden llamar usando la palabra reservada `await' siempre que se esté dentro de una función asíncrona también. 
+	Por un lado, se define el objeto `Promise' \cite{javascript-promise}. Este objeto ofrece al programador que lo crea dos funciones: \textbf{resolve} y \textbf{reject}. 
+	
+	\vspace{10px}
+	
+	Cuando un evento asíncrono ha salido bien, el programador podrá llamar a `resolve' indicando que la promesa ha sido \textbf{resuelta} correctamente. Si por el contrario, ha habido un error durante el evento, o el evento ha fallado, el programador debe llamar a `reject' para indicar que la promesa ha sido \textbf{rechazada}. 
+	
+	\vspace{10px}
+	
+	Por otro lado, se definen las funciones asíncronas. Éstas son aquellas que, o son declaradas con la palabra reservada `async', y devuelven un objeto `Promise'. `async' es una palabra reservada que se coloca delante de la palabra `function' en JavaScript, indicando que la función devolverá una promesa.
+	
+	\vspace{10px}
+	
+	Por otro lado, las funciones que son asíncronas se pueden llamar usando la palabra reservada `await' siempre que se esté dentro de una función asíncrona también. Cuando son llamadas de esta forma, el código se bloquea hasta que la promesa se \textbf{resuelve} o se \textbf{rechaza}.
 	
 	\vspace{10px}
 	
@@ -1787,9 +1795,10 @@ await new Promise((resolver) => {
 */
 Fin
 \end{BVerbatim}
-\begin{center}
-	En este ejemplo se define la subrutina como Primitiva y Asíncrona. Al ser primitiva, el código que hay dentro debe ser JavaScript en lugar de Zl (no se compilará, sino que se copiará tal cual en el código compilado objetivo). Por otro lado, al ser asíncrona, se permite el uso de la sintaxis de async/await. En este caso concreto, se hacer `await' sobre una Promesa que carga una imagen, y que se resuelve cuando carga (evento onload) o cuando falla (onerror). Si falla, se escribe la estructura de datos `Error de Salida' poniendo un mensaje de error.
-\end{center}
+
+	\vspace{10px}
+
+	En este ejemplo se define la subrutina como Primitiva y Asíncrona. Al ser primitiva, el código que hay dentro debe ser JavaScript en lugar de Zl (no se compilará, sino que se copiará tal cual en el código compilado objetivo). Por otro lado, al ser asíncrona, se permite el uso de la sintaxis de async/await. Al compilarse a JavaScript, la función compilada será declarada con la palabra reservada `async'. En este caso concreto, se usa `await' sobre una Promesa que carga una imagen, y que se resuelve cuando carga (evento onload) o cuando falla (onerror). Si falla, se escribe la estructura de datos `Error de Salida' poniendo un mensaje de error.
 	
 
 \end{document}
