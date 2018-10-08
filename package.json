@@ -26,9 +26,9 @@
     "chai": "3.4.1",
     "circular-json": "^0.3.0",
     "electron-prebuilt": "^1.2.1",
-    "http-server": "^0.9.0",
+    "http-server": "^0.11.1",
     "js-beautify": "1.5.10",
-    "mocha": "2.3.4",
+    "mocha": "^5.2.0",
     "uglify-js": "2.6.1"
   }
 }
